@@ -66,8 +66,26 @@ jobs:
             echo "=== Esperando limpieza completa ==="
             sleep 3
             
-            echo "=== Reconstruyendo imágenes ==="
-            $COMPOSE_CMD -p "$PROJECT_NAME" build --no-cache
+            echo "=== Reconstruyendo imágenes (con reintentos) ==="
+            MAX_RETRIES=3
+            ATTEMPT=1
+            until [ "$ATTEMPT" -gt "$MAX_RETRIES" ]
+            do
+              echo "Intento de build $ATTEMPT/$MAX_RETRIES"
+              if $COMPOSE_CMD -p "$PROJECT_NAME" build --pull; then
+                echo "Build completado correctamente"
+                break
+              fi
+
+              if [ "$ATTEMPT" -eq "$MAX_RETRIES" ]; then
+                echo "Build falló después de $MAX_RETRIES intentos"
+                exit 1
+              fi
+
+              echo "Build falló (posible error transitorio de red). Reintentando en 20 segundos..."
+              ATTEMPT=$((ATTEMPT + 1))
+              sleep 20
+            done
             
             echo "=== Iniciando servicios ==="
             $COMPOSE_CMD -p "$PROJECT_NAME" up -d
