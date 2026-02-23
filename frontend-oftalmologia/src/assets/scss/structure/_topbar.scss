@@ -1,0 +1,215 @@
+//
+// topbar.scss
+//
+
+/* ==================
+Topbar CSS
+===================== */
+
+.app-topbar {
+  position: sticky;
+  top: 15px;
+  z-index: 1000;
+  box-shadow: var(--#{$prefix}box-shadow);
+  background: var(--#{$prefix}topbar-bg);
+  min-height: $topbar-height;
+  margin-left: calc($sidenav-width + 35px);
+  margin-right: 15px;
+  transition: $transition-base;
+  border-bottom: $card-border-width solid $card-border-color;
+  padding: 0 calc($grid-gutter-width * 0.5);
+  border-radius: 30px;
+
+  .topbar-menu {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+
+    .topbar-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: $topbar-height;
+
+      .topbar-link {
+        z-index: 1;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--#{$prefix}topbar-item-color);
+
+        &:hover,
+        &:active,
+        &:focus {
+          color: var(--#{$prefix}topbar-item-hover-color);
+        }
+      }
+    }
+  }
+
+  ul {
+    list-style-type: none;
+    margin-bottom: 0;
+  }
+
+  .logo {
+    display: none;
+  }
+}
+
+.sidenav-toggle-button {
+  display: flex;
+  position: relative;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  color: var(--#{$prefix}topbar-item-color);
+}
+
+// Topbar light/Dark Mode icon
+html[data-bs-theme='dark'] {
+  #light-dark-mode {
+    .ti-moon {
+      &::before {
+        content: '\eb30';
+      }
+    }
+  }
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-width: 0;
+  border-style: none;
+  background-color: var(--#{$prefix}topbar-bg);
+  min-height: $topbar-height;
+  transition: none;
+  border-radius: 0 30px 30px 0;
+}
+
+// Topbar Search
+.topbar-search {
+  width: 230px;
+  padding: calc($input-padding-y * 1.25) $input-padding-x;
+  line-height: $input-line-height;
+  background-color: var(--#{$prefix}topbar-search-bg);
+  @include border-radius($input-border-radius, 0);
+}
+
+// Notification
+.notification-item {
+  background-color: var(--#{$prefix}secondary-bg);
+  position: relative;
+  cursor: pointer;
+
+  .notification-item-close {
+    position: absolute;
+    right: 0;
+    display: none;
+    top: 0;
+    bottom: 0;
+    padding: 15px;
+    background-color: #{$dropdown-link-hover-bg};
+  }
+
+  .notification-badge {
+    height: 22px;
+    width: 22px;
+    text-align: center;
+    color: $white;
+    top: -12px;
+    right: -8px;
+    border: 2px solid $card-bg;
+    line-height: 18px;
+    font-size: 11px;
+  }
+
+  &:hover {
+    .notification-item-close {
+      display: block;
+    }
+  }
+}
+
+.animate-ring {
+  animation: tada 1.5s ease infinite;
+}
+
+@keyframes tada {
+  0% {
+    transform: scaleZ(1);
+  }
+
+  10%,
+  20% {
+    transform: scale3d(0.95, 0.95, 0.95) rotate3d(0, 0, 1, -10deg);
+  }
+
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: scaleZ(1) rotate3d(0, 0, 1, 10deg);
+  }
+
+  40%,
+  60%,
+  80% {
+    transform: rotate3d(0, 0, 1, -10deg);
+  }
+
+  to {
+    transform: scaleZ(1);
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .app-topbar {
+    border-radius: 30px;
+    margin-left: 15px;
+    margin-right: 15px;
+    top: 10px;
+
+    .topbar-menu {
+      position: initial;
+    }
+
+    .dropdown {
+      position: static;
+
+      .dropdown-menu {
+        width: 100%;
+        left: 10px !important;
+        right: 10px !important;
+      }
+    }
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .app-topbar {
+    padding: 0 $spacer * 0.5;
+    border-radius: 30px;
+    margin-left: 15px;
+    margin-right: 15px;
+    top: 10px;
+  }
+
+  .logo-topbar {
+    display: block;
+
+    span.logo-lg {
+      display: none;
+    }
+
+    span.logo-sm {
+      display: block;
+    }
+  }
+}

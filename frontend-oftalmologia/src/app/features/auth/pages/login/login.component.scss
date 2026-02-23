@@ -1,0 +1,78 @@
+img {
+  filter: drop-shadow(0 0 40px rgba(2, 2, 2, 0.8));
+  animation: floatAnimation 18s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+  transform-origin: center center;
+  will-change: transform;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+@keyframes floatAnimation {
+  0%,
+  100% {
+    transform: translate3d(0, -5px, 0) rotateX(0) rotateY(0) scale(1);
+    filter: drop-shadow(0 0 40px rgba(var(--app-primary-rgb), 0.8));
+  }
+  20% {
+    transform: translate3d(5px, -15px, 20px) rotateX(2deg) rotateY(-1deg)
+      scale(1.02);
+    filter: drop-shadow(0 0 50px rgba(var(--app-primary-rgb), 0.9));
+  }
+  40% {
+    transform: translate3d(-5px, -25px, 30px) rotateX(3deg) rotateY(2deg)
+      scale(1.03);
+    filter: drop-shadow(0 0 60px rgba(var(--app-primary-rgb), 1));
+  }
+  60% {
+    transform: translate3d(5px, -20px, 20px) rotateX(1deg) rotateY(-2deg)
+      scale(1.02);
+    filter: drop-shadow(0 0 50px rgba(var(--app-primary-rgb), 0.9));
+  }
+  80% {
+    transform: translate3d(-5px, -5px, 10px) rotateX(0deg) rotateY(1deg)
+      scale(1.01);
+    filter: drop-shadow(0 0 45px rgba(var(--app-primary-rgb), 0.85));
+  }
+}
+
+img:hover {
+  transform: translate3d(0, -30px, 40px) scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  img {
+    animation: none;
+    transition: none;
+  }
+}
+
+.floating-image {
+  filter: drop-shadow(0 0 40px rgba(2, 2, 2, 0.8));
+  animation: floatAnimation 18s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+  transform-origin: center center;
+  will-change: transform;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  position: relative;
+  top: 50%;
+  right: 10%;
+  transform: translateY(-60%);
+}
+
+.form-check-input {
+  &:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+  }
+
+  &:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  }
+}
+
+.form-check-label {
+  color: var(--bs-body-color);
+}

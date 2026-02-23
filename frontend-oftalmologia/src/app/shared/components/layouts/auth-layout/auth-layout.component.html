@@ -1,0 +1,52 @@
+<div
+  class="auth-bg d-flex min-vh-100 justify-content-center align-items-center"
+>
+  <div class="row g-0 justify-content-center w-100 m-xxl-5 px-xxl-4 m-3">
+    <div class="col-sm-12 col-md-12 col-lg-10 col-xl-8 col col-xxl-6">
+      <div class="card overflow-hidden text-center h-100 p-xxl-4 p-3 mb-0">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="flex-grow-1 d-flex justify-content-end">
+            <div class="dropdown language-box" ngbDropdown>
+              <button
+                class="btn dropdown-toggle language-selector"
+                type="button"
+                ngbDropdownToggle
+              >
+                <img
+                  [src]="
+                    './assets/images/flags/' +
+                    (languageToFlagMap[translate.currentLang] || 'us') +
+                    '.svg'
+                  "
+                  alt="language-flag"
+                  class="me-2"
+                  height="18"
+                />
+              </button>
+
+              <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
+                @for (item of languageList; track item) {
+                  <button
+                    ngbDropdownItem
+                    (click)="changeLanguage(item)"
+                    class="dropdown-item d-flex align-items-center"
+                  >
+                    <img
+                      [src]="item.flag"
+                      alt="flag"
+                      class="me-2"
+                      height="18"
+                    />
+                    <span>{{ item.name }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>

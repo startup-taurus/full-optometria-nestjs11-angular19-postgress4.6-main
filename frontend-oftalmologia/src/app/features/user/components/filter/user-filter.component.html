@@ -1,0 +1,174 @@
+<div class="user-filter">
+  <form [formGroup]="userFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.GENERAL_SEARCH' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="search"
+          [placeholder]="'USER.FILTER.GENERAL_SEARCH_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.FIRST_NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [placeholder]="'USER.FILTER.FIRST_NAME_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.LAST_NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [placeholder]="'USER.FILTER.LAST_NAME_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.EMAIL' | translate }}
+        </label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [placeholder]="'USER.FILTER.EMAIL_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.DOCUMENT_NUMBER' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="documentNumber"
+          [placeholder]="'USER.FILTER.DOCUMENT_NUMBER_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.MOBILE_PHONE' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="mobilePhone"
+          [placeholder]="'USER.FILTER.MOBILE_PHONE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.ADDRESS' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="address"
+          [placeholder]="'USER.FILTER.ADDRESS_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.ROLE' | translate }}
+        </label>
+        <ng-select
+          formControlName="roleId"
+          [items]="roles$ | async"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="true"
+          [searchable]="true"
+          [placeholder]="'USER.FILTER.ROLE_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option *ngFor="let role of roles$ | async" [value]="role.value">
+            <span class="text-dark fw-medium">{{ role.label }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.IS_ACTIVE' | translate }}
+        </label>
+        <ng-select
+          formControlName="isActive"
+          [items]="active$ | async"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="true"
+          [placeholder]="'USER.FILTER.IS_ACTIVE_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option
+            *ngFor="let option of active$ | async"
+            [value]="option.value"
+          >
+            <span class="text-dark fw-medium">{{ option.label }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'USER.FILTER.IS_LOCKED' | translate }}
+        </label>
+        <ng-select
+          formControlName="isLocked"
+          [items]="blocked$ | async"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="true"
+          [placeholder]="'USER.FILTER.IS_LOCKED_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option
+            *ngFor="let option of blocked$ | async"
+            [value]="option.value"
+          >
+            <span class="text-dark fw-medium">{{ option.label }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="onReset()"
+          >
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-sm"
+            [disabled]="!userFilterForm?.valid"
+          >
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

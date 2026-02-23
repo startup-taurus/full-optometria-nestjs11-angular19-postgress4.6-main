@@ -1,0 +1,102 @@
+.filter-form {
+  padding: 0;
+  height: 100%;
+
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--bs-dark);
+  }
+
+  .form-control,
+  .form-select {
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.15s ease-in-out;
+
+    &:focus {
+      border-color: var(--bs-primary);
+      box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+    }
+
+    &::placeholder {
+      color: #adb5bd;
+    }
+  }
+
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+
+    &.btn-primary {
+      background-color: var(--bs-primary);
+      border-color: var(--bs-primary);
+    }
+
+    &.btn-outline-secondary {
+      border-color: #6c757d;
+      color: #6c757d;
+
+      &:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+      }
+    }
+  }
+
+  .mt-4 {
+    margin-top: 1.5rem !important;
+  }
+
+  .gap-2 {
+    gap: 0.5rem;
+  }
+
+  .flex-fill {
+    flex: 1 1 auto;
+  }
+
+  .d-flex {
+    display: flex;
+  }
+}
+
+// Dark mode support
+[data-bs-theme='dark'] {
+  .filter-form {
+    .form-label {
+      color: var(--bs-gray-300);
+    }
+
+    .form-control,
+    .form-select {
+      background-color: var(--bs-gray-800);
+      border-color: var(--bs-gray-600);
+      color: var(--bs-white);
+
+      &:focus {
+        background-color: var(--bs-gray-800);
+        border-color: var(--bs-primary);
+        color: var(--bs-white);
+      }
+
+      &::placeholder {
+        color: var(--bs-gray-400);
+      }
+    }
+
+    .btn.btn-outline-secondary {
+      color: var(--bs-gray-300);
+      border-color: var(--bs-gray-600);
+
+      &:hover {
+        background-color: var(--bs-gray-700);
+        border-color: var(--bs-gray-500);
+        color: var(--bs-white);
+      }
+    }
+  }
+}

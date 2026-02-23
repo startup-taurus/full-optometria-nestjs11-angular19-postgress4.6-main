@@ -1,0 +1,195 @@
+<div class="sidenav-menu">
+  <!-- Logo principal -->
+  <app-logo></app-logo>
+
+  <!-- Botón para cambiar el tamaño del sidebar -->
+  <button class="button-sm-hover" (click)="changeSidebarSize()">
+    <i class="ti ti-circle align-middle"></i>
+  </button>
+
+  <!-- Botón para cerrar el sidebar (si lo deseas) -->
+  <button class="button-close-fullsidebar">
+    <i class="ti ti-x align-middle"></i>
+  </button>
+
+  <!-- Contenedor con scroll -->
+  <ngx-simplebar data-simplebar>
+    <!-- Mostrar loader mientras se cargan los permisos -->
+    @if (!permissionsService.isLoaded()) {
+      <div class="text-center p-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'SYSTEM.LOADING_PERMISSIONS' | translate }}</span>
+        </div>
+        <div class="mt-2 text-muted small">
+          {{ 'SYSTEM.LOADING_PERMISSIONS' | translate }}
+        </div>
+      </div>
+    } @else {
+      <ul class="side-nav">
+        <!-- Iteramos sobre menuItems filtrados -->
+        @for (item of filteredMenuItems; track item.label; let first = $first) {
+        @if (item.isTitle) {
+          <!-- Si es un título -->
+          <li class="side-nav-title">
+            <!-- Mapeamos a 'SIDEBAR.' + item.label | translate -->
+            {{ 'SIDEBAR.' + item.label | translate }}
+          </li>
+        } @else {
+          <!-- Determinamos si tiene submenú -->
+          @if (hasSubmenu(item)) {
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItemWithChildren;
+                context: {
+                  menu: item,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  subMenuClassNames: 'sub-menu',
+                  itemClassName: 'side-nav-item',
+                }
+              "
+            >
+            </ng-container>
+          } @else {
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItem;
+                context: {
+                  menu: item,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  itemClassName: 'side-nav-item',
+                }
+              "
+            >
+            </ng-container>
+          }
+        }
+      }
+    </ul>
+    }
+
+    <div class="clearfix"></div>
+  </ngx-simplebar>
+</div>
+
+<!-- Template para menús que tienen submenús -->
+<ng-template
+  #MenuItemWithChildren
+  let-menu="menu"
+  let-itemClassName="itemClassName"
+  let-linkClassName="linkClassName"
+  let-subMenuClassNames="subMenuClassNames"
+>
+  <li [class]="itemClassName">
+    <a
+      [class]="linkClassName"
+      [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+      (click)="toggleMenuItem(menu, collapse)"
+      role="button"
+      [attr.aria-expanded]="!menu.collapsed"
+      [attr.aria-controls]="menu.key"
+    >
+      @if (menu.icon) {
+        <span class="menu-icon">
+          <i class="ti {{ menu.icon }}"></i>
+        </span>
+      }
+      <!-- Aquí sustituimos el label por la clave de traducción -->
+      <span class="menu-text">
+        {{ 'SIDEBAR.' + menu.label | translate }}
+      </span>
+      <span class="menu-arrow"></span>
+    </a>
+
+    <!-- Contenedor colapsable para submenús -->
+    <div
+      #collapse="ngbCollapse"
+      [(ngbCollapse)]="menu.collapsed"
+      class="collapse"
+      id="sidebarDashboards"
+    >
+      <ul [class]="subMenuClassNames">
+        @for (child of menu.children; track child.label) {
+          @if (hasSubmenu(child)) {
+            <!-- Render recursivo si hay más submenús -->
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItemWithChildren;
+                context: {
+                  menu: child,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  itemClassName: 'side-nav-item',
+                  subMenuClassNames: 'sub-menu',
+                }
+              "
+            >
+            </ng-container>
+          } @else {
+            <!-- Render simple si no hay más submenús -->
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItem;
+                context: {
+                  menu: child,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  itemClassName: 'side-nav-item',
+                }
+              "
+            >
+            </ng-container>
+          }
+        }
+      </ul>
+    </div>
+  </li>
+</ng-template>
+
+<!-- Template para menús sin submenú -->
+<ng-template
+  #MenuItem
+  let-menu="menu"
+  let-linkClassName="linkClassName"
+  let-itemClassName="itemClassName"
+>
+  <li
+    [class]="itemClassName"
+    [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+  >
+    <!-- Insertamos el link simple -->
+    <ng-container
+      *ngTemplateOutlet="
+        MenuItemLink;
+        context: { menu: menu, className: linkClassName }
+      "
+    >
+    </ng-container>
+  </li>
+</ng-template>
+
+<!-- Template para un item link final -->
+<ng-template #MenuItemLink let-menu="menu" let-className="className">
+  <a
+    [routerLink]="menu.url"
+    [class]="className"
+    [ngClass]="{
+      active: activeMenuItems.includes(menu.key),
+      disabled: menu.isDisabled,
+    }"
+    [attr.aria-controls]="menu.key"
+  >
+    @if (menu.icon) {
+      <span class="menu-icon">
+        <i class="ti {{ menu.icon }}"></i>
+      </span>
+      <span class="menu-text">
+        {{ 'SIDEBAR.' + menu.label | translate }}
+      </span>
+    } @else {
+      {{ 'SIDEBAR.' + menu.label | translate }}
+    }
+    @if (menu.badge) {
+      <span class="badge rounded-pill text-end bg-{{ menu.badge.variant }}">
+        {{ menu.badge.text }}
+      </span>
+    }
+  </a>
+</ng-template>

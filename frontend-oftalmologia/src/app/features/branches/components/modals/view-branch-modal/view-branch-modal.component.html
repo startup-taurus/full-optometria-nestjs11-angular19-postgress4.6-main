@@ -1,0 +1,110 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    <i class="ti ti-building me-2"></i>
+    {{ 'BRANCHES_MODULE.BRANCH_DETAILS' | translate }}
+  </h5>
+  <button type="button" class="btn-close ms-auto" (click)="closeModal()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="branch-details">
+    <div class="mb-3 text-center">
+      <span
+        class="badge rounded-pill fs-6"
+        [class.bg-success]="selectedBranch.isActive"
+        [class.bg-danger]="!selectedBranch.isActive"
+      >
+        {{
+          (selectedBranch.isActive ? 'WORDS.ACTIVE' : 'WORDS.INACTIVE')
+            | translate
+        }}
+      </span>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="card-title text-primary mb-3">
+          <i class="ti ti-info-circle me-2"></i>
+          {{ 'BRANCHES_MODULE.GENERAL_INFO' | translate }}
+        </h6>
+
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.NAME' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.name }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.CODE' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.code }}</p>
+          </div>
+          @if (selectedBranch.company?.name) {
+            <div class="col-md-6 mb-2">
+              <strong>{{ 'BRANCHES_MODULE.COMPANY' | translate }}:</strong>
+              <p class="mb-0">{{ selectedBranch.company.name }}</p>
+            </div>
+          }
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.CITY' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.city }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.PHONE' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.phone || 'N/A' }}</p>
+          </div>
+          <div class="col-12 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.ADDRESS' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.address }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="card-title text-primary mb-3">
+          <i class="ti ti-mail me-2"></i>
+          {{ 'BRANCHES_MODULE.CONTACT_INFO' | translate }}
+        </h6>
+
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <strong
+              >{{ 'BRANCHES_MODULE.CORPORATE_EMAIL' | translate }}:</strong
+            >
+            <p class="mb-0">{{ selectedBranch.corporateEmail || 'N/A' }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.OPENING_HOURS' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.openingHours || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title text-primary mb-3">
+          <i class="ti ti-clock me-2"></i>
+          {{ 'BRANCHES_MODULE.TIMESTAMPS' | translate }}
+        </h6>
+
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'WORDS.CREATED_AT' | translate }}:</strong>
+            <p class="mb-0">{{ getFormattedDate(selectedBranch.createdAt) }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'WORDS.UPDATED_AT' | translate }}:</strong>
+            <p class="mb-0">{{ getFormattedDate(selectedBranch.updatedAt) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="closeModal()">
+    {{ 'WORDS.CLOSE' | translate }}
+  </button>
+</div>

@@ -1,0 +1,366 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    <i [class]="isEdit ? 'fa fa-edit me-2' : 'fa fa-plus me-2'"></i>
+    {{
+      (isEdit ? 'INVENTORY.ACTIONS.EDIT' : 'INVENTORY.ACTIONS.CREATE')
+        | translate
+    }}
+  </h4>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form">
+  <div class="modal-body">
+    <div class="row g-3">
+      <div class="col-12">
+        <h6 class="text-primary border-bottom pb-2">
+          <i class="fa fa-info-circle me-2"></i>
+          {{ 'INVENTORY.DETAILS.GENERAL_INFO' | translate }}
+        </h6>
+      </div>
+
+      <div class="col-md-6">
+        <label for="code" class="form-label">{{
+          'INVENTORY.TABLE.CODE' | translate
+        }}</label>
+        <input
+          type="text"
+          id="code"
+          class="form-control"
+          formControlName="code"
+          [class.is-invalid]="
+            form.get('code')?.invalid && form.get('code')?.touched
+          "
+        />
+        <div class="invalid-feedback" *ngIf="getFieldError('code')">
+          {{ getFieldError('code') | translate }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="name" class="form-label">{{
+          'INVENTORY.TABLE.NAME' | translate
+        }}</label>
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          formControlName="name"
+          [class.is-invalid]="
+            form.get('name')?.invalid && form.get('name')?.touched
+          "
+        />
+        <div class="invalid-feedback" *ngIf="getFieldError('name')">
+          {{ getFieldError('name') | translate }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="brand" class="form-label">{{
+          'INVENTORY.TABLE.BRAND' | translate
+        }}</label>
+        <input
+          type="text"
+          id="brand"
+          class="form-control"
+          formControlName="brand"
+          [class.is-invalid]="
+            form.get('brand')?.invalid && form.get('brand')?.touched
+          "
+        />
+        <div class="invalid-feedback" *ngIf="getFieldError('brand')">
+          {{ getFieldError('brand') | translate }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="description" class="form-label">{{
+          'INVENTORY.TABLE.DESCRIPTION' | translate
+        }}</label>
+        <input
+          type="text"
+          id="description"
+          class="form-control"
+          formControlName="description"
+          placeholder="{{ 'INVENTORY.TABLE.DESCRIPTION' | translate }}"
+        />
+      </div>
+
+      <div class="col-md-6" *ngIf="isEdit">
+        <div class="form-group mb-3">
+          <label class="form-label">
+            {{ 'INVENTORY.TABLE.STATUS' | translate }}
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="isActive"
+              class="toggle-input"
+              formControlName="isActive"
+            />
+            <label for="isActive" class="toggle-label">
+              <span class="toggle-slider"></span>
+              <span class="toggle-text">
+                {{
+                  form.get('isActive')?.value
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 mt-4">
+        <h6 class="text-primary border-bottom pb-2">
+          <i class="fa fa-tags me-2"></i>
+          {{ 'INVENTORY.DETAILS.CATEGORY_INFO' | translate }}
+        </h6>
+      </div>
+
+      <div class="col-md-6">
+        <label for="categoryId" class="form-label">{{
+          'INVENTORY.TABLE.CATEGORY' | translate
+        }}</label>
+        <ng-select
+          formControlName="categoryId"
+          bindLabel="name"
+          bindValue="id"
+          [placeholder]="'INVENTORY.FORM.SELECT_CATEGORY' | translate"
+          [class.is-invalid]="
+            form.get('categoryId')?.invalid && form.get('categoryId')?.touched
+          "
+        >
+          <ng-option
+            *ngFor="let category of categories$ | async"
+            [value]="category.id"
+          >
+            {{ category.name }}
+          </ng-option>
+        </ng-select>
+        <div class="invalid-feedback" *ngIf="getFieldError('categoryId')">
+          {{ getFieldError('categoryId') | translate }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="subcategoryId" class="form-label">{{
+          'INVENTORY.TABLE.SUBCATEGORY' | translate
+        }}</label>
+        <ng-select
+          formControlName="subcategoryId"
+          bindLabel="name"
+          bindValue="id"
+          [placeholder]="
+            (filteredSubcategories$ | async)?.length
+              ? ('INVENTORY.FORM.SELECT_SUBCATEGORY' | translate)
+              : ('INVENTORY.FORM.SELECT_CATEGORY_FIRST' | translate)
+          "
+          [class.is-invalid]="
+            form.get('subcategoryId')?.invalid &&
+            form.get('subcategoryId')?.touched
+          "
+        >
+          <ng-option
+            *ngFor="let subcategory of filteredSubcategories$ | async"
+            [value]="subcategory.id"
+          >
+            {{ subcategory.name }}
+          </ng-option>
+        </ng-select>
+        <div class="invalid-feedback" *ngIf="getFieldError('subcategoryId')">
+          {{ getFieldError('subcategoryId') | translate }}
+        </div>
+        <small
+          class="form-text text-muted"
+          *ngIf="!form.get('categoryId')?.value"
+        >
+          {{ 'INVENTORY.FORM.SELECT_CATEGORY_FIRST' | translate }}
+        </small>
+      </div>
+
+      <div class="col-12 mt-4">
+        <h6 class="text-primary border-bottom pb-2">
+          <i class="fa fa-boxes me-2"></i>
+          {{ 'INVENTORY.DETAILS.STOCK_INFO' | translate }}
+        </h6>
+      </div>
+
+      <div class="col-md-6">
+        <label for="unitPrice" class="form-label">{{
+          'INVENTORY.TABLE.UNIT_PRICE' | translate
+        }}</label>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input
+            type="number"
+            id="unitPrice"
+            class="form-control"
+            step="0.01"
+            min="0"
+            formControlName="unitPrice"
+            [class.is-invalid]="
+              form.get('unitPrice')?.invalid && form.get('unitPrice')?.touched
+            "
+          />
+        </div>
+        <div class="invalid-feedback" *ngIf="getFieldError('unitPrice')">
+          {{ getFieldError('unitPrice') | translate }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="quantity" class="form-label">{{
+          'INVENTORY.TABLE.QUANTITY' | translate
+        }}</label>
+        <input
+          type="number"
+          id="quantity"
+          class="form-control"
+          min="0"
+          formControlName="quantity"
+          [class.is-invalid]="
+            form.get('quantity')?.invalid && form.get('quantity')?.touched
+          "
+        />
+        <div class="invalid-feedback" *ngIf="getFieldError('quantity')">
+          {{ getFieldError('quantity') | translate }}
+        </div>
+      </div>
+
+      <div class="col-12 mt-4">
+        <h6 class="text-primary border-bottom pb-2">
+          <i class="fa fa-image me-2"></i>
+          {{ 'INVENTORY.DETAILS.IMAGE_INFO' | translate }}
+        </h6>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label optional">{{
+          'INVENTORY.TABLE.IMAGE' | translate
+        }}</label>
+
+        <div
+          class="image-preview-container mb-3"
+          *ngIf="
+            imagePreview ||
+            (isEdit && product?.images && product?.images.length > 0)
+          "
+        >
+          <div class="image-preview-wrapper">
+            <img
+              [src]="imagePreview || getProductImageUrl()"
+              alt="Product image preview"
+              class="img-thumbnail"
+            />
+            <button
+              type="button"
+              class="btn btn-danger btn-sm remove-image-btn"
+              (click)="removeImage()"
+              *ngIf="
+                imagePreview ||
+                (isEdit && product?.images && product?.images.length > 0)
+              "
+            >
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <input
+            type="file"
+            class="form-control"
+            #fileInput
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            (change)="onFileSelected($event)"
+            [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="fileInput.click()"
+            [disabled]="isLoading"
+          >
+            <i class="fa fa-upload me-2"></i>
+            {{
+              (imagePreview ||
+              (isEdit && product?.images && product?.images.length > 0)
+                ? 'INVENTORY.FORM.CHANGE_IMAGE'
+                : 'INVENTORY.FORM.SELECT_IMAGE'
+              ) | translate
+            }}
+          </button>
+        </div>
+        <small class="form-text text-muted">
+          {{ 'INVENTORY.FORM.IMAGE_FORMATS' | translate }}
+        </small>
+        <div class="alert alert-danger mt-2" *ngIf="imageError">
+          <i class="fa fa-exclamation-triangle me-2"></i>
+          {{ imageError }}
+        </div>
+      </div>
+
+      <div class="col-12 mt-4">
+        <h6 class="text-primary border-bottom pb-2">
+          <i class="fa fa-truck me-2"></i>
+          {{ 'INVENTORY.DETAILS.SUPPLIER_INFO' | translate }}
+        </h6>
+      </div>
+
+      <div class="col-md-6">
+        <label for="defaultSupplierId" class="form-label">{{
+          'INVENTORY.DETAILS.DEFAULT_SUPPLIER' | translate
+        }}</label>
+        <ng-select
+          formControlName="defaultSupplierId"
+          bindLabel="name"
+          bindValue="id"
+          [placeholder]="'INVENTORY.FORM.SELECT_SUPPLIER' | translate"
+          [class.is-invalid]="
+            form.get('defaultSupplierId')?.invalid &&
+            form.get('defaultSupplierId')?.touched
+          "
+        >
+          <ng-option
+            *ngFor="let supplier of suppliers$ | async"
+            [value]="supplier.id"
+          >
+            {{ supplier.name }}
+          </ng-option>
+        </ng-select>
+        <div
+          class="invalid-feedback"
+          *ngIf="getFieldError('defaultSupplierId')"
+        >
+          {{ getFieldError('defaultSupplierId') | translate }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">
+      {{ 'WORDS.CANCEL' | translate }}
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="form.invalid || isLoading"
+    >
+      <span
+        *ngIf="isLoading"
+        class="spinner-border spinner-border-sm me-2"
+      ></span>
+      {{
+        (isEdit ? 'INVENTORY.FORM.UPDATE' : 'INVENTORY.FORM.CREATE') | translate
+      }}
+    </button>
+  </div>
+</form>

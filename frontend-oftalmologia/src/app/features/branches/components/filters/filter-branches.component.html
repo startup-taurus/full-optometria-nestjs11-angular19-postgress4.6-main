@@ -1,0 +1,107 @@
+<div class="branches-filter">
+  <form [formGroup]="branchesFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'BRANCHES_MODULE.NAME' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
+          [placeholder]="'BRANCHES_MODULE.NAME_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'BRANCHES_MODULE.CODE' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="code"
+          [placeholder]="'BRANCHES_MODULE.CODE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'BRANCHES_MODULE.CITY' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="city"
+          [placeholder]="'BRANCHES_MODULE.CITY_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'BRANCHES_MODULE.PHONE' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="phone"
+          [placeholder]="'BRANCHES_MODULE.PHONE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'BRANCHES_MODULE.CORPORATE_EMAIL' | translate
+        }}</label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="corporateEmail"
+          [placeholder]="
+            'BRANCHES_MODULE.CORPORATE_EMAIL_PLACEHOLDER' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'BRANCHES_MODULE.ADDRESS' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="address"
+          [placeholder]="'BRANCHES_MODULE.ADDRESS_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'WORDS.STATUS' | translate
+        }}</label>
+        <select class="form-select" formControlName="isActive">
+          <option value="">{{ 'WORDS.ALL' | translate }}</option>
+          <option [value]="true">{{ 'WORDS.ACTIVE' | translate }}</option>
+          <option [value]="false">{{ 'WORDS.INACTIVE' | translate }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="onReset()"
+          >
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

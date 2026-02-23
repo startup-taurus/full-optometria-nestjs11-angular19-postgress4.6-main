@@ -1,0 +1,108 @@
+<div class="medical-history-filter">
+  <form [formGroup]="laboratoryOrdersFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label">{{
+          'LABORATORY_ORDERS_MODULE.FIRST_NAME' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [placeholder]="
+            'LABORATORY_ORDERS_MODULE.ENTER_FIRST_NAME' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">{{
+          'LABORATORY_ORDERS_MODULE.LAST_NAME' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [placeholder]="'LABORATORY_ORDERS_MODULE.ENTER_LAST_NAME' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">{{ 'WORDS.CEDULA' | translate }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="cedula"
+          [placeholder]="'WORDS.CEDULA' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">{{ 'WORDS.EMAIL' | translate }}</label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [placeholder]="'WORDS.EMAIL' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">{{
+          'LABORATORY_ORDERS_MODULE.MOBILE_PHONE' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="mobilePhone"
+          [placeholder]="
+            'LABORATORY_ORDERS_MODULE.ENTER_MOBILE_PHONE' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">{{ 'WORDS.STATUS' | translate }}</label>
+        <select class="form-select" formControlName="status">
+          <option value="">
+            {{ 'WORDS.ALL' | translate }}
+          </option>
+          <option value="pending">
+            {{ 'LABORATORY_ORDERS_MODULE.PENDING' | translate }}
+          </option>
+          <option value="sent">
+            {{ 'LABORATORY_ORDERS_MODULE.SENT' | translate }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">{{
+          'LABORATORY_ORDERS_MODULE.DATE' | translate
+        }}</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="deliveryDate"
+        />
+      </div>
+
+      <div class="col-12 mt-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-end gap-2">
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              (click)="onClear()"
+            >
+              {{ 'WORDS.RESET' | translate }}
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm">
+              {{ 'WORDS.FILTER' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

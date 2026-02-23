@@ -1,0 +1,146 @@
+<page-title title="{{ 'MEDICAL_HISTORY.TITLE' | translate }}" />
+
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card common-datatable-card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-primary">
+              <i class="fa fa-history me-2"></i>
+              {{ 'MEDICAL_HISTORY.TABLE.TITLE' | translate }}
+            </h5>
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-outline-danger btn-sm filter-clear-btn"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RESET' | translate"
+                (click)="sideFilterPanel.resetFilters()"
+                *ngIf="sideFilterPanel?.hasActiveFilters()"
+              >
+                <i class="fa fa-filter filter-crossed"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
+                (click)="reloadDatatable()"
+              >
+                <i class="fa fa-repeat"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'MEDICAL_HISTORY.BUTTONS.ADD_RECORD' | translate"
+                (click)="openModal(BUTTON_ACTIONS.ADD)"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <shared-ngx-datatable
+            [config]="config$ | async"
+            [data]="data$ | async"
+            (onChangeLimit)="onChangeLimit($event)"
+            (onChangePage)="onChangePage($event)"
+            class="common-ngx-datatable"
+          >
+          </shared-ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  [config]="{
+    title: 'INVENTORY.FILTER.TITLE',
+    showBadge: true,
+    position: 'right',
+    width: '400px',
+    backdrop: true,
+    closeOnEsc: true,
+  }"
+  (filterApplied)="onSideFilterApplied($event)"
+  (filterCleared)="onSideFilterCleared()"
+  (resetRequested)="onSideFilterCleared()"
+>
+</side-filter-panel>
+
+<ng-template #statusTemplate let-row="row" let-rowIndex="rowIndex">
+  <span
+    class="badge badge-sm"
+    [class.bg-success]="row.status === 'enviado'"
+    [class.bg-warning]="row.status === 'pendiente'"
+    [class.bg-danger]="row.status === 'cancelado'"
+  >
+    {{ 'MEDICAL_HISTORY.STATUS.' + row.status.toUpperCase() | translate }}
+  </span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row="row">
+  <div class="d-flex gap-1 flex-wrap">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-info"
+      (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
+      [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.VIEW_DETAILS' | translate"
+      [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.VIEW_DETAILS' | translate"
+      placement="left"
+    >
+      <i class="fa fa-eye"></i>
+    </button>
+    <!-- <button
+      *ngIf="row.status === 'pendiente'"
+      type="button"
+      class="btn btn-sm btn-outline-success"
+      (click)="sendRecord(row)"
+      [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.SEND' | translate"
+      [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.SEND' | translate"
+      placement="left"
+    >
+      <i class="fa fa-paper-plane"></i>
+    </button> -->
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-warning"
+      (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
+      [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.EDIT' | translate"
+      [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.EDIT' | translate"
+      placement="left"
+    >
+      <i class="fa fa-edit"></i>
+    </button>
+    <button
+      *ngIf="row.status !== 'cancelado'"
+      type="button"
+      class="btn btn-sm btn-outline-danger"
+      (click)="openModal(BUTTON_ACTIONS.DELETE, row)"
+      [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.DELETE' | translate"
+      [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.DELETE' | translate"
+      placement="left"
+    >
+      <i class="fa fa-trash"></i>
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      (click)="createLaboratoryOrder(row)"
+      [attr.aria-label]="'Crear Orden Lab'"
+      [ngbTooltip]="'Crear Orden de Laboratorio'"
+      placement="left"
+    >
+      <i class="fa fa-flask"></i>
+    </button>
+  </div>
+</ng-template>

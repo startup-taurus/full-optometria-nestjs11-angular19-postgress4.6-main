@@ -1,0 +1,57 @@
+<page-title title="{{ 'PROFILE.TITLE' | translate }}" />
+
+<div class="card">
+  <div class="card-body">
+    <div class="row">
+      <!-- Sidebar con línea divisoria -->
+      <div
+        class="col-sm-2 mb-2 mb-sm-0 border-end border-secondary-subtle border-3 rounded-top rounded-bottom"
+      >
+        <div
+          ngbNav
+          #verticalnav="ngbNav"
+          class="nav flex-column nav-pills"
+          id="v-pills-tab"
+          role="tablist"
+          aria-orientation="vertical"
+        >
+          <ng-container ngbNavItem>
+            <a
+              id="v-pills-home-tab"
+              ngbNavLink
+              role="tab"
+              aria-controls="v-pills-home"
+              aria-selected="true"
+            >
+            <i class="ti ti-user-circle fs-18 me-1"></i> {{'PROFILE.MY_PROFILE.TITLE' | translate}}
+            </a>
+            <ng-template ngbNavContent>
+              <profile-details />
+            </ng-template>
+          </ng-container>
+          <ng-container ngbNavItem>
+            <a
+              id="v-pills-profile-tab"
+              ngbNavLink
+              role="tab"
+              aria-controls="v-pills-profile"
+              aria-selected="false"
+            >
+              <i class="ti ti-shield-lock fs-18 me-1"></i> {{'PROFILE.SECURITY.TITLE' | translate}}
+            </a>
+            <ng-template ngbNavContent> <security-settings /> </ng-template>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Contenido de los tabs -->
+      <div class="col-sm-10">
+        <div
+          [ngbNavOutlet]="verticalnav"
+          class="tab-content"
+          id="v-pills-tabContent"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>

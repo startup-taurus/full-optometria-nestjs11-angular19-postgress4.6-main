@@ -1,0 +1,517 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{ 'LABORATORY_ORDERS.VIEW_TITLE' | translate }}
+  </h4>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    aria-label="Close"
+    (click)="onClose()"
+  ></button>
+</div>
+
+<div class="modal-progress" *ngIf="!loading && order">
+  <div class="container-fluid px-4 py-2">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <divk
+            *ngFor="let title of stepTitles; let i = index"
+            class="d-flex align-items-center"
+          >
+            <div
+              class="step-circle"
+              [class.active]="currentStep === i + 1"
+              [class.completed]="currentStep > i + 1"
+              [class.clickable]="true"
+              (click)="goToStep(i + 1)"
+            >
+              <span *ngIf="currentStep > i + 1">✓</span>
+              <span *ngIf="currentStep <= i + 1">{{ i + 1 }}</span>
+            </div>
+            <div class="step-label ms-2">
+              <span>{{ title | translate }}</span>
+            </div>
+            <div class="step-divider" *ngIf="i < totalSteps - 1"></div>
+          </divk>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-body">
+  <div class="step-content" *ngIf="!loading && order">
+    <div *ngIf="currentStep === 1">
+      <h5 class="section-title">
+        <i class="ti ti-user me-2"></i>
+        {{ 'LABORATORY_ORDERS.STEP1_TITLE' | translate }}
+      </h5>
+
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-header">
+              <h6>
+                <i class="ti ti-id me-2"></i>
+                {{ 'LABORATORY_ORDERS.FIELDS.PATIENT_INFO' | translate }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FIRST_NAME' | translate
+                  }}:</strong
+                >
+                <span>{{ order.patient?.firstName || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.LAST_NAME' | translate
+                  }}:</strong
+                >
+                <span>{{ order.patient?.lastName || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.DOCUMENT_NUMBER' | translate
+                  }}:</strong
+                >
+                <span>{{ order.patient?.documentNumber || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.EMAIL' | translate }}:</strong
+                >
+                <span>{{ order.patient?.email || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.MOBILE_PHONE' | translate
+                  }}:</strong
+                >
+                <span>{{ order.patient?.mobilePhone || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.HOME_PHONE' | translate
+                  }}:</strong
+                >
+                <span>{{ order.patient?.homePhone || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-header">
+              <h6>
+                <i class="ti ti-calendar me-2"></i>
+                Fechas
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.ATTENDANCE_DATE' | translate
+                  }}:</strong
+                >
+                <span>{{ formatDate(order.attendanceDate) }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.DELIVERY_DATE' | translate
+                  }}:</strong
+                >
+                <span>{{ formatDate(order.deliveryDate) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="currentStep === 2">
+      <h5 class="section-title">
+        <i class="ti ti-eye me-2"></i>
+        {{ 'LABORATORY_ORDERS.STEP2_TITLE' | translate }}
+      </h5>
+
+      <div class="info-card mb-4">
+        <div class="card-header">
+          <h6>
+            <i class="ti ti-eye me-2"></i>
+            {{ 'LABORATORY_ORDERS.FIELDS.GRADUATION' | translate }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 80px">{{ 'WORDS.EYE' | translate }}</th>
+                  <th>{{ 'LABORATORY_ORDERS.FIELDS.SPHERE' | translate }}</th>
+                  <th>{{ 'LABORATORY_ORDERS.FIELDS.CYLINDER' | translate }}</th>
+                  <th>{{ 'LABORATORY_ORDERS.FIELDS.AXIS' | translate }}</th>
+                  <th>{{ 'LABORATORY_ORDERS.FIELDS.ADD' | translate }}</th>
+                  <th>{{ 'LABORATORY_ORDERS.FIELDS.HEIGHT' | translate }}</th>
+                  <th>{{ 'LABORATORY_ORDERS.FIELDS.DNP' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="fw-bold text-primary">
+                    <i class="ti ti-circle-filled me-1"></i>OD
+                  </td>
+                  <td>{{ order.odSphere || '-' }}</td>
+                  <td>{{ order.odCylinder || '-' }}</td>
+                  <td>{{ order.odAxis || '-' }}</td>
+                  <td>{{ order.odAdd || '-' }}</td>
+                  <td>{{ order.odHeight || '-' }}</td>
+                  <td>{{ order.odDnp || '-' }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-bold text-success">
+                    <i class="ti ti-circle-filled me-1"></i>OI
+                  </td>
+                  <td>{{ order.oiSphere || '-' }}</td>
+                  <td>{{ order.oiCylinder || '-' }}</td>
+                  <td>{{ order.oiAxis || '-' }}</td>
+                  <td>{{ order.oiAdd || '-' }}</td>
+                  <td>{{ order.oiHeight || '-' }}</td>
+                  <td>{{ order.oiDnp || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card mb-4">
+        <div class="card-header">
+          <h6>
+            <i class="ti ti-adjustments me-2"></i>
+            {{ 'LABORATORY_ORDERS.FIELDS.SHARED_PARAMETERS' | translate }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.CBASE' | translate }}:</strong
+                >
+                <span>{{ order.cbase || '-' }}</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.SUN_DEGREE' | translate
+                  }}:</strong
+                >
+                <span>{{ order.sunDegree || '-' }}</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.PRISM' | translate }}:</strong
+                >
+                <span>{{ order.prism || '-' }}</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.BASE' | translate }}:</strong
+                >
+                <span>{{ order.base || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="currentStep === 3">
+      <h5 class="section-title">
+        <i class="ti ti-settings me-2"></i>
+        {{ 'LABORATORY_ORDERS.STEP3_TITLE' | translate }}
+      </h5>
+
+      <div class="info-card mb-4">
+        <div class="card-header">
+          <h6><i class="ti ti-ruler me-2"></i>Parámetros de Diseño</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.D_VERTEX' | translate
+                  }}:</strong
+                >
+                <span>{{ order.dVertex || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.PANTOS' | translate }}:</strong
+                >
+                <span>{{ order.pantos || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.PANORA' | translate }}:</strong
+                >
+                <span>{{ order.panora || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_FIT' | translate
+                  }}:</strong
+                >
+                <span>{{ order.frameFit || '-' }}</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.PROFILE' | translate }}:</strong
+                >
+                <span>{{ order.profile || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.MID' | translate }}:</strong
+                >
+                <span>{{ order.mid || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.DIST_VP' | translate }}:</strong
+                >
+                <span>{{ order.distVp || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.ENGRAVING' | translate
+                  }}:</strong
+                >
+                <span>{{ order.engraving || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Datos de la Montura -->
+    <div *ngIf="currentStep === 4">
+      <h5 class="section-title">
+        <i class="ti ti-sunglasses me-2"></i>
+        {{ 'LABORATORY_ORDERS.STEP4_TITLE' | translate }}
+      </h5>
+
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-header">
+              <h6><i class="ti ti-package me-2"></i>Producto</h6>
+            </div>
+            <div class="card-body">
+              <div class="data-field">
+                <strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate }}:</strong
+                >
+                <span>{{ order.product?.name || '-' }}</span>
+              </div>
+              <div class="data-field" *ngIf="order.product?.code">
+                <strong>Código:</strong>
+                <span>{{ order.product.code }}</span>
+              </div>
+              <div class="data-field" *ngIf="order.product?.brand">
+                <strong>Marca:</strong>
+                <span>{{ order.product.brand }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-header">
+              <h6><i class="ti ti-checkbox me-2"></i>Tipo de Armazón</h6>
+            </div>
+            <div class="card-body">
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_TYPE' | translate
+                  }}:</strong
+                >
+                <span>{{
+                  getFrameTypeLabel(order.frameType) | translate
+                }}</span>
+              </div>
+              <div class="data-field" *ngIf="order.frameTypeDescription">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_TYPE_DESCRIPTION'
+                      | translate
+                  }}:</strong
+                >
+                <span>{{ order.frameTypeDescription }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card mb-4">
+        <div class="card-header">
+          <h6><i class="ti ti-info-circle me-2"></i>Datos del Armazón</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="data-field">
+                <div class="data-field">
+                  <strong
+                    >{{
+                    'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate
+
+                    }}:</strong
+                  >
+                  <span>{{ order.frameModel || '-' }}</span>
+                </div>
+
+                <strong
+                  >{{
+                      'LABORATORY_ORDERS.FIELDS.FRAME_BRAND' | translate
+
+                  }}:</strong
+                >
+                <span>{{ order.frameBrand || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_DATA' | translate
+                  }}:</strong
+                >
+                <span>{{ order.frameData || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_LARGER_DIAMETER'
+                      | translate
+                  }}:</strong
+                >
+                <span>{{ order.frameLargerDiameter || '-' }}</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_HORIZONTAL' | translate
+                  }}:</strong
+                >
+                <span>{{ order.frameHorizontal || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_VERTICAL' | translate
+                  }}:</strong
+                >
+                <span>{{ order.frameVertical || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong
+                  >{{
+                    'LABORATORY_ORDERS.FIELDS.FRAME_BRIDGE' | translate
+                  }}:</strong
+                >
+                <span>{{ order.frameBridge || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="data-field mt-3" *ngIf="order.observations">
+            <strong
+              >{{
+                'LABORATORY_ORDERS.FIELDS.OBSERVATIONS' | translate
+              }}:</strong
+            >
+            <div class="mt-2">
+              <span>{{ order.observations }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-body text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{
+        'LABORATORY_ORDERS.MESSAGES.LOADING' | translate
+      }}</span>
+    </div>
+    <div class="mt-3">
+      {{ 'LABORATORY_ORDERS.MESSAGES.LOADING_ORDER' | translate }}
+    </div>
+  </div>
+
+  <div class="modal-body text-center py-5" *ngIf="!loading && !order">
+    <div class="text-muted">
+      <div>{{ 'LABORATORY_ORDERS.MESSAGES.COULD_NOT_LOAD' | translate }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer" *ngIf="!loading && order">
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    (click)="goToPreviousStep()"
+    [disabled]="!canGoToPreviousStep()"
+  >
+    {{ 'LABORATORY_ORDERS.ACTIONS.PREVIOUS' | translate }}
+  </button>
+
+  <div class="flex-fill text-center">
+    <span class="text-muted"
+      >{{ 'LABORATORY_ORDERS.MESSAGES.STEP_OF' | translate }} {{ currentStep }}
+      {{ 'LABORATORY_ORDERS.MESSAGES.OF' | translate }} {{ totalSteps }}</span
+    >
+  </div>
+
+  <button type="button" class="btn btn-secondary ms-3" (click)="onClose()">
+    {{ 'LABORATORY_ORDERS.ACTIONS.CLOSE' | translate }}
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="goToNextStep()"
+    [disabled]="!canGoToNextStep()"
+  >
+    {{ 'LABORATORY_ORDERS.ACTIONS.NEXT' | translate }}
+  </button>
+</div>

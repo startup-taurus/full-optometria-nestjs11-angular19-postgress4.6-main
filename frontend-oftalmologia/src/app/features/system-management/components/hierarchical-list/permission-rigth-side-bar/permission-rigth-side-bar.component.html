@@ -1,0 +1,121 @@
+<div id="chat-user-list">
+  <div class="chat-user-list border-start">
+    <div class="card-body py-2 px-3 border-bottom">
+      <div class="d-flex align-items-center gap-2 py-1">
+        <div class="flex-grow-1">
+          <p class="mb-0 text-muted">
+            {{
+              'ROLES_AND_PERMISSIONS.PERMISSION.LIST_PERMISSIONS' | translate
+            }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-3 py-2">
+      <div class="app-search py-1">
+        <input
+          type="text"
+          class="form-control border-light bg-light bg-opacity-50 rounded-2"
+          placeholder="{{
+            'ROLES_AND_PERMISSIONS.PERMISSION.SEARCH_PERMISSIONS' | translate
+          }}"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchInput()"
+          (keyup.enter)="searchPermissions()"
+        />
+        <i class="app-search-icon ti ti-search text-muted fs-16"></i>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column overflow-auto scrollbar">
+      <ngx-simplebar
+        class="users-list position-relative list-scroll"
+        *ngIf="permissions$ | async as permissions"
+        data-simplebar
+      >
+        @if (isLoading) {
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status"></div>
+          </div>
+        } @else if (!isLoading) {
+          @for (item of permissions; track $index) {
+            <div class="d-flex gap-2 py-1">
+              <a
+                href="javascript:void(0);"
+                class="text-body w-100 d-block"
+                [class.pointer-events-none]="!item.isActive"
+              >
+                <div class="chat-users">
+                  <div
+                    class="flex-grow-1 overflow-hidden"
+                    [ngClass]="{
+                      'text-muted opacity-50': !item.isActive,
+                    }"
+                    ngbTooltip="{{
+                      !item.isActive
+                        ? ('ROLES_AND_PERMISSIONS.PERMISSION.ACTIVATE_DEACTIVATE.PERMISSION_DEACTIVATE'
+                          | translate)
+                        : ''
+                    }}"
+                  >
+                    <h5 class="mt-0 mb-0 fs-13">
+                      {{ item.permissionName }}
+                    </h5>
+                  </div>
+
+                  <div class="d-flex gap-1 text-muted">
+                    @if (item.isActive) {
+                      <i
+                        class="ti ti-pencil fs-16"
+                        placement="left"
+                        ngbTooltip="{{
+                          'ROLES_AND_PERMISSIONS.PERMISSION.EDIT_PERMISSION'
+                            | translate
+                        }}"
+                        (click)="openEditModal(item.id, $event)"
+                      >
+                      </i>
+                    }
+                    <i
+                      [ngClass]="
+                        item.isActiveForRole
+                          ? 'ti ti-toggle-right text-success'
+                          : 'ti ti-toggle-left text-muted'
+                      "
+                      class="fs-16"
+                      (click)="togglePermissionStatus(item.id, $event)"
+                      ngbTooltip="{{
+                        item.isActiveForRole
+                          ? ('ROLES_AND_PERMISSIONS.PERMISSION.ACTIVATE_DEACTIVATE.REMOVE_PERMISSION_FROM_ROLE'
+                            | translate)
+                          : ('ROLES_AND_PERMISSIONS.PERMISSION.ACTIVATE_DEACTIVATE.ASSIGN_PERMISSION_TO_ROLE'
+                            | translate)
+                      }}"
+                    >
+                    </i>
+                  </div>
+                </div>
+              </a>
+            </div>
+          } @empty {
+            <div class="d-flex gap-2 py-1">
+              <a href="javascript:void(0);" class="text-body w-100 d-block">
+                <div class="chat-users">
+                  <div class="flex-grow-1 overflow-hidden">
+                    <h5 class="mt-0 mb-0 fs-13">
+                      {{
+                        'ROLES_AND_PERMISSIONS.PERMISSION.NO_PERMISSIONS_FOUND'
+                          | translate
+                      }}
+                    </h5>
+                  </div>
+                </div>
+              </a>
+            </div>
+          }
+        }
+      </ngx-simplebar>
+    </div>
+  </div>
+</div>

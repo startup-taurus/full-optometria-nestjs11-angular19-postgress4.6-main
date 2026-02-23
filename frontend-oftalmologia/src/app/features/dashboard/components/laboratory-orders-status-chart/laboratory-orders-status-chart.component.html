@@ -1,0 +1,53 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="card-title mb-0">
+          {{ 'DASHBOARD.LABORATORY_ORDERS.TITLE' | translate }}
+        </h5>
+        <iconify-icon
+          icon="ph:info"
+          [ngbTooltip]="'DASHBOARD.LABORATORY_ORDERS.TOOLTIP' | translate"
+          placement="top"
+          container="body"
+          style="cursor: help; color: #64748b; font-size: 18px"
+        ></iconify-icon>
+      </div>
+      @if (chartData()) {
+        <span class="badge bg-info-subtle text-info">
+          Total: {{ chartData()!.total }}
+        </span>
+      }
+    </div>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{
+            'DASHBOARD.LABORATORY_ORDERS.LOADING' | translate
+          }}</span>
+        </div>
+      </div>
+    } @else if (
+      chartData() && chartData()!.data && chartData()!.data!.length > 0
+    ) {
+      <apx-chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!"
+        [plotOptions]="chartOptions.plotOptions!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [colors]="chartOptions.colors!"
+        [xaxis]="chartOptions.xaxis!"
+        [yaxis]="chartOptions.yaxis!"
+        [grid]="chartOptions.grid!"
+        [legend]="chartOptions.legend!"
+        [tooltip]="chartOptions.tooltip!"
+      ></apx-chart>
+    } @else {
+      <div class="text-center py-5 text-muted">
+        <i class="ti ti-flask fs-1 mb-2"></i>
+        <p>{{ 'DASHBOARD.LABORATORY_ORDERS.NO_DATA' | translate }}</p>
+      </div>
+    }
+  </div>
+</div>

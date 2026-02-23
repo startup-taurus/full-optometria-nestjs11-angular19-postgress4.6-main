@@ -1,0 +1,101 @@
+<div class="side-filter-toggle" [class.side-filter-toggle--open]="isOpen">
+  <button
+    type="button"
+    class="btn btn-primary btn-lg rounded-circle shadow-lg position-relative"
+    (click)="togglePanel()"
+    [attr.aria-label]="config.title | translate"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-controls]="'side-filter-panel-' + config.position"
+    [title]="
+      config.badgeCount && config.badgeCount > 0
+        ? config.badgeCount +
+          ' ' +
+          (config.badgeCount === 1 ? 'filtro aplicado' : 'filtros aplicados') +
+          ' - Clic para modificar'
+        : (config.title | translate)
+    "
+  >
+    <i
+      class="fa fa-filter"
+      [class.fa-times]="isOpen"
+      [class.fa-filter]="!isOpen"
+    ></i>
+
+    <span
+      *ngIf="config.showBadge && config.badgeCount && config.badgeCount > 0"
+      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+      [attr.aria-label]="config.badgeCount + ' filtros activos'"
+    >
+      {{ config.badgeCount }}
+    </span>
+  </button>
+</div>
+
+<div
+  *ngIf="isOpen && config.backdrop"
+  class="side-filter-backdrop"
+  (click)="onBackdropClick()"
+  [attr.aria-hidden]="true"
+></div>
+
+<div
+  [id]="'side-filter-panel-' + config.position"
+  [class]="panelClasses"
+  [ngStyle]="panelStyles"
+  (click)="onPanelClick($event)"
+  role="dialog"
+  [attr.aria-modal]="isOpen"
+  [attr.aria-labelledby]="'side-filter-title-' + config.position"
+  [attr.aria-hidden]="!isOpen"
+>
+  <div class="side-filter-panel__header">
+    <h5
+      [id]="'side-filter-title-' + config.position"
+      class="side-filter-panel__title mb-0"
+    >
+      <i class="fa fa-filter me-2"></i>
+      {{ config.title | translate }}
+    </h5>
+
+    <button
+      type="button"
+      class="btn btn-outline-secondary btn-sm rounded-circle"
+      (click)="closePanel()"
+      [attr.aria-label]="'WORDS.CLOSE' | translate"
+    >
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <div class="side-filter-panel__body">
+    <div class="filter-content-wrapper">
+      <div #filterContainer class="filter-content-container"></div>
+
+      <div
+        *ngIf="filterTemplate && !filterComponent"
+        class="filter-template-container"
+      >
+        <ng-container [ngTemplateOutlet]="filterTemplate"></ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-filter-panel__footer">
+    <div class="text-center">
+      <small class="text-muted">
+        <i class="fa fa-info-circle me-1"></i>
+        <span
+          *ngIf="config.badgeCount && config.badgeCount > 0; else noFilters"
+        >
+          {{ config.badgeCount }}
+          {{
+            config.badgeCount === 1 ? 'filtro aplicado' : 'filtros aplicados'
+          }}
+        </span>
+        <ng-template #noFilters>
+          {{ 'USER.FILTER.TITLE' | translate }}
+        </ng-template>
+      </small>
+    </div>
+  </div>
+</div>

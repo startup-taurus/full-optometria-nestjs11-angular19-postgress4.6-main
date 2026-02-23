@@ -1,0 +1,162 @@
+<header class="topnav">
+  <nav class="navbar navbar-expand-lg">
+    <nav class="page-container">
+      <div class="collapse navbar-collapse" id="topnav-menu-content">
+        <ul class="navbar-nav">
+
+          @for (menu of menuItems; track $index) {
+            @if (hasSubmenu(menu)) {
+              <ng-container
+                *ngTemplateOutlet="
+                  MenuItemWithChildren;
+                  context: {
+                    menu: menu,
+                    className: 'nav-item dropdown',
+                    linkClassName:
+                      'nav-link dropdown-toggle drop-arrow-none nav-link-ref',
+                  }
+                "
+              >
+              </ng-container>
+            } @else {
+              <ng-container
+                *ngTemplateOutlet="
+                  MenuItem;
+                  context: {
+                    menu: menu,
+                    className: 'nav-item',
+                    linkClassName: 'nav-link nav-link-ref',
+                  }
+                "
+              >
+              </ng-container>
+            }
+          }
+
+        </ul>
+      </div>
+    </nav>
+  </nav>
+</header>
+
+
+<ng-template
+  #MenuItemWithChildren
+  let-menu="menu"
+  let-className="className"
+  let-linkClassName="linkClassName"
+>
+  <li
+    [class]="className"
+    ngbDropdown
+    [autoClose]="'outside'"
+    [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+  >
+    <a
+      ngbDropdownToggle
+      [class]="linkClassName"
+      href="javascript: void(0);"
+      [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+      role="button"
+      id="topnav-{{ menu.label }}"
+      [attr.aria-expanded]="!menu.collapsed"
+      [attr.data-menu-key]="menu.key"
+    >
+      @if (menu.icon) {
+        <span class="menu-icon">
+          <i class="ti {{ menu.icon }}"></i>
+        </span>
+      }
+      {{ menu.label }}
+      <div class="menu-arrow"></div>
+    </a>
+
+    <div
+      ngbDropdownMenu
+      class="dropdown-menu"
+      attr.aria-labelledby="topnav-{{ menu.label }}"
+    >
+      @for (subitem of menu.children; track $index) {
+        <ng-container
+          *ngTemplateOutlet="
+            SubMenu;
+            context: {
+              menu: subitem,
+              linkClassName:
+                'dropdown-toggle dropdown-item drop-arrow-none nav-link-ref',
+            }
+          "
+        >
+        </ng-container>
+      }
+    </div>
+  </li>
+</ng-template>
+
+<ng-template #SubMenu let-menu="menu" let-linkClassName="linkClassName">
+  <div ngbDropdown class="dropdown hover-dropdown">
+    @if (hasSubmenu(menu)) {
+      <a
+        ngbDropdownToggle
+        [class]="linkClassName"
+        [routerLink]="menu.url"
+        [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+        id="topnav-{{ menu.label }}"
+        role="button"
+        [attr.data-menu-key]="menu.key"
+      >
+        {{ menu.label }}
+        <div class="menu-arrow"></div>
+      </a>
+
+      <div
+        ngbDropdownMenu
+        class="dropdown-menu"
+        attr.aria-labelledby="topnav-{{ menu.label }}"
+      >
+        @for (subitem of menu.children; track $index) {
+          <ng-container
+            *ngTemplateOutlet="
+              SubMenu;
+              context: {
+                menu: subitem,
+                linkClassName: 'dropdown-item drop-arrow-none nav-link-ref',
+              }
+            "
+          >
+          </ng-container>
+        }
+      </div>
+    } @else {
+      <a
+        [routerLink]="menu.url"
+        class="dropdown-item nav-link-ref"
+        [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+        [attr.data-menu-key]="menu.key"
+        >{{ menu.label }}
+      </a>
+    }
+  </div>
+</ng-template>
+
+<ng-template
+  #MenuItem
+  let-menu="menu"
+  let-className="className"
+  let-linkClassName="linkClassName"
+>
+  <li
+    [class]="className"
+    [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+  >
+    <a
+      [routerLink]="menu.url"
+      [class]="linkClassName"
+      [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+      [attr.data-menu-key]="menu.key"
+    >
+      <i class="ti {{menu.icon}}" class="me-1" *ngIf="menu.icon"></i>
+     {{ menu.label }}
+    </a>
+  </li>
+</ng-template>

@@ -1,0 +1,108 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{ 'SUPPLIERS.VIEW_SUPPLIER' | translate }}
+  </h4>
+  <button type="button" class="btn-close ms-auto" (click)="onClose()"></button>
+</div>
+
+<div class="modal-body" *ngIf="supplier">
+  <div class="supplier-details">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'SUPPLIERS.NAME' | translate }}:</label
+          >
+          <div class="detail-value">{{ supplier.name }}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'SUPPLIERS.DOCUMENT_NUMBER' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{
+              supplier.documentNumber || ('COMMON.NOT_SPECIFIED' | translate)
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'SUPPLIERS.PHONE' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{ supplier.phone || ('COMMON.NOT_SPECIFIED' | translate) }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'SUPPLIERS.EMAIL' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{ supplier.email || ('COMMON.NOT_SPECIFIED' | translate) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'SUPPLIERS.STATUS' | translate }}:</label
+          >
+          <div class="detail-value">
+            <span
+              [class]="
+                'badge ' + (supplier.isActive ? 'bg-success' : 'bg-danger')
+              "
+            >
+              {{
+                supplier.isActive
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'COMMON.CREATED_AT' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{ supplier.createdAt | date: 'yyyy/MM/dd HH:mm' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="supplier.updatedAt !== supplier.createdAt">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'COMMON.UPDATED_AT' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{ supplier.updatedAt | date: 'yyyy/MM/dd HH:mm' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="onClose()">
+    {{ 'COMMON.CLOSE' | translate }}
+  </button>
+</div>

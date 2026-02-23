@@ -1,0 +1,100 @@
+<div
+  class="theme-customizer-backdrop"
+  *ngIf="isOpen"
+  (click)="closePanel()"
+></div>
+
+<div
+  class="theme-customizer-panel"
+  [class.theme-customizer-panel--open]="isOpen"
+>
+  <div class="theme-customizer-panel__header">
+    <div class="d-flex align-items-center gap-2">
+      <i class="ti ti-palette fs-20 text-primary"></i>
+      <h5 class="theme-customizer-panel__title mb-0">
+        {{ 'THEME_CUSTOMIZER.TITLE' | translate }}
+      </h5>
+    </div>
+    <button
+      type="button"
+      class="btn btn-sm btn-light rounded-circle"
+      (click)="closePanel()"
+      [attr.aria-label]="'Cerrar panel'"
+    >
+      <i class="ti ti-x"></i>
+    </button>
+  </div>
+
+  <div class="theme-customizer-panel__body">
+    <div class="customizer-section">
+      <h6 class="customizer-section__title">
+        <i class="ti ti-color-swatch me-2"></i>
+        {{ 'THEME_CUSTOMIZER.PRIMARY_COLOR' | translate }}
+      </h6>
+      <p class="customizer-section__description text-muted small mb-3">
+        {{ 'THEME_CUSTOMIZER.PRIMARY_COLOR_DESC' | translate }}
+      </p>
+
+      <div class="color-palette">
+        <button
+          *ngFor="let color of availableColors"
+          type="button"
+          class="color-palette__item"
+          [class.color-palette__item--selected]="isColorSelected(color)"
+          [style.background-color]="color.hex"
+          (click)="selectColor(color)"
+          [attr.aria-label]="'Seleccionar color ' + color.displayName"
+          [attr.title]="color.displayName"
+        >
+          <i
+            class="ti ti-check color-palette__check"
+            *ngIf="isColorSelected(color)"
+          ></i>
+        </button>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="customizer-section">
+      <h6 class="customizer-section__title">
+        <i class="ti ti-language me-2"></i>
+        {{ 'THEME_CUSTOMIZER.LANGUAGE' | translate }}
+      </h6>
+      <p class="customizer-section__description text-muted small mb-3">
+        {{ 'THEME_CUSTOMIZER.LANGUAGE_DESC' | translate }}
+      </p>
+
+      <div class="language-selector">
+        <button
+          *ngFor="let lang of languageList"
+          type="button"
+          class="language-selector__item"
+          [class.language-selector__item--active]="
+            getCurrentLanguage() === lang.code
+          "
+          (click)="changeLanguage(lang.code)"
+          [attr.aria-label]="'Seleccionar idioma ' + lang.name"
+        >
+          <img
+            [src]="lang.flag"
+            [alt]="lang.name"
+            class="language-selector__flag"
+          />
+          <span class="language-selector__name">{{ lang.name }}</span>
+          <i
+            class="ti ti-check language-selector__check"
+            *ngIf="getCurrentLanguage() === lang.code"
+          ></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-customizer-panel__footer">
+    <small class="text-muted d-block text-center mt-2">
+      <i class="ti ti-info-circle me-1"></i>
+      {{ 'THEME_CUSTOMIZER.INFO' | translate }}
+    </small>
+  </div>
+</div>

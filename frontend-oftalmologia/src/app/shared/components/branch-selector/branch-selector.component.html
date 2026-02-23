@@ -1,0 +1,59 @@
+<div class="branch-selector-topbar">
+  <ng-select
+    [items]="allBranchOptions"
+    bindLabel="name"
+    bindValue="id"
+    [ngModel]="selectedBranchId"
+    (ngModelChange)="onBranchChange($event)"
+    [placeholder]="'Seleccionar sucursal'"
+    [clearable]="true"
+    [loading]="filterState?.isLoading"
+    class="branch-select-minimal"
+    [class.branch-filtered]="hasActiveFilter"
+    dropdownPosition="bottom"
+  >
+    <!-- <ng-template ng-header-tmp>
+      <div class="dropdown-header">
+        <i class="ti ti-building-community me-2"></i>
+        <span>Filtrar por Sucursal</span>
+      </div>
+    </ng-template> -->
+
+    <ng-template ng-label-tmp let-item="item">
+      <div class="selected-branch-label">
+        <i
+          class="ti me-2"
+          [ngClass]="item ? 'ti-building-store' : 'ti-user-check'"
+        ></i>
+        <span class="label-text">{{ item?.name || 'Mi Sucursal' }}</span>
+      </div>
+    </ng-template>
+
+    <ng-template ng-option-tmp let-item="item" let-index="index">
+      <div class="branch-option">
+        <i
+          class="ti me-2"
+          [ngClass]="item.id ? 'ti-building-store' : 'ti-user-check'"
+        ></i>
+        <span>{{ item.name || 'Mi Sucursal' }}</span>
+      </div>
+    </ng-template>
+
+    <ng-option [value]="null">
+      <div class="branch-option">
+        <i class="ti ti-user-check me-2"></i>
+        <span>Sin Sucursal</span>
+      </div>
+    </ng-option>
+
+    <ng-option
+      *ngFor="let branch of filterState?.availableBranches"
+      [value]="branch.id"
+    >
+      <div class="branch-option">
+        <i class="ti ti-building-store me-2"></i>
+        <span>{{ branch.name }}</span>
+      </div>
+    </ng-option>
+  </ng-select>
+</div>

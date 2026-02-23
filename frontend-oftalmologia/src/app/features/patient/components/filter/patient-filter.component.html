@@ -1,0 +1,136 @@
+<div class="patient-filter">
+  <form [formGroup]="patientFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.GENERAL_SEARCH' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="search"
+          [placeholder]="
+            'PATIENT.FILTER.GENERAL_SEARCH_PLACEHOLDER' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.FIRST_NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [placeholder]="'PATIENT.FILTER.FIRST_NAME_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.LAST_NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [placeholder]="'PATIENT.FILTER.LAST_NAME_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.EMAIL' | translate }}
+        </label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [placeholder]="'PATIENT.FILTER.EMAIL_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.DOCUMENT_NUMBER' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="documentNumber"
+          [placeholder]="
+            'PATIENT.FILTER.DOCUMENT_NUMBER_PLACEHOLDER' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.MOBILE_PHONE' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="mobilePhone"
+          [placeholder]="'PATIENT.FILTER.MOBILE_PHONE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.ADDRESS' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="address"
+          [placeholder]="'PATIENT.FILTER.ADDRESS_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'PATIENT.FILTER.IS_ACTIVE' | translate }}
+        </label>
+        <ng-select
+          formControlName="isActive"
+          [items]="active$ | async"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="true"
+          [placeholder]="'PATIENT.FILTER.IS_ACTIVE_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option
+            *ngFor="let option of active$ | async"
+            [value]="option.value"
+          >
+            <span class="text-dark fw-medium">{{ option.label }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="onReset()"
+          >
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-sm"
+            [disabled]="!patientFilterForm?.valid"
+          >
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

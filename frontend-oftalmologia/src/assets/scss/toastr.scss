@@ -1,0 +1,158 @@
+// Estilos personalizados para Toastr
+.toast-container {
+  position: fixed;
+  z-index: 999999;
+  margin: 12px;
+  
+  .ngx-toastr {
+    position: relative;
+    overflow: hidden;
+    margin: 0 0 8px;
+    padding: 15px 35px 15px 15px !important;
+    width: 350px;
+    border-radius: 4px;
+    box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
+    opacity: 0.95;
+    display: flex;
+    flex-direction: column;
+    
+    // Ocultar el icono por defecto de ngx-toastr
+    &:before {
+      display: none !important;
+    }
+
+    // Eliminar padding izquierdo por defecto
+    &.toast-success,
+    &.toast-error,
+    &.toast-info,
+    &.toast-warning {
+      padding-left: 15px !important;
+      background-image: none !important;
+    }
+    
+    &:hover {
+      opacity: 1;
+      cursor: pointer;
+    }
+  }
+
+  // Posicionamiento
+  &.toast-top-right {
+    top: 12px;
+    right: 12px;
+  }
+
+  // Tipos de toast
+  .toast-success {
+    background-color: #0ab39c !important;
+    border-left: 4px solid darken(#0ab39c, 10%);
+    color: #ffffff;
+  }
+
+  .toast-error {
+    background-color: #f06548 !important;
+    border-left: 4px solid darken(#f06548, 10%);
+    color: #ffffff;
+  }
+
+  .toast-info {
+    background-color: #299cdb !important;
+    border-left: 4px solid darken(#299cdb, 10%);
+    color: #ffffff;
+  }
+
+  .toast-warning {
+    background-color: #f7b84b !important;
+    border-left: 4px solid darken(#f7b84b, 10%);
+    color: #ffffff;
+  }
+
+  // Elementos internos
+  .toast-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-weight: 500;
+    font-size: 15px;
+    margin: 0 0 5px 0;
+
+    &::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      flex-shrink: 0;
+    }
+  }
+
+  .toast-success .toast-title::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%23ffffff' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .toast-error .toast-title::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%23ffffff' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
+  }
+
+  .toast-info .toast-title::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%23ffffff' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='16' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='8' x2='12.01' y2='8'%3E%3C/line%3E%3C/svg%3E");
+  }
+
+  .toast-warning .toast-title::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%23000000' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'%3E%3C/path%3E%3Cline x1='12' y1='9' x2='12' y2='13'%3E%3C/line%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'%3E%3C/line%3E%3C/svg%3E");
+  }
+
+  .toast-message {
+    font-size: 14px;
+    word-wrap: break-word;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .toast-close-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 16px;
+    height: 16px;
+    color: currentColor;
+    opacity: 0.5;
+    font-size: 16px;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // Barra de progreso
+  .toast-progress {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.7);
+    opacity: 0.7;
+  }
+}
+
+// Animación de entrada
+@keyframes toast-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.toast-container .ngx-toastr {
+  animation: toast-in-right 0.3s ease-in-out;
+} 
+ 

@@ -1,0 +1,261 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{
+      editMode
+        ? ('SHIFTS.EDIT_SHIFT' | translate)
+        : ('SHIFTS.CREATE_SHIFT' | translate)
+    }}
+  </h4>
+  <button
+    type="button"
+    class="ms-auto border-0 bg-transparent"
+    (click)="onCancel()"
+  >
+    <span class="fs-1 text-black">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="shiftForm" (ngSubmit)="onSubmit()" class="modal-form">
+    <div class="row" *ngIf="!editMode">
+      <div class="col-md-12">
+        <div class="form-group mb-3">
+          <label for="patientId" class="form-label">
+            {{ 'SHIFTS.PATIENT' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <ng-select
+            formControlName="patientId"
+            [placeholder]="'SHIFTS.SELECT_PATIENT' | translate"
+            [clearable]="true"
+            [searchable]="true"
+            [loading]="patientsLoading"
+            [items]="patients"
+            bindLabel="fullName"
+            bindValue="id"
+            [loadingText]="'COMMON.LOADING' | translate"
+            [notFoundText]="'COMMON.NO_RESULTS' | translate"
+            [clearAllText]="'COMMON.CLEAR_ALL' | translate"
+            [class.is-invalid]="isFieldInvalid('patientId')"
+            (change)="onPatientSelected($event)"
+            (clear)="onPatientCleared()"
+            (search)="onPatientSearch($event)"
+          >
+            <ng-template ng-option-tmp let-patient="item">
+              <div class="d-flex align-items-center">
+                <img
+                  [src]="getPatientProfileImage(patient)"
+                  [alt]="patient.fullName"
+                  class="rounded-circle me-2"
+                  width="32"
+                  height="32"
+                  style="object-fit: cover"
+                  (error)="onImageError($event)"
+                />
+                <div>
+                  <div class="fw-semibold">{{ patient.fullName }}</div>
+                  <small class="text-muted">{{ patient.documentNumber }}</small>
+                </div>
+              </div>
+            </ng-template>
+          </ng-select>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('patientId')">
+            {{ getFieldError('patientId') | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedPatient && !editMode" class="selected-patient-info mb-3">
+      <div class="card border-info">
+        <div class="card-header bg-light-info">
+          <h6 class="card-title mb-0">
+            {{ 'SHIFTS.SELECTED_PATIENT' | translate }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-auto">
+              <div class="patient-avatar">
+                <img
+                  [src]="getPatientProfileImage(selectedPatient)"
+                  [alt]="selectedPatient.fullName"
+                  class="rounded-circle"
+                  width="60"
+                  height="60"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            </div>
+            <div class="col">
+              <div class="patient-details">
+                <h6 class="mb-1">{{ selectedPatient.fullName }}</h6>
+                <p class="text-muted mb-1">
+                  {{ selectedPatient.documentNumber }}
+                </p>
+                <p class="text-muted mb-1">
+                  {{ selectedPatient.email }}
+                </p>
+                <p class="text-muted mb-0" *ngIf="selectedPatient.mobilePhone">
+                  {{ selectedPatient.mobilePhone }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedPatient && editMode" class="selected-patient-info mb-3">
+      <div class="card border-secondary">
+        <div class="card-header bg-light-secondary">
+          <h6 class="card-title mb-0">
+            {{ 'SHIFTS.PATIENT_INFORMATION' | translate }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-auto">
+              <div class="patient-avatar">
+                <img
+                  [src]="getPatientProfileImage(selectedPatient)"
+                  [alt]="selectedPatient.fullName"
+                  class="rounded-circle"
+                  width="60"
+                  height="60"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            </div>
+            <div class="col">
+              <div class="patient-details">
+                <h6 class="mb-1">{{ selectedPatient.fullName }}</h6>
+                <p class="text-muted mb-1">
+                  {{ selectedPatient.documentNumber }}
+                </p>
+                <p class="text-muted mb-1">
+                  {{ selectedPatient.email }}
+                </p>
+                <p class="text-muted mb-0" *ngIf="selectedPatient.mobilePhone">
+                  {{ selectedPatient.mobilePhone }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label for="appointmentDate" class="form-label">
+            {{ 'SHIFTS.APPOINTMENT_DATE' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="datetime-local"
+            id="appointmentDate"
+            class="form-control"
+            formControlName="appointmentDate"
+            [class.is-invalid]="isFieldInvalid('appointmentDate')"
+            [readonly]="formLoading"
+          />
+          <div
+            class="invalid-feedback"
+            *ngIf="isFieldInvalid('appointmentDate')"
+          >
+            {{ getFieldError('appointmentDate') | translate }}
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="col-md-6" *ngIf="editMode">
+        <div class="form-group mb-3">
+          <label for="statusId" class="form-label">
+            {{ 'SHIFTS.STATUS' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <ng-select
+            formControlName="statusId"
+            [placeholder]="'SHIFTS.SELECT_STATUS' | translate"
+            [clearable]="false"
+            [searchable]="false"
+            [loading]="statusesLoading"
+            [items]="statuses"
+            bindLabel="name"
+            bindValue="id"
+            [class.is-invalid]="isFieldInvalid('statusId')"
+            [disabled]="formLoading || statusesLoading"
+          >
+            <ng-template ng-option-tmp let-item="item">
+              <div class="d-flex align-items-center">
+                <span class="badge me-2" [style.background-color]="item.color">
+                  &nbsp;
+                </span>
+                {{ item.name }}
+              </div>
+            </ng-template>
+          </ng-select>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('statusId')">
+            {{ getFieldError('statusId') | translate }}
+          </div>
+        </div>
+      </div> -->
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group mb-3">
+          <label for="description" class="form-label">
+            {{ 'SHIFTS.DESCRIPTION' | translate }}
+          </label>
+          <textarea
+            id="description"
+            class="form-control"
+            formControlName="description"
+            rows="3"
+            [placeholder]="'SHIFTS.DESCRIPTION_PLACEHOLDER' | translate"
+            [class.is-invalid]="isFieldInvalid('description')"
+            [readonly]="formLoading"
+          >
+          </textarea>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('description')">
+            {{ getFieldError('description') | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="formLoading" class="loading-overlay">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="onCancel()"
+    [disabled]="formLoading"
+  >
+    {{ 'COMMON.CANCEL' | translate }}
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="onSubmit()"
+    [disabled]="!shiftForm.valid || formLoading"
+  >
+    <span
+      *ngIf="formLoading"
+      class="spinner-border spinner-border-sm me-2"
+    ></span>
+    {{
+      editMode ? ('COMMON.UPDATE' | translate) : ('COMMON.CREATE' | translate)
+    }}
+  </button>
+</div>

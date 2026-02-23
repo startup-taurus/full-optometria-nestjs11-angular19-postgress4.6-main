@@ -1,0 +1,190 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    <i class="ti ti-building me-2"></i>
+    {{
+      (editMode
+        ? 'BRANCHES_MODULE.EDIT_BRANCH'
+        : 'BRANCHES_MODULE.CREATE_NEW_BRANCH'
+      ) | translate
+    }}
+  </h5>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    (click)="closeModal()"
+    [disabled]="formLoading"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="branchForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="name" class="form-label">
+          {{ 'BRANCHES_MODULE.NAME' | translate }}
+          <span class="text-danger">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          formControlName="name"
+          [class.is-invalid]="isFieldInvalid('name')"
+          [placeholder]="'BRANCHES_MODULE.NAME_PLACEHOLDER' | translate"
+        />
+        @if (isFieldInvalid('name')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('name') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="code" class="form-label">
+          {{ 'BRANCHES_MODULE.CODE' | translate }}
+          <span class="text-danger">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="code"
+          formControlName="code"
+          [class.is-invalid]="isFieldInvalid('code')"
+          [placeholder]="'BRANCHES_MODULE.CODE_PLACEHOLDER' | translate"
+        />
+        @if (isFieldInvalid('code')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('code') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-12 mb-3">
+        <label for="address" class="form-label">
+          {{ 'BRANCHES_MODULE.ADDRESS' | translate }}
+          <span class="text-danger">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="address"
+          formControlName="address"
+          [class.is-invalid]="isFieldInvalid('address')"
+          [placeholder]="'BRANCHES_MODULE.ADDRESS_PLACEHOLDER' | translate"
+        />
+        @if (isFieldInvalid('address')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('address') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="city" class="form-label">
+          {{ 'BRANCHES_MODULE.CITY' | translate }}
+          <span class="text-danger">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="city"
+          formControlName="city"
+          [class.is-invalid]="isFieldInvalid('city')"
+          [placeholder]="'BRANCHES_MODULE.CITY_PLACEHOLDER' | translate"
+        />
+        @if (isFieldInvalid('city')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('city') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="phone" class="form-label">
+          {{ 'BRANCHES_MODULE.PHONE' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="phone"
+          formControlName="phone"
+          [class.is-invalid]="isFieldInvalid('phone')"
+          [placeholder]="'BRANCHES_MODULE.PHONE_PLACEHOLDER' | translate"
+        />
+        @if (isFieldInvalid('phone')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('phone') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="corporateEmail" class="form-label">
+          {{ 'BRANCHES_MODULE.CORPORATE_EMAIL' | translate }}
+        </label>
+        <input
+          type="email"
+          class="form-control"
+          id="corporateEmail"
+          formControlName="corporateEmail"
+          [class.is-invalid]="isFieldInvalid('corporateEmail')"
+          [placeholder]="
+            'BRANCHES_MODULE.CORPORATE_EMAIL_PLACEHOLDER' | translate
+          "
+        />
+        @if (isFieldInvalid('corporateEmail')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('corporateEmail') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="openingHours" class="form-label">
+          {{ 'BRANCHES_MODULE.OPENING_HOURS' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="openingHours"
+          formControlName="openingHours"
+          [class.is-invalid]="isFieldInvalid('openingHours')"
+          [placeholder]="
+            'BRANCHES_MODULE.OPENING_HOURS_PLACEHOLDER' | translate
+          "
+        />
+        @if (isFieldInvalid('openingHours')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('openingHours') | translate }}
+          </div>
+        }
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="closeModal()"
+    [disabled]="formLoading"
+  >
+    {{ 'WORDS.CANCEL' | translate }}
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="onSubmit()"
+    [disabled]="formLoading || branchForm.invalid"
+  >
+    @if (formLoading) {
+      <span
+        class="spinner-border spinner-border-sm me-1"
+        role="status"
+        aria-hidden="true"
+      ></span>
+    }
+    {{ (editMode ? 'COMMON.UPDATE' : 'COMMON.CREATE') | translate }}
+  </button>
+</div>

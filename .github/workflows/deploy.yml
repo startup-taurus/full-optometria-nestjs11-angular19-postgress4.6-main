@@ -1,0 +1,82 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  deploy:
+    if: github.event_name == 'push' || (github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    env:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+
+    steps:
+      - name: Install sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Deploy over SSH
+        env:
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          PORT="${SERVER_PORT:-22}"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -p "$PORT" "$SERVER_USER@$SERVER_HOST" <<'EOF'
+            set -e
+
+            PROJECT_PATH="/var/www/full-optometria-nestjs11-angular19-postgress4.6"
+            git config --global --add safe.directory "$PROJECT_PATH"
+
+            if command -v docker-compose >/dev/null 2>&1; then
+              COMPOSE_CMD="docker-compose"
+            else
+              COMPOSE_CMD="docker compose"
+            fi
+
+            cd "$PROJECT_PATH"
+            
+            echo "=== Actualizando código desde repositorio ==="
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+            
+            PROJECT_NAME="full-optometria-nestjs11-angular19-postgress46"
+
+            echo "=== Deteniendo y removiendo contenedores del proyecto (sin borrar volúmenes) ==="
+            $COMPOSE_CMD -p "$PROJECT_NAME" down --remove-orphans || true
+
+            echo "=== Forzando eliminación de contenedores con nombres conflictivos ==="
+            docker ps -aq -f "name=${PROJECT_NAME}-" | xargs -r docker rm -f 2>/dev/null || true
+            docker ps -aq -f "name=full-optometria" | xargs -r docker rm -f 2>/dev/null || true
+            docker ps -aq -f "name=optometria" | xargs -r docker rm -f 2>/dev/null || true
+
+            echo "=== Limpiando redes huérfanas del proyecto ==="
+            docker network ls -q -f "name=${PROJECT_NAME}" | xargs -r docker network rm 2>/dev/null || true
+            docker network ls -q -f "name=full-optometria" | xargs -r docker network rm 2>/dev/null || true
+            docker network ls -q -f "name=optometria" | xargs -r docker network rm 2>/dev/null || true
+            
+            echo "=== Esperando limpieza completa ==="
+            sleep 3
+            
+            echo "=== Reconstruyendo imágenes ==="
+            $COMPOSE_CMD -p "$PROJECT_NAME" build --no-cache
+            
+            echo "=== Iniciando servicios ==="
+            $COMPOSE_CMD -p "$PROJECT_NAME" up -d
+            
+            echo "=== Limpiando imágenes no utilizadas ==="
+            docker image prune -f
+            
+            echo "=== Estado de los servicios ==="
+            $COMPOSE_CMD -p "$PROJECT_NAME" ps
+            
+            echo "=== Despliegue completado exitosamente ==="
+          EOF

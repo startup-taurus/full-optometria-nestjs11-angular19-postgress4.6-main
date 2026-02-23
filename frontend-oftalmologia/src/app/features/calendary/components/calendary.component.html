@@ -1,0 +1,486 @@
+<div class="container-fluid p-4 common-calendar">
+  <div class="row">
+    <div class="col-lg-3 col-md-4 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div
+          class="card-header bg-transparent border-0 pb-0 d-flex justify-content-between align-items-center"
+        >
+          <h6 class="card-title mb-0 text-dark fw-semibold">
+            <i class="ti ti-calendar me-2"></i>
+            {{ monthNames[currentMonth()] }} {{ currentYear() }}
+          </h6>
+          <div class="btn-group btn-group-sm" role="group">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="previousMonth()"
+              [title]="'CALENDAR.NAVIGATION.PREVIOUS_MONTH' | translate"
+            >
+              <i class="ti ti-chevron-left"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="nextMonth()"
+              [title]="'CALENDAR.NAVIGATION.NEXT_MONTH' | translate"
+            >
+              <i class="ti ti-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body pt-2">
+          <div class="mini-calendar">
+            <div class="row g-0 text-center fw-bold text-muted small mb-2">
+              <div
+                class="col"
+                *ngFor="let day of ['D', 'L', 'M', 'M', 'J', 'V', 'S']"
+              >
+                {{ day }}
+              </div>
+            </div>
+
+            <ng-container
+              *ngFor="let week of getCalendarWeeks(); let weekIndex = index"
+            >
+              <div class="row g-0 mb-1">
+                <div
+                  class="col text-center"
+                  *ngFor="let day of week; let dayIndex = index"
+                >
+                  <button
+                    type="button"
+                    class="btn btn-sm w-100 mini-day-btn"
+                    [class.btn-primary]="day && isSelectedDay(day)"
+                    [class.btn-outline-light]="
+                      day && !isSelectedDay(day) && !isToday(day)
+                    "
+                    [class.btn-outline-primary]="
+                      day && isToday(day) && !isSelectedDay(day)
+                    "
+                    [class.btn-light]="
+                      day && isToday(day) && isSelectedDay(day)
+                    "
+                    [class.invisible]="!day"
+                    [disabled]="!day"
+                    (click)="selectDay(day)"
+                    [title]="
+                      day
+                        ? 'Ir al ' +
+                          day.getDate() +
+                          ' de ' +
+                          monthNames[day.getMonth()]
+                        : ''
+                    "
+                  >
+                    {{ day?.getDate() || '' }}
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid mt-3">
+        <button
+          type="button"
+          class="btn btn-outline-primary shadow-sm"
+          (click)="goToToday()"
+        >
+          <i class="ti ti-calendar-today me-2"></i>{{ 'CALENDAR.NAVIGATION.GO_TO_TODAY' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-8">
+      <div class="card border-0 shadow-sm calendar-container">
+        <div class="card-header text-white calendar-main-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-white">
+              {{ monthNames[currentMonth()] }} de {{ currentYear() }}
+            </h4>
+            <div class="d-flex align-items-center gap-2">
+              <button
+                type="button"
+                class="btn btn-light btn-sm"
+                (click)="goToToday()"
+              >
+                <i class="ti ti-calendar-today me-1"></i>{{ 'CALENDAR.NAVIGATION.TODAY' | translate }}
+              </button>
+              <div class="btn-group" role="group">
+                <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  (click)="previousMonth()"
+                  [title]="'CALENDAR.NAVIGATION.PREVIOUS_MONTH' | translate"
+                >
+                  <i class="ti ti-chevron-left"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  (click)="nextMonth()"
+                  [title]="'CALENDAR.NAVIGATION.NEXT_MONTH' | translate"
+                >
+                  <i class="ti ti-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0" *ngIf="!isLoading(); else loading">
+          <div class="row g-0 bg-light border-bottom calendar-header-days">
+            <div
+              class="col text-center py-3 border-end fw-bold text-dark"
+              *ngFor="let day of dayNames"
+            >
+              {{ day }}
+            </div>
+          </div>
+
+          <div class="calendar-grid">
+            <ng-container
+              *ngFor="let week of getCalendarWeeks(); let weekIndex = index"
+            >
+              <div class="row g-0" style="height: 120px">
+                <div
+                  class="col border-end border-bottom calendar-day position-relative"
+                  *ngFor="let day of week; let dayIndex = index"
+                  [class.bg-light]="!day"
+                  [class.bg-primary-subtle]="day && isToday(day)"
+                  [class.bg-info-subtle]="
+                    day && isSelectedDay(day) && !isToday(day)
+                  "
+                  (click)="selectDay(day)"
+                >
+                  <div class="position-absolute top-0 start-0 p-2">
+                    <span
+                      class="badge rounded-pill"
+                      [class.bg-primary]="day && isToday(day)"
+                      [class.bg-secondary]="day && !isToday(day)"
+                      *ngIf="day"
+                    >
+                      {{ day.getDate() }}
+                    </span>
+                  </div>
+
+                  <div
+                    class="events-container"
+                    *ngIf="day"
+                    [class.today-events]="isToday(day)"
+                  >
+                    <ng-container
+                      *ngFor="
+                        let shift of getShiftsForDay(day);
+                        let i = index;
+                        trackBy: trackByShiftId
+                      "
+                    >
+                      <div
+                        class="calendar-shift text-truncate cursor-pointer"
+                        [class.d-none]="i >= 3"
+                        [style.background-color]="shift.status.color"
+                        (click)="
+                          openDetailModal(shift); $event.stopPropagation()
+                        "
+                        [attr.title]="
+                          shift.patient.firstName +
+                          ' ' +
+                          shift.patient.lastName +
+                          ' - ' +
+                          formatTime(shift.appointmentDate)
+                        "
+                      >
+                        <small class="d-block text-white fw-semibold"
+                          >{{ shift.patient.firstName }}
+                          {{ shift.patient.lastName }}</small
+                        >
+                        <small class="d-block text-white-50">
+                          {{ formatTime(shift.appointmentDate) }}
+                        </small>
+                      </div>
+                    </ng-container>
+
+                    <div
+                      class="more-events-indicator"
+                      *ngIf="getShiftsForDay(day).length > 3"
+                      [attr.title]="
+                        'Ver todas las ' +
+                        getShiftsForDay(day).length +
+                        ' citas'
+                      "
+                    >
+                      +{{ getShiftsForDay(day).length - 3 }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <ng-template #loading>
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">{{ 'CALENDAR.MESSAGES.LOADING' | translate }}</span>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  [class.show]="showDetailModal()"
+  [style.display]="showDetailModal() ? 'block' : 'none'"
+  [style.z-index]="showDetailModal() ? '1055' : ''"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="detailModalLabel"
+  aria-hidden="!showDetailModal()"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-dark" id="detailModalLabel">
+          <i class="ti ti-eye me-2"></i>{{ 'CALENDAR.APPOINTMENT_DETAILS.TITLE' | translate }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close ms-auto"
+          (click)="closeDetailModal()"
+          [attr.aria-label]="'CALENDAR.ACTIONS.CLOSE' | translate"
+        ></button>
+      </div>
+      <form
+        [formGroup]="updateShiftForm"
+        (ngSubmit)="updateShift()"
+        *ngIf="selectedShift()"
+      >
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card mb-3 border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">
+                    <i class="ti ti-user me-2"></i>{{ 'CALENDAR.APPOINTMENT_DETAILS.PATIENT_INFO' | translate }}
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">
+                      {{ 'CALENDAR.APPOINTMENT_DETAILS.FULL_NAME' | translate }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control form-control-readonly"
+                        [value]="
+                          selectedShift()!.patient.firstName +
+                          ' ' +
+                          selectedShift()!.patient.lastName
+                        "
+                        readonly
+                        disabled
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-copy"
+                        (click)="
+                          $event.stopPropagation();
+                          copyToClipboard(
+                            selectedShift()!.patient.firstName +
+                              ' ' +
+                              selectedShift()!.patient.lastName,
+                            'name'
+                          )
+                        "
+                        [title]="'CALENDAR.APPOINTMENT_DETAILS.COPY_NAME' | translate"
+                      >
+                        <i class="ti ti-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">
+                      {{ 'CALENDAR.APPOINTMENT_DETAILS.DOCUMENT_NUMBER' | translate }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control form-control-readonly"
+                        [value]="selectedShift()!.patient.documentNumber"
+                        readonly
+                        disabled
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-copy"
+                        (click)="
+                          $event.stopPropagation();
+                          copyToClipboard(
+                            selectedShift()!.patient.documentNumber,
+                            'document'
+                          )
+                        "
+                        [title]="'CALENDAR.APPOINTMENT_DETAILS.COPY_DOCUMENT' | translate"
+                      >
+                        <i class="ti ti-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">
+                      {{ 'CALENDAR.APPOINTMENT_DETAILS.PHONE' | translate }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control form-control-readonly"
+                        [value]="selectedShift()!.patient.mobilePhone"
+                        readonly
+                        disabled
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-copy"
+                        (click)="
+                          $event.stopPropagation();
+                          copyToClipboard(
+                            selectedShift()!.patient.mobilePhone,
+                            'phone'
+                          )
+                        "
+                        [title]="'CALENDAR.APPOINTMENT_DETAILS.COPY_PHONE' | translate"
+                      >
+                        <i class="ti ti-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mb-0">
+                    <label class="form-label text-muted small mb-1">
+                      {{ 'CALENDAR.APPOINTMENT_DETAILS.EMAIL' | translate }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control form-control-readonly"
+                        [value]="selectedShift()!.patient.email"
+                        readonly
+                        disabled
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-copy"
+                        (click)="
+                          $event.stopPropagation();
+                          copyToClipboard(selectedShift()!.patient.email, 'email')
+                        "
+                        [title]="'CALENDAR.APPOINTMENT_DETAILS.COPY_EMAIL' | translate"
+                      >
+                        <i class="ti ti-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card mb-3 border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">
+                    <i class="ti ti-info-circle me-2"></i>{{ 'CALENDAR.APPOINTMENT_DETAILS.STATUS_AND_BRANCH' | translate }}
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">
+                      {{ 'CALENDAR.APPOINTMENT_DETAILS.STATUS' | translate }}
+                    </label>
+                    <div class="d-flex align-items-center">
+                      <span
+                        class="badge rounded-pill px-3 py-2"
+                        [style.background-color]="selectedShift()!.status.color"
+                      >
+                        {{ selectedShift()!.status.name }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="mb-0">
+                    <label class="form-label text-muted small mb-1">
+                      {{ 'CALENDAR.APPOINTMENT_DETAILS.BRANCH' | translate }}
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control form-control-readonly"
+                      [value]="selectedShift()!.branch.name"
+                      readonly
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="detailAppointmentDate" class="form-label text-dark">
+                  <i class="ti ti-calendar-clock me-1"></i>{{ 'CALENDAR.APPOINTMENT_DETAILS.APPOINTMENT_DATE_TIME' | translate }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="detailAppointmentDate"
+                  formControlName="appointmentDate"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="detailDescription" class="form-label text-dark">
+              <i class="ti ti-file-text me-1"></i>{{ 'CALENDAR.APPOINTMENT_DETAILS.OBSERVATIONS' | translate }}
+            </label>
+            <textarea
+              class="form-control"
+              id="detailDescription"
+              rows="4"
+              formControlName="description"
+              [placeholder]="'CALENDAR.APPOINTMENT_DETAILS.OBSERVATIONS_PLACEHOLDER' | translate"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeDetailModal()"
+          >
+            {{ 'CALENDAR.ACTIONS.CANCEL' | translate }}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="updateShiftForm.invalid"
+          >
+            {{ 'CALENDAR.ACTIONS.UPDATE' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal-backdrop fade show"
+  *ngIf="showDetailModal()"
+  (click)="closeDetailModal()"
+  [style.z-index]="'1050'"
+></div>

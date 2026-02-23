@@ -1,0 +1,163 @@
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinner-border {
+  &.text-primary {
+    --bs-spinner-border-color: var(--bs-primary);
+    --bs-spinner-border-color-rgb: var(--bs-primary-rgb);
+  }
+}
+
+.badge {
+  i.fa-circle {
+    opacity: 0.8;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e9ecef;
+  transition: box-shadow 0.15s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  strong {
+    font-size: 0.875rem;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  span {
+    font-size: 0.95rem;
+    color: #212529;
+    word-break: break-word;
+
+    &.text-muted {
+      color: #6c757d !important;
+    }
+  }
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  font-weight: 500;
+  border-radius: 0.35rem;
+
+  &.bg-success {
+    background-color: #198754 !important;
+  }
+
+  &.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+  }
+
+  &.bg-light {
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    border: 1px solid #dee2e6 !important;
+  }
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+
+  &.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+
+    &:hover {
+      background-color: #545b62;
+      border-color: #4e555b;
+    }
+  }
+}
+
+.btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.text-center {
+  .fa-exclamation-triangle {
+    color: #ffc107;
+  }
+}
+
+h4 {
+  font-weight: 600;
+  color: #495057;
+}
+
+h5 {
+  font-weight: 500;
+  color: #495057;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .user-avatar {
+    .profile-img,
+    .avatar-placeholder {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-item {
+    padding: 0.5rem;
+
+    strong,
+    span {
+      font-size: 0.8rem;
+    }
+  }
+}

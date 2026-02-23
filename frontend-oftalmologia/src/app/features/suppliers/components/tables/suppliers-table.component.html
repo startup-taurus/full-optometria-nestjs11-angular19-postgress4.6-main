@@ -1,0 +1,126 @@
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card common-datatable-card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-primary">
+              <i class="ti ti-building-store me-2"></i>
+              {{ 'SUPPLIERS.TITLE' | translate }}
+            </h5>
+            <div class="d-flex gap-2">
+              <button
+                *ngIf="hasActiveFilters()"
+                class="btn btn-outline-danger btn-sm filter-clear-btn"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RESET' | translate"
+                (click)="clearAllFilters()"
+              >
+                <i class="fa fa-filter filter-crossed"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'SUPPLIERS.ACTIONS.REFRESH' | translate"
+                (click)="reloadDatatable()"
+              >
+                <i class="fa fa-repeat"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'SUPPLIERS.ACTIONS.CREATE' | translate"
+                (click)="openModal(BUTTON_ACTIONS.ADD)"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <shared-ngx-datatable
+            [config]="config$ | async"
+            [data]="data$ | async"
+            (onChangePage)="onChangePage($event)"
+            (onChangeLimit)="onChangeLimit($event)"
+            class="common-ngx-datatable"
+          >
+            <ng-template #statusTemplate let-row="row" let-value="value">
+              <span
+                class="badge"
+                [ngClass]="{
+                  'bg-success': row.isActive,
+                  'bg-danger': !row.isActive,
+                }"
+              >
+                {{
+                  row.isActive
+                    ? ('SUPPLIERS.FILTERS.ACTIVE' | translate)
+                    : ('SUPPLIERS.FILTERS.INACTIVE' | translate)
+                }}
+              </span>
+            </ng-template>
+
+            <ng-template #createdAtTemplate let-row="row" let-value="value">
+              <span class="text-muted">
+                {{ row.createdAt | date: FORMAT_FOR_DATES }}
+              </span>
+            </ng-template>
+
+            <ng-template #updatedAtTemplate let-row="row" let-value="value">
+              <span class="text-muted">
+                {{ row.updatedAt | date: FORMAT_FOR_DATES }}
+              </span>
+            </ng-template>
+
+            <ng-template #actionsTemplate let-row="row">
+              <div class="d-flex gap-1">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-info"
+                  (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
+                  [attr.aria-label]="'SUPPLIERS.ACTIONS.VIEW' | translate"
+                  [ngbTooltip]="'SUPPLIERS.ACTIONS.VIEW' | translate"
+                >
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-warning"
+                  (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
+                  [attr.aria-label]="'SUPPLIERS.ACTIONS.EDIT' | translate"
+                  [ngbTooltip]="'SUPPLIERS.ACTIONS.EDIT' | translate"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="openModal(BUTTON_ACTIONS.DELETE, row)"
+                  [attr.aria-label]="'SUPPLIERS.ACTIONS.DELETE' | translate"
+                  [ngbTooltip]="'SUPPLIERS.ACTIONS.DELETE' | translate"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </ng-template>
+          </shared-ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  (filterApplied)="onSideFilterApplied($event)"
+  (filterCleared)="onSideFilterCleared()"
+>
+</side-filter-panel>

@@ -1,0 +1,88 @@
+<page-title
+  title="{{ 'ROLES_AND_PERMISSIONS.ROLE.TITLE' | translate }}"
+  class="d-none d-lg-block"
+/>
+
+<div class="card roles-permissions-wrapper">
+  <div class="mobile-view d-lg-none">
+    <div class="mobile-header">
+      <button
+        class="btn-back"
+        *ngIf="currentMobileView !== 'roles'"
+        (click)="navigateBack()"
+      >
+        <i class="ti ti-arrow-left"></i>
+      </button>
+      <h5 class="mobile-title">{{ getMobileTitle() | translate }}</h5>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="mobile-views-container" [attr.data-view]="currentMobileView">
+      <div
+        class="mobile-view-panel"
+        [class.active]="currentMobileView === 'roles'"
+      >
+        <role-left-side-bar />
+      </div>
+
+      <div
+        class="mobile-view-panel"
+        [class.active]="currentMobileView === 'modules'"
+      >
+        <module-area />
+      </div>
+
+      <div
+        class="mobile-view-panel"
+        [class.active]="currentMobileView === 'permissions'"
+      >
+        <permission-rigth-side-bar />
+      </div>
+    </div>
+  </div>
+
+  <div class="desktop-view d-none d-lg-flex chat">
+    <div class="sidebar-left">
+      <role-left-side-bar />
+    </div>
+
+    <div class="content-center flex-grow-1">
+      @if (selectedRoleId) {
+        <module-area />
+      } @else {
+        <div class="empty-state">
+          <i class="ti ti-user-cog fs-48 text-muted mb-3"></i>
+          <h4 class="text-muted mb-2">
+            {{ 'ROLES_AND_PERMISSIONS.ROLE.SELECT_ROLE' | translate }}
+          </h4>
+          <p class="text-muted text-center">
+            {{
+              'ROLES_AND_PERMISSIONS.ROLE.SELECT_ROLE_DESCRIPTION' | translate
+            }}
+          </p>
+        </div>
+      }
+    </div>
+
+    @if (selectedRoleId) {
+      @if (selectedModuleId) {
+        <div class="sidebar-right">
+          <permission-rigth-side-bar />
+        </div>
+      } @else {
+        <div class="sidebar-right empty-state">
+          <i class="ti ti-click fs-48 text-muted mb-3"></i>
+          <h4 class="text-muted mb-2">
+            {{ 'ROLES_AND_PERMISSIONS.MODULE.SELECT_MODULE' | translate }}
+          </h4>
+          <p class="text-muted text-center">
+            {{
+              'ROLES_AND_PERMISSIONS.MODULE.SELECT_MODULE_DESCRIPTION'
+                | translate
+            }}
+          </p>
+        </div>
+      }
+    }
+  </div>
+</div>

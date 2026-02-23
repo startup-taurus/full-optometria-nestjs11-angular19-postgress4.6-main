@@ -1,0 +1,204 @@
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card common-datatable-card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-primary">
+              <i class="ti ti-package me-2"></i>
+              {{ 'INVENTORY.TITLE' | translate }}
+            </h5>
+            <div class="d-flex gap-2">
+              <button
+                *ngIf="hasActiveFilters()"
+                class="btn btn-outline-danger btn-sm filter-clear-btn"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RESET' | translate"
+                (click)="clearAllFilters()"
+              >
+                <i class="fa fa-filter filter-crossed"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'SUPPLIERS.ACTIONS.REFRESH' | translate"
+                (click)="reloadDatatable()"
+              >
+                <i class="fa fa-repeat"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'INVENTORY.ACTIONS.CREATE' | translate"
+                (click)="openModal(BUTTON_ACTIONS.ADD)"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <shared-ngx-datatable
+            [config]="config$ | async"
+            [data]="data$ | async"
+            (onChangePage)="onChangePage($event)"
+            (onChangeLimit)="onChangeLimit($event)"
+            class="common-ngx-datatable"
+          >
+            <ng-template #createdByTemplate let-row="row" let-value="value">
+              <span class="d-flex align-items-center">
+                <i class="fa fa-user me-2 text-primary"></i>
+                <span>
+                  {{
+                    row.createdByUser?.firstName && row.createdByUser?.lastName
+                      ? row.createdByUser.firstName +
+                        ' ' +
+                        row.createdByUser.lastName
+                      : ('COMMON.NOT_SPECIFIED' | translate)
+                  }}
+                </span>
+              </span>
+            </ng-template>
+
+            <ng-template #descriptionTemplate let-row="row" let-value="value">
+              <span
+                class="text-muted text-truncate d-inline-block"
+                style="max-width: 200px"
+                [ngbTooltip]="row.description || ''"
+              >
+                {{ row.description || ('COMMON.NOT_SPECIFIED' | translate) }}
+              </span>
+            </ng-template>
+
+            <ng-template #viewsTemplate let-row="row" let-value="value">
+              <span class="badge bg-info">
+                <i class="fa fa-eye me-1"></i>
+                {{ row.views || 0 }}
+              </span>
+            </ng-template>
+
+            <ng-template #priceTemplate let-row="row" let-value="value">
+              <span class="fw-bold text-success">
+                {{ row.unitPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
+              </span>
+            </ng-template>
+
+            <ng-template #quantityTemplate let-row="row" let-value="value">
+              <span
+                class="badge"
+                [ngClass]="{
+                  'bg-danger': row.quantity === 0,
+                  'bg-warning': row.quantity > 0 && row.quantity <= 10,
+                  'bg-success': row.quantity > 10,
+                }"
+              >
+                {{ row.quantity }}
+              </span>
+            </ng-template>
+
+            <ng-template #supplierTemplate let-row="row" let-value="value">
+              <span>
+                {{
+                  row.defaultSupplier?.name ||
+                    ('COMMON.NOT_SPECIFIED' | translate)
+                }}
+              </span>
+            </ng-template>
+
+            <ng-template #statusTemplate let-row="row" let-value="value">
+              <span
+                class="badge"
+                [ngClass]="{
+                  'bg-success': row.isActive,
+                  'bg-danger': !row.isActive,
+                }"
+              >
+                {{
+                  row.isActive
+                    ? ('INVENTORY.FILTERS.ACTIVE' | translate)
+                    : ('INVENTORY.FILTERS.INACTIVE' | translate)
+                }}
+              </span>
+            </ng-template>
+
+            <ng-template #createdAt let-row="row" let-value="value">
+              <span class="text-muted">
+                {{ row.createdAt | date: FORMAT_FOR_DATES : 'UTC' }}
+              </span>
+            </ng-template>
+
+            <ng-template #actionsTemplate let-row="row">
+              <div class="d-flex gap-1">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-info"
+                  (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
+                  [attr.aria-label]="
+                    'INVENTORY.ACTIONS.VIEW_DETAILS' | translate
+                  "
+                  [ngbTooltip]="'INVENTORY.ACTIONS.VIEW_DETAILS' | translate"
+                >
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-warning"
+                  (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
+                  [attr.aria-label]="'INVENTORY.ACTIONS.EDIT' | translate"
+                  [ngbTooltip]="'INVENTORY.ACTIONS.EDIT' | translate"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [ngClass]="
+                    row.isActive ? 'btn-outline-danger' : 'btn-outline-success'
+                  "
+                  (click)="toggleProductStatus(row)"
+                  [attr.aria-label]="
+                    (row.isActive
+                      ? 'INVENTORY.ACTIONS.DEACTIVATE_PRODUCT'
+                      : 'INVENTORY.ACTIONS.ACTIVATE'
+                    ) | translate
+                  "
+                  [ngbTooltip]="
+                    (row.isActive
+                      ? 'INVENTORY.ACTIONS.DEACTIVATE_PRODUCT'
+                      : 'INVENTORY.ACTIONS.ACTIVATE'
+                    ) | translate
+                  "
+                >
+                  <i [class]="row.isActive ? 'fa fa-ban' : 'fa fa-check'"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteProduct(row)"
+                  [attr.aria-label]="'INVENTORY.ACTIONS.DELETE' | translate"
+                  [ngbTooltip]="'INVENTORY.ACTIONS.DELETE' | translate"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </ng-template>
+          </shared-ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  (filterApplied)="onSideFilterApplied($event)"
+  (filterCleared)="onSideFilterCleared()"
+>
+</side-filter-panel>

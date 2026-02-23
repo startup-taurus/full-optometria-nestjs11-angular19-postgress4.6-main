@@ -1,0 +1,18 @@
+
+// Responsive adjustments
+@media (max-width: 576px) {
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    .btn {
+      width: 100%;
+      margin-bottom: 0.5rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

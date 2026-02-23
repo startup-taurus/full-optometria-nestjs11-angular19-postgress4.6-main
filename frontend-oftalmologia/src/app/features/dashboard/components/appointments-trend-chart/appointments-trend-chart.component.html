@@ -1,0 +1,70 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="card-title mb-0">
+          {{ 'DASHBOARD.APPOINTMENTS_TREND.TITLE' | translate }}
+        </h5>
+        <iconify-icon
+          icon="ph:info"
+          [ngbTooltip]="'DASHBOARD.APPOINTMENTS_TREND.TOOLTIP' | translate"
+          placement="top"
+          container="body"
+          style="cursor: help; color: #64748b; font-size: 18px"
+        ></iconify-icon>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <select
+          class="form-select form-select-sm"
+          [value]="selectedMonths()"
+          (change)="onMonthsChange($event)"
+          style="width: auto"
+        >
+          @for (option of monthsOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        @if (chartData()) {
+          <span class="badge bg-primary-subtle text-primary">
+            Total: {{ chartData()!.total }}
+          </span>
+          @if (chartData()!.average !== undefined) {
+            <span class="badge bg-info-subtle text-info">
+              Promedio: {{ chartData()!.average | number: '1.0-1' }}
+            </span>
+          }
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{
+            'DASHBOARD.APPOINTMENTS_TREND.LOADING' | translate
+          }}</span>
+        </div>
+      </div>
+    } @else if (chartData()?.data?.length > 0) {
+      <apx-chart
+        #chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!"
+        [stroke]="chartOptions.stroke!"
+        [markers]="chartOptions.markers!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [colors]="chartOptions.colors!"
+        [xaxis]="chartOptions.xaxis!"
+        [yaxis]="chartOptions.yaxis!"
+        [grid]="chartOptions.grid!"
+        [legend]="chartOptions.legend!"
+        [tooltip]="chartOptions.tooltip!"
+      ></apx-chart>
+    } @else {
+      <div class="text-center py-5 text-muted">
+        <i class="ti ti-chart-line fs-1 mb-2"></i>
+        <p>{{ 'DASHBOARD.APPOINTMENTS_TREND.NO_DATA' | translate }}</p>
+      </div>
+    }
+  </div>
+</div>

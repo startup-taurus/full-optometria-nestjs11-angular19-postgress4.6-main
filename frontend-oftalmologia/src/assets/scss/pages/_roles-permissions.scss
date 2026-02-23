@@ -1,0 +1,11 @@
+.selected-role,
+.selected-module {
+  background-color: rgba(0, 123, 255, 0.1);
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.disabled-module,
+.disbled-role {
+  cursor: not-allowed;
+}

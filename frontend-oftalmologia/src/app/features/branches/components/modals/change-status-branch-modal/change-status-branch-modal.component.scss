@@ -1,0 +1,25 @@
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+strong {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+p {
+  color: #212529;
+}
+
+.btn-check:checked + .btn-outline-success {
+  background-color: #198754;
+  border-color: #198754;
+  color: #fff;
+}
+
+.btn-check:checked + .btn-outline-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}

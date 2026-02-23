@@ -1,0 +1,109 @@
+<div class="shift-management-filter">
+  <form [formGroup]="shiftFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'SHIFT_MANAGEMENT_MODULE.PATIENT_NAME' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="patientName"
+          [placeholder]="
+            'SHIFT_MANAGEMENT_MODULE.ENTER_PATIENT_NAME' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'SHIFT_MANAGEMENT_MODULE.PATIENT_ID' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="patientId"
+          [placeholder]="'SHIFT_MANAGEMENT_MODULE.ENTER_PATIENT_ID' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'SHIFT_MANAGEMENT_MODULE.PHONE' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="phone"
+          [placeholder]="'SHIFT_MANAGEMENT_MODULE.ENTER_PHONE' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'SHIFT_MANAGEMENT_MODULE.EMAIL' | translate
+        }}</label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [placeholder]="'SHIFT_MANAGEMENT_MODULE.ENTER_EMAIL' | translate"
+        />
+      </div>
+
+      <!-- Estado -->
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'SHIFT_MANAGEMENT_MODULE.STATUS' | translate
+        }}</label>
+        <select
+          class="form-select"
+          formControlName="statusId"
+          [disabled]="statusesLoading"
+        >
+          <option value="">
+            {{ 'SHIFT_MANAGEMENT_MODULE.ALL_STATUSES' | translate }}
+          </option>
+          <option *ngFor="let status of statuses" [value]="status.id">
+            {{ status.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'SHIFT_MANAGEMENT_MODULE.DATE_FROM' | translate
+        }}</label>
+        <input type="date" class="form-control" formControlName="dateFrom" />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{
+          'SHIFT_MANAGEMENT_MODULE.DATE_TO' | translate
+        }}</label>
+        <input type="date" class="form-control" formControlName="dateTo" />
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="onReset()"
+          >
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-sm"
+            [disabled]="!shiftFilterForm?.valid"
+          >
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

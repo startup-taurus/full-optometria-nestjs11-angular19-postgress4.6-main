@@ -1,0 +1,47 @@
+/**
+ * _theme-variables.scss
+ * 
+ * Variables CSS globales para el sistema de temas dinámico.
+ * Estas variables se actualizan en tiempo real desde el ThemeCustomizerService.
+ * 
+ * IMPORTANTE: No definir valores estáticos aquí. Los valores iniciales
+ * se aplican desde el servicio al cargar la aplicación.
+ */
+
+:root {
+  // Color Primario Global de la Aplicación
+  // Estas variables son la fuente de verdad y se actualizan dinámicamente
+  --app-primary: #60bdd6;
+  --app-primary-rgb: 96, 189, 214;
+
+  // 🔘 Variables Bootstrap para Botones
+  // Mapeadas a la variable global para heredar cambios
+  --bs-btn-bg: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-color: #ffffff;
+
+  // Estados de botones (hover, active, disabled)
+  // Se calculan automáticamente desde el servicio
+  --bs-btn-hover-bg: var(--bs-primary-600);
+  --bs-btn-hover-border-color: var(--bs-primary-600);
+  --bs-btn-hover-color: #ffffff;
+
+  --bs-btn-active-bg: var(--bs-primary-700);
+  --bs-btn-active-border-color: var(--bs-primary-700);
+  --bs-btn-active-color: #ffffff;
+
+  --bs-btn-disabled-bg: var(--app-primary);
+  --bs-btn-disabled-border-color: var(--app-primary);
+  --bs-btn-disabled-color: #ffffff;
+
+  // Focus state
+  --bs-btn-focus-shadow-rgb: var(--app-primary-rgb);
+  --bs-btn-focus-box-shadow: 0 0 0 0.25rem
+    rgba(var(--bs-btn-focus-shadow-rgb), 0.5);
+
+  // 🔗 Variables Bootstrap para Links
+  --bs-link-color: var(--app-primary);
+  --bs-link-hover-color: var(--bs-primary-700);
+  --bs-link-color-rgb: var(--app-primary-rgb);
+  --bs-link-hover-color-rgb: var(--app-primary-rgb);
+}

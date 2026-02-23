@@ -1,0 +1,56 @@
+//
+// dropzone.scss
+//
+
+dropzone{
+background: center !important;  
+}
+
+.dropzone {
+  border: 0 !important;
+  padding: 0 !important;
+
+  .dropzone.dz-wrapper {
+    border:2px dashed var(--#{$prefix}border-color) !important;
+    background: $input-bg !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    min-height: 150px !important;
+    padding: 20px !important;
+
+    .dz-message {
+      text-align: center !important;
+      margin: 2rem 0 !important;
+      height: 100px !important;
+      background-color: transparent !important;
+      border: 0;
+      overflow: hidden;
+      scrollbar-width: none;
+      scroll-behavior: unset;
+
+      // .dz-text {
+      //   font-size: 22px !important;
+      //   font-weight: 500;
+      // }
+    }
+
+    &.dz-started {
+      .dz-message {
+        display: none;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 522px) {
+  .dropzone {
+    .dropzone.dz-wrapper {
+      .dz-message {
+        height: 170px !important;
+        line-height: 1 !important;
+      }
+    }
+  }
+}
+
+

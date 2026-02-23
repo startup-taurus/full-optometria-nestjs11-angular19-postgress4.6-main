@@ -1,0 +1,144 @@
+<page-title title="{{ 'PATIENT.TITLE' | translate }}" />
+
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card common-datatable-card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-primary">
+              <i class="fa fa-users me-2"></i>
+              {{ 'PATIENT.TABLE.TITLE' | translate }}
+            </h5>
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-outline-danger btn-sm filter-clear-btn"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RESET' | translate"
+                (click)="sideFilterPanel.resetFilters()"
+                *ngIf="sideFilterPanel?.hasActiveFilters()"
+              >
+                <i class="fa fa-filter filter-crossed"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
+                (click)="reloadDatatable()"
+              >
+                <i class="fa fa-repeat"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'PATIENT.BUTTONS.ADD_PATIENT' | translate"
+                (click)="openModal(BUTTON_ACTIONS.ADD)"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <shared-ngx-datatable
+            [config]="config$ | async"
+            [data]="data$ | async"
+            (onChangeLimit)="onChangeLimit($event)"
+            (onChangePage)="onChangePage($event)"
+            class="common-ngx-datatable"
+          >
+          </shared-ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  [config]="{
+    title: 'PATIENT.FILTER.TITLE',
+    showBadge: true,
+    position: 'right',
+    width: '400px',
+    backdrop: true,
+    closeOnEsc: true,
+  }"
+  (filterApplied)="onSideFilterApplied($event)"
+  (filterCleared)="onSideFilterCleared()"
+  (resetRequested)="onSideFilterCleared()"
+>
+</side-filter-panel>
+
+<ng-template #createdAt let-row="row" let-rowIndex="rowIndex">
+  <span class="small">
+    {{ row.createdAt | date: FORMAT_FOR_DATES }}
+  </span>
+</ng-template>
+
+<ng-template #statusTemplate let-row="row" let-rowIndex="rowIndex">
+  <span
+    class="badge common-badge badge-sm"
+    [class.bg-success]="row.isActive"
+    [class.bg-secondary]="!row.isActive"
+  >
+    {{
+      (row.isActive ? 'PATIENT.STATUS.ACTIVE' : 'PATIENT.STATUS.INACTIVE')
+        | translate
+    }}
+  </span>
+</ng-template>
+
+<ng-template #branchTemplate let-row="row" let-rowIndex="rowIndex">
+  <span class="badge common-badge bg-black" *ngIf="row.branch">
+    {{ row.branch.name }}
+  </span>
+  <span class="text-muted small" *ngIf="!row.branch">
+    {{ 'PATIENT.TABLE.NO_BRANCH' | translate }}
+  </span>
+</ng-template>
+
+<ng-template #companyTemplate let-row="row" let-rowIndex="rowIndex">
+  <span class="badge common-badge bg-info" *ngIf="row.company">
+    {{ row.company.name }}
+  </span>
+  <span class="text-muted small" *ngIf="!row.company">
+    {{ 'PATIENT.TABLE.NO_COMPANY' | translate }}
+  </span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row="row" let-rowIndex="rowIndex">
+  <div class="d-flex gap-1 flex-wrap">
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      placement="left"
+      [ngbTooltip]="'Ver Detalles'"
+      (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
+    >
+      <i class="fa fa-eye"></i>
+    </button>
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      placement="left"
+      [ngbTooltip]="'Editar paciente'"
+      (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
+    >
+      <i class="fa fa-edit"></i>
+    </button>
+    <button
+      class="btn btn-outline-danger btn-xs"
+      placement="left"
+      [ngbTooltip]="'Eliminar paciente'"
+      (click)="deletePatient(row)"
+    >
+      <i class="fa fa-trash"></i>
+    </button>
+  </div>
+</ng-template>

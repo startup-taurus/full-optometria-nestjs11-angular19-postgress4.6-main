@@ -1,0 +1,172 @@
+<page-title title="{{ 'USER.TITLE' | translate }}" />
+
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card common-datatable-card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-primary">
+              <i class="fa fa-users me-2"></i>
+              {{ 'USER.TABLE.TITLE' | translate }}
+            </h5>
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-outline-danger btn-sm filter-clear-btn"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RESET' | translate"
+                (click)="sideFilterPanel.resetFilters()"
+                *ngIf="sideFilterPanel?.hasActiveFilters()"
+              >
+                <i class="fa fa-filter filter-crossed"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
+                (click)="reloadDatatable()"
+              >
+                <i class="fa fa-repeat"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'USER.BUTTONS.ADD_USER' | translate"
+                (click)="openModal(BUTTON_ACTIONS.ADD)"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <shared-ngx-datatable
+            [config]="config$ | async"
+            [data]="data$ | async"
+            (onChangeLimit)="onChangeLimit($event)"
+            (onChangePage)="onChangePage($event)"
+            class="common-ngx-datatable"
+          >
+          </shared-ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  [config]="{
+    title: 'USER.FILTER.TITLE',
+    showBadge: true,
+    position: 'right',
+    width: '400px',
+    backdrop: true,
+    closeOnEsc: true,
+  }"
+  (filterApplied)="onSideFilterApplied($event)"
+  (filterCleared)="onSideFilterCleared()"
+  (resetRequested)="onSideFilterCleared()"
+>
+</side-filter-panel>
+
+<ng-template #createdAt let-row="row" let-rowIndex="rowIndex">
+  <span class="small">
+    {{ row.createdAt | date: FORMAT_FOR_DATES }}
+  </span>
+</ng-template>
+
+<ng-template #lastLoginAt let-row="row" let-rowIndex="rowIndex">
+  <span class="small" *ngIf="row.lastLoginAt; else noLogin">
+    {{ row.lastLoginAt | date: FORMAT_FOR_DATES }}
+  </span>
+  <ng-template #noLogin>
+    <span class="small">{{ 'USER.TABLE.NEVER' | translate }}</span>
+  </ng-template>
+</ng-template>
+
+<ng-template #statusTemplate let-row="row" let-rowIndex="rowIndex">
+  <div class="d-flex flex-column gap-1">
+    <span
+      class="badge common-badge badge-sm"
+      [class.bg-success]="row.isActive"
+      [class.bg-secondary]="!row.isActive"
+    >
+      {{
+        (row.isActive ? 'USER.STATUS.ACTIVE' : 'USER.STATUS.INACTIVE')
+          | translate
+      }}
+    </span>
+    <span
+      class="badge common-badge badge-sm"
+      [class.bg-danger]="row.isLocked"
+      [class.bg-success]="!row.isLocked"
+      *ngIf="row.isLocked"
+    >
+      {{ 'USER.STATUS.LOCKED' | translate }}
+    </span>
+  </div>
+</ng-template>
+
+<ng-template #roleTemplate let-row="row" let-rowIndex="rowIndex">
+  <span class="badge common-badge bg-primary" *ngIf="row.role">
+    {{ row.role.roleName }}
+  </span>
+  <span class="text-muted small" *ngIf="!row.role">
+    {{ 'USER.TABLE.NO_ROLE' | translate }}
+  </span>
+</ng-template>
+
+<ng-template #branchTemplate let-row="row" let-rowIndex="rowIndex">
+  <span class="badge common-badge bg-black" *ngIf="row.branch">
+    {{ row.branch.name }}
+  </span>
+  <span class="text-muted small" *ngIf="!row.branch">
+    {{ 'USER.TABLE.NO_BRANCH' | translate }}
+  </span>
+</ng-template>
+
+<ng-template #companyTemplate let-row="row" let-rowIndex="rowIndex">
+  <span class="badge common-badge bg-info" *ngIf="row.company">
+    {{ row.company.name }}
+  </span>
+  <span class="text-muted small" *ngIf="!row.company">
+    {{ 'USER.TABLE.NO_COMPANY' | translate }}
+  </span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row="row" let-rowIndex="rowIndex">
+  <div class="d-flex gap-1 flex-wrap">
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      placement="left"
+      [ngbTooltip]="'Ver Detalles'"
+      (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
+    >
+      <i class="fa fa-eye"></i>
+    </button>
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      placement="left"
+      [ngbTooltip]="'Editar usuario'"
+      (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
+    >
+      <i class="fa fa-edit"></i>
+    </button>
+    <button
+      class="btn btn-outline-danger btn-xs"
+      placement="left"
+      [ngbTooltip]="'Eliminar usuario'"
+      (click)="deleteUser(row)"
+    >
+      <i class="fa fa-trash"></i>
+    </button>
+  </div>
+</ng-template>

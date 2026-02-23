@@ -1,0 +1,160 @@
+<div class="step-content">
+  <h5 class="mb-4">
+    <i class="ti ti-user me-2"></i>
+    {{ 'LABORATORY_ORDERS.STEP1_TITLE' | translate }}
+  </h5>
+
+  <div class="card mb-3">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="ti ti-id me-2"></i
+        >{{ 'LABORATORY_ORDERS.FIELDS.PATIENT_INFO' | translate }}
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label"
+            >{{ 'LABORATORY_ORDERS.FIELDS.FIRST_NAME' | translate }} -
+            {{ 'LABORATORY_ORDERS.FIELDS.LAST_NAME' | translate }}</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            [value]="userDisplayName"
+            readonly
+            disabled
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.DOCUMENT_NUMBER' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="userDocumentNumber"
+            readonly
+            disabled
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.EMAIL' | translate
+          }}</label>
+          <input
+            type="email"
+            class="form-control"
+            [value]="userEmail"
+            readonly
+            disabled
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.MOBILE_PHONE' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="userMobilePhone"
+            readonly
+            disabled
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.HOME_PHONE' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="userHomePhone"
+            readonly
+            disabled
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="ti ti-calendar me-2"></i
+        >{{ 'LABORATORY_ORDERS.FIELDS.ATTENDANCE_DATE' | translate }} -
+        {{ 'LABORATORY_ORDERS.FIELDS.DELIVERY_DATE' | translate }}
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row g-3" [formGroup]="formGroup">
+        <div class="col-md-6">
+          <label class="form-label">
+            {{ 'LABORATORY_ORDERS.FIELDS.ATTENDANCE_DATE' | translate }}
+          </label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="attendanceDate"
+            [class.is-invalid]="
+              formGroup.get('attendanceDate')?.invalid &&
+              formGroup.get('attendanceDate')?.touched
+            "
+          />
+          <div
+            class="invalid-feedback"
+            *ngIf="
+              formGroup.get('attendanceDate')?.invalid &&
+              formGroup.get('attendanceDate')?.touched
+            "
+          >
+            {{
+              'VALIDATION.REQUIRED_FIELD'
+                | translate
+                  : {
+                      field:
+                        'LABORATORY_ORDERS.FIELDS.ATTENDANCE_DATE' | translate,
+                    }
+            }}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">
+            {{ 'LABORATORY_ORDERS.FIELDS.DELIVERY_DATE' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="deliveryDate"
+            [class.is-invalid]="
+              formGroup.get('deliveryDate')?.invalid &&
+              formGroup.get('deliveryDate')?.touched
+            "
+          />
+          <div
+            class="invalid-feedback"
+            *ngIf="
+              formGroup.get('deliveryDate')?.invalid &&
+              formGroup.get('deliveryDate')?.touched
+            "
+          >
+            {{
+              'VALIDATION.REQUIRED_FIELD'
+                | translate
+                  : {
+                      field:
+                        'LABORATORY_ORDERS.FIELDS.DELIVERY_DATE' | translate,
+                    }
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

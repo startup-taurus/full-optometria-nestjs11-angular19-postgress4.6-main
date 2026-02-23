@@ -1,0 +1,175 @@
+<div class="modal-header border-bottom">
+  <h5 class="modal-title d-flex align-items-center text-dark">
+    <i class="fas fa-exchange-alt me-2 text-muted"></i>
+    {{ 'SHIFTS.CHANGE_STATUS' | translate }}
+  </h5>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    aria-label="Close"
+    (click)="onCancel()"
+    [disabled]="formLoading"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <div class="patient-info-section mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h6 class="card-title mb-3 text-muted d-flex align-items-center">
+          {{ 'SHIFTS.PATIENT_INFORMATION' | translate }}
+        </h6>
+        <div class="row align-items-center g-3">
+          <div class="col-auto">
+            <img
+              [src]="getPatientProfileImage()"
+              [alt]="getPatientFullName()"
+              class="rounded-circle border"
+              width="60"
+              height="60"
+              loading="lazy"
+              (error)="onImageError($event)"
+              style="object-fit: cover"
+            />
+          </div>
+          <div class="col">
+            <div class="patient-details">
+              <h6 class="mb-2 text-dark">{{ getPatientFullName() }}</h6>
+              <p class="mb-1 text-muted d-flex align-items-center">
+                <i class="fas fa-calendar-alt me-2"></i>
+                <small>{{ getFormattedAppointmentDate() }}</small>
+              </p>
+              <p
+                class="mb-0 text-muted d-flex align-items-start"
+                *ngIf="selectedShift?.name"
+              >
+                <small class="flex-grow-1">{{ selectedShift.name }}</small>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="current-status mb-4">
+    <label class="form-label text-muted">{{
+      'SHIFTS.CURRENT_STATUS' | translate
+    }}</label>
+    <div class="current-status-display">
+      <div
+        class="alert alert-light border-0 bg-light d-flex align-items-center py-2"
+      >
+        <span
+          class="badge text-dark"
+          [style.background-color]="getCurrentStatusColor()"
+          [style.opacity]="'0.8'"
+        >
+          {{ getCurrentStatusName() }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <form
+    [formGroup]="statusForm"
+    (ngSubmit)="onSubmit()"
+    novalidate
+    class="position-relative"
+  >
+    <div class="form-group mb-4">
+      <label
+        for="statusId"
+        class="form-label text-muted d-flex align-items-center"
+      >
+        <i class="fas fa-exchange-alt me-2"></i>
+        {{ 'SHIFTS.NEW_STATUS' | translate }}
+      </label>
+
+      <ng-select
+        formControlName="statusId"
+        [placeholder]="'SHIFTS.SELECT_STATUS' | translate"
+        [clearable]="false"
+        [searchable]="false"
+        [loading]="statusesLoading"
+        [items]="statuses"
+        bindLabel="name"
+        bindValue="id"
+        [disabled]="formLoading || statusesLoading"
+        [ngClass]="{
+          'ng-invalid ng-touched':
+            statusForm.get('statusId')?.invalid &&
+            statusForm.get('statusId')?.touched,
+        }"
+      >
+        <ng-option *ngFor="let status of statuses" [value]="status.id">
+          <div class="d-flex align-items-center">
+            <span
+              class="badge me-2 d-inline-block"
+              [style.background-color]="status.color"
+              [style.opacity]="'0.8'"
+              style="width: 12px; height: 12px; border-radius: 50%"
+            ></span>
+            <span>{{ status.name }}</span>
+          </div>
+        </ng-option>
+      </ng-select>
+
+      <div
+        *ngIf="
+          statusForm.get('statusId')?.invalid &&
+          statusForm.get('statusId')?.touched
+        "
+        class="invalid-feedback d-block mt-2"
+      >
+        <small class="text-danger">
+          {{
+            'VALIDATION.REQUIRED_FIELD'
+              | translate: { field: ('SHIFTS.STATUS' | translate) }
+          }}
+        </small>
+      </div>
+    </div>
+
+    <div
+      *ngIf="formLoading"
+      class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90 rounded"
+    >
+      <div class="text-center">
+        <div class="spinner-border text-muted mb-2" role="status">
+          <span class="visually-hidden">{{
+            'COMMON.LOADING' | translate
+          }}</span>
+        </div>
+        <p class="text-muted small mb-0">
+          {{ 'SHIFTS.UPDATING_STATUS' | translate }}
+        </p>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer border-top">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="onCancel()"
+    [disabled]="formLoading"
+  >
+    {{ 'COMMON.CANCEL' | translate }}
+  </button>
+  <button
+    type="submit"
+    class="btn btn-primary"
+    [disabled]="!statusForm.valid || formLoading"
+    (click)="onSubmit()"
+  >
+    <span
+      *ngIf="formLoading"
+      class="spinner-border spinner-border-sm me-2"
+      role="status"
+      aria-hidden="true"
+    ></span>
+    {{ 'SHIFTS.UPDATE_STATUS' | translate }}
+  </button>
+</div>

@@ -1,0 +1,149 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{
+      isEdit
+        ? ('SUPPLIERS.EDIT_SUPPLIER' | translate)
+        : ('SUPPLIERS.CREATE_SUPPLIER' | translate)
+    }}
+  </h4>
+  <button type="button" class="btn-close ms-auto" (click)="onCancel()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label for="name" class="form-label">
+            {{ 'SUPPLIERS.NAME' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            class="form-control"
+            formControlName="name"
+            [class.is-invalid]="isFieldInvalid('name')"
+            [placeholder]="'SUPPLIERS.NAME_PLACEHOLDER' | translate"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+            {{ getFieldError('name') | translate }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label for="documentNumber" class="form-label">
+            {{ 'SUPPLIERS.DOCUMENT_NUMBER' | translate }}
+          </label>
+          <input
+            type="text"
+            id="documentNumber"
+            class="form-control"
+            formControlName="documentNumber"
+            [class.is-invalid]="isFieldInvalid('documentNumber')"
+            [placeholder]="'SUPPLIERS.DOCUMENT_NUMBER_PLACEHOLDER' | translate"
+          />
+          <div
+            class="invalid-feedback"
+            *ngIf="isFieldInvalid('documentNumber')"
+          >
+            {{ getFieldError('documentNumber') | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label for="phone" class="form-label">
+            {{ 'SUPPLIERS.PHONE' | translate }}
+          </label>
+          <input
+            type="text"
+            id="phone"
+            class="form-control"
+            formControlName="phone"
+            [class.is-invalid]="isFieldInvalid('phone')"
+            [placeholder]="'SUPPLIERS.PHONE_PLACEHOLDER' | translate"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('phone')">
+            {{ getFieldError('phone') | translate }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label for="email" class="form-label">
+            {{ 'SUPPLIERS.EMAIL' | translate }}
+          </label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            formControlName="email"
+            [class.is-invalid]="isFieldInvalid('email')"
+            [placeholder]="'SUPPLIERS.EMAIL_PLACEHOLDER' | translate"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
+            {{ getFieldError('email') | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="isEdit">
+      <div class="col-md-12">
+        <div class="form-group mb-3">
+          <label class="form-label">
+            {{ 'SUPPLIERS.STATUS' | translate }}
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="isActive"
+              class="toggle-input"
+              formControlName="isActive"
+            />
+            <label for="isActive" class="toggle-label">
+              <span class="toggle-slider"></span>
+              <span class="toggle-text">
+                {{
+                  form.get('isActive')?.value
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="onCancel()"
+    [disabled]="isLoading"
+  >
+    {{ 'COMMON.CANCEL' | translate }}
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="onSubmit()"
+    [disabled]="isLoading || form.invalid"
+  >
+    <span
+      *ngIf="isLoading"
+      class="spinner-border spinner-border-sm me-2"
+    ></span>
+    {{ isEdit ? ('COMMON.UPDATE' | translate) : ('COMMON.CREATE' | translate) }}
+  </button>
+</div>

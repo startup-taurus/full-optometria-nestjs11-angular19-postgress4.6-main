@@ -1,0 +1,353 @@
+<div
+  class="modal-header border-0 pb-0 pt-3 px-4 d-flex align-items-center gap-3"
+>
+  <div class="flex-grow-1">
+    <h5 class="mb-0 fw-semibold text-dark">
+      {{ modalTitle | translate }}
+    </h5>
+  </div>
+
+  <button
+    type="button"
+    class="btn-close"
+    (click)="onCancel()"
+    aria-label="Close"
+  ></button>
+</div>
+
+<div class="modal-body px-4">
+  <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
+    <div class="mb-4">
+      <h6
+        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
+      >
+        <i class="fa fa-info-circle"></i>
+        {{ 'PATIENT.FORM.BASIC_INFO' | translate }}
+      </h6>
+
+      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.FIRST_NAME' | translate }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              formControlName="firstName"
+              [class.is-invalid]="isFieldInvalid('firstName')"
+              [placeholder]="'PATIENT.FORM.FIRST_NAME_PLACEHOLDER' | translate"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('firstName')">
+              {{ getFieldError('firstName') | translate }}
+            </div>
+          </div>
+
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.LAST_NAME' | translate }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              formControlName="lastName"
+              [class.is-invalid]="isFieldInvalid('lastName')"
+              [placeholder]="'PATIENT.FORM.LAST_NAME_PLACEHOLDER' | translate"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('lastName')">
+              {{ getFieldError('lastName') | translate }}
+            </div>
+          </div>
+
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.DOCUMENT_NUMBER' | translate }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              formControlName="documentNumber"
+              [class.is-invalid]="isFieldInvalid('documentNumber')"
+              [placeholder]="
+                'PATIENT.FORM.DOCUMENT_NUMBER_PLACEHOLDER' | translate
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="isFieldInvalid('documentNumber')"
+            >
+              {{ getFieldError('documentNumber') | translate }}
+            </div>
+          </div>
+
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.BRANCH' | translate }}
+              <span class="text-danger">*</span>
+            </label>
+            <ng-select
+              [items]="branches$ | async"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="branchId"
+              [placeholder]="'PATIENT.FORM.BRANCH_PLACEHOLDER' | translate"
+              [clearable]="true"
+              [searchable]="true"
+              [class.is-invalid]="isFieldInvalid('branchId')"
+            >
+            </ng-select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('branchId')">
+              {{ getFieldError('branchId') | translate }}
+            </div>
+          </div>
+
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.DATE_OF_BIRTH' | translate }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="date"
+              class="form-control form-control-lg"
+              formControlName="dateOfBirth"
+              [class.is-invalid]="isFieldInvalid('dateOfBirth')"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('dateOfBirth')">
+              {{ getFieldError('dateOfBirth') | translate }}
+            </div>
+          </div>
+
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.EMAIL' | translate }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="email"
+              class="form-control form-control-lg"
+              formControlName="email"
+              [class.is-invalid]="isFieldInvalid('email')"
+              [placeholder]="'PATIENT.FORM.EMAIL_PLACEHOLDER' | translate"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
+              {{ getFieldError('email') | translate }}
+            </div>
+          </div>
+
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.ADDRESS' | translate }}
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              formControlName="address"
+              [class.is-invalid]="isFieldInvalid('address')"
+              [placeholder]="'PATIENT.FORM.ADDRESS_PLACEHOLDER' | translate"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('address')">
+              {{ getFieldError('address') | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h6
+        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
+      >
+        <i class="fa fa-image"></i>
+        {{ 'PATIENT.FORM.PROFILE_PHOTO' | translate }}
+      </h6>
+
+      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+        <div class="row">
+          <div class="col-12">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.PROFILE_PHOTO_LABEL' | translate }}
+            </label>
+            <div class="d-flex align-items-center gap-3">
+              <div
+                class="border rounded d-flex align-items-center justify-content-center bg-white"
+                style="width: 120px; height: 120px; overflow: hidden"
+              >
+                <img
+                  *ngIf="photoPreviewUrl"
+                  [src]="photoPreviewUrl"
+                  alt="Profile photo preview"
+                  class="img-fluid"
+                  style="width: 100%; height: 100%; object-fit: cover"
+                />
+                <i
+                  *ngIf="!photoPreviewUrl"
+                  class="fa fa-user fa-3x text-muted"
+                ></i>
+              </div>
+
+              <div class="d-flex flex-column gap-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="triggerPhotoInput()"
+                  [disabled]="loading"
+                >
+                  <i class="fa fa-upload me-1"></i>
+                  {{
+                    (photoPreviewUrl
+                      ? 'PATIENT.FORM.CHANGE_PHOTO'
+                      : 'PATIENT.FORM.UPLOAD_PHOTO'
+                    ) | translate
+                  }}
+                </button>
+
+                <button
+                  *ngIf="photoPreviewUrl"
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="removePhoto()"
+                  [disabled]="loading"
+                >
+                  <i class="fa fa-trash me-1"></i>
+                  {{ 'PATIENT.FORM.REMOVE_PHOTO' | translate }}
+                </button>
+
+                <small class="text-muted">
+                  {{ 'PATIENT.FORM.PHOTO_HELP' | translate }}
+                </small>
+              </div>
+
+              <input
+                #photoInput
+                type="file"
+                accept="image/*"
+                class="d-none"
+                (change)="onPhotoSelected($event)"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h6
+        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
+      >
+        <i class="fa fa-phone"></i>
+        {{ 'PATIENT.FORM.CONTACT_INFO' | translate }}
+      </h6>
+
+      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.MOBILE_PHONE' | translate }}
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              formControlName="mobilePhone"
+              [class.is-invalid]="isFieldInvalid('mobilePhone')"
+              [placeholder]="
+                'PATIENT.FORM.MOBILE_PHONE_PLACEHOLDER' | translate
+              "
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('mobilePhone')">
+              {{ getFieldError('mobilePhone') | translate }}
+            </div>
+          </div>
+
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'PATIENT.FORM.HOME_PHONE' | translate }}
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              formControlName="homePhone"
+              [class.is-invalid]="isFieldInvalid('homePhone')"
+              [placeholder]="'PATIENT.FORM.HOME_PHONE_PLACEHOLDER' | translate"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('homePhone')">
+              {{ getFieldError('homePhone') | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4" *ngIf="isEditMode">
+      <h6
+        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
+      >
+        <i class="fa fa-toggle-on"></i>
+        {{ 'PATIENT.FORM.STATUS' | translate }}
+      </h6>
+
+      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          <div class="col">
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="isActive"
+                class="toggle-input"
+                formControlName="isActive"
+              />
+              <label for="isActive" class="toggle-label">
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">
+                  {{ 'PATIENT.FORM.IS_ACTIVE' | translate }}
+                </span>
+              </label>
+            </div>
+            <small class="form-text text-muted d-block mt-2">
+              {{ 'PATIENT.FORM.IS_ACTIVE_HELP' | translate }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="text-center py-4" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal-footer"
+>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="onCancel()"
+    [disabled]="loading"
+  >
+    {{ 'WORDS.CANCEL' | translate }}
+  </button>
+  <button
+    type="submit"
+    class="btn btn-primary"
+    (click)="onSubmit()"
+    [disabled]="loading || patientForm.invalid"
+  >
+    <span *ngIf="!loading">
+      {{ (isEditMode ? 'COMMON.UPDATE' : 'COMMON.CREATE') | translate }}
+    </span>
+    <span *ngIf="loading">
+      <span
+        class="spinner-border spinner-border-sm me-2"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      {{ 'WORDS.LOADING' | translate }}
+    </span>
+  </button>
+</div>

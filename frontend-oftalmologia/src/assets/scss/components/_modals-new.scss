@@ -1,0 +1,681 @@
+// =============================================================================
+// MODAL THEME SYSTEM - COMPREHENSIVE LIGHT/DARK THEME INTEGRATION
+// =============================================================================
+
+// CSS Custom Properties para el sistema de temas
+:root {
+  // Surface hierarchy (Light theme - Surface 1 base, 2 elevated, 3 highest)
+  --modal-surface-1: #ffffff;
+  --modal-surface-2: #f8f9fa;
+  --modal-surface-3: #ffffff;
+
+  // Typography con contrast ratio ≥ 4.5:1 (AA compliance)
+  --modal-text-primary: #212529;
+  --modal-text-secondary: #6c757d;
+  --modal-text-muted: #868e96;
+  --modal-text-disabled: #adb5bd;
+  --modal-text-placeholder: #6c757d;
+
+  // Border system con hierarchy
+  --modal-border-color: #dee2e6;
+  --modal-border-hover: #adb5bd;
+  --modal-divider: #e9ecef;
+
+  // Shadow system
+  --modal-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --modal-shadow-dropdown: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+
+  // Focus ring with primary color
+  --modal-focus-ring: rgba(var(--bs-primary-rgb), 0.25);
+
+  // Input states
+  --modal-input-disabled: #f8f9fa;
+
+  // Interactive states
+  --modal-hover-bg: #f8f9fa;
+  --modal-active-bg: #e9ecef;
+
+  // Backdrop
+  --modal-backdrop-opacity: 0.5;
+
+  // Opacity values
+  --modal-disabled-opacity: 0.65;
+
+  // Modal specific values
+  --modal-border-radius: 1rem;
+}
+
+// Dark theme overrides
+[data-bs-theme='dark'] {
+  // Surface hierarchy (Dark theme - darker base, lighter elevated)
+  --modal-surface-1: #2d3748;
+  --modal-surface-2: #4a5568;
+  --modal-surface-3: #2d3748;
+
+  // Typography con contrast ratio ≥ 4.5:1 (AA compliance)
+  --modal-text-primary: #f7fafc;
+  --modal-text-secondary: #cbd5e0;
+  --modal-text-muted: #a0aec0;
+  --modal-text-disabled: #718096;
+  --modal-text-placeholder: #a0aec0;
+
+  // Border system adapted for dark
+  --modal-border-color: #4a5568;
+  --modal-border-hover: #718096;
+  --modal-divider: #4a5568;
+
+  // Enhanced shadows for dark theme
+  --modal-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+  --modal-shadow-dropdown: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+
+  // Input states for dark
+  --modal-input-disabled: #4a5568;
+
+  // Interactive states for dark
+  --modal-hover-bg: #4a5568;
+  --modal-active-bg: #718096;
+
+  // Stronger backdrop for dark theme
+  --modal-backdrop-opacity: 0.65;
+}
+
+// Force dark color scheme for theme consistency
+.modal.theme-dark,
+[data-bs-theme='dark'] .modal {
+  color-scheme: dark;
+}
+
+// =============================================================================
+// MODAL BASE STYLES
+// =============================================================================
+
+// Estilos base para el modal
+.modal {
+  &.fade .modal-dialog {
+    transition:
+      transform 0.3s ease-out,
+      opacity 0.15s linear;
+    transform: translateY(-50px);
+  }
+
+  &.show .modal-dialog {
+    transform: none;
+  }
+}
+
+// Contenido del modal - Surface 1
+.modal-content {
+  border-radius: var(--modal-border-radius) !important;
+  box-shadow: var(--modal-shadow) !important;
+  border: 0 !important;
+  overflow: hidden;
+  background-color: var(--modal-surface-1) !important;
+  color: var(--modal-text-primary) !important;
+
+  // Animación de entrada suave
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+// =============================================================================
+// MODAL HEADER STYLES
+// =============================================================================
+
+.modal-header {
+  border: 0 !important;
+  padding-bottom: 0 !important;
+  padding-top: 1rem !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  background-color: var(--modal-surface-1) !important;
+  color: var(--modal-text-primary) !important;
+
+  // Gap entre elementos
+  &.d-flex.align-items-center.gap-3 {
+    gap: 1rem !important;
+  }
+
+  // Botón de cerrar mejorado
+  .btn-close {
+    margin: 0;
+    padding: 0.5rem;
+    opacity: 0.6;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.2rem var(--modal-focus-ring);
+    }
+  }
+
+  // Título del modal
+  .modal-title {
+    color: var(--modal-text-primary) !important;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  // Avatar en el header (96x96px, círculo perfecto)
+  .avatar-lg {
+    width: 6rem !important;
+    height: 6rem !important;
+    border: 3px solid var(--modal-border-color);
+    transition: border-color 0.2s ease-in-out;
+
+    &:hover {
+      border-color: var(--bs-primary);
+    }
+  }
+}
+
+// =============================================================================
+// MODAL BODY STYLES
+// =============================================================================
+
+.modal-body {
+  padding: 1rem 1.5rem !important;
+  background-color: var(--modal-surface-1) !important;
+  color: var(--modal-text-primary) !important;
+
+  // Cards dentro del modal - Surface 2
+  .card {
+    background-color: var(--modal-surface-2) !important;
+    border-color: var(--modal-border-color) !important;
+    color: var(--modal-text-primary) !important;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      border-color: var(--modal-border-hover);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    .card-header {
+      background-color: transparent;
+      border-color: var(--modal-border-color);
+      color: var(--modal-text-secondary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  // Form controls - Surface 3 con contrast compliance
+  .form-control,
+  .form-select {
+    background-color: var(--modal-surface-3) !important;
+    border-color: var(--modal-border-color) !important;
+    color: var(--modal-text-primary) !important;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      background-color: var(--modal-surface-3) !important;
+      border-color: var(--bs-primary) !important;
+      color: var(--modal-text-primary) !important;
+      box-shadow: 0 0 0 0.25rem var(--modal-focus-ring) !important;
+    }
+
+    &:hover:not(:focus) {
+      border-color: var(--modal-border-hover) !important;
+    }
+
+    &::placeholder {
+      color: var(--modal-text-placeholder) !important;
+      opacity: 1;
+    }
+
+    &:disabled {
+      background-color: var(--modal-input-disabled) !important;
+      color: var(--modal-text-disabled) !important;
+      opacity: var(--modal-disabled-opacity);
+      cursor: not-allowed;
+    }
+
+    // Plaintext variant para readonly
+    &-plaintext {
+      color: var(--modal-text-primary) !important;
+      background-color: transparent !important;
+      border: 1px solid transparent;
+
+      &:focus {
+        box-shadow: none !important;
+      }
+    }
+  }
+
+  // Labels mejorados
+  .form-label {
+    color: var(--modal-text-primary) !important;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+
+    .text-danger {
+      color: var(--bs-danger) !important;
+    }
+  }
+
+  // Badges estilizados según el contexto
+  .badge {
+    font-weight: 500;
+    padding: 0.4em 0.8em;
+    border-radius: 0.5rem;
+
+    &.bg-success {
+      background-color: var(--bs-success) !important;
+      color: white !important;
+    }
+
+    &.bg-warning {
+      background-color: var(--bs-warning) !important;
+      color: var(--bs-dark) !important;
+    }
+
+    &.bg-danger {
+      background-color: var(--bs-danger) !important;
+      color: white !important;
+    }
+
+    &.bg-secondary {
+      background-color: var(--bs-secondary) !important;
+      color: white !important;
+      border: 1px solid var(--modal-border-color);
+      border-color: rgba(var(--bs-secondary-rgb), 0.2);
+    }
+
+    // Badges con pulso para indicadores de estado
+    i.fa-circle {
+      opacity: 0.8;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  // Alertas mejoradas
+  .alert {
+    border: 0;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--modal-surface-2) !important;
+    color: var(--modal-text-primary) !important;
+    border-left: 3px solid var(--bs-info);
+
+    &.bg-info-subtle {
+      background-color: rgba(var(--bs-info-rgb), 0.08) !important;
+      color: var(--bs-info) !important;
+      border-left-color: var(--bs-info);
+    }
+
+    i {
+      color: var(--bs-info) !important;
+    }
+  }
+
+  // Switch mejorados con contraste AA
+  .form-check {
+    .form-check-input {
+      background-color: var(--modal-surface-2) !important;
+      border-color: var(--modal-border-color) !important;
+
+      &:checked {
+        background-color: var(--bs-success) !important;
+        border-color: var(--bs-success) !important;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0.2rem var(--modal-focus-ring) !important;
+        border-color: var(--bs-primary) !important;
+      }
+    }
+
+    .form-check-label {
+      font-weight: 500;
+      color: var(--modal-text-primary) !important;
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+
+  .form-text.text-muted {
+    font-size: 0.825rem;
+    color: var(--modal-text-muted) !important;
+  }
+
+  // Divisores con opacidad adecuada
+  hr {
+    border-color: var(--modal-divider) !important;
+    opacity: 1;
+  }
+
+  // Links y correos con hover underline
+  a {
+    color: var(--bs-primary) !important;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--bs-primary) !important;
+      text-decoration: underline;
+    }
+  }
+}
+
+// =============================================================================
+// MODAL FOOTER STYLES
+// =============================================================================
+
+.modal-footer {
+  border: 0 !important;
+  padding-top: 0 !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  background-color: var(--modal-surface-1) !important;
+
+  .gap-2 {
+    gap: 0.5rem !important;
+  }
+
+  // Botones estilizados con contraste AA
+  .btn {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+
+    // Botón secundario - diferente en light/dark
+    &.btn-light {
+      // Light theme
+      background-color: var(--modal-surface-2) !important;
+      border-color: var(--modal-border-color) !important;
+      color: var(--modal-text-primary) !important;
+
+      &:hover {
+        background-color: var(--modal-surface-3) !important;
+        border-color: var(--modal-border-hover) !important;
+        color: var(--modal-text-primary) !important;
+        transform: translateY(-1px);
+      }
+    }
+
+    // Botón primario mantiene el mismo color en ambos temas
+    &.btn-primary {
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(var(--bs-primary-rgb), 0.3);
+      }
+    }
+
+    // Spinner con color del botón
+    .spinner-border-sm {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.5rem;
+      color: currentColor; // Usa el color del texto del botón
+    }
+
+    // Estado disabled
+    &:disabled {
+      opacity: var(--modal-disabled-opacity);
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+// Ajustes para tema oscuro en botones
+[data-bs-theme='dark'] .modal-footer {
+  .btn.btn-light {
+    // En dark theme, usar outline-light en lugar de btn-light sólido
+    background-color: transparent !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: var(--modal-text-primary) !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+      color: var(--modal-text-primary) !important;
+    }
+  }
+}
+
+// =============================================================================
+// RESPONSIVE ADJUSTMENTS
+// =============================================================================
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .row.row-cols-1.row-cols-md-2 {
+    .col {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+// =============================================================================
+// BACKDROP AND ANIMATIONS
+// =============================================================================
+
+// Backdrop con opacidad personalizada
+.modal-backdrop {
+  opacity: var(--modal-backdrop-opacity) !important;
+}
+
+// Animación de entrada del modal
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Animación de pulso para badges
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+// Estilos para elementos específicos del avatar
+.object-fit-cover {
+  object-fit: cover;
+}
+
+// =============================================================================
+// NG-SELECT THEME INTEGRATION
+// =============================================================================
+
+// Contenedor principal de ng-select
+.modal ng-select {
+  .ng-select-container {
+    background-color: var(--modal-surface-3) !important;
+    border: 1px solid var(--modal-border-color) !important;
+    border-radius: 0.5rem !important;
+    color: var(--modal-text-primary) !important;
+    transition: all 0.2s ease-in-out;
+    min-height: 3rem;
+
+    &:hover {
+      border-color: var(--modal-border-hover) !important;
+      box-shadow: 0 0 0 0.125rem rgba(var(--bs-primary-rgb), 0.1);
+    }
+
+    &.ng-select-focused {
+      border-color: var(--bs-primary) !important;
+      box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important;
+      background-color: var(--modal-surface-3) !important;
+    }
+
+    &.ng-select-disabled {
+      background-color: var(--modal-input-disabled) !important;
+      color: var(--modal-text-disabled) !important;
+      opacity: var(--modal-disabled-opacity);
+      cursor: not-allowed;
+    }
+  }
+
+  // Input de búsqueda
+  .ng-input input {
+    background-color: transparent !important;
+    border: none !important;
+    color: var(--modal-text-primary) !important;
+
+    &::placeholder {
+      color: var(--modal-text-placeholder) !important;
+    }
+  }
+
+  // Placeholder cuando no hay selección
+  .ng-placeholder {
+    color: var(--modal-text-placeholder) !important;
+    font-style: italic;
+  }
+
+  // Valores seleccionados
+  .ng-value-container {
+    .ng-value {
+      color: var(--modal-text-primary) !important;
+
+      // Tags/chips para multiselección
+      &.ng-value-multiple {
+        background-color: var(--bs-primary) !important;
+        color: white !important;
+        border-radius: 0.375rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0.125rem;
+
+        .ng-value-label {
+          color: white !important;
+          font-size: 0.875rem;
+        }
+
+        .ng-value-icon {
+          color: rgba(255, 255, 255, 0.7) !important;
+
+          &:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+          }
+        }
+      }
+    }
+  }
+
+  // Flecha desplegable
+  .ng-arrow-wrapper {
+    .ng-arrow {
+      border-color: var(--modal-text-secondary) transparent transparent !important;
+    }
+  }
+
+  // Botón clear
+  .ng-clear-wrapper {
+    color: var(--modal-text-secondary) !important;
+
+    &:hover {
+      color: var(--modal-text-primary) !important;
+    }
+  }
+}
+
+// Dropdown de opciones
+.ng-dropdown-panel {
+  background-color: var(--modal-surface-3) !important;
+  border: 1px solid var(--modal-border-color) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: var(--modal-shadow-dropdown) !important;
+  z-index: 1060; // Por encima del modal
+
+  // Opciones individuales
+  .ng-option {
+    background-color: transparent !important;
+    color: var(--modal-text-primary) !important;
+    padding: 0.75rem 1rem !important;
+    border: none !important;
+
+    &:hover {
+      background-color: var(--modal-surface-2) !important;
+      color: var(--modal-text-primary) !important;
+    }
+
+    &.ng-option-selected {
+      background-color: var(--bs-primary) !important;
+      color: white !important;
+
+      &:hover {
+        background-color: var(--bs-primary) !important;
+        color: white !important;
+        opacity: 0.9;
+      }
+    }
+
+    &.ng-option-disabled {
+      color: var(--modal-text-disabled) !important;
+      background-color: transparent !important;
+      cursor: not-allowed;
+      opacity: var(--modal-disabled-opacity);
+    }
+  }
+
+  // Mensaje cuando no hay opciones
+  .ng-option.ng-option-not-found {
+    text-align: center;
+    font-style: italic;
+    color: var(--modal-text-secondary) !important;
+  }
+
+  // Grupos de opciones
+  .ng-optgroup {
+    font-weight: 600;
+    color: var(--modal-text-secondary) !important;
+    background-color: var(--modal-surface-2) !important;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// Ajustes para tema oscuro en ng-select
+[data-bs-theme='dark'] {
+  .ng-dropdown-panel {
+    // Mejor contraste en tema oscuro
+    box-shadow:
+      0 0.5rem 1rem rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .modal ng-select {
+    .ng-value-container .ng-value.ng-value-multiple {
+      // Tags más visibles en tema oscuro
+      background-color: var(--bs-primary) !important;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+  }
+}

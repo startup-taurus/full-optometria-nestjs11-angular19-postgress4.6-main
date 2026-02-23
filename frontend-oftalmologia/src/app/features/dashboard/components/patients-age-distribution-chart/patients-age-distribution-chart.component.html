@@ -1,0 +1,52 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="card-title mb-0">
+          {{ 'DASHBOARD.PATIENTS_AGE.TITLE' | translate }}
+        </h5>
+        <iconify-icon
+          icon="ph:info"
+          [ngbTooltip]="'DASHBOARD.PATIENTS_AGE.TOOLTIP' | translate"
+          placement="top"
+          container="body"
+          style="cursor: help; color: #64748b; font-size: 18px"
+        ></iconify-icon>
+      </div>
+      @if (chartData()) {
+        <span class="badge bg-secondary-subtle text-secondary">
+          Total: {{ chartData()!.total }}
+        </span>
+      }
+    </div>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{
+            'DASHBOARD.PATIENTS_AGE.LOADING' | translate
+          }}</span>
+        </div>
+      </div>
+    } @else if (
+      chartData() && chartData()!.data && chartData()!.data!.length > 0
+    ) {
+      <apx-chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!"
+        [plotOptions]="chartOptions.plotOptions!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [colors]="chartOptions.colors!"
+        [xaxis]="chartOptions.xaxis!"
+        [yaxis]="chartOptions.yaxis!"
+        [grid]="chartOptions.grid!"
+        [tooltip]="chartOptions.tooltip!"
+      ></apx-chart>
+    } @else {
+      <div class="text-center py-5 text-muted">
+        <i class="ti ti-users fs-1 mb-2"></i>
+        <p>{{ 'DASHBOARD.PATIENTS_AGE.NO_DATA' | translate }}</p>
+      </div>
+    }
+  </div>
+</div>

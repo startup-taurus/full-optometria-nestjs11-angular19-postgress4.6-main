@@ -1,0 +1,277 @@
+.step-content {
+  padding: 1rem;
+
+  .card {
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+
+    h6 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #495057;
+    }
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  .text-primary {
+    color: var(--bs-primary) !important;
+  }
+
+  .text-success {
+    color: #28a745 !important;
+  }
+
+  .col-auto {
+    display: flex;
+    align-items: center;
+    min-height: 72px;
+    
+    label {
+      margin-bottom: 0;
+      padding-top: 1.5rem; 
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .step-content {
+    padding: 0.75rem;
+
+    .card-body {
+      padding: 0.75rem;
+    }
+
+    .row.g-2 {
+      .col-md-2 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .step-content {
+    padding: 0.5rem;
+
+    h5 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem !important;
+    }
+
+    .card {
+      margin-bottom: 1rem !important;
+    }
+
+    .card-header {
+      padding: 0.5rem 0.75rem;
+
+      h6 {
+        font-size: 0.9rem;
+      }
+    }
+
+    .card-body {
+      padding: 0.75rem;
+
+      .row.g-2 {
+        row-gap: 1rem !important;
+
+        .col-auto {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          margin-bottom: 0.5rem;
+
+          label {
+            font-size: 0.95rem;
+          }
+        }
+
+        .col {
+          width: 100%;
+        }
+
+        .col-md-2 {
+          flex: 0 0 50%;
+          max-width: 50%;
+          padding: 0 0.25rem;
+
+          .form-label {
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+          }
+
+          .form-control {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.5rem;
+          }
+        }
+      }
+
+      .row.g-3 {
+        .col-md-3 {
+          flex: 0 0 50%;
+          max-width: 50%;
+          margin-bottom: 0.75rem;
+
+          .form-label {
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+          }
+
+          .form-control {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .step-content {
+    padding: 0.5rem;
+
+    h5 {
+      font-size: 1rem;
+      margin-bottom: 0.75rem !important;
+    }
+
+    .card {
+      margin-bottom: 0.75rem !important;
+      border-radius: 0.5rem;
+    }
+
+    .card-header {
+      padding: 0.5rem;
+
+      h6 {
+        font-size: 0.85rem;
+
+        i {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .card-body {
+      padding: 0.5rem;
+
+      > .row.g-2 {
+        row-gap: 0.75rem !important;
+
+        > .col-12 {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 1rem;
+
+          > .row.g-2 {
+            flex-direction: column;
+            row-gap: 0.5rem !important;
+
+            .col-auto {
+              width: 100%;
+              text-align: center;
+              padding: 0.5rem;
+              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+              border-radius: 0.25rem;
+              margin-bottom: 0.5rem;
+              border-left: 3px solid currentColor;
+
+              label {
+                font-size: 0.9rem;
+                margin: 0;
+                font-weight: 600;
+              }
+            }
+
+            .col {
+              width: 100%;
+              padding: 0;
+
+              > .row.g-2 {
+                margin: 0;
+                row-gap: 0.5rem !important;
+
+                .col-md-2 {
+                  flex: 0 0 50%;
+                  max-width: 50%;
+                  padding: 0 0.25rem;
+
+                  .form-label {
+                    font-size: 0.75rem;
+                    margin-bottom: 0.2rem;
+                    font-weight: 600;
+                    color: #495057;
+                  }
+
+                  .form-control {
+                    font-size: 0.8rem;
+                    padding: 0.35rem 0.4rem;
+                    height: auto;
+                  }
+                }
+              }
+            }
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      .row.g-3 {
+        gap: 0.5rem !important;
+
+        .col-md-3 {
+          flex: 0 0 100%;
+          max-width: 100%;
+          margin-bottom: 0.5rem;
+
+          .form-label {
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+          }
+
+          .form-control {
+            font-size: 0.85rem;
+            padding: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .step-content {
+    .card-body {
+      .row.g-2 {
+        .col-md-2 {
+          .form-label {
+            font-size: 0.7rem;
+          }
+
+          .form-control {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.35rem;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,252 @@
+<div class="step-content">
+  <h5 class="mb-4">
+    <i class="ti ti-eye me-2"></i>
+    {{ 'LABORATORY_ORDERS.STEP2_TITLE' | translate }}
+  </h5>
+
+  <div [formGroup]="formGroup">
+    <div class="card mb-3">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="ti ti-eye me-2"></i>
+          {{ 'LABORATORY_ORDERS.FIELDS.GRADUATION' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-primary mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  OD ({{ 'WORDS.RIGHT_EYE' | translate }})
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.SPHERE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="odSphere"
+                      placeholder="Ej: +2.00"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.CYLINDER' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="odCylinder"
+                      placeholder="Ej: -1.50"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.AXIS' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="odAxis"
+                      placeholder="Ej: 90"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.ADD' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="odAdd"
+                      placeholder="Ej: +2.00"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.HEIGHT' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="odHeight"
+                      placeholder="mm"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.DNP' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="odDnp"
+                      placeholder="mm"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-success mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  OI ({{ 'WORDS.LEFT_EYE' | translate }})
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.SPHERE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oiSphere"
+                      placeholder="Ej: +2.00"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.CYLINDER' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oiCylinder"
+                      placeholder="Ej: -1.50"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.AXIS' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oiAxis"
+                      placeholder="Ej: 90"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.ADD' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oiAdd"
+                      placeholder="Ej: +2.00"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.HEIGHT' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oiHeight"
+                      placeholder="mm"
+                    />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label">{{
+                      'LABORATORY_ORDERS.FIELDS.DNP' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oiDnp"
+                      placeholder="mm"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="ti ti-adjustments me-2"></i>
+          {{ 'LABORATORY_ORDERS.FIELDS.SHARED_PARAMETERS' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.FIELDS.CBASE' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="cbase"
+              placeholder=""
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.FIELDS.SUN_DEGREE' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="sunDegree"
+              placeholder=""
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.FIELDS.PRISM' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="prism"
+              placeholder=""
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.FIELDS.BASE' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="base"
+              placeholder=""
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

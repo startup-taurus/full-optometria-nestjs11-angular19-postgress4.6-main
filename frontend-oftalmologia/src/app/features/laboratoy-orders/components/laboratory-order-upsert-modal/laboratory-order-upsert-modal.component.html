@@ -1,0 +1,45 @@
+<app-base-step-modal
+  [currentStep]="currentStep"
+  [totalSteps]="totalSteps"
+  [stepLabels]="stepLabels"
+  [modalTitle]="
+    (mode === 'create'
+      ? 'LABORATORY_ORDERS.CREATE_TITLE'
+      : 'LABORATORY_ORDERS.EDIT_TITLE'
+    ) | translate
+  "
+  [isLoading]="isLoading"
+  [canProceedNext]="canProceedNext"
+  [canSave]="true"
+  (stepClicked)="onStepChange($event)"
+  (saveClicked)="onSave()"
+  (cancelClicked)="onCancel()"
+  (nextClicked)="onNextStep()"
+  (previousClicked)="onPreviousStep()"
+>
+  <div *ngIf="currentStep === 1" class="step-container">
+    <app-laboratory-order-step1
+      [formGroup]="stepForms[1]"
+      [preloadedData]="preloadedData"
+    ></app-laboratory-order-step1>
+  </div>
+
+  <div *ngIf="currentStep === 2" class="step-container">
+    <app-laboratory-order-step2
+      [formGroup]="stepForms[2]"
+      [preloadedData]="preloadedData"
+    ></app-laboratory-order-step2>
+  </div>
+
+  <div *ngIf="currentStep === 3" class="step-container">
+    <app-laboratory-order-step3
+      [formGroup]="stepForms[3]"
+    ></app-laboratory-order-step3>
+  </div>
+
+  <div *ngIf="currentStep === 4" class="step-container">
+    <app-laboratory-order-step4
+      [formGroup]="stepForms[4]"
+    ></app-laboratory-order-step4>
+  </div>
+</app-base-step-modal>

@@ -1,0 +1,182 @@
+<div class="inventory-filter">
+  <form [formGroup]="inventoryFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.CODE' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="code"
+          [placeholder]="'INVENTORY.FILTER.CODE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.PRODUCT_NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
+          [placeholder]="
+            'INVENTORY.FILTER.PRODUCT_NAME_PLACEHOLDER' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.BRAND' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="brand"
+          [placeholder]="'INVENTORY.FILTER.BRAND_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.UNIT_PRICE' | translate }}
+        </label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="unitPrice"
+          step="0.01"
+          min="0"
+          [placeholder]="'INVENTORY.FILTER.UNIT_PRICE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.QUANTITY' | translate }}
+        </label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="quantity"
+          min="0"
+          [placeholder]="'INVENTORY.FILTER.QUANTITY_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.CATEGORY' | translate }}
+        </label>
+        <ng-select
+          formControlName="categoryId"
+          [items]="categories$ | async"
+          bindLabel="name"
+          bindValue="id"
+          [clearable]="true"
+          [searchable]="true"
+          [placeholder]="'INVENTORY.FILTER.CATEGORY_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option
+            *ngFor="let category of categories$ | async"
+            [value]="category.id"
+          >
+            <span class="text-dark fw-medium">{{ category.name }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.SUBCATEGORY' | translate }}
+        </label>
+        <ng-select
+          formControlName="subcategoryId"
+          [items]="subcategories$ | async"
+          bindLabel="name"
+          bindValue="id"
+          [clearable]="true"
+          [searchable]="true"
+          [placeholder]="'INVENTORY.FILTER.SUBCATEGORY_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option
+            *ngFor="let subcategory of subcategories$ | async"
+            [value]="subcategory.id"
+          >
+            <span class="text-dark fw-medium">{{ subcategory.name }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.SUPPLIER' | translate }}
+        </label>
+        <ng-select
+          formControlName="supplierId"
+          [items]="suppliers$ | async"
+          bindLabel="name"
+          bindValue="id"
+          [clearable]="true"
+          [searchable]="true"
+          [placeholder]="'INVENTORY.FILTER.SUPPLIER_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option
+            *ngFor="let supplier of suppliers$ | async"
+            [value]="supplier.id"
+          >
+            <span class="text-dark fw-medium">{{ supplier.name }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'INVENTORY.FILTER.STATUS' | translate }}
+        </label>
+        <ng-select
+          formControlName="isActive"
+          [items]="statusOptions$ | async"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="true"
+          [placeholder]="'INVENTORY.FILTER.STATUS_PLACEHOLDER' | translate"
+          class="text-dark"
+        >
+          <ng-option
+            *ngFor="let option of statusOptions$ | async"
+            [value]="option.value"
+          >
+            <span class="text-dark fw-medium">{{ option.label }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="onReset()"
+          >
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-sm"
+            [disabled]="!inventoryFilterForm?.valid"
+          >
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

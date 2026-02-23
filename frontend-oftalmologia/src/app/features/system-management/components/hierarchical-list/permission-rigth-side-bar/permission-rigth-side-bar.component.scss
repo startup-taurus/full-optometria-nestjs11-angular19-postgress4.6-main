@@ -1,0 +1,222 @@
+@media (max-width: 991.98px) {
+  :host {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #chat-user-list,
+  .chat-user-list {
+    height: 100%;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  .card-body.py-2.px-3.border-bottom {
+    display: none !important;
+  }
+
+  .px-3.py-2 {
+    padding: 1rem 1.25rem !important;
+    background: var(--bs-body-bg);
+
+    .app-search {
+      padding: 0 !important;
+
+      .form-control {
+        height: 44px;
+        font-size: 1rem;
+        border-radius: 12px;
+        padding-left: 2.75rem;
+        border: 1px solid var(--bs-border-color);
+        background: white;
+
+        &:focus {
+          box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
+        }
+      }
+
+      .app-search-icon {
+        left: 1rem;
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  .d-flex.flex-column.overflow-auto.scrollbar {
+    padding: 0.5rem 0;
+    background: var(--bs-body-bg);
+  }
+
+  ngx-simplebar,
+  .users-list {
+    padding: 0 !important;
+  }
+
+  .d-flex.gap-2.py-1 {
+    margin: 0 1rem 0.75rem 1rem;
+    padding: 0 !important;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    overflow: hidden;
+
+    &:active {
+      transform: scale(0.98);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    }
+
+    a {
+      padding: 1.125rem 1.25rem !important;
+      border-radius: 12px;
+
+      &:hover {
+        background: transparent;
+      }
+    }
+  }
+
+  .chat-users {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0;
+    width: 100%;
+
+    .flex-grow-1 {
+      h5 {
+        font-size: 1.0625rem;
+        font-weight: 600;
+        margin-bottom: 0;
+        line-height: 1.4;
+        color: var(--bs-dark);
+      }
+    }
+
+    .d-flex.gap-1 {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 0.375rem;
+
+      i {
+        font-size: 1.5rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        &:active {
+          transform: scale(0.9);
+        }
+
+        &.ti-pencil {
+          color: var(--bs-info);
+          background: rgba(var(--bs-info-rgb), 0.1);
+
+          &:active {
+            background: rgba(var(--bs-info-rgb), 0.2);
+          }
+        }
+
+        &.ti-toggle-right {
+          color: var(--bs-success);
+          background: rgba(var(--bs-success-rgb), 0.1);
+
+          &:active {
+            background: rgba(var(--bs-success-rgb), 0.2);
+          }
+        }
+
+        &.ti-toggle-left {
+          color: var(--bs-secondary);
+          background: rgba(var(--bs-secondary-rgb), 0.1);
+
+          &:active {
+            background: rgba(var(--bs-secondary-rgb), 0.2);
+          }
+        }
+      }
+    }
+  }
+
+  .text-muted.opacity-50 {
+    h5 {
+      color: var(--bs-secondary) !important;
+    }
+  }
+
+  .d-flex.gap-2.py-1:has(.text-muted.opacity-50) {
+    opacity: 0.65;
+    background: #f8f9fa !important;
+    border-color: #e0e0e0 !important;
+  }
+
+  .d-flex.justify-content-center {
+    padding: 3rem 0;
+
+    .spinner-border {
+      width: 2.5rem;
+      height: 2.5rem;
+      color: var(--bs-primary);
+    }
+  }
+
+  .d-flex.gap-2.py-1:has(a .chat-users .flex-grow-1 h5:only-child) {
+    background: transparent;
+    box-shadow: none;
+    padding: 2rem 1rem;
+    text-align: center;
+
+    h5 {
+      color: var(--bs-secondary);
+      font-size: 1rem;
+      font-weight: normal;
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  :host {
+    display: block;
+    height: 100%;
+  }
+
+  .chat-user-list {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-body.py-2.px-3.border-bottom,
+  .px-3.py-2 {
+    flex-shrink: 0;
+  }
+
+  .d-flex.flex-column.overflow-auto.scrollbar {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  ngx-simplebar,
+  .users-list {
+    width: 100%;
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+  }
+
+  @media (min-width: 1200px) {
+    ngx-simplebar,
+    .users-list {
+      max-height: calc(100vh - 320px);
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  .chat-user-list {
+    border-left: 1px solid var(--bs-border-color);
+  }
+}

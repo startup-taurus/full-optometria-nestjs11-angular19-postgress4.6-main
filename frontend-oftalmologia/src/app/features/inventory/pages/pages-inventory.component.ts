@@ -1,0 +1,21 @@
+import { Component } from '@angular/core'
+import { TableInventoryComponent } from '../components/tables/table-inventory.component'
+import { BranchSelectorComponent } from '@/app/shared/components/branch-selector/branch-selector.component'
+import { PageTitleComponent } from '../../../shared/components/layouts/page-title/page-title.component'
+import { TranslateModule } from '@ngx-translate/core'
+
+@Component({
+  selector: 'pages-inventory',
+  standalone: true,
+  imports: [
+    TableInventoryComponent,
+    BranchSelectorComponent,
+    PageTitleComponent,
+    TranslateModule,
+  ],
+  templateUrl: './pages-inventory.component.html',
+  styleUrl: './pages-inventory.component.scss',
+})
+export class PagesInventoryComponent {
+  constructor() {}
+}

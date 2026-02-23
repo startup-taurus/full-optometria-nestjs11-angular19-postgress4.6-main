@@ -1,0 +1,97 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    <i class="ti ti-building me-2"></i>
+    {{ 'COMPANIES_MODULE.COMPANY_DETAILS' | translate }}
+  </h5>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    (click)="closeModal()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <div class="company-details">
+    <div class="mb-3 text-center">
+      <span
+        class="badge rounded-pill fs-6"
+        [class.bg-success]="selectedCompany.isActive"
+        [class.bg-danger]="!selectedCompany.isActive"
+      >
+        {{
+          (selectedCompany.isActive ? 'WORDS.ACTIVE' : 'WORDS.INACTIVE')
+            | translate
+        }}
+      </span>
+    </div>
+
+    @if (selectedCompany.logoFile) {
+      <div class="text-center mb-3">
+        <img
+          [src]="getLogoUrl()"
+          [alt]="selectedCompany.name"
+          class="img-fluid rounded"
+          style="max-height: 150px; object-fit: contain"
+        />
+      </div>
+    }
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="card-title text-primary mb-3">
+          <i class="ti ti-info-circle me-2"></i>
+          {{ 'COMPANIES_MODULE.GENERAL_INFO' | translate }}
+        </h6>
+
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'COMPANIES_MODULE.NAME' | translate }}:</strong>
+            <p class="mb-0">{{ selectedCompany.name }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'COMPANIES_MODULE.CODE' | translate }}:</strong>
+            <p class="mb-0">{{ selectedCompany.code }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'WORDS.EMAIL' | translate }}:</strong>
+            <p class="mb-0">{{ selectedCompany.email || 'N/A' }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'WORDS.PHONE' | translate }}:</strong>
+            <p class="mb-0">{{ selectedCompany.phone || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title text-primary mb-3">
+          <i class="ti ti-clock me-2"></i>
+          {{ 'COMPANIES_MODULE.TIMESTAMPS' | translate }}
+        </h6>
+
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'WORDS.CREATED_AT' | translate }}:</strong>
+            <p class="mb-0">
+              {{ getFormattedDate(selectedCompany.createdAt) }}
+            </p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'WORDS.UPDATED_AT' | translate }}:</strong>
+            <p class="mb-0">
+              {{ getFormattedDate(selectedCompany.updatedAt) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="closeModal()">
+    {{ 'WORDS.CLOSE' | translate }}
+  </button>
+</div>

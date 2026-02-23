@@ -1,0 +1,49 @@
+<div class="row">
+  <div class="col-12">
+    <div
+      class="page-title-head d-flex align-items-sm-center flex-sm-row flex-column"
+    >
+      <div class="flex-grow-1">
+        <h4 class="fs-18 fw-semibold m-0">
+          {{ 'DASHBOARD.TITLE' | translate }}
+        </h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <app-stats />
+
+    <div class="row">
+      <div class="col-xxl-8">
+        <appointments-trend-chart />
+      </div>
+
+      <div class="col-xxl-4">
+        <shift-status-distribution-chart />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xxl-6">
+        <diagnosis-frequency-chart />
+      </div>
+
+      <div class="col-xxl-6">
+        <patients-age-distribution-chart />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xxl-6">
+        <laboratory-orders-status-chart />
+      </div>
+
+      <div class="col-xxl-6">
+        <products-inventory-chart />
+      </div>
+    </div>
+  </div>
+</div>

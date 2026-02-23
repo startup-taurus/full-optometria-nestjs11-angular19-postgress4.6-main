@@ -1,0 +1,14 @@
+.border-secondary-subtle {
+  border-color: #eeeeee !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: var(--osen-nav-pills-link-active-color);
+  background-color: #232e51;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: #232e51;
+}

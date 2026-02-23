@@ -1,0 +1,115 @@
+<div class="medical-history-filter">
+  <form [formGroup]="medicalHistoryFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.IDENTIFICATION' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="identification"
+          [placeholder]="
+            'MEDICAL_HISTORY.FILTER.IDENTIFICATION_PLACEHOLDER' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.FIRST_NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [placeholder]="
+            'MEDICAL_HISTORY.FILTER.FIRST_NAME_PLACEHOLDER' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.LAST_NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [placeholder]="
+            'MEDICAL_HISTORY.FILTER.LAST_NAME_PLACEHOLDER' | translate
+          "
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.PHONE' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="phone"
+          [placeholder]="'MEDICAL_HISTORY.FILTER.PHONE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.EMAIL' | translate }}
+        </label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [placeholder]="'MEDICAL_HISTORY.FILTER.EMAIL_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.STATUS' | translate }}
+        </label>
+        <select class="form-control" formControlName="status">
+          <option value="">
+            {{ 'MEDICAL_HISTORY.FILTER.SELECT_STATUS' | translate }}
+          </option>
+          <option value="enviado">Enviado</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.DATE_FROM' | translate }}
+        </label>
+        <input type="date" class="form-control" formControlName="dateFrom" />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'MEDICAL_HISTORY.FILTER.DATE_TO' | translate }}
+        </label>
+        <input type="date" class="form-control" formControlName="dateTo" />
+      </div>
+
+      <div class="col-12 mt-3">
+        <div class="col-12">
+        <div class="d-flex gap-2 justify-content-end">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="resetForm()"
+          >
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            {{ 'WORDS.FILTER' | translate }}
+          </button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,258 @@
+<div class="row mb-4" [formGroup]="formGroup">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fa fa-user me-2"></i>
+          {{ 'MEDICAL_HISTORY.FORM.STEP1_TITLE' | translate }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12">
+            <label class="form-label"
+              >{{ 'MEDICAL_HISTORY.FIELDS.FULL_NAME' | translate }} *</label
+            >
+            @if (showPatientSelector) {
+              <ng-select
+                [items]="patients"
+                bindLabel="fullName"
+                bindValue="id"
+                [loading]="patientsLoading"
+                [clearable]="true"
+                [searchable]="true"
+                [typeahead]="patientSearch$"
+                [minTermLength]="2"
+                [placeholder]="'MEDICAL_HISTORY.FORM.SEARCH_PATIENT' | translate"
+                [loadingText]="'MEDICAL_HISTORY.FORM.LOADING_TEXT' | translate"
+                [notFoundText]="'MEDICAL_HISTORY.FORM.NOT_FOUND_TEXT' | translate"
+                [clearAllText]="'MEDICAL_HISTORY.FORM.CLEAR_ALL_TEXT' | translate"
+                formControlName="patientId"
+                (selectionChange)="onPatientSelect($event)"
+                (clear)="onPatientClear()"
+              >
+                <ng-option *ngFor="let patient of patients" [value]="patient.id">
+                  <div class="user-option">
+                    <div class="user-name">{{ patient.fullName }}</div>
+                    <small class="text-muted">
+                      {{ 'MEDICAL_HISTORY.FIELDS.DOCUMENT_NUMBER' | translate }}:
+                      {{ patient.documentNumber || 'N/A' }}
+                      @if (patient.age !== undefined) {
+                        | {{ 'MEDICAL_HISTORY.FIELDS.AGE' | translate }}:
+                        {{ patient.age }}
+                        {{ 'MEDICAL_HISTORY.FIELDS.YEARS' | translate }}
+                      }
+                    </small>
+                  </div>
+                </ng-option>
+              </ng-select>
+            }
+            @if (
+              formGroup.get('patientId')?.invalid &&
+              formGroup.get('patientId')?.touched
+            ) {
+              <div class="text-danger mt-1">
+                <small>{{
+                  'MEDICAL_HISTORY.FORM.SELECT_PATIENT' | translate
+                }}</small>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (selectedPatient) {
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="alert alert-info">
+                <div class="row">
+                  <div class="col-md-3">
+                    <strong
+                      >{{
+                        'MEDICAL_HISTORY.FIELDS.FULL_NAME' | translate
+                      }}:</strong
+                    ><br />
+                    {{ selectedPatient.fullName }}
+                  </div>
+                  <div class="col-md-3">
+                    <strong
+                      >{{
+                        'MEDICAL_HISTORY.FIELDS.DOCUMENT_NUMBER' | translate
+                      }}:</strong
+                    ><br />
+                    {{ selectedPatient.documentNumber || 'N/A' }}
+                  </div>
+                  <div class="col-md-3">
+                    <strong
+                      >{{ 'USER.FORM.DATE_OF_BIRTH' | translate }}:</strong
+                    ><br />
+                    {{
+                      selectedPatient.dateOfBirth
+                        ? (selectedPatient.dateOfBirth | date: 'dd/MM/yyyy')
+                        : 'N/A'
+                    }}
+                  </div>
+                  <div class="col-md-3">
+                    <strong
+                      >{{ 'MEDICAL_HISTORY.FIELDS.AGE' | translate }}:</strong
+                    ><br />
+                    {{
+                      selectedPatient.age !== undefined
+                        ? selectedPatient.age +
+                          ' ' +
+                          ('MEDICAL_HISTORY.FIELDS.YEARS' | translate)
+                        : 'N/A'
+                    }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4" *ngIf="shouldShowSection('step1_personalData')">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-clipboard me-2"></i>
+          {{ 'MEDICAL_HISTORY.FORM.PATIENT_INFORMATION' | translate }}
+        </h6>
+      </div>
+      <div class="card-body" [formGroup]="formGroup">
+        <div class="row">
+          <div class="col-md-6 mb-3" *ngIf="shouldShowField('occupation')">
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.OCCUPATION' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="occupation"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.OCCUPATION' | translate
+              "
+            />
+          </div>
+
+          <div
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('lastVisualExamDate')"
+          >
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.LAST_VISUAL_EXAM_DATE' | translate
+            }}</label>
+            <div class="toggle-switch mb-3">
+              <input
+                type="checkbox"
+                id="firstTime"
+                class="toggle-input"
+                formControlName="firstTime"
+              />
+              <label for="firstTime" class="toggle-label">
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">
+                  {{
+                    formGroup.get('firstTime')?.value
+                      ? ('MEDICAL_HISTORY.FIELDS.FIRST_TIME' | translate)
+                      : ('MEDICAL_HISTORY.FIELDS.HAS_PREVIOUS_EXAM' | translate)
+                  }}
+                </span>
+              </label>
+            </div>
+            @if (!formGroup.get('firstTime')?.value) {
+              <input
+                type="date"
+                class="form-control"
+                formControlName="lastVisualExamDate"
+                [placeholder]="
+                  'MEDICAL_HISTORY.PLACEHOLDERS.LAST_EXAM_DATE' | translate
+                "
+              />
+            }
+          </div>
+
+          <div class="col-md-6 mb-3" *ngIf="shouldShowField('visionProblems')">
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.VISUAL_COMPLAINTS' | translate
+            }}</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              formControlName="visionProblems"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.VISUAL_COMPLAINTS' | translate
+              "
+            ></textarea>
+          </div>
+
+          <div class="col-md-6 mb-3" *ngIf="shouldShowField('generalHealth')">
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.GENERAL_HEALTH' | translate
+            }}</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              formControlName="generalHealth"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.GENERAL_HEALTH' | translate
+              "
+            ></textarea>
+          </div>
+
+          <div
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('otherHealthProblems')"
+          >
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.OTHER_HEALTH_PROBLEMS' | translate
+            }}</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              formControlName="otherHealthProblems"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_HEALTH_PROBLEMS' | translate
+              "
+            ></textarea>
+          </div>
+
+          <div class="col-md-6 mb-3" *ngIf="shouldShowField('segmentAnterior')">
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.ANTERIOR_SEGMENT' | translate
+            }}</label>
+            <div class="mb-2">
+              @for (option of ['OD', 'OI', 'A.O.']; track option) {
+                <div class="form-check form-check-inline">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    [value]="option"
+                    formControlName="segmentAnterior"
+                    [id]="'segment_' + option"
+                  />
+                  <label class="form-check-label" [for]="'segment_' + option">
+                    {{ option }}
+                  </label>
+                </div>
+              }
+            </div>
+            @if (formGroup.get('segmentAnterior')?.value) {
+              <input
+                type="text"
+                class="form-control mt-2"
+                formControlName="segmentAnteriorOther"
+                [placeholder]="
+                  'MEDICAL_HISTORY.PLACEHOLDERS.SPECIFY_OTHER' | translate
+                "
+              />
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

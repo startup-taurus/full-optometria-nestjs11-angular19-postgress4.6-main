@@ -1,0 +1,158 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{ 'SHIFTS.VIEW_SHIFT_DETAILS' | translate }}
+  </h4>
+<button
+    type="button"
+    class="ms-auto border-0 bg-transparent"
+    (click)="closeModal()"
+  >
+    <span class="fs-1 text-black">&times;</span>
+  </button></div>
+
+<div class="modal-body">
+  <div class="card mb-4">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        {{ 'SHIFTS.PATIENT_INFORMATION' | translate }}
+      </h6>
+
+      <div class="row align-items-center g-3">
+        <div class="col-auto">
+          <img
+            [src]="getPatientProfileImage()"
+            [alt]="getPatientFullName()"
+            class="rounded-circle border"
+            width="80"
+            height="80"
+            loading="lazy"
+            (error)="onImageError($event)"
+            style="object-fit: cover"
+          />
+        </div>
+        <div class="col">
+          <h5 class="mb-2">{{ getPatientFullName() }}</h5>
+
+          <div class="row g-2">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center text-muted mb-1">
+                <strong class="me-2">Email:</strong>
+                <small>{{ selectedShift.patient.email }}</small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center text-muted mb-1">
+                <strong class="me-2">Teléfono:</strong>
+                <small>{{ selectedShift.patient.mobilePhone }}</small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center text-muted mb-1">
+                <strong class="me-2">Documento:</strong>
+                <small>{{ selectedShift.patient.documentNumber }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        {{ 'SHIFTS.APPOINTMENT_INFORMATION' | translate }}
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div>
+            <small class="text-muted d-block mb-1">{{
+              'SHIFTS.APPOINTMENT_DATE' | translate
+            }}</small>
+            <span class="fw-medium">{{ getFormattedAppointmentDate() }}</span>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div>
+            <small class="text-muted d-block mb-1">{{
+              'SHIFTS.STATUS' | translate
+            }}</small>
+            <span
+              class="badge fs-6 px-2 py-1"
+              [style.background-color]="selectedShift.status.color"
+            >
+              {{ selectedShift.status.description }}
+            </span>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div>
+            <small class="text-muted d-block mb-1">{{
+              'USER.FILTER.BRANCH' | translate
+            }}</small>
+            <span class="fw-medium">{{ selectedShift.branch.name }}</span>
+          </div>
+        </div>
+
+        <div class="col-12" *ngIf="selectedShift.description">
+          <div>
+            <small class="text-muted d-block mb-1">{{
+              'SHIFTS.DESCRIPTION' | translate
+            }}</small>
+            <span class="fw-medium">{{ selectedShift.description }}</span>
+          </div>
+        </div>
+
+        <div class="col-12" *ngIf="selectedShift.notes">
+          <div>
+            <small class="text-muted d-block mb-1">{{
+              'SHIFTS.NOTES' | translate
+            }}</small>
+            <span class="fw-medium">{{ selectedShift.notes }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        {{ 'SHIFTS.SYSTEM_INFORMATION' | translate }}
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div>
+            <small class="text-muted d-block mb-1">{{
+              'COMMON.CREATED_AT' | translate
+            }}</small>
+            <small class="fw-medium">
+              {{ getFormattedDate(selectedShift.createdAt) }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div>
+            <small class="text-muted d-block mb-1">{{
+              'COMMON.UPDATED_AT' | translate
+            }}</small>
+            <small class="fw-medium">
+              {{ getFormattedDate(selectedShift.updatedAt) }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="closeModal()">
+    {{ 'COMMON.CLOSE' | translate }}
+  </button>
+</div>

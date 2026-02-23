@@ -1,0 +1,17 @@
+<div class="wrapper">
+  <app-topbar
+    (settingsButtonClicked)="onSettingsButtonClicked()"
+    (mobileMenuButtonClicked)="onToggleMobileMenu()"
+  />
+
+  <horizontal-nav />
+  <div class="page-content">
+    <div class="page-container">
+      <router-outlet />
+    </div>
+
+    <app-footer class="mt-auto" />
+  </div>
+</div>
+
+<app-theme-customizer />

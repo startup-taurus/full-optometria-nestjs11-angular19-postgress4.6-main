@@ -1,0 +1,110 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    <i class="ti ti-switch me-2"></i>
+    {{ 'BRANCHES_MODULE.CHANGE_STATUS' | translate }}
+  </h5>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    (click)="closeModal()"
+    [disabled]="formLoading"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <div class="card mb-3">
+    <div class="card-body">
+      <h6 class="mb-3">{{ 'BRANCHES_MODULE.BRANCH_INFO' | translate }}</h6>
+      <div class="row">
+        <div class="col-12 mb-2">
+          <strong>{{ 'BRANCHES_MODULE.NAME' | translate }}:</strong>
+          <p class="mb-0">{{ selectedBranch.name }}</p>
+        </div>
+        <div class="col-md-6 mb-2">
+          <strong>{{ 'BRANCHES_MODULE.CODE' | translate }}:</strong>
+          <p class="mb-0">{{ selectedBranch.code }}</p>
+        </div>
+        <div class="col-md-6 mb-2">
+          <strong>{{ 'BRANCHES_MODULE.CITY' | translate }}:</strong>
+          <p class="mb-0">{{ selectedBranch.city }}</p>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-3 mb-0">
+        <strong>{{ 'WORDS.CURRENT_STATUS' | translate }}:</strong>
+        <span
+          class="badge rounded-pill ms-2 bg-white"
+          [class.text-success]="selectedBranch.isActive"
+          [class.text-danger]="!selectedBranch.isActive"
+        >
+          {{
+            (selectedBranch.isActive ? 'WORDS.ACTIVE' : 'WORDS.INACTIVE')
+              | translate
+          }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="statusForm">
+    <div class="mb-3">
+      <label class="form-label">
+        {{ 'WORDS.NEW_STATUS' | translate }}
+        <span class="text-danger">*</span>
+      </label>
+      <div class="btn-group w-100" role="group">
+        <input
+          type="radio"
+          class="btn-check"
+          name="isActive"
+          id="statusActive"
+          [value]="true"
+          formControlName="isActive"
+        />
+        <label class="btn btn-outline-success" for="statusActive">
+          <i class="ti ti-check me-1"></i>
+          {{ 'WORDS.ACTIVE' | translate }}
+        </label>
+
+        <input
+          type="radio"
+          class="btn-check"
+          name="isActive"
+          id="statusInactive"
+          [value]="false"
+          formControlName="isActive"
+        />
+        <label class="btn btn-outline-danger" for="statusInactive">
+          <i class="ti ti-x me-1"></i>
+          {{ 'WORDS.INACTIVE' | translate }}
+        </label>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="closeModal()"
+    [disabled]="formLoading"
+  >
+    {{ 'WORDS.CANCEL' | translate }}
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="onSubmit()"
+    [disabled]="formLoading"
+  >
+    @if (formLoading) {
+      <span
+        class="spinner-border spinner-border-sm me-1"
+        role="status"
+        aria-hidden="true"
+      ></span>
+    }
+    {{ 'WORDS.UPDATE' | translate }}
+  </button>
+</div>

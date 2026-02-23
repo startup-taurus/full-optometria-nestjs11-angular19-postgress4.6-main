@@ -1,0 +1,101 @@
+/* src/app/core/components/auth-layout/auth-layout.component.scss */
+
+.language-selector .dropdown-menu a {
+    display: flex;
+    align-items: center;
+}
+
+.language-selector img {
+    border-radius: 4px;
+}
+
+.language-selector span {
+    font-weight: 500;
+}
+
+:host {
+  .position-relative {
+    min-height: 40px;
+  }
+
+  .dropdown {
+    &.language-box {
+      background-color: #fff;
+      border: 1px solid #72717136;
+      border-radius: 8px;
+      padding: 4px 8px;
+      margin: 0;
+
+      transition: all 0.2s ease;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .language-selector {
+      background: transparent;
+      border: none;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bs-body-color);
+      font-size: 0.875rem;
+      min-width: 40px;
+      
+      &:hover, &:focus, &:active {
+        background: transparent;
+        box-shadow: none;
+        color: var(--bs-primary);
+      }
+
+      img {
+        border-radius: 4px;
+        border: 1px solid var(--bs-border-color);
+        width: 20px;
+        height: 20px;
+        object-fit: cover;
+        margin: 0;
+      }
+
+      &::after {
+        margin-left: 8px;
+        opacity: 0.5;
+      }
+    }
+
+    .dropdown-menu {
+      min-width: 160px;
+      padding: 0.5rem 0;
+      margin-top: 8px;
+      border: 1px solid var(--bs-border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      
+      .dropdown-item {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+
+        img {
+          border-radius: 4px;
+          border: 1px solid var(--bs-border-color);
+          width: 20px;
+          height: 20px;
+          object-fit: cover;
+        }
+
+        &:hover {
+          background-color: var(--bs-light);
+          color: var(--bs-primary);
+        }
+
+        &:active {
+          background-color: var(--bs-primary);
+          color: white;
+        }
+      }
+    }
+  }
+}

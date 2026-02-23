@@ -1,0 +1,86 @@
+<div class="zgames-content">
+  <div class="container-fluid px-4 px-lg-5 py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8">
+        <div class="zgames-card">
+          <div class="row align-items-center g-4">
+            <div class="col-md-5 text-center">
+              <img
+                src="assets/images/ZGames.png"
+                alt="ZGames Technology"
+                class="zgames-logo"
+              />
+            </div>
+
+            <div class="col-md-7">
+              <h1 class="zgames-title">
+                ZGames <span class="highlight">Technology</span>
+              </h1>
+              <p class="zgames-subtitle">Soluciones de Software a tu Medida</p>
+
+              <p class="zgames-description">
+                Transformamos tus ideas en software profesional y escalable.
+                Especializados en desarrollo web, aplicaciones móviles y
+                sistemas empresariales.
+              </p>
+
+              <div class="zgames-features">
+                <div class="feature-item">
+                  <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                  <span>Desarrollo Web & Móvil</span>
+                </div>
+                <div class="feature-item">
+                  <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                  <span>Sistemas Empresariales</span>
+                </div>
+                <div class="feature-item">
+                  <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                  <span>Consultoría Tecnológica</span>
+                </div>
+                <div class="feature-item">
+                  <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                  <span>Soporte & Mantenimiento</span>
+                </div>
+              </div>
+
+              <div class="zgames-contact">
+                <h3 class="contact-title">¡Contáctanos!</h3>
+
+                <div class="contact-buttons">
+                  <button
+                    class="btn-contact btn-whatsapp"
+                    (click)="openWhatsApp()"
+                  >
+                    <iconify-icon icon="mdi:whatsapp"></iconify-icon>
+                    <span>WhatsApp</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-contact btn-copy"
+                    [class.copied]="copiedPhone()"
+                    (click)="copyToClipboard(phoneNumber, 'phone')"
+                  >
+                    <iconify-icon
+                      [icon]="copiedPhone() ? 'mdi:check' : 'mdi:content-copy'"
+                    ></iconify-icon>
+                    <span>{{ copiedPhone() ? '¡Copiado!' : phoneNumber }}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-contact btn-email"
+                    (click)="openEmail()"
+                  >
+                    <iconify-icon icon="mdi:email"></iconify-icon>
+                    <span class="btn-text">{{ email }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

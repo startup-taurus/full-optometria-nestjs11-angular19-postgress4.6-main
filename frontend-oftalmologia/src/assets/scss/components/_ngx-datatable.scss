@@ -1,0 +1,169 @@
+.ngx-datatable.material {
+  box-shadow: none !important;
+  border-radius: 4px !important;
+  background-color: transparent !important;
+
+  &.single-selection,
+  &.multi-selection,
+  &.multi-click-selection {
+    .datatable-body-row {
+      &.active,
+      &.active .datatable-row-group {
+        background-color: var(--bs-primary-bg-subtle) !important;
+        color: var(--bs-body-color) !important;
+        border-left: 4px solid var(--bs-primary) !important;
+        transition: background-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+            color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+            border-left-color 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+
+      }
+
+      &.active:hover,
+      &.active:hover .datatable-row-group {
+        background-color: var(--bs-primary-bg-subtle) !important;
+        color: var(--bs-body-color) !important;
+      }
+
+      &.active:focus,
+      &.active:focus .datatable-row-group {
+        background-color: var(--bs-primary-bg-subtle) !important;
+        color: var(--bs-body-color) !important;
+      }
+    }
+  }
+
+  .datatable-header,
+  .datatable-body,
+  .datatable-footer {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .datatable-header .datatable-row-left,
+  .datatable-body .datatable-row-left {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    transform: none !important;
+    position: sticky;
+    left: 0;
+    .datatable-header-cell,
+    .datatable-body-cell {
+      border-right: 1px solid #efefef;
+      width: 100% !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .datatable-header .datatable-row-right,
+  .datatable-body .datatable-row-right {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    transform: none !important;
+    position: sticky;
+    right: 0;
+    .datatable-header-cell,
+    .datatable-body-cell {
+      border-left: 1px solid #efefef;
+      width: 100% !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .datatable-body .progress-linear .container {
+    max-width: none;
+    background-color: rgba(#84a7cd, 0.03);
+    .bar {
+      background-color: #214178;
+    }
+  }
+
+  .datatable-body .datatable-body-row {
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover .datatable-row-group {
+      background-color: #d7e2e9 !important;
+    }
+
+    &:focus .datatable-row-group {
+      background-color: #d7e2e9 !important;
+    }
+
+    &.active .datatable-row-group {
+      background-color: #d7e2e9 !important;
+    }
+
+    &.active:hover .datatable-row-group {
+      background-color: #d7e2e9 !important;
+    }
+  }
+
+  .datatable-row-wrapper .datatable-row-detail {
+    height: auto !important;
+  }
+
+  .datatable-body .datatable-summary-row .datatable-body-row {
+    height: auto !important;
+    background-color: transparent !important;
+  }
+
+  .datatable-body
+    .datatable-summary-row
+    .datatable-body-row
+    .datatable-body-cell {
+    height: auto !important;
+  }
+
+  .datatable-footer .datatable-footer-inner {
+    flex-wrap: wrap;
+    height: auto !important;
+    overflow: hidden;
+
+    .footer-left,
+    .datatable-pager {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .footer-left {
+      .page-size-container,
+      .total-rows-container {
+        color: inherit;
+        padding: 8px;
+      }
+    }
+
+    .datatable-pager {
+      flex: 1 30% !important;
+      justify-content: flex-end;
+    }
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .ngx-datatable.material {
+    .datatable-footer .datatable-footer-inner {
+      flex-direction: column;
+
+      .footer-left,
+      .datatable-pager {
+        width: 100%;
+      }
+      .footer-left {
+        order: 1;
+        justify-content: space-between;
+      }
+
+      .datatable-pager {
+        order: 2;
+        justify-content: center;
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+  }
+}

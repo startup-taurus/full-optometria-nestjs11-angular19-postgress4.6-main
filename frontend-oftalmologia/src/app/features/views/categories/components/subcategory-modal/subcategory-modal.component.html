@@ -1,0 +1,188 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-title">{{ modalTitle }}</h4>
+  <button type="button" class="btn-close ms-auto" (click)="onCancel()"></button>
+</div>
+
+<div class="modal-body">
+  <form
+    [formGroup]="subcategoryForm"
+    (ngSubmit)="onSubmit()"
+    class="modal-form"
+  >
+    <div class="mb-3">
+      <label for="subcategoryCategoryId" class="form-label">
+        {{ 'CATEGORIES.FORM.PARENT_CATEGORY' | translate }}
+        <span class="text-danger">*</span>
+      </label>
+      <select
+        id="subcategoryCategoryId"
+        class="form-select"
+        formControlName="categoryId"
+        [class.is-invalid]="categoryId?.invalid && categoryId?.touched"
+        [disabled]="isLoading || isLoadingCategories"
+      >
+        <option value="">
+          {{ 'CATEGORIES.FORM.SELECT_CATEGORY' | translate }}
+        </option>
+
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{ category.name }}
+        </option>
+      </select>
+
+      <div class="form-text" *ngIf="isLoadingCategories">
+        <div class="d-flex align-items-center">
+          <div
+            class="spinner-border spinner-border-sm text-primary me-2"
+            role="status"
+          >
+            <span class="visually-hidden">{{
+              'COMMON.LOADING' | translate
+            }}</span>
+          </div>
+          <span>{{ 'COMMON.LOADING' | translate }}...</span>
+        </div>
+      </div>
+
+      <div
+        class="invalid-feedback"
+        *ngIf="categoryId?.invalid && categoryId?.touched"
+      >
+        <div *ngIf="categoryId?.errors?.['required']">
+          {{ 'COMMON.VALIDATIONS.REQUIRED' | translate }}
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="subcategoryName" class="form-label">
+        {{ 'CATEGORIES.FORM.SUBCATEGORY_NAME' | translate }}
+        <span class="text-danger">*</span>
+      </label>
+      <input
+        type="text"
+        id="subcategoryName"
+        class="form-control"
+        formControlName="name"
+        [class.is-invalid]="name?.invalid && name?.touched"
+        placeholder="{{
+          'CATEGORIES.FORM.SUBCATEGORY_NAME_PLACEHOLDER' | translate
+        }}"
+        [disabled]="isLoading"
+      />
+
+      <div class="invalid-feedback" *ngIf="name?.invalid && name?.touched">
+        <div *ngIf="name?.errors?.['required']">
+          {{ 'COMMON.VALIDATIONS.REQUIRED' | translate }}
+        </div>
+        <div *ngIf="name?.errors?.['minlength']">
+          {{ 'COMMON.VALIDATIONS.MIN_LENGTH' | translate: { min: 2 } }}
+        </div>
+        <div *ngIf="name?.errors?.['maxlength']">
+          {{ 'COMMON.VALIDATIONS.MAX_LENGTH' | translate: { max: 100 } }}
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="subcategoryDescription" class="form-label">
+        {{ 'CATEGORIES.FORM.DESCRIPTION' | translate }}
+      </label>
+      <textarea
+        id="subcategoryDescription"
+        class="form-control"
+        formControlName="description"
+        rows="3"
+        [class.is-invalid]="description?.invalid && description?.touched"
+        placeholder="{{
+          'CATEGORIES.FORM.SUBCATEGORY_DESCRIPTION_PLACEHOLDER' | translate
+        }}"
+        [disabled]="isLoading"
+      >
+      </textarea>
+
+      <div
+        class="invalid-feedback"
+        *ngIf="description?.invalid && description?.touched"
+      >
+        <div *ngIf="description?.errors?.['maxlength']">
+          {{ 'COMMON.VALIDATIONS.MAX_LENGTH' | translate: { max: 500 } }}
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3" *ngIf="mode === 'edit'">
+      <div class="form-group mb-3">
+        <label class="form-label">
+          {{ 'CATEGORIES.FORM.IS_ACTIVE' | translate }}
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="subcategoryIsActive"
+            class="toggle-input"
+            formControlName="isActive"
+            [disabled]="isLoading"
+          />
+          <label for="subcategoryIsActive" class="toggle-label">
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">
+              {{
+                subcategoryForm.get('isActive')?.value
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </label>
+        </div>
+        <small class="text-muted">
+          {{ 'CATEGORIES.FORM.IS_ACTIVE_DESCRIPTION' | translate }}
+        </small>
+      </div>
+    </div>
+
+    <div
+      class="alert alert-info"
+      *ngIf="categoryId?.value && !isLoadingCategories"
+    >
+      <small>
+        {{ 'CATEGORIES.FORM.SELECTED_CATEGORY' | translate }}:
+        <strong>{{ getCategoryName(categoryId.value) }}</strong>
+      </small>
+    </div>
+
+    <div class="alert alert-light border" *ngIf="mode === 'create'">
+      <small class="text-muted">
+        <i class="fas fa-lightbulb me-1"></i>
+        {{ 'CATEGORIES.FORM.SUBCATEGORY_CREATE_INFO' | translate }}
+      </small>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="onCancel()"
+    [disabled]="isLoading"
+  >
+    {{ 'COMMON.CANCEL' | translate }}
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="onSubmit()"
+    [disabled]="subcategoryForm.invalid || isLoading || isLoadingCategories"
+  >
+    <span
+      class="spinner-border spinner-border-sm me-2"
+      *ngIf="isLoading"
+      role="status"
+      aria-hidden="true"
+    >
+    </span>
+    {{ submitButtonText }}
+  </button>
+</div>

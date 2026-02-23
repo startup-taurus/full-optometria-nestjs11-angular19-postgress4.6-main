@@ -1,0 +1,160 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="modal-basic-title">
+    @if (isEditMode) {
+      {{ 'ROLES_AND_PERMISSIONS.PERMISSION.EDIT_PERMISSION' | translate }}
+    } @else {
+      {{ 'ROLES_AND_PERMISSIONS.PERMISSION.NEW_PERMISSION' | translate }}
+    }
+  </h5>
+  <button type="button" class="btn-close ms-auto" (click)="closeModal()"></button>
+</div>
+@if (isLoading && isEditMode) {
+  <div class="d-flex justify-content-center mt-3 mb-3">
+    <div class="spinner-border" role="status"></div>
+  </div>
+} @else {
+  <form [formGroup]="permissionForm" (ngSubmit)="onSubmit()">
+    <div class="modal-body">
+      @if (moduleId && !isEditMode) {
+        <div class="alert alert-info mb-3">
+          <i class="ti ti-info-circle me-2"></i>
+          {{
+            'ROLES_AND_PERMISSIONS.PERMISSION.FORM.CREATING_FOR_MODULE'
+              | translate: { moduleName: moduleName }
+          }}
+        </div>
+      }
+      <div class="row g-2">
+        <div class="mb-3">
+          <label class="form-label" for="permissionName">
+            {{
+              'ROLES_AND_PERMISSIONS.PERMISSION.FORM.PERMISSION_NAME'
+                | translate
+            }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            formControlName="permissionName"
+            type="text"
+            class="form-control"
+            [class.is-invalid]="
+              permissionForm.get('permissionName')?.invalid &&
+              permissionForm.get('permissionName')?.touched
+            "
+            [class.is-valid]="
+              permissionForm.get('permissionName')?.valid &&
+              permissionForm.get('permissionName')?.touched
+            "
+            id="permissionName"
+            placeholder="{{
+              'ROLES_AND_PERMISSIONS.PERMISSION.FORM.PERMISSION_NAME_PLACEHOLDER'
+                | translate
+            }}"
+            required
+          />
+          <div
+            class="invalid-feedback"
+            *ngIf="
+              permissionForm.get('permissionName')?.invalid &&
+              permissionForm.get('permissionName')?.touched
+            "
+          >
+            {{
+              'ROLES_AND_PERMISSIONS.PERMISSION.FORM.PERMISSION_NAME_REQUIRED'
+                | translate
+            }}
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="description">
+            {{
+              'ROLES_AND_PERMISSIONS.PERMISSION.FORM.DESCRIPTION' | translate
+            }}
+            <span class="text-danger">*</span>
+          </label>
+          <textarea
+            formControlName="description"
+            class="form-control"
+            [class.is-invalid]="
+              permissionForm.get('description')?.invalid &&
+              permissionForm.get('description')?.touched
+            "
+            [class.is-valid]="
+              permissionForm.get('description')?.valid &&
+              permissionForm.get('description')?.touched
+            "
+            id="description"
+            rows="3"
+            placeholder="{{
+              'ROLES_AND_PERMISSIONS.PERMISSION.FORM.DESCRIPTION_PLACEHOLDER'
+                | translate
+            }}"
+            required
+          ></textarea>
+          <div
+            class="invalid-feedback"
+            *ngIf="
+              permissionForm.get('description')?.invalid &&
+              permissionForm.get('description')?.touched
+            "
+          >
+            {{
+              'ROLES_AND_PERMISSIONS.PERMISSION.FORM.DESCRIPTION_REQUIRED'
+                | translate
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="closeModal()">
+        {{ 'WORDS.CANCEL' | translate }}
+      </button>
+      @if (isLoadingButton) {
+        @if (isEditMode) {
+          <button class="btn btn-primary" type="button" disabled>
+            <span
+              class="spinner-border spinner-border-sm me-1"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            {{ 'WORDS.UPDATING' | translate }}
+          </button>
+        } @else {
+          <button class="btn btn-primary" type="button" disabled>
+            <span
+              class="spinner-border spinner-border-sm me-1"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            {{ 'WORDS.CREATING' | translate }}
+          </button>
+        }
+      } @else {
+        @if (isEditMode) {
+          <button
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="permissionForm.invalid"
+          >
+            {{
+              'ROLES_AND_PERMISSIONS.PERMISSION.BUTTONS.EDIT_PERMISSION'
+                | translate
+            }}
+          </button>
+        } @else {
+          <button
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="permissionForm.invalid"
+          >
+            {{
+              'ROLES_AND_PERMISSIONS.PERMISSION.BUTTONS.CREATE_PERMISSION'
+                | translate
+            }}
+          </button>
+        }
+      }
+    </div>
+  </form>
+}

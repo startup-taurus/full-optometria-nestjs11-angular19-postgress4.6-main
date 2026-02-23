@@ -1,0 +1,232 @@
+{
+  "AUTH.LOGIN.SUCCESS": {
+    "es": "Inicio de sesión correcto",
+    "en": "Login successful"
+  },
+  "AUTH.REFRESH.SUCCESS": {
+    "es": "Token refrescado",
+    "en": "Token refreshed"
+  },
+  "AUTH.LOGOUT.SUCCESS": {
+    "es": "Sesión cerrada correctamente",
+    "en": "Logout successful"
+  },
+  "AUTH.GET_ME.SUCCESS": {
+    "es": "Usuario autenticado obtenido correctamente",
+    "en": "Authenticated user fetched successfully"
+  },
+  
+  "USER.CREATED": {
+    "es": "Usuario creado con éxito",
+    "en": "User created successfully"
+  },
+  "USER.UPDATED": {
+    "es": "Usuario actualizado",
+    "en": "User updated"
+  },
+  "USER.DELETED": {
+    "es": "Usuario eliminado",
+    "en": "User deleted"
+  },
+  "USER.FOUND": {
+    "es": "Usuarios obtenidos correctamente",
+    "en": "Users fetched successfully"
+  },
+  "USER.PROFILE_UPDATED": {
+    "es": "Perfil actualizado correctamente",
+    "en": "Profile updated successfully"
+  },
+  "USER.PASSWORD_VALIDATED": {
+    "es": "Contraseña actual validada correctamente",
+    "en": "Current password validated successfully"
+  },
+  "USER.FETCHED": {
+    "es": "Usuario obtenido correctamente",
+    "en": "User fetched successfully"
+  },
+  "USER.SEARCH_RESULTS": {
+    "es": "Resultados de búsqueda obtenidos",
+    "en": "Search results retrieved"
+  },
+  "USER.SEARCH_QUERY_TOO_SHORT": {
+    "es": "La consulta de búsqueda es muy corta",
+    "en": "Search query is too short"
+  },
+
+  "COMPANY.CREATED": {
+    "es": "Compañia creada con éxito",
+    "en": "Company created successfully"
+  },
+  "COMPANY.CREATED_COMPLETE": {
+    "es": "Compañia creada exitosamente con rol, sucursal y usuario administrador",
+    "en": "Company created successfully with role, branch and admin user"
+  },
+  "COMPANY.UPDATED": {
+    "es": "Compañia actualizada",
+    "en": "Company updated"
+  },
+  "COMPANY.DELETED": {
+    "es": "Compañia eliminada",
+    "en": "Company deleted"
+  },
+  "COMPANY.FOUND": {
+    "es": "Compañias obtenidas correctamente",
+    "en": "Companies fetched successfully"
+  },
+  "COMPANY.FETCHED": {
+    "es": "Compañia obtenida correctamente",
+    "en": "Company fetched successfully"
+  },
+  "COMPANY.SELECTOR_DATA": {
+    "es": "Datos de compañias para selector obtenidos",
+    "en": "Company selector data retrieved"
+  },
+
+  "ROLE.CREATED": {
+    "es": "Rol creado con éxito",
+    "en": "Role created successfully"
+  },
+  "ROLE.UPDATED": {
+    "es": "Rol actualizado",
+    "en": "Role updated"
+  },
+  "ROLE.DELETED": {
+    "es": "Rol eliminado",
+    "en": "Role deleted"
+  },
+  "ROLE.FOUND": {
+    "es": "Roles obtenidos correctamente",
+    "en": "Roles fetched successfully"
+  },
+  "ROLE.FETCHED": {
+    "es": "Rol obtenido correctamente",
+    "en": "Role fetched successfully"
+  },
+
+  "MODULE.CREATED": {
+    "es": "Módulo creado con éxito",
+    "en": "Module created successfully"
+  },
+  "MODULE.UPDATED": {
+    "es": "Módulo actualizado",
+    "en": "Module updated"
+  },
+  "MODULE.DELETED": {
+    "es": "Módulo eliminado",
+    "en": "Module deleted"
+  },
+  "MODULE.FOUND": {
+    "es": "Módulos obtenidos correctamente",
+    "en": "Modules fetched successfully"
+  },
+  "MODULE.FETCHED": {
+    "es": "Módulo obtenido correctamente",
+    "en": "Module fetched successfully"
+  },
+
+  "PERMISSION.CREATED": {
+    "es": "Permiso creado con éxito",
+    "en": "Permission created successfully"
+  },
+  "PERMISSION.UPDATED": {
+    "es": "Permiso actualizado",
+    "en": "Permission updated"
+  },
+  "PERMISSION.DELETED": {
+    "es": "Permiso eliminado",
+    "en": "Permission deleted"
+  },
+  "PERMISSION.FOUND": {
+    "es": "Permisos obtenidos correctamente",
+    "en": "Permissions fetched successfully"
+  },
+  "PERMISSION.FETCHED": {
+    "es": "Permiso obtenido correctamente",
+    "en": "Permission fetched successfully"
+  },
+
+  "ERROR.VALIDATION": {
+    "es": "Error de validación",
+    "en": "Validation error"
+  },
+  "ERROR.NOT_FOUND": {
+    "es": "Recurso no encontrado",
+    "en": "Resource not found"
+  },
+  "ERROR.UNAUTHORIZED": {
+    "es": "No autorizado",
+    "en": "Unauthorized"
+  },
+  "ERROR.FORBIDDEN": {
+    "es": "Acceso denegado",
+    "en": "Forbidden"
+  },
+  "ERROR.INTERNAL": {
+    "es": "Error interno del servidor",
+    "en": "Internal server error"
+  },
+  "ERROR.INVALID_CREDENTIALS": {
+    "es": "Credenciales inválidas",
+    "en": "Invalid credentials"
+  },
+  "ERROR.TOKEN_EXPIRED": {
+    "es": "Token expirado",
+    "en": "Token expired"
+  },
+  "ERROR.INVALID_TOKEN": {
+    "es": "Token inválido",
+    "en": "Invalid token"
+  },
+  "ERROR.INVALID_CURRENT_PASSWORD": {
+    "es": "La contraseña actual es incorrecta",
+    "en": "Current password is incorrect"
+  },
+  "ERROR.BOTH_PASSWORDS_REQUIRED": {
+    "es": "Se requieren tanto la contraseña actual como la nueva para cambiar la contraseña",
+    "en": "Both current password and new password are required for password change"
+  },
+  "ERROR.EMAIL_NOT_FOUND": {
+    "es": "El correo no existe en el sistema",
+    "en": "Email does not exist in the system"
+  },
+  "ERROR.EMAIL_SEND_FAILED": {
+    "es": "Error al enviar el correo de recuperación",
+    "en": "Failed to send recovery email"
+  },
+  "AUTH.RESET_EMAIL_SENT": {
+    "es": "Se ha enviado un enlace de restablecimiento a tu correo electrónico",
+    "en": "A password reset link has been sent to your email"
+  },
+  "AUTH.PASSWORD_CHANGED": {
+    "es": "Contraseña cambiada exitosamente",
+    "en": "Password changed successfully"
+  },
+  "AUTH.PASSWORD_RESET": {
+    "es": "La contraseña ha sido restablecida exitosamente",
+    "en": "Password has been reset successfully"
+  },
+  "ERROR.INVALID_OR_EXPIRED_TOKEN": {
+    "es": "Token inválido o expirado",
+    "en": "Invalid or expired token"
+  },
+  "ERROR.ADMIN_REQUIRED": {
+    "es": "Solo los usuarios administradores pueden realizar esta acción",
+    "en": "Only admin users can perform this action"
+  },
+  "ERROR.BRANCH_NOT_FOUND": {
+    "es": "Sucursal no encontrada",
+    "en": "Branch not found"
+  },
+  "ERROR.BRANCH_INACTIVE": {
+    "es": "La sucursal no está activa",
+    "en": "Branch is not active"
+  },
+  "AUTH.ADMIN_BRANCH_FILTER_SET": {
+    "es": "Filtro de sucursal establecido exitosamente",
+    "en": "Branch filter set successfully"
+  },
+  "AUTH.ADMIN_BRANCH_FILTER_CLEARED": {
+    "es": "Filtro de sucursal eliminado exitosamente",
+    "en": "Branch filter cleared successfully"
+  }
+}

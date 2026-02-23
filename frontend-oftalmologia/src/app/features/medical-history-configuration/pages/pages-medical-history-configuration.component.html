@@ -1,0 +1,504 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-1">{{ 'MEDICAL_HISTORY_CONFIG.TITLE' | translate }}</h2>
+          <p class="text-muted mb-0">
+            {{ 'MEDICAL_HISTORY_CONFIG.SUBTITLE' | translate }}
+          </p>
+        </div>
+        @if (currentConfig && !loading) {
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm"
+            (click)="deleteConfiguration()"
+            [disabled]="saving"
+            [title]="'COMMON.DELETE_CONFIG' | translate"
+          >
+            <i class="fa fa-trash-o"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- @if (selectedBranch) {
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="alert border-0">
+          <i class="fa fa-building me-2"></i>
+          <strong
+            >{{ 'MEDICAL_HISTORY_CONFIG.CURRENT_BRANCH' | translate }}:</strong
+          >
+          {{ selectedBranch.name }} ({{ selectedBranch.code }})
+        </div>
+      </div>
+    </div>
+  } -->
+
+  @if (loading) {
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">{{
+              'COMMON.LOADING' | translate
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!loading && selectedBranch && !currentConfig) {
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center py-5">
+          <div
+            class="card shadow-sm border-0"
+            style="max-width: 500px; margin: 0 auto"
+          >
+            <div class="card-body p-4 p-md-5">
+              <i class="fa fa-cogs fa-3x text-muted mb-4"></i>
+              <h4 class="mb-3">
+                {{ 'MEDICAL_HISTORY_CONFIG.WELCOME_TITLE' | translate }}
+              </h4>
+              <p class="text-muted mb-4">
+                {{ 'MEDICAL_HISTORY_CONFIG.WELCOME_DESCRIPTION' | translate }}
+              </p>
+              <button
+                type="button"
+                class="btn btn-primary btn-lg px-4 px-md-5 w-100 w-md-auto"
+                (click)="initializeConfiguration()"
+                [disabled]="saving"
+              >
+                @if (saving) {
+                  <span
+                    class="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                }
+                <i class="fa fa-play me-2"></i>
+                {{ 'MEDICAL_HISTORY_CONFIG.START_CONFIG' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!loading && selectedBranch && currentConfig) {
+    <form [formGroup]="configForm" (ngSubmit)="saveConfiguration()">
+      <div class="row">
+        <div class="col-12">
+          <div class="accordion-manual mb-4">
+            <div class="accordion-item-manual mb-3 border-0 shadow-sm">
+              <div class="accordion-header-manual">
+                <button
+                  type="button"
+                  class="accordion-button-manual w-100 text-start p-3 bg-light text-dark border-0 rounded"
+                  [class.collapsed]="!isAccordionOpen('step1')"
+                  (click)="toggleAccordion('step1')"
+                >
+                  <i class="fa fa-user me-2 me-md-3 text-muted"></i>
+                  <span class="fw-medium flex-grow-1">{{
+                    'MEDICAL_HISTORY_CONFIG.STEP1_TITLE' | translate
+                  }}</span>
+                  <i
+                    class="fa ms-2"
+                    [class.fa-chevron-down]="!isAccordionOpen('step1')"
+                    [class.fa-chevron-up]="isAccordionOpen('step1')"
+                  ></i>
+                </button>
+              </div>
+
+              @if (isAccordionOpen('step1')) {
+                <div
+                  class="accordion-body-manual p-3 p-md-4 bg-white border border-top-0 rounded-bottom"
+                >
+                  <div formGroupName="fieldsConfig">
+                    <div formGroupName="sections">
+                      @for (
+                        sectionKey of getStep1Sections();
+                        track sectionKey
+                      ) {
+                        <div class="mb-4" [formGroupName]="sectionKey">
+                          <div
+                            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-3 bg-light rounded gap-2"
+                          >
+                            <div
+                              class="d-flex align-items-center w-100 w-md-auto"
+                            >
+                              <div class="form-check form-switch me-3 me-md-4">
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  role="switch"
+                                  [id]="'section-' + sectionKey"
+                                  formControlName="visible"
+                                  (change)="
+                                    toggleSection(
+                                      sectionKey,
+                                      $any($event.target).checked
+                                    )
+                                  "
+                                />
+                              </div>
+                              <h6 class="mb-0 fw-medium text-dark">
+                                {{ LABELS.sections[sectionKey] || sectionKey }}
+                              </h6>
+                            </div>
+                            <span
+                              class="badge ms-auto ms-md-0"
+                              [class.bg-success]="isSectionVisible(sectionKey)"
+                              [class.bg-secondary]="
+                                !isSectionVisible(sectionKey)
+                              "
+                            >
+                              {{
+                                isSectionVisible(sectionKey)
+                                  ? ('MEDICAL_HISTORY_CONFIG.ENABLED'
+                                    | translate)
+                                  : ('MEDICAL_HISTORY_CONFIG.DISABLED'
+                                    | translate)
+                              }}
+                            </span>
+                          </div>
+
+                          @if (isSectionVisible(sectionKey)) {
+                            <div
+                              class="mt-3 p-2 p-md-3 bg-white border rounded"
+                            >
+                              <div class="row" formGroupName="fields">
+                                @for (
+                                  fieldKey of getFieldKeys(sectionKey);
+                                  track fieldKey
+                                ) {
+                                  <div
+                                    class="col-12 col-md-6 col-lg-4 mb-2 mb-md-3"
+                                  >
+                                    <div
+                                      class="field-toggle d-flex align-items-center justify-content-between gap-3 rounded border hover-bg px-3 py-3"
+                                    >
+                                      <label
+                                        class="field-toggle__label mb-0 flex-grow-1 fw-medium text-dark"
+                                        [for]="sectionKey + '-' + fieldKey"
+                                      >
+                                        {{
+                                          LABELS.fields[fieldKey] || fieldKey
+                                        }}
+                                      </label>
+                                      <div class="form-check form-switch m-0">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          role="switch"
+                                          [id]="sectionKey + '-' + fieldKey"
+                                          [formControlName]="fieldKey"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="accordion-item-manual mb-3 border-0 shadow-sm">
+              <div class="accordion-header-manual">
+                <button
+                  type="button"
+                  class="accordion-button-manual w-100 text-start p-3 bg-light text-dark border-0 rounded"
+                  [class.collapsed]="!isAccordionOpen('step2')"
+                  (click)="toggleAccordion('step2')"
+                >
+                  <i class="fa fa-eye me-2 me-md-3 text-muted"></i>
+                  <span class="fw-medium flex-grow-1">{{
+                    'MEDICAL_HISTORY_CONFIG.STEP2_TITLE' | translate
+                  }}</span>
+                  <i
+                    class="fa ms-2"
+                    [class.fa-chevron-down]="!isAccordionOpen('step2')"
+                    [class.fa-chevron-up]="isAccordionOpen('step2')"
+                  ></i>
+                </button>
+              </div>
+
+              @if (isAccordionOpen('step2')) {
+                <div
+                  class="accordion-body-manual p-3 p-md-4 bg-white border border-top-0 rounded-bottom"
+                >
+                  <div formGroupName="fieldsConfig">
+                    <div formGroupName="sections">
+                      @for (
+                        sectionKey of getStep2Sections();
+                        track sectionKey
+                      ) {
+                        <div class="mb-4" [formGroupName]="sectionKey">
+                          <div
+                            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-3 bg-light rounded gap-2"
+                          >
+                            <div
+                              class="d-flex align-items-center w-100 w-md-auto"
+                            >
+                              <div class="form-check form-switch me-3 me-md-4">
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  role="switch"
+                                  [id]="'section-' + sectionKey"
+                                  formControlName="visible"
+                                  (change)="
+                                    toggleSection(
+                                      sectionKey,
+                                      $any($event.target).checked
+                                    )
+                                  "
+                                />
+                              </div>
+                              <h6 class="mb-0 fw-medium text-dark">
+                                {{ LABELS.sections[sectionKey] || sectionKey }}
+                              </h6>
+                            </div>
+                            <span
+                              class="badge ms-auto ms-md-0"
+                              [class.bg-success]="isSectionVisible(sectionKey)"
+                              [class.bg-secondary]="
+                                !isSectionVisible(sectionKey)
+                              "
+                            >
+                              {{
+                                isSectionVisible(sectionKey)
+                                  ? ('MEDICAL_HISTORY_CONFIG.ENABLED'
+                                    | translate)
+                                  : ('MEDICAL_HISTORY_CONFIG.DISABLED'
+                                    | translate)
+                              }}
+                            </span>
+                          </div>
+
+                          @if (isSectionVisible(sectionKey)) {
+                            <div
+                              class="mt-3 p-2 p-md-3 bg-white border rounded"
+                            >
+                              <div class="row" formGroupName="fields">
+                                @for (
+                                  fieldKey of getFieldKeys(sectionKey);
+                                  track fieldKey
+                                ) {
+                                  <div
+                                    class="col-12 col-md-6 col-lg-4 mb-2 mb-md-3"
+                                  >
+                                    <div
+                                      class="field-toggle d-flex align-items-center justify-content-between gap-3 rounded border hover-bg px-3 py-3"
+                                    >
+                                      <label
+                                        class="field-toggle__label mb-0 flex-grow-1 fw-medium text-dark"
+                                        [for]="sectionKey + '-' + fieldKey"
+                                      >
+                                        {{
+                                          LABELS.fields[fieldKey] || fieldKey
+                                        }}
+                                      </label>
+                                      <div class="form-check form-switch m-0">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          role="switch"
+                                          [id]="sectionKey + '-' + fieldKey"
+                                          [formControlName]="fieldKey"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="accordion-item-manual mb-3 border-0 shadow-sm">
+              <div class="accordion-header-manual">
+                <button
+                  type="button"
+                  class="accordion-button-manual w-100 text-start p-3 bg-light text-dark border-0 rounded"
+                  [class.collapsed]="!isAccordionOpen('step3')"
+                  (click)="toggleAccordion('step3')"
+                >
+                  <i class="fa fa-stethoscope me-2 me-md-3 text-muted"></i>
+                  <span class="fw-medium flex-grow-1">{{
+                    'MEDICAL_HISTORY_CONFIG.STEP3_TITLE' | translate
+                  }}</span>
+                  <i
+                    class="fa ms-2"
+                    [class.fa-chevron-down]="!isAccordionOpen('step3')"
+                    [class.fa-chevron-up]="isAccordionOpen('step3')"
+                  ></i>
+                </button>
+              </div>
+
+              @if (isAccordionOpen('step3')) {
+                <div
+                  class="accordion-body-manual p-3 p-md-4 bg-white border border-top-0 rounded-bottom"
+                >
+                  <div formGroupName="fieldsConfig">
+                    <div formGroupName="sections">
+                      @for (
+                        sectionKey of getStep3Sections();
+                        track sectionKey
+                      ) {
+                        <div class="mb-4" [formGroupName]="sectionKey">
+                          <div
+                            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-3 bg-light rounded gap-2"
+                          >
+                            <div
+                              class="d-flex align-items-center w-100 w-md-auto"
+                            >
+                              <div class="form-check form-switch me-3 me-md-4">
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  role="switch"
+                                  [id]="'section-' + sectionKey"
+                                  formControlName="visible"
+                                  (change)="
+                                    toggleSection(
+                                      sectionKey,
+                                      $any($event.target).checked
+                                    )
+                                  "
+                                />
+                              </div>
+                              <h6 class="mb-0 fw-medium text-dark">
+                                {{ LABELS.sections[sectionKey] || sectionKey }}
+                              </h6>
+                            </div>
+                            <span
+                              class="badge ms-auto ms-md-0"
+                              [class.bg-success]="isSectionVisible(sectionKey)"
+                              [class.bg-secondary]="
+                                !isSectionVisible(sectionKey)
+                              "
+                            >
+                              {{
+                                isSectionVisible(sectionKey)
+                                  ? ('MEDICAL_HISTORY_CONFIG.ENABLED'
+                                    | translate)
+                                  : ('MEDICAL_HISTORY_CONFIG.DISABLED'
+                                    | translate)
+                              }}
+                            </span>
+                          </div>
+
+                          @if (isSectionVisible(sectionKey)) {
+                            <div
+                              class="mt-3 p-2 p-md-3 bg-white border rounded"
+                            >
+                              <div class="row" formGroupName="fields">
+                                @for (
+                                  fieldKey of getFieldKeys(sectionKey);
+                                  track fieldKey
+                                ) {
+                                  <div
+                                    class="col-12 col-md-6 col-lg-4 mb-2 mb-md-3"
+                                  >
+                                    <div
+                                      class="field-toggle d-flex align-items-center justify-content-between gap-3 rounded border hover-bg px-3 py-3"
+                                    >
+                                      <label
+                                        class="field-toggle__label mb-0 flex-grow-1 fw-medium text-dark"
+                                        [for]="sectionKey + '-' + fieldKey"
+                                      >
+                                        {{
+                                          LABELS.fields[fieldKey] || fieldKey
+                                        }}
+                                      </label>
+                                      <div class="form-check form-switch m-0">
+                                        <input
+                                          class="form-check-input"
+                                          type="checkbox"
+                                          role="switch"
+                                          [id]="sectionKey + '-' + fieldKey"
+                                          [formControlName]="fieldKey"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <div
+            class="d-flex flex-column flex-md-row justify-content-end gap-2 gap-md-3"
+          >
+            <button
+              type="button"
+              class="btn btn-outline-secondary px-4 w-100 w-md-auto"
+              (click)="resetFormToDefault()"
+              [disabled]="saving"
+            >
+              <i class="fa fa-undo me-2"></i>
+              {{ 'MEDICAL_HISTORY_CONFIG.RESET_TO_DEFAULT' | translate }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary px-4 w-100 w-md-auto"
+              [disabled]="configForm.invalid || saving || !currentConfig"
+            >
+              @if (saving) {
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
+              }
+              <i class="fa fa-floppy-o me-2"></i>
+              {{ 'MEDICAL_HISTORY_CONFIG.SAVE_CHANGES' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  }
+
+  @if (!loading && !selectedBranch) {
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-warning text-center py-4 border-0">
+          <i class="fa fa-exclamation-triangle fa-2x mb-3"></i>
+          <h5>{{ 'MEDICAL_HISTORY_CONFIG.NO_BRANCH_SELECTED' | translate }}</h5>
+          <p class="mb-0">
+            {{ 'MEDICAL_HISTORY_CONFIG.SELECT_BRANCH_TO_CONTINUE' | translate }}
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+</div>

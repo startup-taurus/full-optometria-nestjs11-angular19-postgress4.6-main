@@ -1,0 +1,85 @@
+<div class="filter-container" *ngIf="suppliersFilterForm">
+  <form [formGroup]="suppliersFilterForm" (ngSubmit)="onSubmit()">
+    <div class="filter-content">
+      <div class="mb-3">
+        <label for="name" class="form-label">
+          {{ 'SUPPLIERS.NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          formControlName="name"
+          [placeholder]="'SUPPLIERS.NAME_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="documentNumber" class="form-label">
+          {{ 'SUPPLIERS.DOCUMENT_NUMBER' | translate }}
+        </label>
+        <input
+          type="text"
+          id="documentNumber"
+          class="form-control"
+          formControlName="documentNumber"
+          [placeholder]="'SUPPLIERS.DOCUMENT_NUMBER_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">
+          {{ 'SUPPLIERS.EMAIL' | translate }}
+        </label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          formControlName="email"
+          [placeholder]="'SUPPLIERS.EMAIL_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="phone" class="form-label">
+          {{ 'SUPPLIERS.PHONE' | translate }}
+        </label>
+        <input
+          type="text"
+          id="phone"
+          class="form-control"
+          formControlName="phone"
+          [placeholder]="'SUPPLIERS.PHONE_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="isActive" class="form-label">
+          {{ 'SUPPLIERS.STATUS' | translate }}
+        </label>
+        <select id="isActive" class="form-select" formControlName="isActive">
+          <option value="">{{ 'COMMON.ALL' | translate }}</option>
+          <option value="true">{{ 'COMMON.ACTIVE' | translate }}</option>
+          <option value="false">{{ 'COMMON.INACTIVE' | translate }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3">
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-sm"
+        (click)="resetForm()"
+      >
+        {{ 'WORDS.RESET' | translate }}
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        [disabled]="!suppliersFilterForm?.valid"
+      >
+        {{ 'WORDS.SEARCH' | translate }}
+      </button>
+    </div>
+  </form>
+</div>

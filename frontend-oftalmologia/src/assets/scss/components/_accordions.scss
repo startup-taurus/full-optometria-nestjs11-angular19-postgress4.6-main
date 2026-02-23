@@ -1,0 +1,118 @@
+/**=====================
+    24. According CSS start
+==========================**/
+.accordion-button,
+.accordion-item {
+  // color: $theme-body-font-color;
+  color: #2f2f3b;
+}
+.accordion-button:not(.collapsed) {
+  background-color: transparent;
+}
+.default-according {
+  .avatar-showcase {
+    margin-bottom: 0;
+  }
+  .card {
+    margin-bottom: 0;
+    box-shadow: none;
+    & + .card {
+      // margin-top: $according-card-top-margin;
+      margin-top: 10px;
+    }
+    .btn-link {
+      // font-weight: $according-btn-weight;
+      font-weight: 500;
+      // color: $theme-body-font-color;
+      color: #2f2f3b;
+      text-decoration: none;
+    }
+    .btn-link {
+      &:focus,
+      &:hover {
+        text-decoration: none;
+      }
+    }
+    .card-header {
+      // padding: $according-card-header-padding;
+      padding: 0.75rem 1.25rem;
+      border: $card-border-color !important;
+      i {
+        position: absolute;
+        left: 18px;
+        font-size: 20px;
+        top: 20px;
+      }
+      h5 {
+        margin-top: 2px;
+      }
+    }
+    .card-body {
+      // border: $card-border-color;
+      border: 1px solid #ecf3fa;
+      border-top: none;
+    }
+  }
+}
+.default-according.style-1 {
+  button {
+    width: 100%;
+    text-align: left;
+    &:before {
+      right: 20px;
+      position: absolute;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+      font-size: 20px;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      transform: translateY(-50%);
+      @media (max-width: 575px) {
+        right: 15px;
+      }
+    }
+    &::after {
+      display: none;
+    }
+    &[aria-expanded='true'] {
+      &:before {
+        content: '\eb73';
+        font-family: IcoFont;
+      }
+    }
+    &[aria-expanded='false'] {
+      &:before {
+        content: '\eb7a';
+        font-family: IcoFont;
+      }
+    }
+  }
+}
+.accordion-button:not(.collapsed)::after {
+  background-image: none;
+  transform: none;
+}
+
+.collapse-accordion {
+  .accordion-item {
+    border: none;
+  }
+}
+
+.card-according {
+  .card-header {
+    &.collapsed {
+      border: 0 !important;
+      border-radius: 15px !important;
+    }
+  }
+  .accordion-item {
+    border-radius: none;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+  }
+}
+
+/**=====================
+     24. According CSS Ends
+==========================**/

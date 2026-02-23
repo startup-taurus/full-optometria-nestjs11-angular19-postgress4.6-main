@@ -1,0 +1,139 @@
+<header class="app-topbar">
+  <div class="page-container topbar-menu">
+    <div class="d-flex align-items-center gap-2">
+      <app-logo />
+
+      <button class="sidenav-toggle-button px-2" (click)="toggleMobileMenu()">
+        <i class="ti ti-menu-deep fs-24"></i>
+      </button>
+
+      <button
+        (click)="toggleMobileMenu()"
+        class="topnav-toggle-button px-2"
+        data-bs-toggle="collapse"
+        data-bs-target="#topnav-menu-content"
+      >
+        <i class="ti ti-menu-deep fs-22"></i>
+      </button>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <!-- Branch Selector para usuarios Admin poner permisos despues thiss -->
+      <div class="topbar-item" *hasPermissionId="permissions.branchSelector">
+        <app-branch-selector />
+      </div>
+
+      <div class="topbar-item" *ngIf="companySlug">
+        <button
+          class="topbar-link d-flex align-items-center gap-1"
+          type="button"
+          (click)="copyCompanyUrl()"
+        >
+          <i class="ti ti-link fs-20"></i>
+          <span class="d-none d-md-inline">{{ 'COMPANIES_MODULE.COPY_URL' | translate }}</span>
+          <i 
+            class="ti ti-info-circle ms-1 text-info"
+            [ngbTooltip]="'COMPANIES_MODULE.URL_SLUG_TOOLTIP' | translate"
+            placement="bottom"
+          ></i>
+        </button>
+      </div>
+
+      <!-- Botón de engranaje integrado en el topbar -->
+      <div class="topbar-item">
+        <button
+          class="topbar-link"
+          (click)="toggleThemeCustomizer()"
+          type="button"
+          [attr.aria-label]="'Abrir configuración de tema'"
+        >
+          <i class="ti ti-settings fs-22"></i>
+        </button>
+      </div>
+
+      <div class="topbar-item nav-user">
+        <div ngbDropdown>
+          <a
+            ngbDropdownToggle
+            class="topbar-link drop-arrow-none px-2"
+            data-bs-toggle="dropdown"
+            data-bs-offset="0,19"
+            type="button"
+            aria-haspopup="false"
+            aria-expanded="false"
+          >
+            <img
+              [src]="userImage || 'assets/images/default-avatar.png'"
+              width="38"
+              height="38"
+              class="rounded-circle me-lg-2 d-flex"
+              alt="user-image"
+            />
+            <span class="d-lg-flex flex-column gap-1 d-none">
+              <h5 class="my-0">{{ userProfile?.username }}</h5>
+              <h6 class="my-0 fw-normal">
+                {{ userProfile?.roleId?.roleName }}
+              </h6>
+            </span>
+            <i
+              class="ti ti-chevron-down d-none d-lg-block align-middle ms-2"
+            ></i>
+          </a>
+          <div ngbDropdownMenu class="dropdown-menu-start">
+            <div class="dropdown-header noti-title">
+              <h6 class="text-overflow m-0">
+                {{ 'WORDS.WELCOME' | translate }} {{ userProfile?.username }}!
+              </h6>
+            </div>
+
+            <a href="/profile" ngbDropdownItem>
+              <i class="ti ti-user-hexagon me-1 fs-17 align-middle"></i>
+              <span class="align-middle">{{
+                'TOPBAR.MY_ACCOUNT' | translate
+              }}</span>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a href="/auth/lock-screen" ngbDropdownItem>
+              <i class="ti ti-lock-square-rounded me-1 fs-17 align-middle"></i>
+              <span class="align-middle">Lock Screen</span>
+            </a>
+
+            <a
+              (click)="logout()"
+              class="cursor-pointer dropdown-item active fw-semibold text-danger"
+            >
+              <i class="ti ti-logout me-1 fs-17 align-middle"></i>
+              <span class="align-middle">{{
+                'TOPBAR.SIGN_OUT' | translate
+              }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<ng-template #content let-modal>
+  <div class="card mb-0 w-100">
+    <div class="px-3 py-2 d-flex flex-row align-items-center" id="top-search">
+      <i class="ti ti-search fs-22"></i>
+      <input
+        type="search"
+        class="form-control border-0"
+        id="search-modal-input"
+        [placeholder]="'TOPBAR.SEARCH' | translate"
+      />
+      <button
+        type="button"
+        class="btn p-0"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      >
+        [esc]
+      </button>
+    </div>
+  </div>
+</ng-template>

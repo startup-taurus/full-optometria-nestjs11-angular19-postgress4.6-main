@@ -1,0 +1,19 @@
+@if (permissionsService.isLoaded()) {
+
+  @if (isVerticalLayoutRequested()) {
+    <app-vertical-layout />
+  }
+  @if (isHorizontalLayoutRequested()) {
+    <horizontal-layout />
+  }
+} @else {
+
+  <div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="text-center">
+      <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">{{ 'SYSTEM.LOADING_PERMISSIONS' | translate }}</span>
+      </div>
+      <h5 class="text-muted">{{ 'SYSTEM.LOADING_PERMISSIONS' | translate }}</h5>
+    </div>
+  </div>
+}

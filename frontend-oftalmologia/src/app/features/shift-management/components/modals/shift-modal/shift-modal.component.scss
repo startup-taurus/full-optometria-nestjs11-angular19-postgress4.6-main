@@ -1,0 +1,235 @@
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+
+  .modal-title {
+    font-weight: 600;
+    color: #495057;
+    font-size: 1.25rem;
+  }
+
+  .btn-close {
+    border: none;
+    background: none;
+    color: #6c757d;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: #495057;
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+
+  .modal-form {
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+
+      .text-danger {
+        margin-left: 2px;
+      }
+    }
+
+    .form-control {
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        outline: none;
+      }
+
+      &.is-invalid {
+        border-color: #dc3545;
+
+        &:focus {
+          box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+      }
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .ng-select {
+      .ng-select-container {
+        border-radius: 6px;
+        min-height: 38px;
+        border: 1px solid #ced4da;
+        transition: all 0.2s ease;
+
+        &.ng-select-focused {
+          border-color: #007bff;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+      }
+
+      &.is-invalid .ng-select-container {
+        border-color: #dc3545;
+
+        &.ng-select-focused {
+          box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+      }
+
+      .ng-option {
+        padding: 8px 12px;
+
+        &.ng-option-highlighted {
+          background-color: #f8f9fa;
+          color: #495057;
+        }
+
+        &.ng-option-selected {
+          background-color: #007bff;
+          color: white;
+        }
+      }
+    }
+
+    .invalid-feedback {
+      display: block;
+      font-size: 0.875rem;
+      color: #dc3545;
+      margin-top: 0.25rem;
+    }
+  }
+
+  .selected-patient-info {
+    .card {
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+      .card-header {
+        border-radius: 8px 8px 0 0;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+
+        &.bg-light-info {
+          background-color: #e3f2fd;
+          border-color: #2196f3;
+          color: #1976d2;
+        }
+
+        &.bg-light-secondary {
+          background-color: #f8f9fa;
+          border-color: #6c757d;
+          color: #495057;
+        }
+
+        .card-title {
+          font-size: 0.95rem;
+          font-weight: 600;
+          margin: 0;
+        }
+      }
+
+      .card-body {
+        padding: 1rem;
+
+        .patient-avatar img {
+          border: 2px solid #e9ecef;
+          object-fit: cover;
+        }
+
+        .patient-details {
+          h6 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+          }
+
+          p {
+            font-size: 0.875rem;
+            margin: 0.25rem 0;
+            color: #6c757d;
+          }
+        }
+      }
+    }
+  }
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 6px;
+  }
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+
+  .btn {
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    min-width: 100px;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .spinner-border-sm {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 576px) {
+  .modal-body {
+    padding: 1rem;
+
+    .selected-patient-info .card-body .row {
+      .col-auto,
+      .col {
+        flex: 0 0 100%;
+        max-width: 100%;
+        text-align: center;
+      }
+
+      .patient-avatar {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  .modal-footer {
+    padding: 1rem;
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+  }
+}

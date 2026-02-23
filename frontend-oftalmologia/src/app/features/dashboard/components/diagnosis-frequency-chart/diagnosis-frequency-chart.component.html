@@ -1,0 +1,52 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="card-title mb-0">
+          {{ 'DASHBOARD.DIAGNOSIS_FREQUENCY.TITLE' | translate }}
+        </h5>
+        <iconify-icon
+          icon="ph:info"
+          [ngbTooltip]="'DASHBOARD.DIAGNOSIS_FREQUENCY.TOOLTIP' | translate"
+          placement="top"
+          container="body"
+          style="cursor: help; color: #64748b; font-size: 18px"
+        ></iconify-icon>
+      </div>
+      @if (chartData() && chartData()!.labels) {
+        <span class="badge bg-success-subtle text-success">
+          Top {{ chartData()!.labels.length }}
+        </span>
+      }
+    </div>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{
+            'DASHBOARD.DIAGNOSIS_FREQUENCY.LOADING' | translate
+          }}</span>
+        </div>
+      </div>
+    } @else if (
+      chartData() && chartData()!.data && chartData()!.data!.length > 0
+    ) {
+      <apx-chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!"
+        [labels]="chartOptions.labels!"
+        [colors]="chartOptions.colors!"
+        [legend]="chartOptions.legend!"
+        [plotOptions]="chartOptions.plotOptions!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [responsive]="chartOptions.responsive!"
+        [tooltip]="chartOptions.tooltip!"
+      ></apx-chart>
+    } @else {
+      <div class="text-center py-5 text-muted">
+        <i class="ti ti-chart-donut fs-1 mb-2"></i>
+        <p>{{ 'DASHBOARD.DIAGNOSIS_FREQUENCY.NO_DATA' | translate }}</p>
+      </div>
+    }
+  </div>
+</div>

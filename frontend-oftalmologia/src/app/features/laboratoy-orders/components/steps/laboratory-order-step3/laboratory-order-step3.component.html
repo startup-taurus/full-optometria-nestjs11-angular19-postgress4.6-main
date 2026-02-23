@@ -1,0 +1,114 @@
+<div class="step-content">
+  <h5 class="mb-4">
+    <i class="ti ti-settings me-2"></i>
+    {{ 'LABORATORY_ORDERS.STEP3_TITLE' | translate }}
+  </h5>
+
+  <div class="card">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="ti ti-ruler me-2"></i
+        >{{ 'LABORATORY_ORDERS.STEP3_SUBTITLE' | translate }}
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row g-3" [formGroup]="formGroup">
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.D_VERTEX' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="dVertex"
+            placeholder="mm"
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.PANTOS' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="pantos"
+            placeholder=""
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.PANORA' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="panora"
+            placeholder=""
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.FRAME_FIT' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="frameFit"
+            placeholder=""
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.PROFILE' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="profile"
+            placeholder=""
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.MID' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="mid"
+            placeholder=""
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.DIST_VP' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="distVp"
+            placeholder="mm"
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.FIELDS.ENGRAVING' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="engraving"
+            placeholder=""
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

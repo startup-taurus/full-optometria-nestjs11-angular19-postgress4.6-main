@@ -1,0 +1,632 @@
+<div class="public-catalog">
+  @if (isCheckingCompany()) {
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else {
+    <header class="catalog-header">
+      <div class="container-fluid px-4 px-lg-5">
+        <div class="d-flex justify-content-between align-items-center py-3">
+          <div>
+            <h1 class="mb-0">Catálogo de Productos</h1>
+            <p class="text-white-50 mb-0">
+              Encuentra los mejores productos para el cuidado visual
+            </p>
+          </div>
+          <div>
+            <button
+              type="button"
+              (click)="goToLogin()"
+              class="btn btn-light btn-login"
+              aria-label="Iniciar Sesión"
+            >
+              <i class="bi bi-box-arrow-in-right me-2"></i>
+              Iniciar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    @if (!isValidCompany()) {
+      <app-default-zgames></app-default-zgames>
+    } @else {
+      @if (backendError()) {
+        <div class="container-fluid px-4 px-lg-5 py-4">
+          <div
+            class="alert alert-danger d-flex align-items-center"
+            role="alert"
+          >
+            <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+            <div>
+              <h5 class="alert-heading mb-1">Error de Conexión</h5>
+              <p class="mb-0">
+                Contacte con soporte técnico o intente nuevamente más tarde.
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="container-fluid px-4 px-lg-5 py-4">
+        <div class="row">
+          <div class="col-12 d-lg-none mb-3">
+            <button
+              class="btn btn-filters-toggle w-100"
+              (click)="toggleFilters()"
+              type="button"
+            >
+              <i class="bi bi-funnel-fill me-2"></i>
+              {{ showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros' }}
+              <iconify-icon
+                class="ms-auto"
+                [icon]="filterToggleIcon"
+                width="20"
+                height="20"
+              ></iconify-icon>
+            </button>
+          </div>
+
+          <aside
+            class="filters-sidebar col-lg-3 col-xl-2 mb-4"
+            [class.show]="showFilters"
+          >
+            <div class="filters-panel">
+              <div class="filters-card card shadow-sm">
+                <div class="card-header d-none d-lg-block">
+                  <h5 class="mb-0">
+                    <i class="bi bi-funnel-fill me-2"></i>
+                    Filtros
+                  </h5>
+                </div>
+                <div class="card-body" [class.collapsed-mobile]="!showFilters">
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">
+                      <i class="bi bi-search me-2 text-primary"></i>
+                      Buscar por nombre
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Nombre del producto..."
+                      [(ngModel)]="searchName"
+                      (keyup.enter)="onSearch()"
+                    />
+                  </div>
+
+                  <!-- <div class="mb-3">
+                <label class="form-label fw-bold">
+                  <i class="bi bi-file-text me-2 text-info"></i>
+                  Buscar por descripción
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Descripción..."
+                  [(ngModel)]="searchDescription"
+                  (keyup.enter)="onSearch()"
+                />
+              </div> -->
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">
+                      <i class="bi bi-cash me-2 text-success"></i>
+                      Rango de precio
+                    </label>
+                    <div class="row g-2">
+                      <div class="col-6">
+                        <input
+                          type="number"
+                          class="form-control form-control-sm"
+                          placeholder="Mínimo"
+                          [(ngModel)]="minPrice"
+                        />
+                      </div>
+                      <div class="col-6">
+                        <input
+                          type="number"
+                          class="form-control form-control-sm"
+                          placeholder="Máximo"
+                          [(ngModel)]="maxPrice"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    class="btn btn-primary w-100 mb-2"
+                    (click)="onSearch()"
+                  >
+                    <i class="bi bi-funnel-fill me-2"></i>
+                    Filtrar
+                  </button>
+
+                  <button
+                    class="btn btn-outline-secondary w-100"
+                    (click)="clearFilters()"
+                  >
+                    <i class="bi bi-x-circle me-2"></i>
+                    Limpiar filtros
+                  </button>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <main class="col-lg-9 col-xl-10">
+            <div
+              class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2"
+            >
+              <div>
+                <span class="text-muted">
+                  {{ totalCount() }} producto{{
+                    totalCount() !== 1 ? 's' : ''
+                  }}
+                  encontrado{{ totalCount() !== 1 ? 's' : '' }}
+                </span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <label class="mb-0 text-muted d-none d-sm-inline"
+                  >Ordenar por:</label
+                >
+                <select
+                  class="form-select form-select-sm"
+                  [(ngModel)]="sortBy"
+                  (change)="onFilterChange()"
+                  style="width: auto; min-width: 150px"
+                >
+                  <option value="newest">Más recientes</option>
+                  <option value="views">Más vistos</option>
+                  <option value="price-asc">Precio: menor a mayor</option>
+                  <option value="price-desc">Precio: mayor a menor</option>
+                </select>
+              </div>
+            </div>
+
+            @if (loading()) {
+              <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+              </div>
+            }
+
+            @if (!loading() && products() && products().length > 0) {
+              <div
+                class="products-grid row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4"
+              >
+                @for (product of products(); track product.id; let i = $index) {
+                  <div class="col" [attr.data-index]="i">
+                    <div class="product-card">
+                      <div class="product-image-container">
+                        <img
+                          [src]="getImageUrl(product)"
+                          [alt]="product.name"
+                          class="product-image"
+                          loading="lazy"
+                        />
+
+                        @if (isOutOfStock(product)) {
+                          <span class="badge-stock badge-out">
+                            <i class="bi bi-x-circle"></i> Agotado
+                          </span>
+                        }
+
+                        @if (product.views > 100) {
+                          <span class="badge-views">
+                            <i class="bi bi-eye-fill"></i> {{ product.views }}
+                          </span>
+                        }
+
+                        <div
+                          class="product-overlay"
+                          (click)="openProductModal(product)"
+                        >
+                          <div class="overlay-content">
+                            <h5 class="overlay-title">{{ product.name }}</h5>
+
+                            @if (product.description) {
+                              <p class="overlay-description">
+                                {{ product.description | slice: 0 : 80
+                                }}{{
+                                  product.description.length > 80 ? '...' : ''
+                                }}
+                              </p>
+                            }
+
+                            <div class="overlay-price">
+                              <i class="bi bi-cash-stack me-2"></i>
+                              {{
+                                product.unitPrice
+                                  | currency: 'USD' : 'symbol' : '1.2-2'
+                              }}
+                            </div>
+
+                            <div class="overlay-actions">
+                              <button
+                                class="btn btn-outline-light btn-sm"
+                                (click)="
+                                  openProductModal(product);
+                                  $event.stopPropagation()
+                                "
+                              >
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ver detalles
+                              </button>
+
+                              @if (canShowWhatsAppButton(product)) {
+                                <a
+                                  [href]="getWhatsAppLink(product)"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="btn btn-whatsapp btn-sm"
+                                  (click)="$event.stopPropagation()"
+                                >
+                                  <iconify-icon
+                                    icon="mdi:whatsapp"
+                                    width="24"
+                                    height="24"
+                                  ></iconify-icon>
+                                  WhatsApp
+                                </a>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="product-info">
+                        <h6 class="product-title">{{ product.name }}</h6>
+
+                        <div class="product-meta">
+                          <span class="meta-item">
+                            <iconify-icon
+                              icon="mdi:award"
+                              width="16"
+                              height="16"
+                              class="text-warning"
+                            ></iconify-icon>
+                            {{ product.brand }}
+                          </span>
+
+                          @if (product.category) {
+                            <span class="meta-item">
+                              <iconify-icon
+                                icon="mdi:tag-outline"
+                                width="16"
+                                height="16"
+                                class="text-success"
+                              ></iconify-icon>
+                              {{ product.category.name }}
+                            </span>
+                          }
+                        </div>
+
+                        <div class="product-footer">
+                          <div class="product-price">
+                            {{
+                              product.unitPrice
+                                | currency: 'USD' : 'symbol' : '1.2-2'
+                            }}
+                          </div>
+
+                          <span class="product-stock">
+                            <iconify-icon
+                              icon="mdi:package-variant"
+                              width="16"
+                              height="16"
+                            ></iconify-icon>
+                            {{ product.quantity }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              @if (totalPages() > 1) {
+                <nav aria-label="Paginación de productos" class="mt-4">
+                  <ul class="pagination justify-content-center flex-wrap">
+                    <li
+                      class="page-item"
+                      [class.disabled]="currentPage() === 1"
+                    >
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="previousPage()"
+                        aria-label="Anterior"
+                      >
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+
+                    @for (page of getPaginationArray(); track page) {
+                      @if (page === -1) {
+                        <li class="page-item disabled">
+                          <span class="page-link">...</span>
+                        </li>
+                      } @else {
+                        <li
+                          class="page-item"
+                          [class.active]="page === currentPage()"
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="goToPage(page)"
+                          >
+                            {{ page }}
+                          </a>
+                        </li>
+                      }
+                    }
+
+                    <li
+                      class="page-item"
+                      [class.disabled]="currentPage() === totalPages()"
+                    >
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="nextPage()"
+                        aria-label="Siguiente"
+                      >
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              }
+            }
+
+            @if (!loading() && products() && products().length === 0) {
+              <div class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h3 class="mt-3">No se encontraron productos</h3>
+                <p class="text-muted">
+                  Intenta ajustar los filtros de búsqueda
+                </p>
+                <button class="btn btn-primary" (click)="clearFilters()">
+                  Limpiar filtros
+                </button>
+              </div>
+            }
+          </main>
+        </div>
+      </div>
+
+      <div
+        class="product-modal"
+        *ngIf="showProductModal"
+        (click)="closeProductModal()"
+      >
+        <div
+          class="modal-dialog modal-lg modal-dialog-centered"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="header-content">
+                <h5 class="modal-title">{{ selectedProduct?.name }}</h5>
+                @if (selectedProduct?.brand) {
+                  <p class="modal-subtitle">{{ selectedProduct.brand }}</p>
+                }
+              </div>
+              <button
+                type="button"
+                class="btn-close-custom"
+                (click)="closeProductModal(); $event.stopPropagation()"
+                aria-label="Cerrar"
+              >
+                <iconify-icon
+                  icon="mdi:close"
+                  width="24"
+                  height="24"
+                ></iconify-icon>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              @if (selectedProduct) {
+                <div class="row g-4">
+                  <div class="col-lg-5">
+                    <div class="product-image-zone">
+                      <img
+                        [src]="getImageUrl(selectedProduct)"
+                        [alt]="selectedProduct.name"
+                        class="product-main-image"
+                        (click)="openImageModal(selectedProduct)"
+                      />
+                      <div class="image-overlay-hint">
+                        <iconify-icon
+                          icon="mdi:magnify-plus-outline"
+                          width="32"
+                          height="32"
+                        ></iconify-icon>
+                        <span>Click para ver completa</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-7">
+                    <div class="product-info-zone">
+                      <div class="info-group">
+                        <h6 class="group-title">PRODUCTO</h6>
+
+                        @if (selectedProduct.category) {
+                          <div class="info-row">
+                            <span class="info-label">CATEGORÍA</span>
+                            <span class="info-value">
+                              {{ selectedProduct.category.name }}
+                            </span>
+                          </div>
+                        }
+
+                        @if (selectedProduct.subcategory) {
+                          <div class="info-row">
+                            <span class="info-label">SUBCATEGORÍA</span>
+                            <span class="info-value">
+                              {{ selectedProduct.subcategory.name }}
+                            </span>
+                          </div>
+                        }
+                      </div>
+
+                      <div class="info-group">
+                        <h6 class="group-title">DISPONIBILIDAD</h6>
+                        <div class="info-row">
+                          <span class="info-label">STOCK</span>
+                          <span
+                            class="info-value"
+                            [class.text-danger]="selectedProduct.quantity === 0"
+                          >
+                            @if (selectedProduct.quantity === 0) {
+                              <span class="badge bg-danger">Agotado</span>
+                            } @else {
+                              <span
+                                >{{ selectedProduct.quantity }} unidades</span
+                              >
+                            }
+                          </span>
+                        </div>
+                      </div>
+
+                      @if (selectedProduct.description) {
+                        <div class="info-group">
+                          <h6 class="group-title">DESCRIPCIÓN</h6>
+                          <p class="product-description">
+                            {{
+                              selectedProduct.description.length > 150
+                                ? (selectedProduct.description
+                                    | slice: 0 : 150) + '...'
+                                : selectedProduct.description
+                            }}
+                          </p>
+                        </div>
+                      }
+
+                      @if (selectedProduct.createdByUser) {
+                        <div class="info-group">
+                          <h6 class="group-title">VENDEDOR</h6>
+                          <div class="info-row">
+                            <span class="info-value seller">
+                              {{ selectedProduct.createdByUser.firstName }}
+                              {{ selectedProduct.createdByUser.lastName }}
+                            </span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="modal-footer">
+              <div class="price-section">
+                <span class="price-label">PRECIO</span>
+                <span class="price-value">
+                  {{
+                    selectedProduct?.unitPrice
+                      | currency: 'USD' : 'symbol' : '1.2-2'
+                  }}
+                </span>
+              </div>
+
+              <div class="actions-section">
+                <button
+                  type="button"
+                  class="btn btn-secondary-custom"
+                  (click)="closeProductModal()"
+                >
+                  Cerrar
+                </button>
+
+                @if (
+                  selectedProduct && canShowWhatsAppButton(selectedProduct)
+                ) {
+                  <a
+                    [href]="getWhatsAppLink(selectedProduct)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-whatsapp-custom"
+                  >
+                    <iconify-icon
+                      icon="mdi:whatsapp"
+                      width="24"
+                      height="24"
+                    ></iconify-icon>
+                    Chatear con vendedor
+                  </a>
+                } @else if (selectedProduct && isOutOfStock(selectedProduct)) {
+                  <button
+                    type="button"
+                    class="btn btn-disabled-custom"
+                    disabled
+                  >
+                    <iconify-icon
+                      icon="mdi:close-circle"
+                      width="24"
+                      height="24"
+                    ></iconify-icon>
+                    Sin stock
+                  </button>
+                } @else if (
+                  selectedProduct &&
+                  !isOutOfStock(selectedProduct) &&
+                  !getWhatsAppLink(selectedProduct)
+                ) {
+                  <button
+                    type="button"
+                    class="btn btn-disabled-custom"
+                    disabled
+                  >
+                    <iconify-icon
+                      icon="mdi:phone-off"
+                      width="24"
+                      height="24"
+                    ></iconify-icon>
+                    Contacto no disponible
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="image-modal-overlay"
+        *ngIf="showImageModal"
+        (click)="closeImageModal()"
+      >
+        <div class="image-modal-content" (click)="$event.stopPropagation()">
+          <button
+            type="button"
+            class="close-modal-btn"
+            (click)="closeImageModal()"
+          >
+            <iconify-icon
+              icon="mdi:close"
+              width="24"
+              height="24"
+            ></iconify-icon>
+          </button>
+          <img
+            [src]="selectedImageUrl"
+            [alt]="selectedProductName"
+            class="modal-full-image"
+          />
+          <div class="modal-image-info">
+            <h5>{{ selectedProductName }}</h5>
+            <p class="text-muted mb-0">{{ selectedProductCode }}</p>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

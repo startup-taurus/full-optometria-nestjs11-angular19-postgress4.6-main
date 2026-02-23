@@ -1,0 +1,117 @@
+<div class="d-flex justify-content-center align-items-center w-100">
+  <div class="col-lg-6 d-none d-xl-block pe-0 h-100">
+    <div class="d-flex flex-column">
+      <div class="pe-6">
+        <h1 class="fw-bold mb-4">
+          {{ 'LOGIN.TITLE' | translate }}
+        </h1>
+        <p class="text-muted fs-5 position-relative">
+          {{ 'LOGIN.DESCRIPTION' | translate }}
+        </p>
+      </div>
+      <div class="mt-auto d-flex justify-content-center">
+        <img
+          src="/assets/images/ofta.png"
+          alt="Welcome illustration"
+          class="img-fluid floating-image"
+          style="
+            max-height: 200px;
+            margin-right: -70px;
+            border-radius: 5px;
+            object-fit: contain;
+          "
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 h-100">
+    <div class="card w-100 border-0 shadow p-4">
+      <h3 class="fw-semibold mb-4">
+        {{ 'LOGIN.SUBTITLE' | translate }}
+      </h3>
+
+      @if (errorMessage.length > 0) {
+        <p class="fs-14 text-danger">{{ errorMessage }}</p>
+      }
+
+      <form [formGroup]="signInForm" (ngSubmit)="login()" class="text-start">
+        <div class="mb-3">
+          <label class="form-label" for="example-email">
+            {{ 'LOGIN.INPUT.EMAIL' | translate }}
+          </label>
+          <input
+            formControlName="identifier"
+            type="text"
+            id="identifier"
+            class="form-control"
+            [placeholder]="'LOGIN.PLACEHOLDER.EMAIL' | translate"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="example-password">
+            {{ 'LOGIN.INPUT.PASSWORD' | translate }}
+          </label>
+          <div class="position-relative">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              id="example-password"
+              class="form-control"
+              [placeholder]="'LOGIN.PLACEHOLDER.PASSWORD' | translate"
+            />
+            <button
+              type="button"
+              class="btn btn-link password-toggle position-absolute top-50 end-0 translate-middle-y pe-3"
+              (click)="togglePasswordVisibility()"
+            >
+              <i
+                [class]="showPassword ? 'ti ti-eye-off' : 'ti ti-eye'"
+                style="font-size: 1.2rem; color: var(--bs-primary)"
+              ></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="checkbox-signin"
+              formControlName="rememberMe"
+            />
+            <label class="form-check-label" for="checkbox-signin">
+              {{ 'LOGIN.INPUT.REMEMBER_ME' | translate }}
+            </label>
+          </div>
+          <a
+            href="javascript:void(0)"
+            (click)="goToForgotPassword()"
+            class="text-primary text-decoration-none small"
+          >
+            {{ 'LOGIN.FORGOT_PASSWORD' | translate }}
+          </a>
+        </div>
+
+        <div class="d-grid mb-2">
+          <button class="btn btn-primary btn-lg" type="submit">
+            {{ 'LOGIN.BUTTON.SIGN_IN' | translate }}
+          </button>
+        </div>
+
+        <div class="d-grid">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="goToCatalog()"
+          >
+            <i class="bi bi-eye me-2"></i>
+            Ver Catálogo Público
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

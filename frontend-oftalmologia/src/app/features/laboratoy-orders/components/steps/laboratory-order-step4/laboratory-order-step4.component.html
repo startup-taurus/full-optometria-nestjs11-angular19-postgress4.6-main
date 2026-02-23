@@ -1,0 +1,209 @@
+<div class="step-content">
+  <h5 class="mb-4">
+    <i class="ti ti-sunglasses me-2"></i>
+    {{ 'LABORATORY_ORDERS.STEP4_TITLE' | translate }}
+  </h5>
+
+  <div [formGroup]="formGroup">
+    <div class="card mb-3">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="ti ti-package me-2"></i
+          >{{ 'LABORATORY_ORDERS.STEP4_PRODUCT_SELECTION' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label"
+              >{{
+                'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate
+              }}
+              (Montura)</label
+            >
+            <ng-select
+              [items]="products"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="productId"
+              [placeholder]="
+                'LABORATORY_ORDERS.FIELDS.SELECT_PRODUCT' | translate
+              "
+              [loading]="productsLoading"
+              [clearable]="true"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                {{ item.name }}
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="ti ti-checkbox me-2"></i
+          >{{ 'LABORATORY_ORDERS.LABELS.FRAME_TYPE' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label mb-3">
+              {{ 'LABORATORY_ORDERS.LABELS.SELECT_FRAME_TYPE' | translate }}
+            </label>
+            <div class="row">
+              <div class="col-md-4 mb-3" *ngFor="let type of frameTypes">
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    [id]="'frameType_' + type.value"
+                    class="toggle-input"
+                    [checked]="isFrameTypeSelected(type.value)"
+                    (change)="onFrameTypeToggle(type.value)"
+                  />
+                  <label [for]="'frameType_' + type.value" class="toggle-label">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">
+                      {{ type.label }}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.ADDITIONAL_TYPE_DESCRIPTION' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="frameTypeDescription"
+              [placeholder]="
+                'LABORATORY_ORDERS.PLACEHOLDERS.ADDITIONAL_INFO' | translate
+              "
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="ti ti-info-circle me-2"></i
+          >{{ 'LABORATORY_ORDERS.LABELS.FRAME_DATA_SECTION' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control disabled-field"
+              formControlName="frameModel"
+              [placeholder]="'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate"
+              [readonly]="true"
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.BRAND' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control disabled-field"
+              formControlName="frameBrand"
+              [placeholder]="'LABORATORY_ORDERS.FIELDS.FRAME_BRAND' | translate"
+              [readonly]="true"
+            />
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.FRAME_DATA' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="frameData"
+              [placeholder]="
+                'LABORATORY_ORDERS.PLACEHOLDERS.FRAME_DATA' | translate
+              "
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.LARGER_DIAMETER' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="frameLargerDiameter"
+              [placeholder]="'LABORATORY_ORDERS.PLACEHOLDERS.MM' | translate"
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.HORIZONTAL' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="frameHorizontal"
+              [placeholder]="'LABORATORY_ORDERS.PLACEHOLDERS.MM' | translate"
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.VERTICAL' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="frameVertical"
+              [placeholder]="'LABORATORY_ORDERS.PLACEHOLDERS.MM' | translate"
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.BRIDGE' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="frameBridge"
+              [placeholder]="'LABORATORY_ORDERS.PLACEHOLDERS.MM' | translate"
+            />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">{{
+              'LABORATORY_ORDERS.LABELS.OBSERVATIONS' | translate
+            }}</label>
+            <textarea
+              class="form-control"
+              formControlName="observations"
+              rows="3"
+              [placeholder]="
+                'LABORATORY_ORDERS.PLACEHOLDERS.ADDITIONAL_OBSERVATIONS'
+                  | translate
+              "
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

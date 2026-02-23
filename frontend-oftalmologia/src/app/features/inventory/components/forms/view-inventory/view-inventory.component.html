@@ -1,0 +1,234 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{ 'INVENTORY.VIEW_PRODUCT' | translate }}
+  </h4>
+  <button type="button" class="btn-close ms-auto" (click)="onClose()"></button>
+</div>
+
+<div class="modal-body" *ngIf="product">
+  <div class="product-details">
+    <div class="row mb-4">
+      <div class="col-12 text-center">
+        <div
+          class="product-image-container"
+          (click)="openImageModal()"
+          role="button"
+          tabindex="0"
+        >
+          <img
+            [src]="getProductImageUrl()"
+            [alt]="product.name"
+            class="product-detail-image"
+          />
+          <div class="image-overlay">
+            <i class="fa fa-search-plus fa-2x"></i>
+            <p class="mt-2 mb-0">{{ 'COMMON.CLICK_TO_ENLARGE' | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label">
+            <i class="fa fa-barcode me-2 text-primary"></i>
+            {{ 'INVENTORY.TABLE.CODE' | translate }}:
+          </label>
+          <div class="detail-value">{{ product.code }}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label">
+            <i class="fa fa-box me-2 text-primary"></i>
+            {{ 'INVENTORY.TABLE.NAME' | translate }}:
+          </label>
+          <div class="detail-value">{{ product.name }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="detail-item">
+          <label class="detail-label">
+            <i class="fa fa-align-left me-2 text-primary"></i>
+            {{ 'INVENTORY.TABLE.DESCRIPTION' | translate }}:
+          </label>
+          <div class="detail-value">{{ getDescription() }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label">
+            <i class="fa fa-copyright me-2 text-warning"></i>
+            {{ 'INVENTORY.TABLE.BRAND' | translate }}:
+          </label>
+          <div class="detail-value">{{ product.brand }}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label">
+            <i class="fa fa-circle-notch me-2 text-info"></i>
+            {{ 'INVENTORY.TABLE.STATUS' | translate }}:
+          </label>
+          <div class="detail-value">
+            <span
+              [class]="
+                'badge ' + (product.isActive ? 'bg-success' : 'bg-danger')
+              "
+            >
+              {{
+                product.isActive
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label">
+            <i class="fa fa-folder me-2 text-success"></i>
+            {{ 'INVENTORY.TABLE.CATEGORY' | translate }}:
+          </label>
+          <div class="detail-value">
+            {{ product.category?.name || ('COMMON.NOT_SPECIFIED' | translate) }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label">
+            <i class="fa fa-folder-open me-2 text-success"></i>
+            {{ 'INVENTORY.TABLE.SUBCATEGORY' | translate }}:
+          </label>
+          <div class="detail-value">
+            {{
+              product.subcategory?.name || ('COMMON.NOT_SPECIFIED' | translate)
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'INVENTORY.TABLE.UNIT_PRICE' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{ product.unitPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'INVENTORY.TABLE.QUANTITY' | translate }}:</label
+          >
+          <div class="detail-value">
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-danger': product.quantity === 0,
+                'bg-warning': product.quantity > 0 && product.quantity <= 10,
+                'bg-success': product.quantity > 10,
+              }"
+            >
+              {{ product.quantity }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'INVENTORY.TABLE.SUPPLIER' | translate }}:</label
+          >
+          <div class="detail-value">
+            <span>
+              {{ getSupplierName() }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'INVENTORY.TABLE.VIEWS' | translate }}:</label
+          >
+          <div class="detail-value">
+            <span class="badge bg-info">
+              <i class="fa fa-eye me-1"></i>
+              {{ product.views || 0 }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'COMMON.CREATED_AT' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{ product.createdAt | date: 'yyyy/MM/dd HH:mm' }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" *ngIf="product.updatedAt !== product.createdAt">
+        <div class="detail-item">
+          <label class="detail-label"
+            >{{ 'COMMON.UPDATED_AT' | translate }}:</label
+          >
+          <div class="detail-value">
+            {{ product.updatedAt | date: 'yyyy/MM/dd HH:mm' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="onClose()">
+    {{ 'COMMON.CLOSE' | translate }}
+  </button>
+</div>
+
+<div
+  class="image-modal-overlay"
+  *ngIf="showImageModal"
+  (click)="closeImageModal()"
+>
+  <div class="image-modal-content" (click)="$event.stopPropagation()">
+    <button type="button" class="close-modal-btn" (click)="closeImageModal()">
+      <i class="fa fa-times"></i>
+    </button>
+    <img
+      [src]="selectedImageUrl"
+      [alt]="product?.name"
+      class="modal-full-image"
+    />
+    <div class="modal-image-info">
+      <h5>{{ product?.name }}</h5>
+      <p class="text-muted mb-0">{{ product?.code }}</p>
+    </div>
+  </div>
+</div>

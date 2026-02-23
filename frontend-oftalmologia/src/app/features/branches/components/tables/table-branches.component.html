@@ -1,0 +1,308 @@
+<page-title title="{{ 'SIDEBAR.BRANCHES' | translate }}" />
+<div class="container-fluid">
+  <div
+    class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-2"
+  >
+    <h5 class="page-title mb-0">
+      <i class="ti ti-building me-2"></i>
+      {{ 'BRANCHES_MODULE.MANAGE_BRANCHES' | translate }}
+    </h5>
+    <div class="d-flex gap-2">
+      @if (sideFilterPanel?.hasActiveFilters()) {
+        <button
+          class="btn btn-outline-danger btn-sm"
+          type="button"
+          placement="top"
+          [ngbTooltip]="'WORDS.RESET' | translate"
+          (click)="sideFilterPanel.resetFilters()"
+        >
+          <i class="fa fa-filter"></i>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!--hacer componente este esqueleton thissss -->
+  @if (loading && branches.length === 0) {
+    <div class="row g-3">
+      @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+        <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-end mb-2">
+                <span class="placeholder col-3 rounded-pill"></span>
+              </div>
+              <div class="d-flex align-items-start mb-2">
+                <div
+                  class="placeholder me-3 rounded"
+                  style="width: 60px; height: 60px"
+                ></div>
+                <div class="flex-grow-1">
+                  <span class="placeholder col-7 mb-2"></span>
+                  <span class="placeholder col-5 mb-2"></span>
+                  <span class="placeholder col-6"></span>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span class="placeholder col-8 mb-1"></span>
+                <span class="placeholder col-10"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <div 
+    class="branches-container"
+    appInfiniteScroll
+    [isLoading]="loading"
+    [hasMore]="hasMore"
+    [scrollThreshold]="200"
+    (scrolled)="onScrollEnd()"
+  >
+    <div class="row g-3">
+      <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+        <div
+          class="card new-item-card new-branch-card h-100 border-0 shadow-sm"
+          (click)="onNewBranch()"
+          role="button"
+        >
+          <div
+            class="card-body d-flex flex-column justify-content-center align-items-center text-center"
+          >
+            <div class="new-item-circle new-branch-circle mb-3">
+              <i class="ti ti-building"></i>
+            </div>
+            <h6 class="mb-0 text-center">
+              {{ 'BRANCHES_MODULE.CREATE_NEW_BRANCH' | translate }}
+            </h6>
+          </div>
+        </div>
+      </div>
+
+      @for (branch of branches; track branch.id) {
+        <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+          <div class="card common-card branch-card h-100 border-0 shadow-sm">
+            <div class="card-body position-relative">
+              <!-- Status Badge -->
+              <div class="d-flex justify-content-end mb-2">
+                <span
+                  class="badge rounded-pill"
+                  [ngClass]="getStatusBadgeClass(branch.isActive)"
+                >
+                  {{ getStatusText(branch.isActive) | translate }}
+                </span>
+              </div>
+
+              <div
+                class="item-content branch-content"
+                (click)="onViewBranch(branch)"
+                style="cursor: pointer"
+                role="button"
+                tabindex="0"
+                [attr.aria-label]="'Ver detalles de ' + branch.name"
+              >
+                <div class="item-section branch-section mb-3">
+                  <div class="d-flex align-items-start mb-2">
+                    <div
+                      class="item-logo branch-logo me-3 d-flex align-items-center justify-content-center bg-primary text-white rounded"
+                      style="width: 60px; height: 60px; font-size: 24px"
+                    >
+                      <i class="ti ti-building"></i>
+                    </div>
+                    <div class="item-info branch-info flex-grow-1 min-w-0">
+                      <h6 class="item-name branch-name mb-1">
+                        {{ branch.name }}
+                      </h6>
+                      <p
+                        class="item-cedula branch-code text-body-secondary mb-1"
+                      >
+                        {{ 'BRANCHES_MODULE.CODE' | translate }}:
+                        {{ branch.code }}
+                      </p>
+                      @if (branch.company?.name) {
+                        <p
+                          class="item-company branch-company text-body-secondary mb-1"
+                        >
+                          {{ 'BRANCHES_MODULE.COMPANY' | translate }}:
+                          {{ branch.company.name }}
+                        </p>
+                      }
+                      <p
+                        class="item-schedule branch-city text-body-secondary mb-0"
+                      >
+                        {{ 'BRANCHES_MODULE.CITY' | translate }}:
+                        {{ branch.city }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="contact-info">
+                    @if (branch.phone) {
+                      <div class="contact-item mb-1">
+                        <i class="ti ti-phone me-1"></i>
+                        <small class="text-body-secondary">{{
+                          branch.phone
+                        }}</small>
+                      </div>
+                    }
+                    @if (branch.corporateEmail) {
+                      <div class="contact-item">
+                        <i class="ti ti-mail me-1"></i>
+                        <small
+                          class="text-body-secondary text-truncate d-inline-block"
+                          style="max-width: 200px"
+                          >{{ branch.corporateEmail }}</small
+                        >
+                      </div>
+                    }
+                    @if (branch.address) {
+                      <div class="contact-item mt-1">
+                        <i class="ti ti-map-pin me-1"></i>
+                        <small
+                          class="text-body-secondary text-truncate d-inline-block"
+                          style="max-width: 200px"
+                          >{{ branch.address }}</small
+                        >
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="actions-section" (click)="$event.stopPropagation()">
+                  <div class="d-flex flex-wrap gap-1 justify-content-center">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-action"
+                      (click)="onViewBranch(branch)"
+                      [title]="'BRANCHES_MODULE.VIEW_BRANCH' | translate"
+                    >
+                      <i class="ti ti-eye"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary btn-action"
+                      (click)="onEditBranch(branch)"
+                      [title]="'BRANCHES_MODULE.EDIT_BRANCH' | translate"
+                    >
+                      <i class="ti ti-edit"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-warning btn-action"
+                      (click)="onToggleStatus(branch)"
+                      [title]="'BRANCHES_MODULE.TOGGLE_STATUS' | translate"
+                    >
+                      <i class="ti ti-switch-horizontal"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-action"
+                      (click)="onDeleteBranch(branch)"
+                      [title]="'BRANCHES_MODULE.DELETE_BRANCH' | translate"
+                    >
+                      <i class="ti ti-trash"></i>
+                    </button>
+
+                    <div class="position-relative">
+                      <button
+                        type="button"
+                        class="btn btn-outline-info btn-action"
+                        (click)="toggleFloatingMenu(branch.id)"
+                        [attr.aria-expanded]="showFloatingMenu === branch.id"
+                        [title]="'BRANCHES_MODULE.MORE_ACTIONS' | translate"
+                      >
+                        <i class="ti ti-send"></i>
+                      </button>
+
+                      <div
+                        class="floating-menu-actions"
+                        [class.show]="showFloatingMenu === branch.id"
+                        id="menu-{{ branch.id }}"
+                      >
+                        <button
+                          type="button"
+                          class="btn btn-success btn-action-menu"
+                          (click)="onSendWhatsApp(branch)"
+                          [title]="'BRANCHES_MODULE.SEND_WHATSAPP' | translate"
+                        >
+                          <i class="ti ti-brand-whatsapp"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-action-menu"
+                          (click)="onSendEmail(branch)"
+                          [title]="'BRANCHES_MODULE.SEND_EMAIL' | translate"
+                        >
+                          <i class="ti ti-mail"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-dark btn-action-menu"
+                          (click)="onPrintBranch(branch)"
+                          [title]="'BRANCHES_MODULE.PRINT_BRANCH' | translate"
+                        >
+                          <i class="ti ti-printer"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (loading && branches.length > 0) {
+      <div class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
+        </div>
+      </div>
+    }
+
+    @if (!loading && branches && branches.length === 0) {
+      <div class="no-items-found">
+        <div class="row">
+          <div class="col-12">
+            <div class="text-center py-5 bg-transparent">
+              <i
+                class="ti ti-building-off display-4 text-body-secondary mb-3"
+              ></i>
+              <h5 class="text-body-secondary">
+                {{ 'BRANCHES_MODULE.NO_BRANCHES_FOUND' | translate }}
+              </h5>
+              <p class="text-body-secondary">
+                {{ 'BRANCHES_MODULE.NO_BRANCHES_MESSAGE' | translate }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  [config]="{
+    title: 'BRANCHES_MODULE.FILTER_TITLE',
+    showBadge: true,
+    position: 'right',
+    width: '400px',
+    backdrop: true,
+    closeOnEsc: true,
+  }"
+  (filterApplied)="onSideFilterApplied($event)"
+  (filterCleared)="onSideFilterCleared()"
+  (resetRequested)="onSideFilterCleared()"
+></side-filter-panel>
+
+@if (showFloatingMenu) {
+  <div class="floating-menu-overlay" (click)="showFloatingMenu = null"></div>
+}

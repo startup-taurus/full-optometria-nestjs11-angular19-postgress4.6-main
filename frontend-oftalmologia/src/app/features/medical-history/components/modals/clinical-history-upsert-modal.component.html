@@ -1,0 +1,41 @@
+<app-base-step-modal
+  [modalTitle]="
+    editMode
+      ? ('MEDICAL_HISTORY.MODAL.EDIT_TITLE' | translate)
+      : ('MEDICAL_HISTORY.MODAL.CREATE_TITLE' | translate)
+  "
+  [currentStep]="currentStep"
+  [totalSteps]="totalSteps"
+  [stepLabels]="stepTitles"
+  [canProceedNext]="canGoToNextStep()"
+  [canSave]="currentStep === totalSteps"
+  [isLoading]="saving"
+  [editMode]="editMode"
+  (nextClicked)="goToNextStep()"
+  (previousClicked)="goToPreviousStep()"
+  (stepClicked)="goToStep($event)"
+  (saveClicked)="onSubmit()"
+  (cancelClicked)="onCancel()"
+>
+  @if (currentStep === 1) {
+    <app-clinical-history-step1
+      [formGroup]="clinicalForm"
+      [fieldsConfig]="fieldsConfig"
+      [preSelectedPatientId]="preSelectedPatientId"
+    ></app-clinical-history-step1>
+  }
+
+  @if (currentStep === 2) {
+    <app-clinical-history-step2
+      [formGroup]="clinicalForm"
+      [fieldsConfig]="fieldsConfig"
+    ></app-clinical-history-step2>
+  }
+
+  @if (currentStep === 3) {
+    <app-clinical-history-step3
+      [formGroup]="clinicalForm"
+      [fieldsConfig]="fieldsConfig"
+    ></app-clinical-history-step3>
+  }
+</app-base-step-modal>

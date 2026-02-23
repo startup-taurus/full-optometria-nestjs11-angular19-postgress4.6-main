@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Visionary</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbvyBxmMbFhrzP9Z8moyYr6dCr-pzjhBE"></script>
+    <style>
+      #splash-screen {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        background: white;
+        display: flex;
+        height: 100%;
+        width: 100%;
+        transform: translate(-50%, -50%);
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: all 15s linear;
+        overflow: hidden;
+      }
+
+      #splash-screen.remove {
+        animation: fadeout 0.7s forwards;
+        z-index: 0;
+      }
+
+      @keyframes fadeout {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <app-root></app-root>
+    <div id="splash-screen">
+      <img alt="Logo" class="light" id="splash-logo" />
+    </div>
+    <script>
+      ;(function () {
+        var pathname = window.location.pathname
+        var isPublicRoute = /^\/(catalog|auth)/.test(pathname) || pathname === '/'
+        var splashScreen = document.getElementById('splash-screen')
+        
+        if (isPublicRoute && splashScreen) {
+          splashScreen.style.display = 'none'
+          return
+        }
+        
+        var splashLogo = document.getElementById('splash-logo')
+        if (!splashLogo) return
+        
+        var cachedLogo = localStorage.getItem('currentCompanyLogoUrl')
+        var defaultLogo = '/assets/images/ZGames.png'
+        splashLogo.setAttribute('src', cachedLogo || defaultLogo)
+      })()
+    </script>
+  </body>
+</html>

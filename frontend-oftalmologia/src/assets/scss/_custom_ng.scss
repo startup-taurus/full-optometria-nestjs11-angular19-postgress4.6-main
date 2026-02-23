@@ -1,0 +1,26 @@
+.arrow-none {
+  &:after {
+    display: none !important;
+  }
+
+  &:before {
+    display: none !important;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.card-detail .carousel-indicators{
+  bottom: -10% !important;
+}
+
+.filled {
+  color: rgba(var(--bs-warning-rgb)) !important;
+  font-size: 0.875em;
+  overflow: hidden;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+}

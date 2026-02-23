@@ -1,0 +1,901 @@
+<div class="row" [formGroup]="formGroup">
+  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_previousRx')">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fa fa-eye me-2"></i>
+          {{ 'MEDICAL_HISTORY.FORM.STEP2_TITLE' | translate }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <h6 class="text-primary mb-3">
+          {{ 'MEDICAL_HISTORY.FORM.PREVIOUS_RX_LENSOMETRY' | translate }}
+        </h6>
+        <div class="row">
+          <div
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('step2_previousRx', 'previousRxOd')"
+          >
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="previousRxOd"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.PREVIOUS_RX_OD' | translate
+              "
+            />
+          </div>
+          <div
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('step2_previousRx', 'previousAddOd')"
+          >
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.RIGHT_EYE_ADD' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="previousAddOd"
+              [placeholder]="'MEDICAL_HISTORY.FIELDS.RIGHT_EYE_ADD' | translate"
+            />
+          </div>
+          <div
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('step2_previousRx', 'previousRxOi')"
+          >
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="previousRxOi"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.PREVIOUS_RX_OI' | translate
+              "
+            />
+          </div>
+          <div
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('step2_previousRx', 'previousAddOi')"
+          >
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.LEFT_EYE_ADD' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="previousAddOi"
+              [placeholder]="'MEDICAL_HISTORY.FIELDS.LEFT_EYE_ADD' | translate"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_visualAcuity')">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-eye me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.VISUAL_ACUITY' | translate }}
+          {{ 'MEDICAL_HISTORY.FIELDS.WITHOUT_RX' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div
+            class="col-md-3 mb-3"
+            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVl')"
+          >
+            <label class="form-label"
+              >{{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }} VL</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="visualAcuityOdVl"
+              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OD_VL' | translate"
+            />
+          </div>
+          <div
+            class="col-md-3 mb-3"
+            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVp')"
+          >
+            <label class="form-label"
+              >{{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }} VP</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="visualAcuityOdVp"
+              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OD_VP' | translate"
+            />
+          </div>
+          <div
+            class="col-md-3 mb-3"
+            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVl')"
+          >
+            <label class="form-label"
+              >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }} VL</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="visualAcuityOiVl"
+              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OI_VL' | translate"
+            />
+          </div>
+          <div
+            class="col-md-3 mb-3"
+            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVp')"
+          >
+            <label class="form-label"
+              >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }} VP</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="visualAcuityOiVp"
+              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OI_VP' | translate"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_lensTypes')">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-eye me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.LENS_TYPES' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div
+            class="col-12"
+            *ngIf="shouldShowField('step2_lensTypes', 'lensTypes')"
+          >
+            <label class="form-label mb-3"
+              >{{
+                'MEDICAL_HISTORY.FIELDS.SELECT_LENS_TYPES' | translate
+              }}:</label
+            >
+            <div class="row">
+              <div
+                class="col-md-6 mb-3"
+                *ngFor="let lensType of lensTypeOptions"
+              >
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    [id]="'lens-' + lensType"
+                    class="toggle-input"
+                    [checked]="isLensTypeSelected(lensType)"
+                    (change)="toggleLensType(lensType)"
+                  />
+                  <label [for]="'lens-' + lensType" class="toggle-label">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">
+                      {{ lensType | titlecase }}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="col-lg-6 mb-4"
+    *ngIf="shouldShowSection('step2_additionalTreatments')"
+  >
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-adjust me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.ADDITIONAL_TREATMENTS' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div
+            class="col-12"
+            *ngIf="
+              shouldShowField(
+                'step2_additionalTreatments',
+                'additionalTreatments'
+              )
+            "
+          >
+            <label class="form-label mb-3"
+              >{{
+                'MEDICAL_HISTORY.FIELDS.SELECT_ADDITIONAL_TREATMENTS'
+                  | translate
+              }}:</label
+            >
+            <div class="row">
+              <div
+                class="col-md-6 mb-3"
+                *ngFor="let treatment of additionalTreatmentOptions"
+              >
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    [id]="'treatment-' + treatment"
+                    class="toggle-input"
+                    [checked]="isAdditionalTreatmentSelected(treatment)"
+                    (change)="toggleAdditionalTreatment(treatment)"
+                  />
+                  <label [for]="'treatment-' + treatment" class="toggle-label">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">
+                      {{ treatment | titlecase }}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_motorTest')">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-eye me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.MOTOR_TEST' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div formGroupName="motorTest" class="row">
+          <div class="col-md-6">
+            <div
+              class="mb-4"
+              formGroupName="exophoria"
+              *ngIf="shouldShowField('step2_motorTest', 'exophoria')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="exophoria"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="exophoria" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.EXOPHORIA' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="getMotorTestControl('exophoria')?.get('applies')?.value"
+              >
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                    }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="od"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="oi"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="value"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mb-4"
+              formGroupName="endophoria"
+              *ngIf="shouldShowField('step2_motorTest', 'endophoria')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="endophoria"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="endophoria" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.ENDOPHORIA' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="getMotorTestControl('endophoria')?.get('applies')?.value"
+              >
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                    }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="od"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="oi"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="value"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mb-4"
+              formGroupName="exotropia"
+              *ngIf="shouldShowField('step2_motorTest', 'exotropia')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="exotropia"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="exotropia" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.EXOTROPIA' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="getMotorTestControl('exotropia')?.get('applies')?.value"
+              >
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                    }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="od"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="oi"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="value"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mb-4"
+              formGroupName="endotropia"
+              *ngIf="shouldShowField('step2_motorTest', 'endotropia')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="endotropia"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="endotropia" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.ENDOTROPIA' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="getMotorTestControl('endotropia')?.get('applies')?.value"
+              >
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                    }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="od"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="oi"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="value"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div
+              class="mb-4"
+              formGroupName="hyperphoria"
+              *ngIf="shouldShowField('step2_motorTest', 'hyperphoria')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="hyperphoria"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="hyperphoria" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.HYPERPHORIA' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="
+                  getMotorTestControl('hyperphoria')?.get('applies')?.value
+                "
+              >
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                    }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="od"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="oi"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="value"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mb-4"
+              formGroupName="hypotropia"
+              *ngIf="shouldShowField('step2_motorTest', 'hypotropia')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="hypotropia"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="hypotropia" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.HYPERTROPIA' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="getMotorTestControl('hypotropia')?.get('applies')?.value"
+              >
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                    }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="od"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="oi"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="value"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mb-4"
+              formGroupName="alternating"
+              *ngIf="shouldShowField('step2_motorTest', 'alternating')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="alternating"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="alternating" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.ALTERNATING' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="
+                  getMotorTestControl('alternating')?.get('applies')?.value
+                "
+              >
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                    }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="od"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="oi"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small"
+                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="value"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step2_finalRx')">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-medkit me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.FINAL_RX' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <h6 class="text-info mb-3">
+              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+            </h6>
+            <div class="row">
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdSphere')"
+              >
+                <label class="form-label small">OD</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOdSphere"
+                  placeholder="OD"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAdd')"
+              >
+                <label class="form-label small">ADD OD</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOdAdd"
+                  placeholder="ADD OD"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVl')"
+              >
+                <label class="form-label small">AV VL</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="correctedAvOdVl"
+                  placeholder="AV VL"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVp')"
+              >
+                <label class="form-label small">AV VP</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="correctedAvOdVp"
+                  placeholder="AV VP"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <h6 class="text-info mb-3">
+              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+            </h6>
+            <div class="row">
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiSphere')"
+              >
+                <label class="form-label small">OI</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOiSphere"
+                  placeholder="OI"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAdd')"
+              >
+                <label class="form-label small">ADD OI</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOiAdd"
+                  placeholder="ADD OI"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVl')"
+              >
+                <label class="form-label small">AV VL</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="correctedAvOiVl"
+                  placeholder="AV VL"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVp')"
+              >
+                <label class="form-label small">AV VP</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="correctedAvOiVp"
+                  placeholder="AV VP"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4" *ngIf="shouldShowSection('step2_professionalName')" />
+
+        <div class="row" *ngIf="shouldShowSection('step2_professionalName')">
+          <div
+            class="col-12 mb-3"
+            *ngIf="
+              shouldShowField('step2_professionalName', 'professionalName')
+            "
+          >
+            <label class="form-label">{{
+              'MEDICAL_HISTORY.FIELDS.PROFESSIONAL' | translate
+            }}</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="professionalName"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.PROFESSIONAL_NAME' | translate
+              "
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

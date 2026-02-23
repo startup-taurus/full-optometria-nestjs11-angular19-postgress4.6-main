@@ -1,0 +1,74 @@
+<div class="text-center mb-4">
+  <img
+    [src]="userImage || 'assets/images/default-avatar.png'"
+    alt="User Avatar"
+    class="avatar-xl rounded img-thumbnail d-block mx-auto"
+  />
+  @if (userProfile) {
+    <h3 class="fw-semibold text-dark mt-3">
+      {{ 'LOGIN.LOCK_SCREEN.HI' | translate }}, {{ userProfile.username }}!
+    </h3>
+    <p class="mb-0">
+      {{ 'LOGIN.LOCK_SCREEN.PLEASE_ENTER_PASSWORD' | translate }}.
+    </p>
+  } @else {
+    <h3 class="fw-semibold text-dark mt-3">
+      {{ 'LOGIN.LOCK_SCREEN.SESSION_EXPIRED' | translate }}
+    </h3>
+    <p class="mb-0">
+      {{ 'LOGIN.LOCK_SCREEN.REDIRECTING' | translate }}
+    </p>
+  }
+</div>
+
+@if (userProfile) {
+  <form
+    [formGroup]="unlockForm"
+    (ngSubmit)="unlockSession()"
+    class="text-start mb-3"
+  >
+    <div class="mb-3">
+      <input
+        type="password"
+        id="lock-password"
+        formControlName="password"
+        class="form-control"
+        placeholder="{{ 'LOGIN.PLACEHOLDER.PASSWORD' | translate }}"
+      />
+    </div>
+
+    @if (isLoading) {
+      <div class="mb-2 d-grid">
+        <button class="btn btn-primary" type="button" disabled>
+          <span
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          {{ 'LOGIN.LOCK_SCREEN.PLEASE_WAIT' | translate }}
+        </button>
+      </div>
+    } @else {
+      <div class="mb-2 d-grid">
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="unlockForm.invalid"
+        >
+          {{ 'LOGIN.LOCK_SCREEN.ENTER_PASSWORD' | translate }}
+        </button>
+      </div>
+    }
+  </form>
+}
+
+<div class="text-center mt-3">
+  <button
+    class="btn btn-outline-primary btn-sm lock-screen-back-btn shadow-sm rounded-pill"
+    type="button"
+    (click)="goToLogin()"
+  >
+    <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
+    <span>{{ 'LOGIN.LOCK_SCREEN.BACK_TO_LOGIN' | translate }}</span>
+  </button>
+</div>
