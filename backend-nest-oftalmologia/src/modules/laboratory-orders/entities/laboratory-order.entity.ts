@@ -130,6 +130,9 @@ export class LaboratoryOrder {
   @Column({ name: 'product_id', nullable: true })
   productId: string;
 
+  @Column({ name: 'product_ids', type: 'uuid', array: true, nullable: true })
+  productIds: string[];
+
   @Column({
     type: 'enum',
     enum: FrameType,

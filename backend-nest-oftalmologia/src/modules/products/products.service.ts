@@ -364,9 +364,14 @@ export class ProductsService {
       });
     }
 
-    const ordersCount = await this.laboratoryOrderRepository.count({
-      where: { productId: id, branchId },
-    });
+    const ordersCount = await this.laboratoryOrderRepository
+      .createQueryBuilder('order')
+      .where('order.branchId = :branchId', { branchId })
+      .andWhere(
+        '(order.productId = :productId OR :productId = ANY(order.productIds))',
+        { productId: id }
+      )
+      .getCount();
 
     if (ordersCount > 0) {
       throw new BadRequestException({
@@ -913,7 +918,7 @@ export class ProductsService {
               fs.unlinkSync(oldFilePath);
             }
           } catch (error) {
-            console.error(`Error al eliminar imagen antigua: ${error.message}`);
+ 
           }
 
           await this.fileRepository.remove(oldFile);
@@ -997,7 +1002,7 @@ export class ProductsService {
           .toFile(filePath);
       }
     } catch (error) {
-      console.error('Error optimizando imagen:', error);
+
       fs.writeFileSync(filePath, buffer);
     }
   }

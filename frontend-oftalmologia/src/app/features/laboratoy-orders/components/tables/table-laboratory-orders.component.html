@@ -101,17 +101,9 @@
                       <strong
                         >{{
                           'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate
-                        }}:</strong
+                        }}(s):</strong
                       >
-                      {{ order.product?.name || '-' }}
-                    </p>
-                    <p class="text-body-secondary mb-0">
-                      <strong
-                        >{{
-                          'LABORATORY_ORDERS.FIELDS.FRAME_BRAND' | translate
-                        }}:</strong
-                      >
-                      {{ order.product?.brand || '-' }}
+                      {{ getOrderProductsText(order) }}
                     </p>
                   </div>
 

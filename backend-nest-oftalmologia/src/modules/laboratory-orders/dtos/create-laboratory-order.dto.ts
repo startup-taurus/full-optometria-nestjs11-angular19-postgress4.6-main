@@ -5,6 +5,7 @@ import {
   IsUUID,
   IsDateString,
   IsEnum,
+  IsArray,
 } from 'class-validator';
 import { FrameType } from '../entities/laboratory-order.entity';
 
@@ -124,6 +125,11 @@ export class CreateLaboratoryOrderDto {
   @IsOptional()
   @IsUUID()
   productId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  productIds?: string[];
 
   @IsOptional()
   @IsEnum(FrameType)

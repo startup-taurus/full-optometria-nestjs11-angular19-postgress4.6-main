@@ -26,6 +26,10 @@ export class LaboratoryOrderPdfService {
   private _store = inject(Store<AppState>)
   private logoBase64: string = ''
 
+  private isSupportedPdfImageDataUrl(value: string): boolean {
+    return /^data:image\/(png|jpe?g|webp);base64,/i.test(value)
+  }
+
   constructor() {
     if (
       pdfFonts &&
@@ -44,7 +48,13 @@ export class LaboratoryOrderPdfService {
       
       if (user?.company?.logoFile?.path) {
         const logoUrl = await firstValueFrom(this._companyLogoService.getCompanyLogoUrl$())
-        this.logoBase64 = await this._companyLogoService.convertLogoToBase64(logoUrl)
+        const rawLogoBase64 = await this._companyLogoService.convertLogoToBase64(logoUrl)
+
+        if (this.isSupportedPdfImageDataUrl(rawLogoBase64)) {
+          this.logoBase64 = rawLogoBase64
+        } else {
+          this.logoBase64 = ''
+        }
       } else {
         this.logoBase64 = ''
       }
@@ -59,8 +69,14 @@ export class LaboratoryOrderPdfService {
       await new Promise((resolve) => setTimeout(resolve, 500))
     }
 
-    const docDefinition = this.buildDocumentDefinition(data)
-    pdfMake.createPdf(docDefinition).open()
+    try {
+      const docDefinition = this.buildDocumentDefinition(data)
+      pdfMake.createPdf(docDefinition).open()
+    } catch (error) {
+      this.logoBase64 = ''
+      const docDefinition = this.buildDocumentDefinition(data)
+      pdfMake.createPdf(docDefinition).open()
+    }
   }
 
   public async downloadPdf(
@@ -72,9 +88,16 @@ export class LaboratoryOrderPdfService {
       await new Promise((resolve) => setTimeout(resolve, 500))
     }
 
-    const docDefinition = this.buildDocumentDefinition(data)
     const pdfFileName = filename || `orden_laboratorio_${data.orderNumber}.pdf`
-    pdfMake.createPdf(docDefinition).download(pdfFileName)
+
+    try {
+      const docDefinition = this.buildDocumentDefinition(data)
+      pdfMake.createPdf(docDefinition).download(pdfFileName)
+    } catch (error) {
+      this.logoBase64 = ''
+      const docDefinition = this.buildDocumentDefinition(data)
+      pdfMake.createPdf(docDefinition).download(pdfFileName)
+    }
   }
 
   private buildDocumentDefinition(
@@ -515,13 +538,13 @@ export class LaboratoryOrderPdfService {
 
   private buildFrameDataSection(data: LaboratoryOrderPdfData): Content {
     const order = data.order
+    const productSectionTitle = this.getProductSectionTitle(order)
+    const productNames = this.getProductNames(order)
 
     return {
       stack: [
         {
-          text: this._translateService.instant(
-            'PDF.LABORATORY_ORDER.FRAME_DATA'
-          ),
+          text: productSectionTitle,
           style: 'sectionTitle',
         },
         {
@@ -544,10 +567,10 @@ export class LaboratoryOrderPdfService {
               ],
               [
                 {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.PRODUCT')}:`,
+                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.PRODUCTS')}:`,
                   bold: true,
                 },
-                { text: order.frameModel || '-' },
+                { text: productNames },
               ],
               [
                 {
@@ -558,7 +581,7 @@ export class LaboratoryOrderPdfService {
               ],
               [
                 {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.OTHER_FRAME')}:`,
+                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.OTHER_PRODUCT_DATA')}:`,
                   bold: true,
                 },
                 { text: order.frameData || '-' },
@@ -736,5 +759,42 @@ export class LaboratoryOrderPdfService {
     }
 
     return labels[frameType] || frameType
+  }
+
+  private getOrderProducts(order: any): Array<{
+    id?: string
+    name?: string
+    brand?: string
+    code?: string
+  }> {
+    if (Array.isArray(order?.products) && order.products.length > 0) {
+      return order.products
+    }
+
+    if (order?.product) {
+      return [order.product]
+    }
+
+    return []
+  }
+
+  private getProductNames(order: any): string {
+    const products = this.getOrderProducts(order)
+
+    if (products.length > 0) {
+      return products.map((product) => product.name || '-').join(', ')
+    }
+
+    return order.frameModel || '-'
+  }
+
+  private getProductSectionTitle(order: any): string {
+    const products = this.getOrderProducts(order)
+
+    return this._translateService.instant(
+      products.length > 1
+        ? 'PDF.LABORATORY_ORDER.PRODUCTS_DATA'
+        : 'PDF.LABORATORY_ORDER.PRODUCT_DATA'
+    )
   }
 }

@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { LaboratoryOrder } from './entities/laboratory-order.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
+import { Product } from '../products/entities/product.entity';
 import { CreateLaboratoryOrderDto } from './dtos/create-laboratory-order.dto';
 import { UpdateLaboratoryOrderDto } from './dtos/update-laboratory-order.dto';
 import { QueryLaboratoryOrderDto } from './dtos/query-laboratory-order.dto';
@@ -15,7 +16,9 @@ export class LaboratoryOrdersService {
     @InjectRepository(LaboratoryOrder)
     private laboratoryOrderRepository: Repository<LaboratoryOrder>,
     @InjectRepository(ClinicalHistory)
-    private clinicalHistoryRepository: Repository<ClinicalHistory>
+    private clinicalHistoryRepository: Repository<ClinicalHistory>,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>
   ) {}
 
   async create(
@@ -25,13 +28,14 @@ export class LaboratoryOrdersService {
   ) {
     const maxRetries = 3;
     let lastError: any;
+    const normalizedCreateDto = this.normalizeProductSelection(createDto);
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const orderNumber = await this.generateOrderNumber();
 
         const laboratoryOrder = this.laboratoryOrderRepository.create({
-          ...createDto,
+          ...normalizedCreateDto,
           branchId,
           companyId,
           orderNumber,
@@ -41,9 +45,9 @@ export class LaboratoryOrdersService {
           laboratoryOrder
         );
 
-        if (createDto.clinicalHistoryId) {
+        if (normalizedCreateDto.clinicalHistoryId) {
           const whereCondition = CompanyFilterUtil.buildWhereCondition(
-            { id: createDto.clinicalHistoryId, branchId },
+            { id: normalizedCreateDto.clinicalHistoryId, branchId },
             companyId
           );
           await this.clinicalHistoryRepository.update(whereCondition, {
@@ -58,7 +62,7 @@ export class LaboratoryOrdersService {
           }
         );
 
-        const response = this.formatResponse(orderWithRelations);
+        const response = await this.formatResponse(orderWithRelations);
         return response;
       } catch (error) {
         lastError = error;
@@ -168,11 +172,14 @@ export class LaboratoryOrdersService {
       .take(limit)
       .getManyAndCount();
 
-    return PaginationUtil.paginate(
-      data.map((item) => this.formatResponse(item)),
-      total,
-      { page, limit }
+    const formattedData = await Promise.all(
+      data.map((item) => this.formatResponse(item))
     );
+
+    return PaginationUtil.paginate(formattedData, total, {
+      page,
+      limit,
+    });
   }
 
   async findOne(id: string, branchId: string, companyId?: string) {
@@ -202,23 +209,25 @@ export class LaboratoryOrdersService {
     branchId: string,
     companyId?: string
   ) {
-    const laboratoryOrder = await this.findOne(id, branchId, companyId);
+    const existingOrder = await this.findOne(id, branchId, companyId);
 
-    if (!laboratoryOrder) {
+    if (!existingOrder) {
       throw new NotFoundException({
         messageKey: 'ERROR.NOT_FOUND',
         message: 'Laboratory order not found',
       });
     }
 
+    const normalizedUpdateDto = this.normalizeProductSelection(updateDto);
+
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
       { id, branchId },
       companyId
     );
-    await this.laboratoryOrderRepository.update(whereCondition, updateDto);
+    await this.laboratoryOrderRepository.update(whereCondition, normalizedUpdateDto);
 
     const updatedOrder = await this.findOne(id, branchId, companyId);
-    return this.formatResponse(updatedOrder);
+    return updatedOrder;
   }
 
   async changeStatus(
@@ -227,9 +236,9 @@ export class LaboratoryOrdersService {
     branchId: string,
     companyId?: string
   ) {
-    const laboratoryOrder = await this.findOne(id, branchId, companyId);
+    const existingOrder = await this.findOne(id, branchId, companyId);
 
-    if (!laboratoryOrder) {
+    if (!existingOrder) {
       throw new NotFoundException({
         messageKey: 'ERROR.NOT_FOUND',
         message: 'Laboratory order not found',
@@ -245,7 +254,7 @@ export class LaboratoryOrdersService {
     });
 
     const updatedOrder = await this.findOne(id, branchId, companyId);
-    return this.formatResponse(updatedOrder);
+    return updatedOrder;
   }
 
   async remove(id: string, branchId: string, companyId?: string) {
@@ -312,7 +321,19 @@ export class LaboratoryOrdersService {
     };
   }
 
-  private formatResponse(laboratoryOrder: any) {
+  private async formatResponse(laboratoryOrder: any) {
+    const productIds = this.extractProductIds(laboratoryOrder);
+    const products = await this.getProductsByIds(productIds);
+    const fallbackProduct = laboratoryOrder.product
+      ? {
+          id: laboratoryOrder.product.id,
+          code: laboratoryOrder.product.code,
+          name: laboratoryOrder.product.name,
+          brand: laboratoryOrder.product.brand,
+        }
+      : null;
+    const primaryProduct = products[0] || fallbackProduct;
+
     return {
       id: laboratoryOrder.id,
       orderNumber: laboratoryOrder.orderNumber,
@@ -345,7 +366,8 @@ export class LaboratoryOrdersService {
       mid: laboratoryOrder.mid,
       distVp: laboratoryOrder.distVp,
       engraving: laboratoryOrder.engraving,
-      productId: laboratoryOrder.productId,
+      productId: primaryProduct?.id || laboratoryOrder.productId,
+      productIds,
       frameType: laboratoryOrder.frameType,
       frameTypeDescription: laboratoryOrder.frameTypeDescription,
       frameBrand: laboratoryOrder.frameBrand,
@@ -370,14 +392,8 @@ export class LaboratoryOrdersService {
             homePhone: laboratoryOrder.patient.homePhone,
           }
         : null,
-      product: laboratoryOrder.product
-        ? {
-            id: laboratoryOrder.product.id,
-            code: laboratoryOrder.product.code,
-            name: laboratoryOrder.product.name,
-            brand: laboratoryOrder.product.brand,
-          }
-        : null,
+      product: primaryProduct,
+      products,
       branch: laboratoryOrder.branch
         ? {
             id: laboratoryOrder.branch.id,
@@ -389,6 +405,89 @@ export class LaboratoryOrdersService {
             corporateEmail: laboratoryOrder.branch.corporateEmail,
           }
         : null,
+    };
+  }
+
+  private extractProductIds(
+    laboratoryOrder: Partial<LaboratoryOrder> & { product?: any }
+  ): string[] {
+    const idsFromArray = Array.isArray(laboratoryOrder.productIds)
+      ? laboratoryOrder.productIds.filter(Boolean)
+      : [];
+
+    if (idsFromArray.length > 0) {
+      return Array.from(new Set(idsFromArray));
+    }
+
+    if (laboratoryOrder.productId) {
+      return [laboratoryOrder.productId];
+    }
+
+    if (laboratoryOrder.product?.id) {
+      return [laboratoryOrder.product.id];
+    }
+
+    return [];
+  }
+
+  private async getProductsByIds(productIds: string[]) {
+    if (!productIds.length) {
+      return [];
+    }
+
+    const products = await this.productRepository.find({
+      where: { id: In(productIds) },
+      select: ['id', 'code', 'name', 'brand'],
+    });
+
+    const productsById = new Map(products.map((product) => [product.id, product]));
+
+    return productIds
+      .map((productId) => productsById.get(productId))
+      .filter(Boolean)
+      .map((product) => ({
+        id: product.id,
+        code: product.code,
+        name: product.name,
+        brand: product.brand,
+      }));
+  }
+
+  private normalizeProductSelection(
+    dto: CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto
+  ): CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto {
+    const hasProductIds = Object.prototype.hasOwnProperty.call(dto, 'productIds');
+    const hasProductId = Object.prototype.hasOwnProperty.call(dto, 'productId');
+
+    if (!hasProductIds && !hasProductId) {
+      return dto;
+    }
+
+    const sourceProductIds: string[] = Array.isArray((dto as any).productIds)
+      ? ((dto as any).productIds as unknown[]).filter(
+          (productId): productId is string =>
+            typeof productId === 'string' && productId.trim().length > 0
+        )
+      : [];
+
+    const uniqueProductIds: string[] = Array.from(new Set(sourceProductIds));
+
+    if (dto.productId && !uniqueProductIds.includes(dto.productId)) {
+      uniqueProductIds.unshift(dto.productId);
+    }
+
+    if (!uniqueProductIds.length) {
+      return {
+        ...dto,
+        productId: null,
+        productIds: [],
+      } as CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto;
+    }
+
+    return {
+      ...dto,
+      productId: uniqueProductIds[0],
+      productIds: uniqueProductIds,
     };
   }
 
