@@ -90,9 +90,6 @@ jobs:
             echo "=== Iniciando servicios ==="
             $COMPOSE_CMD -p "$PROJECT_NAME" up -d
 
-            echo "=== Ejecutando migraciones de base de datos ==="
-            $COMPOSE_CMD -p "$PROJECT_NAME" exec -T backend npm run migration:run:prod
-            
             echo "=== Limpiando imágenes no utilizadas ==="
             docker image prune -f
             
