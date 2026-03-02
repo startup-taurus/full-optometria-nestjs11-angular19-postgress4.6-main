@@ -117,6 +117,22 @@
 <ng-template #actionsTemplate let-row="row" let-rowIndex="rowIndex">
   <div class="d-flex gap-1 flex-wrap">
     <button
+      class="btn btn-xs"
+      placement="left"
+      [class.btn-outline-primary]="patientHasHistory(row.id) !== false"
+      [class.btn-outline-success]="patientHasHistory(row.id) === false"
+      [ngbTooltip]="getMedicalHistoryTooltip(row.id)"
+      [disabled]="isMedicalHistoryLoading(row.id)"
+      (click)="manageMedicalHistory(row)"
+    >
+      <i class="fa fa-spinner fa-spin" *ngIf="isMedicalHistoryLoading(row.id)"></i>
+      <ng-container *ngIf="!isMedicalHistoryLoading(row.id)">
+        <i class="fa fa-pencil" *ngIf="patientHasHistory(row.id) === true"></i>
+        <i class="fa fa-plus" *ngIf="patientHasHistory(row.id) === false"></i>
+        <i class="fa fa-folder-open" *ngIf="patientHasHistory(row.id) === null"></i>
+      </ng-container>
+    </button>
+    <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
       [ngbTooltip]="'Ver Detalles'"

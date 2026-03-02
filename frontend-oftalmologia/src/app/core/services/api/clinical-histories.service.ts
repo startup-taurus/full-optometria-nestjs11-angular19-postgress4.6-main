@@ -63,10 +63,34 @@ export class ClinicalHistoriesService extends BranchAwareService<ClinicalHistory
       .pipe(map((response) => response.data || null))
   }
 
-  getByUser(userId: string): Observable<ClinicalHistory[]> {
+  getByPatient(patientId: string): Observable<ClinicalHistory[]> {
     return this.http
-      .get<ApiResponse<ClinicalHistory[]>>(`${this.baseUrl}/by-user/${userId}`)
-      .pipe(map((response) => response.data || []))
+      .get<ApiResponse<any>>(
+        `${this.baseUrl}/by-patient/${patientId}`
+      )
+      .pipe(
+        map((response) => {
+          const data = response.data
+
+          if (!data) {
+            return []
+          }
+
+          if (data.result !== undefined && Array.isArray(data.result)) {
+            return data.result as ClinicalHistory[]
+          }
+
+          if (Array.isArray(data)) {
+            return data as ClinicalHistory[]
+          }
+
+          return [data]
+        })
+      )
+  }
+
+  getByUser(userId: string): Observable<ClinicalHistory[]> {
+    return this.getByPatient(userId)
   }
 
   override create(dto: CreateClinicalHistoryDto): Observable<ClinicalHistory> {

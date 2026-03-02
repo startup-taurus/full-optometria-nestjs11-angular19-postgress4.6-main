@@ -18,6 +18,7 @@ import { BUTTON_ACTIONS } from '@core/helpers/ui/constants'
 import { DEFAULT_NGX_DATATABLE_PAGINATION } from '@core/helpers/ui/ngx-datatable.constant'
 import { FORMAT_FOR_DATES } from '@core/helpers/ui/ui.constants'
 import { Patient } from '@core/interfaces/api/patient.interface'
+import { ClinicalHistory } from '@core/interfaces/api/clinical-history.interface'
 import {
   BootstrapModalConfig,
   ModalWithAction,
@@ -25,13 +26,15 @@ import {
 import { NgxDatatableConfig } from '@core/interfaces/ui/ngx-datatable.interface'
 import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { PatientService } from '@core/services/api/patient.service'
+import { ClinicalHistoriesService } from '@core/services/api/clinical-histories.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
 import {
   BehaviorSubject,
   catchError,
+  finalize,
   map,
   Observable,
   of,
@@ -48,6 +51,7 @@ import {
 import { PatientFilterComponent } from '../filter/patient-filter.component'
 import { PatientFormModalComponent } from '../forms/patient-form-modal.component'
 import { PatientDetailsModalComponent } from '../modals/patient-details-modal.component'
+import { ClinicalHistoryUpsertModalComponent } from '../../../medical-history/components/modals/clinical-history-upsert-modal.component'
 
 @Component({
   selector: 'app-patients-table',
@@ -86,13 +90,17 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
 
   public config$ = new BehaviorSubject<Partial<NgxDatatableConfig>>({})
   public data$: Observable<Patient[]> = of([])
+  public medicalHistoryLoadingIds = new Set<string>()
+  public medicalHistoryCache = new Map<string, ClinicalHistory | null>()
 
   private filter: object = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _patientService = inject(PatientService)
+  private _clinicalHistoriesService = inject(ClinicalHistoriesService)
   private _bsModalService = inject(BootstrapModalService)
+  private _modal = inject(NgbModal)
 
   ngOnInit(): void {
     this.suscribeToFilter()
@@ -172,7 +180,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
         {
           name: 'PATIENT.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
-          width: 190,
+          width: 230,
           sortable: false,
         },
       ],
@@ -340,5 +348,82 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
           })
       }
     })
+  }
+
+  public manageMedicalHistory(patient: Patient): void {
+    if (!patient.id || this.medicalHistoryLoadingIds.has(patient.id)) {
+      return
+    }
+
+    this.medicalHistoryLoadingIds.add(patient.id)
+
+    this._clinicalHistoriesService
+      .getByPatient(patient.id)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        finalize(() => {
+          this.medicalHistoryLoadingIds.delete(patient.id)
+        })
+      )
+      .subscribe({
+        next: (clinicalHistories: ClinicalHistory[]) => {
+          if (clinicalHistories.length > 0) {
+            this.medicalHistoryCache.set(patient.id, clinicalHistories[0])
+            this.openEditMedicalHistoryModal(clinicalHistories[0])
+            return
+          }
+
+          this.medicalHistoryCache.set(patient.id, null)
+          this.openCreateMedicalHistoryModal(patient.id)
+        },
+        error: (err) => {},
+      })
+  }
+
+  public isMedicalHistoryLoading(patientId: string): boolean {
+    return this.medicalHistoryLoadingIds.has(patientId)
+  }
+
+  public getMedicalHistoryTooltip(patientId: string): string {
+    if (!this.medicalHistoryCache.has(patientId)) {
+      return 'Historial clínico'
+    }
+    return this.medicalHistoryCache.get(patientId) !== null
+      ? 'Editar historial clínico'
+      : 'Crear historial clínico'
+  }
+
+  public patientHasHistory(patientId: string): boolean | null {
+    if (!this.medicalHistoryCache.has(patientId)) return null
+    return this.medicalHistoryCache.get(patientId) !== null
+  }
+
+  private openCreateMedicalHistoryModal(patientId: string): void {
+    const modalRef = this._modal.open(ClinicalHistoryUpsertModalComponent, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static',
+      keyboard: false,
+    })
+
+    modalRef.componentInstance.editMode = false
+    modalRef.componentInstance.preSelectedPatientId = patientId
+
+    modalRef.result.then(() => {}).catch(() => {})
+  }
+
+  private openEditMedicalHistoryModal(clinicalHistory: ClinicalHistory): void {
+    const modalRef = this._modal.open(ClinicalHistoryUpsertModalComponent, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static',
+      keyboard: false,
+    })
+
+    modalRef.componentInstance.editMode = true
+    modalRef.componentInstance.selectedRecord = clinicalHistory
+    modalRef.componentInstance.recordId = clinicalHistory.id
+
+    modalRef.result.then(() => {}).catch(() => {})
   }
 }
