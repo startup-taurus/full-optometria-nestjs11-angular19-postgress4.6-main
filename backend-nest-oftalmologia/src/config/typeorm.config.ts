@@ -10,9 +10,11 @@ const AppDataSource = new DataSource({
   type: 'postgres',
   host: configService.get('DATABASE_HOST'),
   port: configService.get('DATABASE_PORT'),
-  username: configService.get('DATABASE_USERNAME'),
-  password: configService.get('DATABASE_PASSWORD'),
-  database: configService.get('DATABASE_NAME'),
+  username:
+    configService.get('DB_USER') || configService.get('DATABASE_USERNAME'),
+  password:
+    configService.get('DB_PASSWORD') || configService.get('DATABASE_PASSWORD'),
+  database: configService.get('DB_NAME') || configService.get('DATABASE_NAME'),
   synchronize: false,
   logging: true,
   entities: ['src/**/*.entity{.ts,.js}'],

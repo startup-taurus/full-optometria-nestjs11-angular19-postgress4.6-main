@@ -7,9 +7,9 @@ async function ensureProductIdsColumn(): Promise<void> {
   const client = new Client({
     host: process.env.DATABASE_HOST,
     port: Number(process.env.DATABASE_PORT || 5432),
-    user: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME,
+    user: process.env.DB_USER || process.env.DATABASE_USERNAME,
+    password: process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD,
+    database: process.env.DB_NAME || process.env.DATABASE_NAME,
   });
 
   await client.connect();
