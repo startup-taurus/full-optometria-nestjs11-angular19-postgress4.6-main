@@ -791,7 +791,8 @@
       "CATEGORY_INFO": "Category Information", 
       "STOCK_INFO": "Stock Information",
       "SUPPLIER_INFO": "Supplier Information",
-      "DEFAULT_SUPPLIER": "Default Supplier"
+      "DEFAULT_SUPPLIER": "Default Supplier",
+      "IMAGE_INFO": "Image Information"
     },
     "FORM": {
       "CREATE": "Create Product",

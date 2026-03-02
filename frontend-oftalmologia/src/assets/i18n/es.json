@@ -808,7 +808,8 @@
       "CATEGORY_INFO": "Información de Categorización", 
       "STOCK_INFO": "Información de Stock",
       "SUPPLIER_INFO": "Información del Proveedor",
-      "DEFAULT_SUPPLIER": "Proveedor Predeterminado"
+      "DEFAULT_SUPPLIER": "Proveedor Predeterminado",
+      "IMAGE_INFO": "Información de la Imagen"
     },
     "FORM": {
       "CREATE": "Crear Producto",
