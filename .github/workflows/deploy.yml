@@ -4,14 +4,13 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+
+concurrency:
+  group: deploy-production-main
+  cancel-in-progress: true
 
 jobs:
   deploy:
-    if: github.event_name == 'push' || (github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     env:
       SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -57,6 +56,7 @@ jobs:
             docker ps -aq -f "name=${PROJECT_NAME}-" | xargs -r docker rm -f 2>/dev/null || true
             docker ps -aq -f "name=full-optometria" | xargs -r docker rm -f 2>/dev/null || true
             docker ps -aq -f "name=optometria" | xargs -r docker rm -f 2>/dev/null || true
+            docker rm -f "${PROJECT_NAME}-db-1" "${PROJECT_NAME}-backend-1" "${PROJECT_NAME}-frontend-1" 2>/dev/null || true
 
             echo "=== Limpiando redes huérfanas del proyecto ==="
             docker network ls -q -f "name=${PROJECT_NAME}" | xargs -r docker network rm 2>/dev/null || true
