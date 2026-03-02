@@ -231,8 +231,10 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   private loadExistingData(): void {
     if (this.editMode) {
       if (this.selectedRecord) {
+
         this.populateFormFromRecord(this.selectedRecord)
       } else if (this.recordId) {
+
         this.loadRecordFromBackend(this.recordId)
       }
     }
@@ -250,11 +252,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
           } else {
           }
         },
-        error: (error) => {},
+        error: (error) => {
+        },
       })
   }
 
-  private populateFormFromRecord(record: ClinicalHistory): void {
+  public populateFormFromRecord(record: ClinicalHistory): void {
+
     this.clinicalForm.patchValue({
       patientId: record.patientId || '',
       professionalName: record.professionalName || '',
