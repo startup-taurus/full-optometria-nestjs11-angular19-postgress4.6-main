@@ -22,7 +22,7 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
   private _translateService = inject(TranslateService)
 
   public products: Product[] = []
-  public selectedProduct: Product | null = null
+  public selectedProducts: Product[] = []
   public productsLoading = false
   public selectedFrameType: string = ''
 
@@ -82,6 +82,8 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
           const items =
             response?.data?.data?.result || response?.data?.result || []
           this.products = items
+          const currentSelection = this.formGroup.get('productIds')?.value || []
+          this.onProductsSelected(currentSelection)
           this.productsLoading = false
         },
         error: (error: any) => {
@@ -92,34 +94,49 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
 
   private setupProductSelection(): void {
     this.formGroup
-      .get('productId')
+      .get('productIds')
       ?.valueChanges.pipe(
         takeUntil(this.destroy$),
         debounceTime(300),
         distinctUntilChanged()
       )
-      .subscribe((productId) => {
-        if (productId) {
-          this.onProductSelected(productId)
-        }
+      .subscribe((productIds: string[] | null) => {
+        this.onProductsSelected(productIds || [])
       })
   }
 
-  private onProductSelected(productId: string): void {
-    const product = this.products.find((p) => p.id === productId)
+  private onProductsSelected(productIds: string[]): void {
+    const ids = Array.isArray(productIds) ? productIds : []
+    this.selectedProducts = this.products.filter((product) =>
+      ids.includes(product.id)
+    )
 
-    if (product) {
-      this.selectedProduct = product
+    const productNames = this.selectedProducts.map((product) => product.name)
+    const productBrands = Array.from(
+      new Set(
+        this.selectedProducts
+          .map((product) => product.brand)
+          .filter((brand) => !!brand)
+      )
+    )
 
-      this.formGroup.patchValue({
-        frameBrand: product.brand || '',
-        frameModel: product.name || '',
-      })
-    }
+    this.formGroup.patchValue(
+      {
+        frameBrand: productBrands.join(', '),
+        frameModel: productNames.join(', '),
+      },
+      { emitEvent: false }
+    )
   }
 
   public getProductDisplayName(product: Product): string {
     return `${product.code} - ${product.name}`
+  }
+
+  public getProductDataSectionLabel(): string {
+    return this.selectedProducts.length > 1
+      ? 'LABORATORY_ORDERS.LABELS.PRODUCTS_DATA_SECTION'
+      : 'LABORATORY_ORDERS.LABELS.PRODUCT_DATA_SECTION'
   }
 
   public onFrameTypeToggle(value: string): void {

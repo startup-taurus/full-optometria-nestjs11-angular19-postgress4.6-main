@@ -318,7 +318,7 @@
       </div>
     </div>
 
-    <!-- Step 4: Datos de la Montura -->
+    <!-- Step 4: Datos del/los producto(s) -->
     <div *ngIf="currentStep === 4">
       <h5 class="section-title">
         <i class="ti ti-sunglasses me-2"></i>
@@ -329,20 +329,20 @@
         <div class="col-lg-6 mb-4">
           <div class="info-card">
             <div class="card-header">
-              <h6><i class="ti ti-package me-2"></i>Producto</h6>
+              <h6><i class="ti ti-package me-2"></i>Producto(s)</h6>
             </div>
             <div class="card-body">
               <div class="data-field">
                 <strong
-                  >{{ 'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate }}:</strong
+                  >{{ 'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate }}(s):</strong
                 >
-                <span>{{ order.product?.name || '-' }}</span>
+                <span>{{ getOrderProductsText() }}</span>
               </div>
-              <div class="data-field" *ngIf="order.product?.code">
+              <div class="data-field" *ngIf="order.product?.code && !hasMultipleProducts()">
                 <strong>Código:</strong>
                 <span>{{ order.product.code }}</span>
               </div>
-              <div class="data-field" *ngIf="order.product?.brand">
+              <div class="data-field" *ngIf="order.product?.brand && !hasMultipleProducts()">
                 <strong>Marca:</strong>
                 <span>{{ order.product.brand }}</span>
               </div>
@@ -353,7 +353,10 @@
         <div class="col-lg-6 mb-4">
           <div class="info-card">
             <div class="card-header">
-              <h6><i class="ti ti-checkbox me-2"></i>Tipo de Armazón</h6>
+              <h6>
+                <i class="ti ti-checkbox me-2"></i
+                >{{ 'LABORATORY_ORDERS.LABELS.FRAME_TYPE' | translate }}
+              </h6>
             </div>
             <div class="card-body">
               <div class="data-field">
@@ -382,7 +385,15 @@
 
       <div class="info-card mb-4">
         <div class="card-header">
-          <h6><i class="ti ti-info-circle me-2"></i>Datos del Armazón</h6>
+          <h6>
+            <i class="ti ti-info-circle me-2"></i>
+            {{
+              hasMultipleProducts()
+                ? 'LABORATORY_ORDERS.LABELS.PRODUCTS_DATA_SECTION'
+                : 'LABORATORY_ORDERS.LABELS.PRODUCT_DATA_SECTION'
+              | translate
+            }}
+          </h6>
         </div>
         <div class="card-body">
           <div class="row">

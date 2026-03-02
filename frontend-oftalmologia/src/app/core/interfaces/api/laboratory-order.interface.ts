@@ -37,6 +37,7 @@ export interface LaboratoryOrder {
   distVp?: string
   engraving?: string
   productId?: string
+  productIds?: string[]
   frameType?: FrameType
   frameTypeDescription?: string
   frameBrand?: string
@@ -65,6 +66,12 @@ export interface LaboratoryOrder {
     name: string
     brand: string
   }
+  products?: {
+    id: string
+    code: string
+    name: string
+    brand: string
+  }[]
   branch?: {
     id: string
     name: string
@@ -106,6 +113,7 @@ export interface CreateLaboratoryOrderDto {
   distVp?: string
   engraving?: string
   productId?: string
+  productIds?: string[]
   frameType?: FrameType
   frameTypeDescription?: string
   frameBrand?: string

@@ -109,6 +109,13 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe()
   }
 
+  private isSameFilter(
+    current: ClinicalHistoryQueryParams,
+    next: ClinicalHistoryQueryParams
+  ): boolean {
+    return JSON.stringify(current || {}) === JSON.stringify(next || {})
+  }
+
   private initializeSubscriptions(): void {
     this._store
       .select(selectSelectedBranchId)
@@ -119,6 +126,9 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (branchId) => {
+          if (!branchId) {
+            return
+          }
           this.isInitialLoad = true
           this.reloadDatatable()
         },
@@ -129,10 +139,18 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (filter) => {
-          if (!this.isInitialLoad) {
-            this.filter = (filter as ClinicalHistoryQueryParams) || {}
-            this.reloadDatatable(this.filter)
+          if (this.isInitialLoad) {
+            return
           }
+
+          const nextFilter = (filter as ClinicalHistoryQueryParams) || {}
+
+          if (this.isSameFilter(this.filter, nextFilter)) {
+            return
+          }
+
+          this.filter = nextFilter
+          this.reloadDatatable(this.filter)
         },
         error: (err) => {},
       })
@@ -342,11 +360,18 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   }
 
   public onSideFilterApplied(filters: FilterValue): void {
-    this.filter = filters
+    const nextFilter = (filters as ClinicalHistoryQueryParams) || {}
+    if (this.isSameFilter(this.filter, nextFilter)) {
+      return
+    }
+    this.filter = nextFilter
     this.reloadDatatable(this.filter)
   }
 
   public onSideFilterCleared(): void {
+    if (this.isSameFilter(this.filter, {})) {
+      return
+    }
     this.filter = {}
     this.reloadDatatable(this.filter)
   }

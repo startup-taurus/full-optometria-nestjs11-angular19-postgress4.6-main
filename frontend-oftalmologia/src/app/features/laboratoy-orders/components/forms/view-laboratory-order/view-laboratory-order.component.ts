@@ -97,6 +97,22 @@ export class ViewLaboratoryOrderComponent implements OnInit {
     return types[value] || value
   }
 
+  public getOrderProductsText(): string {
+    if (!this.order) return '-'
+
+    const products = this.order.products || []
+
+    if (products.length > 0) {
+      return products.map((product) => product.name).join(', ')
+    }
+
+    return this.order.product?.name || this.order.frameModel || '-'
+  }
+
+  public hasMultipleProducts(): boolean {
+    return (this.order?.products?.length || 0) > 1
+  }
+
   public formatDate(date: string | null): string {
     if (!date) return '-'
     const [year, month, day] = date.split('-')

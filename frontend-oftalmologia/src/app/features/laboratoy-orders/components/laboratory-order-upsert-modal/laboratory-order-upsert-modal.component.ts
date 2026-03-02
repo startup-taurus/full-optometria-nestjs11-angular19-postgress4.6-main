@@ -132,7 +132,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
     })
 
     this.stepForms[4] = this._fb.group({
-      productId: [null],
+      productIds: [[]],
       frameType: [null],
       frameTypeDescription: [null],
       frameBrand: [null],
@@ -237,7 +237,12 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
     })
 
     this.stepForms[4].patchValue({
-      productId: order.productId,
+      productIds:
+        order.productIds && order.productIds.length > 0
+          ? order.productIds
+          : order.productId
+            ? [order.productId]
+            : [],
       frameType: order.frameType,
       frameTypeDescription: order.frameTypeDescription,
       frameBrand: order.frameBrand,
@@ -296,6 +301,20 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
     if (this.mode === 'create') {
       const formValue = this.buildFormData() as CreateLaboratoryOrderDto
+
+      if (!formValue.patientId) {
+        this.isSaving = false
+        this._notificationService.showNotification({
+          type: 'error',
+          message: {
+            es: 'No se encontró el paciente para crear la orden.',
+            en: 'Patient was not found to create the order.',
+          },
+          title: 'LABORATORY_ORDERS_MODULE.TITLE',
+        })
+        return
+      }
+
       this.createOrder(formValue)
     } else {
       const formValue = this.buildFormData() as UpdateLaboratoryOrderDto
@@ -428,7 +447,8 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
         orderNumber: orderNumber,
       }
 
-      await this._pdfService.generatePdf(pdfData)
+      const filename = `orden_laboratorio_${orderNumber}.pdf`
+      await this._pdfService.downloadPdf(pdfData, filename)
     } catch (error) {
       throw error
     }

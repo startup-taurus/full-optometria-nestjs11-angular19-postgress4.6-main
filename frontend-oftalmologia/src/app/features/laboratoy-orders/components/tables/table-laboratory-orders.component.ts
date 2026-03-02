@@ -75,13 +75,13 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   private currentFilters: any = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
   private isInitialLoad = true
+  private currentBranchId: string | null = null
 
   @ViewChild('sideFilterPanel', { static: false })
   public sideFilterPanel?: SideFilterPanelComponent
 
   ngOnInit(): void {
     this.initializeSubscriptions()
-    this.loadLaboratoryOrders()
   }
 
   ngOnDestroy(): void {
@@ -99,7 +99,16 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (branchId) => {
-          if (!this.isInitialLoad) {
+          if (!branchId) {
+            return
+          }
+
+          const shouldLoadInitial = this.isInitialLoad
+          const branchChanged = this.currentBranchId !== branchId
+
+          this.currentBranchId = branchId
+
+          if (shouldLoadInitial || branchChanged) {
             this.resetAndLoad()
           }
         },
@@ -365,6 +374,16 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     return !!order.patient?.email
   }
 
+  public getOrderProductsText(order: LaboratoryOrder): string {
+    const products = order.products || []
+
+    if (products.length > 0) {
+      return products.map((product) => product.name).join(', ')
+    }
+
+    return order.product?.name || order.frameModel || '-'
+  }
+
   public onSendWhatsApp(order: LaboratoryOrder): void {
     const phone = order.patient?.mobilePhone || order.patient?.homePhone
 
@@ -384,7 +403,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     const patientName =
       `${order.patient?.firstName || ''} ${order.patient?.lastName || ''}`.trim()
     const orderDate = this.formatDate(order.attendanceDate)
-    const productName = order.product?.name || '-'
+    const productName = this.getOrderProductsText(order)
 
     const message = `Hola ${patientName}, tu orden de laboratorio para ${productName} con fecha ${orderDate} está lista. ¡Gracias!`
     const encodedMessage = encodeURIComponent(message)
@@ -423,7 +442,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     const patientName =
       `${order.patient?.firstName || ''} ${order.patient?.lastName || ''}`.trim()
     const orderDate = this.formatDate(order.attendanceDate)
-    const productName = order.product?.name || '-'
+    const productName = this.getOrderProductsText(order)
 
     const subject = encodeURIComponent('Orden de Laboratorio Lista')
     const body = encodeURIComponent(
