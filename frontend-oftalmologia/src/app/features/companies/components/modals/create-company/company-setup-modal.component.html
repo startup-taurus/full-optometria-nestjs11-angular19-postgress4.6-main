@@ -165,6 +165,57 @@
           </div>
         </div>
 
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="maxUsers" class="form-label">
+              {{ 'COMPANIES_MODULE.MAX_USERS' | translate }}
+              <span class="text-muted small">({{ 'COMMON.OPTIONAL' | translate }})</span>
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="maxUsers"
+              formControlName="maxUsers"
+              [class.is-invalid]="isFieldInvalid(stepForms[1], 'maxUsers')"
+              [placeholder]="'COMPANIES_MODULE.MAX_USERS_PLACEHOLDER' | translate"
+              min="1"
+            />
+            <div class="form-text text-muted small">
+              {{ 'COMPANIES_MODULE.MAX_USERS_HINT' | translate }}
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="isFieldInvalid(stepForms[1], 'maxUsers')"
+            >
+              {{ 'VALIDATION.MIN_VALUE_1' | translate }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="maxBranches" class="form-label">
+              {{ 'COMPANIES_MODULE.MAX_BRANCHES' | translate }}
+              <span class="text-muted small">({{ 'COMMON.OPTIONAL' | translate }})</span>
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="maxBranches"
+              formControlName="maxBranches"
+              [class.is-invalid]="isFieldInvalid(stepForms[1], 'maxBranches')"
+              [placeholder]="'COMPANIES_MODULE.MAX_BRANCHES_PLACEHOLDER' | translate"
+              min="1"
+            />
+            <div class="form-text text-muted small">
+              {{ 'COMPANIES_MODULE.MAX_BRANCHES_HINT' | translate }}
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="isFieldInvalid(stepForms[1], 'maxBranches')"
+            >
+              {{ 'VALIDATION.MIN_VALUE_1' | translate }}
+            </div>
+          </div>
+        </div>
+
         <div class="col-12">
           <div class="form-group mb-3">
             <label class="form-label">

@@ -168,6 +168,7 @@
   },
   "USER": {
     "TITLE": "Users",
+    "PLAN_USAGE": "Plan usage (users)",
     "BUTTONS": {
       "ADD_USER": "Add User",
       "EDIT_USER": "Edit User",
@@ -742,7 +743,8 @@
     "FUTURE_DATE": "The date cannot be earlier than today",
     "INVALID_TIME": "Office hours are from 8:00 AM to 6:00 PM",
     "INVALID_INTERVAL": "Minutes must be in 15-minute intervals (e.g.: 00, 15, 30, 45)",
-    "REQUIRED_FIELD": "{{field}} is required"
+    "REQUIRED_FIELD": "{{field}} is required",
+    "MIN_VALUE_1": "The minimum allowed value is 1"
   },
   "SWEET_ALERT":{
     "ARE_YOU_SURE": "Are you sure?",
@@ -1252,7 +1254,8 @@
     "BRANCH_INFO": "Branch information",
     "APPLY_FILTERS": "Apply filters",
     "CLEAR_FILTERS": "Clear filters",
-    "COMPANY": "Company"
+    "COMPANY": "Company",
+    "PLAN_USAGE": "Plan usage (branches)"
   },
   "LABORATORY_ORDERS_MODULE": {
     "TITLE": "Laboratory Orders",
@@ -1807,6 +1810,14 @@
     "URL_SLUG_TOOLTIP": "This web address will be used to share your company's product catalog with your customers.",
     "PUBLIC_URL_PREVIEW": "Public URL Preview",
     "COPY_URL": "Copy URL",
-    "URL_COPIED": "Catalog URL copied to clipboard"
+    "URL_COPIED": "Catalog URL copied to clipboard",
+    "MAX_USERS": "Maximum users",
+    "MAX_USERS_PLACEHOLDER": "No limit",
+    "MAX_USERS_HINT": "Leave empty for no limit",
+    "MAX_BRANCHES": "Maximum branches",
+    "MAX_BRANCHES_PLACEHOLDER": "No limit",
+    "MAX_BRANCHES_HINT": "Leave empty for no limit",
+    "USERS_USAGE_TITLE": "Users: current / maximum",
+    "BRANCHES_USAGE_TITLE": "Branches: current / maximum"
   }
 }

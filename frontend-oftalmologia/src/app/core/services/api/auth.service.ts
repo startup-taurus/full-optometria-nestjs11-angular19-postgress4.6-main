@@ -11,6 +11,7 @@ import { Router } from '@angular/router'
 import { environment } from '@environment/environment'
 import { Observable, tap, BehaviorSubject, shareReplay } from 'rxjs'
 import { ApiResponse } from '@core/interfaces/api/api-response.interface'
+import { PlanQuota } from '@core/interfaces/api/company.interface'
 import { USER_SESSION } from '@core/helpers/global/global.constants'
 import * as CryptoJS from 'crypto-js'
 
@@ -72,6 +73,10 @@ export class AuthenticationService {
           sessionStorage.removeItem(SESSION_LOCK_KEY)
         })
       )
+  }
+
+  public getMyQuota(): Observable<ApiResponse<PlanQuota>> {
+    return this._http.get<ApiResponse<PlanQuota>>(`${this.url}/my-quota`)
   }
 
   public getMeUser(): Observable<ApiResponse<User>> {

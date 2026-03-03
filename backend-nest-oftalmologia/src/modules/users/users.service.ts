@@ -18,6 +18,7 @@ import { QueryUserDto } from './dtos/query-user.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { FilesService } from '../files/files.service';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
+import { CompanyQuotaService } from '../company-quota/company-quota.service';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +26,8 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private configService: ConfigService,
-    private filesService: FilesService
+    private filesService: FilesService,
+    private quotaService: CompanyQuotaService
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -40,6 +42,12 @@ export class UsersService {
       dateOfBirth,
       ...userData
     } = createUserDto;
+
+    const companyId = userData.companyId ?? null;
+
+    if (companyId) {
+      await this.quotaService.checkUserQuota(companyId);
+    }
 
     const existingUser = await this.userRepository.findOne({
       where: [{ username }, { email }],
@@ -67,7 +75,6 @@ export class UsersService {
     }
 
     const resolvedDocumentNumber = document_number || userData.documentNumber;
-    const companyId = userData.companyId ?? null;
 
     if (resolvedDocumentNumber) {
       const existingDocument = await this.userRepository.findOne({

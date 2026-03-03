@@ -43,3 +43,9 @@
     }
   }
 }
+
+:host ::ng-deep .tooltip.quota-tooltip .tooltip-inner {
+  max-width: 260px;
+  white-space: normal;
+  text-align: left;
+}

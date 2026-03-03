@@ -11,16 +11,22 @@ import { UpdateBranchDto } from './dtos/update-branch.dto';
 import { QueryBranchDto } from './dtos/query-branch.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
+import { CompanyQuotaService } from '../company-quota/company-quota.service';
 
 @Injectable()
 export class BranchesService {
   constructor(
     @InjectRepository(Branch)
-    private branchRepository: Repository<Branch>
+    private branchRepository: Repository<Branch>,
+    private quotaService: CompanyQuotaService
   ) {}
 
   async create(createBranchDto: CreateBranchDto) {
     const { companyId, name, code } = createBranchDto;
+
+    if (companyId) {
+      await this.quotaService.checkBranchQuota(companyId);
+    }
 
     const existingByName = await this.branchRepository.findOne({
       where: { name, companyId },

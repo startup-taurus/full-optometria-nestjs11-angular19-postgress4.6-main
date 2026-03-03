@@ -113,11 +113,25 @@ export class TableCompaniesComponent implements OnInit, OnDestroy {
   }
 
   public onViewCompany(company: Company): void {
-    const modalRef = this.modalService.open(ViewCompanyModalComponent, {
-      size: 'lg',
-      centered: true,
-    })
-    modalRef.componentInstance.selectedCompany = company
+    this.companyService
+      .getCompanyById(company.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          const modalRef = this.modalService.open(ViewCompanyModalComponent, {
+            size: 'lg',
+            centered: true,
+          })
+          modalRef.componentInstance.selectedCompany = response.data ?? company
+        },
+        error: () => {
+          const modalRef = this.modalService.open(ViewCompanyModalComponent, {
+            size: 'lg',
+            centered: true,
+          })
+          modalRef.componentInstance.selectedCompany = company
+        },
+      })
   }
 
   public onChangeStatus(company: Company): void {

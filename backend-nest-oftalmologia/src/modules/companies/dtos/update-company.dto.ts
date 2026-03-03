@@ -7,6 +7,8 @@ import {
   IsUUID,
   IsEmail,
   ValidateIf,
+  IsInt,
+  Min,
 } from 'class-validator';
 
 export class UpdateCompanyDto {
@@ -41,7 +43,17 @@ export class UpdateCompanyDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @ValidateIf((o) => o.logoFileId !== null)
+  @ValidateIf((o) => o.logoFileId !== null && o.logoFileId !== undefined)
   @IsUUID()
   logoFileId?: string | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxUsers?: number | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxBranches?: number | null;
 }

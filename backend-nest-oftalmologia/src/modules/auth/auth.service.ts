@@ -20,6 +20,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailUtil } from '../../common/utils/email.util';
 import { AdminBranchSessionService } from '../../common/services/admin-branch-session.service';
+import { CompanyQuotaService } from '../company-quota/company-quota.service';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +34,8 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private emailUtil: EmailUtil,
-    private adminBranchSessionService: AdminBranchSessionService
+    private adminBranchSessionService: AdminBranchSessionService,
+    private quotaService: CompanyQuotaService
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -206,6 +208,23 @@ export class AuthService {
         permissionIds: permissionIds,
       },
     };
+  }
+
+  async getMyQuota(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'companyId'],
+    });
+
+    if (!user?.companyId) {
+      return {
+        messageKey: 'AUTH.MY_QUOTA.SUCCESS',
+        data: { usersCount: 0, maxUsers: null, branchesCount: 0, maxBranches: null },
+      };
+    }
+
+    const usage = await this.quotaService.getCompanyUsage(user.companyId);
+    return { messageKey: 'AUTH.MY_QUOTA.SUCCESS', data: usage };
   }
 
   private async generateTokens(user: User) {

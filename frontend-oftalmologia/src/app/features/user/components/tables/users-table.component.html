@@ -10,7 +10,35 @@
               <i class="fa fa-users me-2"></i>
               {{ 'USER.TABLE.TITLE' | translate }}
             </h5>
-            <div class="d-flex gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <div
+                class="border rounded px-2 py-1"
+              >
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge rounded-pill px-2 py-1" [ngClass]="getUsersBadgeClass()">
+                    <i class="ti ti-users me-1"></i>
+                    {{ getUsersUsed() }}/{{ getUsersLimitLabel() }}
+                  </span>
+                  <small class="text-body-secondary">{{ getUsersRemainingLabel() }}</small>
+                  <i
+                    class="ti ti-info-circle text-secondary"
+                    container="body"
+                    placement="bottom"
+                    [ngbTooltip]="getUsersQuotaTooltip()"
+                  ></i>
+                </div>
+                <div class="progress mt-1" style="height: 6px; width: 120px">
+                  <div
+                    class="progress-bar"
+                    role="progressbar"
+                    [ngClass]="getUsersProgressClass()"
+                    [style.width.%]="getUsersUsagePercent()"
+                    [attr.aria-valuenow]="getUsersUsagePercent()"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+              </div>
               <button
                 class="btn btn-outline-danger btn-sm filter-clear-btn"
                 type="button"

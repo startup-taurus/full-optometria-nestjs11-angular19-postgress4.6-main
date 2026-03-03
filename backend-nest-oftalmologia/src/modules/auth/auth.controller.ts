@@ -46,6 +46,12 @@ export class AuthController {
     this.logger.log(`Getting user info for ID: ${user.id}`);
     return this.authService.getMeUser(user.id);
   }
+
+  @Get('my-quota')
+  @UseGuards(AuthGuard('jwt'))
+  async getMyQuota(@CurrentUser() user: User) {
+    return this.authService.getMyQuota(user.id);
+  }
   @Get('profile-with-permissions')
   @UseGuards(AuthGuard('jwt'))
   async getProfileWithPermissions(@CurrentUser() user: User) {

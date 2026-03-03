@@ -19,7 +19,9 @@ import { BranchModalComponent } from '../modals/branch-modal/branch-modal.compon
 import { ViewBranchModalComponent } from '../modals/view-branch-modal/view-branch-modal.component'
 import { ChangeStatusBranchModalComponent } from '../modals/change-status-branch-modal/change-status-branch-modal.component'
 import { BranchesService } from '@core/services/api/branches.service'
+import { AuthenticationService } from '@core/services/api/auth.service'
 import { Branch, QueryBranchDto } from '@core/interfaces/api/branch.interface'
+import { PlanQuota } from '@core/interfaces/api/company.interface'
 import Swal from 'sweetalert2'
 import {
   SWAL_DELETE_CONFIRM_CONFIG,
@@ -51,10 +53,12 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   public totalItems = 0
   public hasMore = true
   public pageSize = 10
+  public quota: PlanQuota | null = null
 
   private destroy$ = new Subject<void>()
   private currentFilters: QueryBranchDto = {}
   private branchesService = inject(BranchesService)
+  private authService = inject(AuthenticationService)
   private modalService = inject(NgbModal)
   private toastr = inject(ToastrService)
 
@@ -68,11 +72,93 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadBranches()
+    this.loadQuota()
   }
 
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  private loadQuota(): void {
+    this.authService.getMyQuota()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => { this.quota = res.data ?? null },
+        error: (err) => { console.error('[Branches] quota error:', err) },
+      })
+  }
+
+  public refreshQuota(): void {
+    this.authService.getMyQuota()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => { this.quota = res.data ?? null },
+        error: () => {},
+      })
+  }
+
+  public getBranchesUsed(): number {
+    return this.quota?.branchesCount ?? 0
+  }
+
+  public getBranchesLimit(): number | null {
+    return this.quota?.maxBranches ?? null
+  }
+
+  public getBranchesLimitLabel(): string {
+    const limit = this.getBranchesLimit()
+    return limit === null ? '∞' : String(limit)
+  }
+
+  public getBranchesUsagePercent(): number {
+    const limit = this.getBranchesLimit()
+    if (!limit || limit <= 0) {
+      return 0
+    }
+
+    return Math.min(100, Math.round((this.getBranchesUsed() / limit) * 100))
+  }
+
+  public getBranchesRemainingLabel(): string {
+    const limit = this.getBranchesLimit()
+    if (limit === null) {
+      return 'Sin límite'
+    }
+
+    return `${Math.max(limit - this.getBranchesUsed(), 0)} libres`
+  }
+
+  public getBranchesBadgeClass(): string {
+    const limit = this.getBranchesLimit()
+    if (limit === null) {
+      return 'bg-primary'
+    }
+
+    return this.getBranchesUsed() >= limit ? 'bg-danger' : 'bg-success'
+  }
+
+  public getBranchesProgressClass(): string {
+    const limit = this.getBranchesLimit()
+    if (limit === null) {
+      return 'bg-primary'
+    }
+
+    return this.getBranchesUsed() >= limit ? 'bg-danger' : 'bg-success'
+  }
+
+  public getBranchesQuotaTooltip(): string {
+    const limit = this.getBranchesLimit()
+    if (limit === null) {
+      return `Tienes ${this.getBranchesUsed()} sucursales registradas. Tu plan no tiene límite de sucursales.`
+    }
+
+    const remaining = Math.max(limit - this.getBranchesUsed(), 0)
+    if (remaining === 0) {
+      return `Has usado ${this.getBranchesUsed()} de ${limit} sucursales. Ya llegaste al límite y debes ampliar tu plan para crear más.`
+    }
+
+    return `Has usado ${this.getBranchesUsed()} de ${limit} sucursales. Te quedan ${remaining} disponibles para crear.`
   }
 
   private loadBranches(filters: QueryBranchDto = {}): void {
@@ -142,6 +228,7 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
 
   public reloadData(): void {
     this.resetAndLoad()
+    this.refreshQuota()
   }
 
   public onSideFilterApplied(filters: QueryBranchDto): void {

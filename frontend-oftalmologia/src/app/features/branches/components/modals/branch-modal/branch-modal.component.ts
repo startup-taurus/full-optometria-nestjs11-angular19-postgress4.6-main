@@ -57,8 +57,8 @@ export class BranchModalComponent implements OnInit, OnDestroy {
       code: ['', [Validators.required, Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
       city: ['', [Validators.required, Validators.maxLength(50)]],
-      phone: ['', [Validators.maxLength(20)]],
-      corporateEmail: ['', [Validators.email]],
+      phone: ['', [Validators.required, Validators.maxLength(20)]],
+      corporateEmail: ['', [Validators.required, Validators.email]],
       openingHours: ['', [Validators.maxLength(100)]],
     })
   }

@@ -18,6 +18,7 @@ import { BUTTON_ACTIONS } from '@core/helpers/ui/constants'
 import { DEFAULT_NGX_DATATABLE_PAGINATION } from '@core/helpers/ui/ngx-datatable.constant'
 import { FORMAT_FOR_DATES } from '@core/helpers/ui/ui.constants'
 import { User } from '@core/interfaces/api/user.interface'
+import { PlanQuota } from '@core/interfaces/api/company.interface'
 import {
   BootstrapModalConfig,
   ModalWithAction,
@@ -25,6 +26,7 @@ import {
 import { NgxDatatableConfig } from '@core/interfaces/ui/ngx-datatable.interface'
 import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { UserService } from '@core/services/api/user.service'
+import { AuthenticationService } from '@core/services/api/auth.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -68,6 +70,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   public BUTTON_ACTIONS = BUTTON_ACTIONS
   public FORMAT_FOR_DATES = FORMAT_FOR_DATES
   private PAGINATION = DEFAULT_NGX_DATATABLE_PAGINATION
+  public quota: PlanQuota | null = null
 
   public sideFilterComponent = UserFilterComponent
 
@@ -96,17 +99,100 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _userService = inject(UserService)
+  private _authService = inject(AuthenticationService)
   private _bsModalService = inject(BootstrapModalService)
 
   ngOnInit(): void {
     this.suscribeToFilter()
     this.config$ = this.setConfigDatatable()
     this.reloadDatatable()
+    this.loadQuota()
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next(true)
     this.unsubscribe$.unsubscribe()
+  }
+
+  private loadQuota(): void {
+    this._authService.getMyQuota()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (res) => { this.quota = res.data ?? null },
+        error: (err) => { console.error('[Users] quota error:', err) },
+      })
+  }
+
+  public refreshQuota(): void {
+    this._authService.getMyQuota()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (res) => { this.quota = res.data ?? null },
+        error: () => {},
+      })
+  }
+
+  public getUsersUsed(): number {
+    return this.quota?.usersCount ?? 0
+  }
+
+  public getUsersLimit(): number | null {
+    return this.quota?.maxUsers ?? null
+  }
+
+  public getUsersLimitLabel(): string {
+    const limit = this.getUsersLimit()
+    return limit === null ? '∞' : String(limit)
+  }
+
+  public getUsersUsagePercent(): number {
+    const limit = this.getUsersLimit()
+    if (!limit || limit <= 0) {
+      return 0
+    }
+
+    return Math.min(100, Math.round((this.getUsersUsed() / limit) * 100))
+  }
+
+  public getUsersRemainingLabel(): string {
+    const limit = this.getUsersLimit()
+    if (limit === null) {
+      return 'Sin límite'
+    }
+
+    return `${Math.max(limit - this.getUsersUsed(), 0)} libres`
+  }
+
+  public getUsersBadgeClass(): string {
+    const limit = this.getUsersLimit()
+    if (limit === null) {
+      return 'bg-primary'
+    }
+
+    return this.getUsersUsed() >= limit ? 'bg-danger' : 'bg-success'
+  }
+
+  public getUsersProgressClass(): string {
+    const limit = this.getUsersLimit()
+    if (limit === null) {
+      return 'bg-primary'
+    }
+
+    return this.getUsersUsed() >= limit ? 'bg-danger' : 'bg-success'
+  }
+
+  public getUsersQuotaTooltip(): string {
+    const limit = this.getUsersLimit()
+    if (limit === null) {
+      return `Tienes ${this.getUsersUsed()} usuarios registrados. Tu plan no tiene límite de usuarios.`
+    }
+
+    const remaining = Math.max(limit - this.getUsersUsed(), 0)
+    if (remaining === 0) {
+      return `Has usado ${this.getUsersUsed()} de ${limit} usuarios. Ya llegaste al límite y debes ampliar tu plan para crear más.`
+    }
+
+    return `Has usado ${this.getUsersUsed()} de ${limit} usuarios. Te quedan ${remaining} disponibles para crear.`
   }
 
   private suscribeToFilter(): void {
@@ -238,6 +324,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       page: this.PAGINATION.PAGE,
     })
     this.data$ = this.fetchUsers(this.filter)
+    this.refreshQuota()
   }
 
   public onChangeLimit(limit: number): void {

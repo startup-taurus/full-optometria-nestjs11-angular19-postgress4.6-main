@@ -173,6 +173,7 @@
   },
   "USER": {
     "TITLE": "Usuarios",
+    "PLAN_USAGE": "Uso del plan (usuarios)",
     "BUTTONS": {
       "ADD_USER": "Agregar usuario",
       "EDIT_USER": "Editar usuario",
@@ -758,7 +759,8 @@
     "PASSWORD_MISMATCH": "Las contraseñas no coinciden",
     "FUTURE_DATE": "La fecha no puede ser anterior a hoy",
     "INVALID_TIME": "El horario de atención es de 8:00 AM a 6:00 PM",
-    "INVALID_INTERVAL": "Los minutos deben ser en intervalos de 15 (ej: 00, 15, 30, 45)"
+    "INVALID_INTERVAL": "Los minutos deben ser en intervalos de 15 (ej: 00, 15, 30, 45)",
+    "MIN_VALUE_1": "El valor mínimo permitido es 1"
   },
   "SWEET_ALERT":{
     "ARE_YOU_SURE": "¿Estas seguro?",
@@ -1269,7 +1271,8 @@
     "BRANCH_INFO": "Información de la sucursal",
     "APPLY_FILTERS": "Aplicar filtros",
     "CLEAR_FILTERS": "Limpiar filtros",
-    "COMPANY": "Compañía"
+    "COMPANY": "Compañía",
+    "PLAN_USAGE": "Uso del plan (sucursales)"
   },
   "LABORATORY_ORDERS_MODULE": {
     "TITLE": "Órdenes de Laboratorio",
@@ -1801,6 +1804,14 @@
     "URL_SLUG_TOOLTIP": "Esta dirección web se usará para compartir el catálogo de productos de tu empresa con tus clientes.",
     "PUBLIC_URL_PREVIEW": "Vista previa de URL pública",
     "COPY_URL": "Copiar URL",
-    "URL_COPIED": "URL del catálogo copiada al portapapeles"
+    "URL_COPIED": "URL del catálogo copiada al portapapeles",
+    "MAX_USERS": "Máximo de usuarios",
+    "MAX_USERS_PLACEHOLDER": "Sin límite",
+    "MAX_USERS_HINT": "Dejar vacío para sin límite",
+    "MAX_BRANCHES": "Máximo de sucursales",
+    "MAX_BRANCHES_PLACEHOLDER": "Sin límite",
+    "MAX_BRANCHES_HINT": "Dejar vacío para sin límite",
+    "USERS_USAGE_TITLE": "Usuarios: actual / máximo",
+    "BRANCHES_USAGE_TITLE": "Sucursales: actual / máximo"
   }
 }

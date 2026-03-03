@@ -10,12 +10,14 @@ import { RefreshStrategy } from './strategies/refresh.strategy';
 import { User } from '../users/entities/user.entity';
 import { Branch } from '../branches/entities/branch.entity';
 import { RolesPermissionsModule } from '../roles-permissions/roles-permissions.module';
+import { CompanyQuotaModule } from '../company-quota/company-quota.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Branch]),
     PassportModule,
     RolesPermissionsModule,
+    CompanyQuotaModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
