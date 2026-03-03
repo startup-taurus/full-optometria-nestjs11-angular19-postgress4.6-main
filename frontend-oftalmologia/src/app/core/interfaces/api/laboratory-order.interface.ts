@@ -153,6 +153,7 @@ export interface ChangeStatusDto {
 export interface PreloadedOrderData {
   clinicalHistoryId: string
   patientId: string
+  attendanceDate?: string
   firstName: string
   lastName: string
   documentNumber: string

@@ -1187,6 +1187,7 @@
   "ALL_STATUSES": "Todos los estados",
   "CONFIRMED": "Confirmado",
   "PENDING": "Pendiente",
+  "FINALIZED": "Finalizado",
   "CANCELLED": "Cancelado",
   "DATE_FROM": "Fecha desde",
   "DATE_TO": "Fecha hasta",

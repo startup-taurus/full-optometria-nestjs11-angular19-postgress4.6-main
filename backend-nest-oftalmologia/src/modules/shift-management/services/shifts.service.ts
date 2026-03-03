@@ -414,12 +414,22 @@ export class ShiftsService {
   }
 
   private async getDefaultStatus() {
-    // ID del estado predeterminado (Pendiente, recordar cambiar si no se migra la data de esta db thiss)
+    // ID del estado predeterminado (Pendiente, recordar cambiar si no se migra la data de esta db thiss, ya no uso id sino el name)
     const DEFAULT_STATUS_ID = '4d0671f6-97cf-40fd-8811-005f5fd4d03e';
 
-    let defaultStatus = await this.shiftStatusRepository.findOne({
-      where: { id: DEFAULT_STATUS_ID, isActive: true },
-    });
+    let defaultStatus = await this.shiftStatusRepository
+      .createQueryBuilder('status')
+      .where('LOWER(status.name) = LOWER(:statusName)', {
+        statusName: 'Pendiente',
+      })
+      .andWhere('status.isActive = :isActive', { isActive: true })
+      .getOne();
+
+    if (!defaultStatus) {
+      defaultStatus = await this.shiftStatusRepository.findOne({
+        where: { id: DEFAULT_STATUS_ID, isActive: true },
+      });
+    }
 
     if (!defaultStatus) {
       defaultStatus = await this.shiftStatusRepository.findOne({

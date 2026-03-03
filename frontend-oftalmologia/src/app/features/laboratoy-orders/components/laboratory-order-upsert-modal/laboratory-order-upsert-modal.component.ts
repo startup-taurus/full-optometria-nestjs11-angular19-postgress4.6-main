@@ -97,7 +97,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
   private initializeForms(): void {
     this.stepForms[1] = this._fb.group({
-      attendanceDate: [null],
+      attendanceDate: [this.getTodayDateString()],
       deliveryDate: [null, Validators.required],
     })
 
@@ -163,6 +163,13 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
       .subscribe({
         next: (data: PreloadedOrderData) => {
           this.preloadedData = data
+
+          if (data.attendanceDate) {
+            this.stepForms[1].patchValue({
+              attendanceDate: data.attendanceDate,
+            })
+          }
+
           this.isLoading = false
         },
         error: (error: any) => {
@@ -456,5 +463,9 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
   private formatOrderNumber(orderNumber: number): string {
     return orderNumber.toString().padStart(9, '0')
+  }
+
+  private getTodayDateString(): string {
+    return new Date().toISOString().split('T')[0]
   }
 }
