@@ -82,6 +82,8 @@ export interface ClinicalHistory {
 
 export interface CreateClinicalHistoryDto {
   patientId: string
+  fromShiftFlow?: boolean
+  sourceShiftId?: string
   professionalName?: string
   occupation?: string
   firstTime?: boolean

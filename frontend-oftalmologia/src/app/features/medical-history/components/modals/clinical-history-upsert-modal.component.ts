@@ -47,6 +47,8 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   @Input() selectedRecord: ClinicalHistory | null = null
   @Input() recordId?: string
   @Input() preSelectedPatientId?: string
+  @Input() fromShiftFlow = false
+  @Input() sourceShiftId?: string
 
   private destroySilentlyContinue = new Subject<void>()
 
@@ -460,7 +462,15 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
           )
         this._toastr.success(successMessage)
       } else {
-        const createDto: CreateClinicalHistoryDto = dto
+        const createDto: CreateClinicalHistoryDto = {
+          ...dto,
+          ...(this.fromShiftFlow && this.sourceShiftId
+            ? {
+                fromShiftFlow: true,
+                sourceShiftId: this.sourceShiftId,
+              }
+            : {}),
+        }
         const response: any = await this._clinicalHistoriesService
           .create(createDto)
           .toPromise()

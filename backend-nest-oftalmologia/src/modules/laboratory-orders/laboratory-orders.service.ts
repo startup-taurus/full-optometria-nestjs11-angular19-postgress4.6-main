@@ -29,13 +29,22 @@ export class LaboratoryOrdersService {
     const maxRetries = 3;
     let lastError: any;
     const normalizedCreateDto = this.normalizeProductSelection(createDto);
+    const attendanceDate = await this.resolveAttendanceDate(
+      normalizedCreateDto,
+      branchId,
+      companyId
+    );
+    const normalizedCreateDtoWithAttendance = {
+      ...normalizedCreateDto,
+      attendanceDate,
+    };
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const orderNumber = await this.generateOrderNumber();
 
         const laboratoryOrder = this.laboratoryOrderRepository.create({
-          ...normalizedCreateDto,
+          ...normalizedCreateDtoWithAttendance,
           branchId,
           companyId,
           orderNumber,
@@ -45,9 +54,9 @@ export class LaboratoryOrdersService {
           laboratoryOrder
         );
 
-        if (normalizedCreateDto.clinicalHistoryId) {
+        if (normalizedCreateDtoWithAttendance.clinicalHistoryId) {
           const whereCondition = CompanyFilterUtil.buildWhereCondition(
-            { id: normalizedCreateDto.clinicalHistoryId, branchId },
+            { id: normalizedCreateDtoWithAttendance.clinicalHistoryId, branchId },
             companyId
           );
           await this.clinicalHistoryRepository.update(whereCondition, {
@@ -304,6 +313,7 @@ export class LaboratoryOrdersService {
     return {
       clinicalHistoryId: clinicalHistory.id,
       patientId: clinicalHistory.patientId,
+      attendanceDate: this.toISODateOnly(clinicalHistory.createdAt),
       firstName: clinicalHistory.patient.firstName,
       lastName: clinicalHistory.patient.lastName,
       documentNumber: clinicalHistory.patient.documentNumber,
@@ -453,9 +463,9 @@ export class LaboratoryOrdersService {
       }));
   }
 
-  private normalizeProductSelection(
-    dto: CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto
-  ): CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto {
+  private normalizeProductSelection<
+    T extends CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto,
+  >(dto: T): T {
     const hasProductIds = Object.prototype.hasOwnProperty.call(dto, 'productIds');
     const hasProductId = Object.prototype.hasOwnProperty.call(dto, 'productId');
 
@@ -481,14 +491,14 @@ export class LaboratoryOrdersService {
         ...dto,
         productId: null,
         productIds: [],
-      } as CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto;
+      } as T;
     }
 
     return {
       ...dto,
       productId: uniqueProductIds[0],
       productIds: uniqueProductIds,
-    };
+    } as T;
   }
 
   private async generateOrderNumber(): Promise<number> {
@@ -499,5 +509,37 @@ export class LaboratoryOrdersService {
 
     const maxOrderNumber = result?.maxOrderNumber || 0;
     return maxOrderNumber + 1;
+  }
+
+  private async resolveAttendanceDate(
+    dto: CreateLaboratoryOrderDto,
+    branchId: string,
+    companyId?: string
+  ): Promise<string> {
+    if (dto.attendanceDate) {
+      return dto.attendanceDate;
+    }
+
+    if (dto.clinicalHistoryId) {
+      const whereCondition = CompanyFilterUtil.buildWhereCondition(
+        { id: dto.clinicalHistoryId, branchId },
+        companyId
+      );
+
+      const clinicalHistory = await this.clinicalHistoryRepository.findOne({
+        where: whereCondition,
+        select: { createdAt: true },
+      });
+
+      if (clinicalHistory?.createdAt) {
+        return this.toISODateOnly(clinicalHistory.createdAt);
+      }
+    }
+
+    return this.toISODateOnly(new Date());
+  }
+
+  private toISODateOnly(date: Date): string {
+    return new Date(date).toISOString().split('T')[0];
   }
 }

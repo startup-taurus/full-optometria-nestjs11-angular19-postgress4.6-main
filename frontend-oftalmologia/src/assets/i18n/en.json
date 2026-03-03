@@ -1170,6 +1170,7 @@
   "ALL_STATUSES": "All statuses",
   "CONFIRMED": "Confirmed",
   "PENDING": "Pending",
+  "FINALIZED": "Finalized",
   "CANCELLED": "Cancelled",
   "DATE_FROM": "Date from",
   "DATE_TO": "Date to",

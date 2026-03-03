@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
@@ -11,12 +12,20 @@ import { UpdateClinicalHistoryDto } from './dtos/update-clinical-history.dto';
 import { QueryClinicalHistoryDto } from './dtos/query-clinical-history.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
+import { Shift } from '../shift-management/entities/shift.entity';
+import { ShiftStatus } from '../shift-management/entities/shift-status.entity';
 
 @Injectable()
 export class ClinicalHistoriesService {
+  private readonly logger = new Logger(ClinicalHistoriesService.name);
+
   constructor(
     @InjectRepository(ClinicalHistory)
-    private clinicalHistoryRepository: Repository<ClinicalHistory>
+    private clinicalHistoryRepository: Repository<ClinicalHistory>,
+    @InjectRepository(Shift)
+    private shiftRepository: Repository<Shift>,
+    @InjectRepository(ShiftStatus)
+    private shiftStatusRepository: Repository<ShiftStatus>
   ) {}
 
   async create(
@@ -24,8 +33,11 @@ export class ClinicalHistoriesService {
     branchId: string,
     companyId?: string
   ) {
+    const { fromShiftFlow, sourceShiftId, ...clinicalHistoryPayload } =
+      createDto;
+
     const clinicalHistory = this.clinicalHistoryRepository.create({
-      ...createDto,
+      ...clinicalHistoryPayload,
       branchId,
       companyId,
     });
@@ -34,7 +46,57 @@ export class ClinicalHistoriesService {
       clinicalHistory
     );
 
+    if (fromShiftFlow && sourceShiftId) {
+      try {
+        await this.finalizeShiftFromClinicalFlow(sourceShiftId, branchId, companyId);
+      } catch (error: any) {
+        this.logger.warn(
+          `Clinical history ${savedHistory.id} created but shift ${sourceShiftId} was not finalized: ${
+            error?.message || 'unknown error'
+          }`
+        );
+      }
+    }
+
     return this.formatResponse(savedHistory);
+  }
+
+  private async finalizeShiftFromClinicalFlow(
+    shiftId: string,
+    branchId: string,
+    companyId?: string
+  ): Promise<void> {
+    const whereCondition = CompanyFilterUtil.buildWhereCondition(
+      { id: shiftId, branchId },
+      companyId
+    );
+
+    const shift = await this.shiftRepository.findOne({
+      where: whereCondition,
+    });
+
+    if (!shift) {
+      throw new NotFoundException('Shift not found for auto-finalization');
+    }
+
+    const finalizadoStatus = await this.shiftStatusRepository
+      .createQueryBuilder('status')
+      .where('LOWER(status.name) = LOWER(:statusName)', {
+        statusName: 'Finalizado',
+      })
+      .andWhere('status.isActive = :isActive', { isActive: true })
+      .getOne();
+
+    if (!finalizadoStatus) {
+      throw new NotFoundException('Finalizado status not found or inactive');
+    }
+
+    if (shift.statusId === finalizadoStatus.id) {
+      return;
+    }
+
+    shift.statusId = finalizadoStatus.id;
+    await this.shiftRepository.save(shift);
   }
 
   async findAll(

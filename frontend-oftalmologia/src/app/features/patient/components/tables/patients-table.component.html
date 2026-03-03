@@ -133,6 +133,15 @@
       </ng-container>
     </button>
     <button
+      *ngIf="canShowViewMedicalHistoryButton(row.id)"
+      class="btn btn-outline-info btn-xs"
+      placement="left"
+      [ngbTooltip]="'Ver historial clínico'"
+      (click)="viewMedicalHistory(row)"
+    >
+      <i class="fa fa-file-text-o"></i>
+    </button>
+    <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
       [ngbTooltip]="'Ver Detalles'"

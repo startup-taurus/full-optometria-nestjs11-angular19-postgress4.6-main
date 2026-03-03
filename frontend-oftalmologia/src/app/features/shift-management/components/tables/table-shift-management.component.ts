@@ -225,6 +225,9 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
       case 'confirmed':
       case 'confirmado':
         return 'bg-success'
+      case 'finished':
+      case 'finalizado':
+        return 'bg-primary'
       case 'pending':
       case 'pendiente':
         return 'bg-warning'
@@ -242,6 +245,9 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
       case 'confirmed':
       case 'confirmado':
         return 'SHIFT_MANAGEMENT_MODULE.CONFIRMED'
+      case 'finished':
+      case 'finalizado':
+        return 'SHIFT_MANAGEMENT_MODULE.FINALIZED'
       case 'pending':
       case 'pendiente':
         return 'SHIFT_MANAGEMENT_MODULE.PENDING'
@@ -358,11 +364,14 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
 
     modalRef.componentInstance.preSelectedPatientId = shift.patient.id
     modalRef.componentInstance.editMode = false
+    modalRef.componentInstance.fromShiftFlow = true
+    modalRef.componentInstance.sourceShiftId = shift.id
 
     modalRef.result
       .then((result) => {
         if (result?.success) {
           this.toastr.success('Historial clínico creado exitosamente', 'Éxito')
+          this.reloadData()
         }
       })
       .catch((error) => {})

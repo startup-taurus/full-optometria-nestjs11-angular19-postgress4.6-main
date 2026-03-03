@@ -15,6 +15,14 @@ export class CreateClinicalHistoryDto {
   patientId: string;
 
   @IsOptional()
+  @IsBoolean()
+  fromShiftFlow?: boolean;
+
+  @IsOptional()
+  @IsUUID()
+  sourceShiftId?: string;
+
+  @IsOptional()
   @IsString()
   professionalName?: string;
 
