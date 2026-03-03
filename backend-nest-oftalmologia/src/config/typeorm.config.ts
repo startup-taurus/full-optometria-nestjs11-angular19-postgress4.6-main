@@ -16,7 +16,7 @@ const AppDataSource = new DataSource({
     configService.get('DB_PASSWORD') || configService.get('DATABASE_PASSWORD'),
   database: configService.get('DB_NAME') || configService.get('DATABASE_NAME'),
   synchronize: false,
-  logging: true,
+  logging: ['error'],
   entities: ['src/**/*.entity{.ts,.js}'],
   migrations: ['src/database/migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations',

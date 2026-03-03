@@ -13,6 +13,7 @@ import { validate } from './config/env.validation';
 
 // Common
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { RequestActivityInterceptor } from './common/interceptors/request-activity.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CommonModule } from './common/common.module';
 import { BranchFilterMiddleware } from './common/middleware/branch-filter.middleware';
@@ -97,7 +98,7 @@ import { Patient } from './modules/patients/entities/patient.entity';
         ],
         synchronize: false,
         dropSchema: false,
-        logging: process.env.NODE_ENV === 'development',
+        logging: ['error'],
       }),
       inject: [ConfigService],
     }),
@@ -122,6 +123,10 @@ import { Patient } from './modules/patients/entities/patient.entity';
     PatientsModule,
   ],
   providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RequestActivityInterceptor,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
