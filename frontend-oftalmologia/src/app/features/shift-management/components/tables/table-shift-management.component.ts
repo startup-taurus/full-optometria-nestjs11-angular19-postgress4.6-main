@@ -371,6 +371,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
       .then((result) => {
         if (result?.success) {
           this.toastr.success('Historial clínico creado exitosamente', 'Éxito')
+          this.reloadData()
         }
       })
       .catch((error) => {})

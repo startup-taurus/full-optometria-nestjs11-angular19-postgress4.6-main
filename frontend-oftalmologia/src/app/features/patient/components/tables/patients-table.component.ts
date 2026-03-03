@@ -52,6 +52,7 @@ import { PatientFilterComponent } from '../filter/patient-filter.component'
 import { PatientFormModalComponent } from '../forms/patient-form-modal.component'
 import { PatientDetailsModalComponent } from '../modals/patient-details-modal.component'
 import { ClinicalHistoryUpsertModalComponent } from '../../../medical-history/components/modals/clinical-history-upsert-modal.component'
+import { ViewMedicalHistoryComponent } from '../../../medical-history/components/forms/view-medical-history/view-medical-history/view-medical-history.component'
 
 @Component({
   selector: 'app-patients-table',
@@ -180,7 +181,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
         {
           name: 'PATIENT.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
-          width: 230,
+          width: 280,
           sortable: false,
         },
       ],
@@ -198,6 +199,9 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
 
     return this._patientService.findPatients(updatedFilter).pipe(
       tap((res) => {
+        const patients = res.data.result || []
+        this.prefetchMedicalHistoryStatus(patients)
+
         this.config$.next({
           ...this.config$.value,
           loadingIndicator: false,
@@ -398,6 +402,61 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
     return this.medicalHistoryCache.get(patientId) !== null
   }
 
+  public canShowViewMedicalHistoryButton(patientId: string): boolean {
+    if (!this.medicalHistoryCache.has(patientId)) return false
+    return this.medicalHistoryCache.get(patientId) !== null
+  }
+
+  public viewMedicalHistory(patient: Patient): void {
+    if (!patient.id) {
+      return
+    }
+
+    const clinicalHistory = this.medicalHistoryCache.get(patient.id)
+    if (!clinicalHistory?.id) {
+      return
+    }
+
+    this.openViewMedicalHistoryModal(clinicalHistory.id)
+  }
+
+  private prefetchMedicalHistoryStatus(patients: Patient[]): void {
+    patients.forEach((patient) => {
+      if (!patient.id) {
+        return
+      }
+
+      if (
+        this.medicalHistoryCache.has(patient.id) ||
+        this.medicalHistoryLoadingIds.has(patient.id)
+      ) {
+        return
+      }
+
+      this.medicalHistoryLoadingIds.add(patient.id)
+
+      this._clinicalHistoriesService
+        .getByPatient(patient.id)
+        .pipe(
+          takeUntil(this.unsubscribe$),
+          finalize(() => {
+            this.medicalHistoryLoadingIds.delete(patient.id)
+          })
+        )
+        .subscribe({
+          next: (clinicalHistories: ClinicalHistory[]) => {
+            this.medicalHistoryCache.set(
+              patient.id,
+              clinicalHistories.length > 0 ? clinicalHistories[0] : null
+            )
+          },
+          error: () => {
+            this.medicalHistoryCache.set(patient.id, null)
+          },
+        })
+    })
+  }
+
   private openCreateMedicalHistoryModal(patientId: string): void {
     const modalRef = this._modal.open(ClinicalHistoryUpsertModalComponent, {
       size: 'xl',
@@ -423,6 +482,19 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.editMode = true
     modalRef.componentInstance.selectedRecord = clinicalHistory
     modalRef.componentInstance.recordId = clinicalHistory.id
+
+    modalRef.result.then(() => {}).catch(() => {})
+  }
+
+  private openViewMedicalHistoryModal(clinicalHistoryId: string): void {
+    const modalRef = this._modal.open(ViewMedicalHistoryComponent, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static',
+      keyboard: false,
+    })
+
+    modalRef.componentInstance.clinicalHistoryId = clinicalHistoryId
 
     modalRef.result.then(() => {}).catch(() => {})
   }
