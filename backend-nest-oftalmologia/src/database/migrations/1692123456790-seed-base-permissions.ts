@@ -2,6 +2,14 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class SeedBasePermissions1692123456790 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Si ya existe SUPER_ADMIN el seed ya fue aplicado (BD restaurada desde dump), skip
+    const existing = await queryRunner.query(
+      `SELECT COUNT(*) as count FROM "roles" WHERE "role_name" = 'SUPER_ADMIN'`
+    );
+    if (parseInt(existing[0].count, 10) > 0) {
+      return;
+    }
+
     // 1. Crear roles base
     await queryRunner.query(`
       INSERT INTO "roles" ("id", "role_name", "description", "is_active") VALUES 
@@ -11,6 +19,7 @@ export class SeedBasePermissions1692123456790 implements MigrationInterface {
       ('${this.generateUUID()}', 'NURSE', 'Enfermera', true),
       ('${this.generateUUID()}', 'RECEPTIONIST', 'Recepcionista', true),
       ('${this.generateUUID()}', 'USER', 'Usuario básico', true)
+      ON CONFLICT DO NOTHING
     `);
 
     // 2. Crear módulos base
@@ -33,6 +42,7 @@ export class SeedBasePermissions1692123456790 implements MigrationInterface {
       ('${patientsModuleId}', 'PATIENTS', 'Gestión de pacientes', true),
       ('${appointmentsModuleId}', 'APPOINTMENTS', 'Gestión de citas', true),
       ('${reportsModuleId}', 'REPORTS', 'Reportes y estadísticas', true)
+      ON CONFLICT DO NOTHING
     `);
 
     // 3. Crear permisos base
@@ -104,6 +114,7 @@ export class SeedBasePermissions1692123456790 implements MigrationInterface {
       await queryRunner.query(`
         INSERT INTO "role_permissions" ("role_id", "permission_id", "is_enabled") 
         VALUES ('${superAdminRoleId}', '${permission.id}', true)
+        ON CONFLICT DO NOTHING
       `);
     }
 
@@ -116,6 +127,7 @@ export class SeedBasePermissions1692123456790 implements MigrationInterface {
       await queryRunner.query(`
         INSERT INTO "role_modules" ("role_id", "module_id", "is_enabled") 
         VALUES ('${superAdminRoleId}', '${module.id}', true)
+        ON CONFLICT DO NOTHING
       `);
     }
 
@@ -242,6 +254,7 @@ export class SeedBasePermissions1692123456790 implements MigrationInterface {
         await queryRunner.query(`
           INSERT INTO "role_permissions" ("role_id", "permission_id", "is_enabled") 
           VALUES ('${roleId}', '${permissionId}', true)
+          ON CONFLICT DO NOTHING
         `);
       }
     }
@@ -267,6 +280,7 @@ export class SeedBasePermissions1692123456790 implements MigrationInterface {
         await queryRunner.query(`
           INSERT INTO "role_modules" ("role_id", "module_id", "is_enabled") 
           VALUES ('${roleId}', '${moduleId}', true)
+          ON CONFLICT DO NOTHING
         `);
       }
     }
