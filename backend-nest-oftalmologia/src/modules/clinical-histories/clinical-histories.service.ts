@@ -81,7 +81,7 @@ export class ClinicalHistoriesService {
 
     const finalizadoStatus = await this.shiftStatusRepository
       .createQueryBuilder('status')
-      .where('LOWER(status.name) = LOWER(:statusName)', {
+      .where('LOWER(BTRIM(status.name)) = LOWER(:statusName)', {
         statusName: 'Finalizado',
       })
       .andWhere('status.isActive = :isActive', { isActive: true })
