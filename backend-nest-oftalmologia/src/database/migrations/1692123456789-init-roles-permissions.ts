@@ -6,7 +6,7 @@ export class InitRolesPermissions1692123456789 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create roles table
     await queryRunner.query(`
-      CREATE TABLE "roles" (
+      CREATE TABLE IF NOT EXISTS "roles" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "role_name" character varying NOT NULL,
         "description" character varying,
@@ -20,7 +20,7 @@ export class InitRolesPermissions1692123456789 implements MigrationInterface {
 
     // Create modules table
     await queryRunner.query(`
-      CREATE TABLE "modules" (
+      CREATE TABLE IF NOT EXISTS "modules" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "module_name" character varying NOT NULL,
         "description" character varying,
@@ -34,7 +34,7 @@ export class InitRolesPermissions1692123456789 implements MigrationInterface {
 
     // Create permissions table
     await queryRunner.query(`
-      CREATE TABLE "permissions" (
+      CREATE TABLE IF NOT EXISTS "permissions" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "permission_name" character varying NOT NULL,
         "description" character varying,
@@ -48,7 +48,7 @@ export class InitRolesPermissions1692123456789 implements MigrationInterface {
 
     // Create users table
     await queryRunner.query(`
-      CREATE TABLE "users" (
+      CREATE TABLE IF NOT EXISTS "users" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "username" character varying NOT NULL,
         "email" character varying NOT NULL,
@@ -71,7 +71,7 @@ export class InitRolesPermissions1692123456789 implements MigrationInterface {
 
     // Create role_permissions junction table
     await queryRunner.query(`
-      CREATE TABLE "role_permissions" (
+      CREATE TABLE IF NOT EXISTS "role_permissions" (
         "role_id" uuid NOT NULL,
         "permission_id" uuid NOT NULL,
         "is_enabled" boolean NOT NULL DEFAULT true,
@@ -81,7 +81,7 @@ export class InitRolesPermissions1692123456789 implements MigrationInterface {
 
     // Create role_modules junction table
     await queryRunner.query(`
-      CREATE TABLE "role_modules" (
+      CREATE TABLE IF NOT EXISTS "role_modules" (
         "role_id" uuid NOT NULL,
         "module_id" uuid NOT NULL,
         "is_enabled" boolean NOT NULL DEFAULT true,
@@ -89,55 +89,97 @@ export class InitRolesPermissions1692123456789 implements MigrationInterface {
       )
     `);
 
-    // Create foreign key constraints
+    // Create foreign key constraints (idempotente)
     await queryRunner.query(`
-      ALTER TABLE "permissions"
-      ADD CONSTRAINT "FK_permissions_module"
-      FOREIGN KEY ("module_id") REFERENCES "modules"("id") ON DELETE CASCADE
+      DO $$ BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE constraint_name = 'FK_permissions_module' AND table_name = 'permissions'
+        ) THEN
+          ALTER TABLE "permissions"
+          ADD CONSTRAINT "FK_permissions_module"
+          FOREIGN KEY ("module_id") REFERENCES "modules"("id") ON DELETE CASCADE;
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "users"
-      ADD CONSTRAINT "FK_users_role"
-      FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE RESTRICT
+      DO $$ BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE constraint_name = 'FK_users_role' AND table_name = 'users'
+        ) THEN
+          ALTER TABLE "users"
+          ADD CONSTRAINT "FK_users_role"
+          FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE RESTRICT;
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "role_permissions"
-      ADD CONSTRAINT "FK_role_permissions_role"
-      FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE CASCADE
+      DO $$ BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE constraint_name = 'FK_role_permissions_role' AND table_name = 'role_permissions'
+        ) THEN
+          ALTER TABLE "role_permissions"
+          ADD CONSTRAINT "FK_role_permissions_role"
+          FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE CASCADE;
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "role_permissions"
-      ADD CONSTRAINT "FK_role_permissions_permission"
-      FOREIGN KEY ("permission_id") REFERENCES "permissions"("id") ON DELETE CASCADE
+      DO $$ BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE constraint_name = 'FK_role_permissions_permission' AND table_name = 'role_permissions'
+        ) THEN
+          ALTER TABLE "role_permissions"
+          ADD CONSTRAINT "FK_role_permissions_permission"
+          FOREIGN KEY ("permission_id") REFERENCES "permissions"("id") ON DELETE CASCADE;
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "role_modules"
-      ADD CONSTRAINT "FK_role_modules_role"
-      FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE CASCADE
+      DO $$ BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE constraint_name = 'FK_role_modules_role' AND table_name = 'role_modules'
+        ) THEN
+          ALTER TABLE "role_modules"
+          ADD CONSTRAINT "FK_role_modules_role"
+          FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE CASCADE;
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "role_modules"
-      ADD CONSTRAINT "FK_role_modules_module"
-      FOREIGN KEY ("module_id") REFERENCES "modules"("id") ON DELETE CASCADE
+      DO $$ BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE constraint_name = 'FK_role_modules_module' AND table_name = 'role_modules'
+        ) THEN
+          ALTER TABLE "role_modules"
+          ADD CONSTRAINT "FK_role_modules_module"
+          FOREIGN KEY ("module_id") REFERENCES "modules"("id") ON DELETE CASCADE;
+        END IF;
+      END $$;
     `);
 
-    // Create indexes
+    // Create indexes (idempotente)
     await queryRunner.query(
-      `CREATE INDEX "IDX_users_email" ON "users" ("email")`
+      `CREATE INDEX IF NOT EXISTS "IDX_users_email" ON "users" ("email")`
     );
     await queryRunner.query(
-      `CREATE INDEX "IDX_users_username" ON "users" ("username")`
+      `CREATE INDEX IF NOT EXISTS "IDX_users_username" ON "users" ("username")`
     );
     await queryRunner.query(
-      `CREATE INDEX "IDX_users_role_id" ON "users" ("role_id")`
+      `CREATE INDEX IF NOT EXISTS "IDX_users_role_id" ON "users" ("role_id")`
     );
     await queryRunner.query(
-      `CREATE INDEX "IDX_permissions_module_id" ON "permissions" ("module_id")`
+      `CREATE INDEX IF NOT EXISTS "IDX_permissions_module_id" ON "permissions" ("module_id")`
     );
   }
 
