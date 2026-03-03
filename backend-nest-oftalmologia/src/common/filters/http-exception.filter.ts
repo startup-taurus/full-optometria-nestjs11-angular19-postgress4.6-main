@@ -28,6 +28,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     let messageKey = 'ERROR.INTERNAL';
     let errorMessage = exception.message;
+    const extracted = this.extractErrorMessageAndDetails(exceptionResponse);
 
     switch (status) {
       case HttpStatus.BAD_REQUEST:
@@ -58,24 +59,61 @@ export class HttpExceptionFilter implements ExceptionFilter {
       en: 'Internal server error',
     };
 
-    let errorDetails = null;
-    if (typeof exceptionResponse === 'object' && exceptionResponse['message']) {
-      if (Array.isArray(exceptionResponse['message'])) {
-        errorDetails = exceptionResponse['message'];
-      } else {
-        errorMessage = exceptionResponse['message'];
-      }
+    if (extracted.errorMessage) {
+      errorMessage = extracted.errorMessage;
     }
+
+    const responseMessage = extracted.errorMessage || messageObj;
 
     response.status(status).json({
       statusCode: status,
       status: 'error',
-      message: messageObj,
+      message: responseMessage,
       data: {
         error: errorMessage,
-        details: errorDetails,
+        details: extracted.errorDetails,
         timestamp: new Date().toISOString(),
       },
     });
+  }
+
+  private extractErrorMessageAndDetails(exceptionResponse: unknown): {
+    errorMessage: string | null;
+    errorDetails: string[] | null;
+  } {
+    if (!exceptionResponse || typeof exceptionResponse !== 'object') {
+      return {
+        errorMessage: null,
+        errorDetails: null,
+      };
+    }
+
+    const response = exceptionResponse as Record<string, unknown>;
+    const message = response.message;
+
+    if (Array.isArray(message)) {
+      const details = message
+        .map((item) =>
+          typeof item === 'string' ? item : JSON.stringify(item)
+        )
+        .filter((item) => item && item !== '{}');
+
+      return {
+        errorMessage: details[0] || null,
+        errorDetails: details.length ? details : null,
+      };
+    }
+
+    if (typeof message === 'string') {
+      return {
+        errorMessage: message,
+        errorDetails: null,
+      };
+    }
+
+    return {
+      errorMessage: null,
+      errorDetails: null,
+    };
   }
 }

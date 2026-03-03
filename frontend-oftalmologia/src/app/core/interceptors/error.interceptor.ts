@@ -31,33 +31,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        const hasCustomBilingualMessage =
-          !!error.error?.message &&
-          typeof error.error.message === 'object' &&
-          (error.error.message.es || error.error.message.en)
-
-        if (hasCustomBilingualMessage) {
-          const preferredLang = this._translateService.currentLang || 'es'
-          const bilingualMessage =
-            error.error.message[preferredLang] ||
-            error.error.message.es ||
-            error.error.message.en ||
-            this._translateService.instant('words.unknownError')
-
-          this._notificationService.showNotification({
-            type: 'error',
-            title: 'Error',
-            message: bilingualMessage,
-          })
-
-          return throwError(() => new Error(bilingualMessage))
-        }
-
-        let errorMessage = this._translateService.instant('words.unknownError')
-
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message
-        }
+        const errorMessage = this.extractErrorMessage(error)
 
         if (
           error.status === RESPONSE_CODES.UNAUTHORIZED ||
@@ -81,6 +55,63 @@ export class ErrorInterceptor implements HttpInterceptor {
         return throwError(() => new Error(errorMessageTranslated))
       })
     )
+  }
+
+  private extractErrorMessage(error: HttpErrorResponse): string {
+    const fallback = this._translateService.instant('words.unknownError')
+    const preferredLang = this._translateService.currentLang || 'es'
+    const payload = error.error
+
+    if (!payload) {
+      return fallback
+    }
+
+    const payloadMessage = payload.message
+
+    if (typeof payloadMessage === 'string' && payloadMessage.trim()) {
+      return payloadMessage
+    }
+
+    if (Array.isArray(payloadMessage) && payloadMessage.length > 0) {
+      const message = payloadMessage.find(
+        (item) => typeof item === 'string' && item.trim()
+      )
+      if (message) {
+        return message
+      }
+    }
+
+    if (
+      payloadMessage &&
+      typeof payloadMessage === 'object' &&
+      (payloadMessage.es || payloadMessage.en)
+    ) {
+      return (
+        payloadMessage[preferredLang] ||
+        payloadMessage.es ||
+        payloadMessage.en ||
+        fallback
+      )
+    }
+
+    if (typeof payload.data?.error === 'string' && payload.data.error.trim()) {
+      return payload.data.error
+    }
+
+    if (Array.isArray(payload.data?.details) && payload.data.details.length > 0) {
+      const detail = payload.data.details.find(
+        (item: unknown) => typeof item === 'string' && item.trim()
+      )
+      if (detail) {
+        return detail
+      }
+    }
+
+    if (typeof payload.error === 'string' && payload.error.trim()) {
+      return payload.error
+    }
+
+    return fallback
   }
 }
 export const ERROR_INTERCEPTOR_PROVIDERS = [

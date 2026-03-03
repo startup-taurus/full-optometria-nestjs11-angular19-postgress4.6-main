@@ -4,9 +4,12 @@ import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { join } from 'path';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: ['error'],
+  });
 
   const configService = app.get(ConfigService);
 
@@ -50,11 +53,16 @@ async function bootstrap() {
   );
 
   const port = configService.get<number>('PORT') || 3000;
+  const dataSource = app.get(DataSource);
 
   await app.listen(port);
 
+  if (dataSource?.isInitialized) {
+    console.log('Conexión a la base de datos establecida');
+  }
+
   console.log(
-    `Application is running on: http://localhost:${port}/${apiPrefix}`
+    `Backend ejecutándose en: http://localhost:${port}/${apiPrefix}`
   );
 }
 
