@@ -181,8 +181,7 @@ export class AuthService {
         ?.filter((rp) => rp.isEnabled && rp.permission.isActive)
         ?.map((rp) => rp.permission.id) || [];
 
-    const isAdmin =
-      user.role?.roleName === 'Admin' || user.role?.roleName === 'SUPER_ADMIN';
+    const isAdmin = this.canManageAdminBranchFilter(user);
 
     return {
       messageKey: 'AUTH.GET_ME.SUCCESS',
@@ -383,13 +382,10 @@ export class AuthService {
   async setAdminBranchFilter(userId: string, branchId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['role'],
+      relations: ['role', 'role.rolePermissions', 'role.rolePermissions.permission'],
     });
 
-    if (
-      !user ||
-      (user.role?.roleName !== 'Admin' && user.role?.roleName !== 'SUPER_ADMIN')
-    ) {
+    if (!user || !this.canManageAdminBranchFilter(user)) {
       throw new UnauthorizedException({
         messageKey: 'ERROR.ADMIN_REQUIRED',
         message: 'Only admin users can set branch filters',
@@ -429,13 +425,10 @@ export class AuthService {
   async clearAdminBranchFilter(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['role', 'branch'],
+      relations: ['role', 'branch', 'role.rolePermissions', 'role.rolePermissions.permission'],
     });
 
-    if (
-      !user ||
-      (user.role?.roleName !== 'Admin' && user.role?.roleName !== 'SUPER_ADMIN')
-    ) {
+    if (!user || !this.canManageAdminBranchFilter(user)) {
       throw new UnauthorizedException({
         messageKey: 'ERROR.ADMIN_REQUIRED',
         message: 'Only admin users can clear branch filters',
@@ -452,5 +445,25 @@ export class AuthService {
         isTemporarySelection: false,
       },
     };
+  }
+
+  private canManageAdminBranchFilter(user: User): boolean {
+    const roleName = user.role?.roleName?.toUpperCase();
+
+    if (roleName === 'ADMIN' || roleName === 'SUPER_ADMIN') {
+      return true;
+    }
+
+    const hasBranchFilterPermission =
+      user.role?.rolePermissions?.some(
+        (rolePermission) =>
+          rolePermission.isEnabled &&
+          rolePermission.permission?.isActive &&
+          rolePermission.permission?.permissionName
+            ?.trim()
+            .toLowerCase() === 'ver filtro de sucursales'
+      ) || false;
+
+    return hasBranchFilterPermission;
   }
 }

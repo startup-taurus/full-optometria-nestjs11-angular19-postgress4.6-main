@@ -16,6 +16,23 @@ import { QueryShiftDto } from '../dtos/query-shift.dto';
 import { PaginationUtil } from '../../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../../common/utils/company-filter.util';
 
+interface BranchOpeningScheduleDay {
+  day: number;
+  enabled: boolean;
+  startTime: string;
+  endTime: string;
+}
+
+const LEGACY_DEFAULT_SCHEDULE: BranchOpeningScheduleDay[] = [
+  { day: 0, enabled: false, startTime: '08:00', endTime: '18:00' },
+  { day: 1, enabled: true, startTime: '08:00', endTime: '18:00' },
+  { day: 2, enabled: true, startTime: '08:00', endTime: '18:00' },
+  { day: 3, enabled: true, startTime: '08:00', endTime: '18:00' },
+  { day: 4, enabled: true, startTime: '08:00', endTime: '18:00' },
+  { day: 5, enabled: true, startTime: '08:00', endTime: '18:00' },
+  { day: 6, enabled: false, startTime: '08:00', endTime: '18:00' },
+];
+
 @Injectable()
 export class ShiftsService {
   constructor(
@@ -37,10 +54,10 @@ export class ShiftsService {
     const { patientId, appointmentDate } = createShiftDto;
 
     await this.validatePatient(patientId);
-    await this.validateBranch(branchId);
+    const branch = await this.validateBranch(branchId);
 
     const appointmentDateTime = new Date(appointmentDate);
-    await this.validateAppointmentDate(appointmentDateTime);
+    await this.validateAppointmentDate(appointmentDateTime, branch);
     await this.checkDuplicateAppointment(patientId, appointmentDateTime);
 
     const pendingStatus = await this.getDefaultStatus();
@@ -273,8 +290,9 @@ export class ShiftsService {
     }
 
     if (updateShiftDto.appointmentDate) {
+      const branch = await this.validateBranch(branchId);
       const appointmentDateTime = new Date(updateShiftDto.appointmentDate);
-      await this.validateAppointmentDate(appointmentDateTime);
+      await this.validateAppointmentDate(appointmentDateTime, branch);
 
       if (appointmentDateTime.getTime() !== shift.appointmentDate.getTime()) {
         await this.checkDuplicateAppointment(
@@ -369,7 +387,10 @@ export class ShiftsService {
     return status;
   }
 
-  private async validateAppointmentDate(appointmentDate: Date) {
+  private async validateAppointmentDate(
+    appointmentDate: Date,
+    branch: Branch
+  ) {
     const now = new Date();
 
     if (appointmentDate <= now) {
@@ -378,6 +399,110 @@ export class ShiftsService {
         message: 'Appointment date must be in the future',
       });
     }
+
+    this.validateAppointmentWithinBranchSchedule(appointmentDate, branch);
+  }
+
+  private validateAppointmentWithinBranchSchedule(
+    appointmentDate: Date,
+    branch: Branch
+  ) {
+    const schedule = this.parseBranchSchedule(branch.openingHours);
+    const appointmentDay = appointmentDate.getDay();
+    const appointmentMinutes =
+      appointmentDate.getHours() * 60 + appointmentDate.getMinutes();
+
+    const daySchedule = schedule.find((item) => item.day === appointmentDay);
+
+    if (!daySchedule || !daySchedule.enabled) {
+      throw new BadRequestException({
+        messageKey: 'ERROR.VALIDATION',
+        message: 'Branch is closed on the selected day',
+      });
+    }
+
+    const startMinutes = this.timeToMinutes(daySchedule.startTime);
+    const endMinutes = this.timeToMinutes(daySchedule.endTime);
+
+    if (appointmentMinutes < startMinutes || appointmentMinutes >= endMinutes) {
+      throw new BadRequestException({
+        messageKey: 'ERROR.VALIDATION',
+        message: 'Appointment time is outside branch opening hours',
+      });
+    }
+  }
+
+  private parseBranchSchedule(
+    openingHours?: string | null
+  ): BranchOpeningScheduleDay[] {
+    if (!openingHours?.trim()) {
+      return LEGACY_DEFAULT_SCHEDULE;
+    }
+
+    try {
+      const parsedValue = JSON.parse(openingHours);
+      const scheduleSource = Array.isArray(parsedValue)
+        ? parsedValue
+        : parsedValue?.weeklySchedule;
+
+      if (!Array.isArray(scheduleSource) || scheduleSource.length === 0) {
+        return LEGACY_DEFAULT_SCHEDULE;
+      }
+
+      const normalizedSchedule = scheduleSource
+        .map((item) => this.normalizeScheduleDay(item))
+        .filter(
+          (item): item is BranchOpeningScheduleDay => item !== null
+        )
+        .sort((a, b) => a.day - b.day);
+
+      if (normalizedSchedule.length !== 7) {
+        return LEGACY_DEFAULT_SCHEDULE;
+      }
+
+      return normalizedSchedule;
+    } catch {
+      return LEGACY_DEFAULT_SCHEDULE;
+    }
+  }
+
+  private normalizeScheduleDay(value: any): BranchOpeningScheduleDay | null {
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+
+    const day = Number(value.day);
+    const enabled = Boolean(value.enabled);
+    const startTime = typeof value.startTime === 'string' ? value.startTime : '';
+    const endTime = typeof value.endTime === 'string' ? value.endTime : '';
+
+    if (!Number.isInteger(day) || day < 0 || day > 6) {
+      return null;
+    }
+
+    if (!this.isValidTimeFormat(startTime) || !this.isValidTimeFormat(endTime)) {
+      return null;
+    }
+
+    if (this.timeToMinutes(startTime) >= this.timeToMinutes(endTime)) {
+      return null;
+    }
+
+    return {
+      day,
+      enabled,
+      startTime,
+      endTime,
+    };
+  }
+
+  private isValidTimeFormat(value: string): boolean {
+    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
+  }
+
+  private timeToMinutes(value: string): number {
+    const [hours, minutes] = value.split(':').map(Number);
+    return hours * 60 + minutes;
   }
 
   private async checkDuplicateAppointment(

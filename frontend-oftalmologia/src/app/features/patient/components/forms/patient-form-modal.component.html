@@ -85,27 +85,6 @@
 
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
-              {{ 'PATIENT.FORM.BRANCH' | translate }}
-              <span class="text-danger">*</span>
-            </label>
-            <ng-select
-              [items]="branches$ | async"
-              bindLabel="name"
-              bindValue="id"
-              formControlName="branchId"
-              [placeholder]="'PATIENT.FORM.BRANCH_PLACEHOLDER' | translate"
-              [clearable]="true"
-              [searchable]="true"
-              [class.is-invalid]="isFieldInvalid('branchId')"
-            >
-            </ng-select>
-            <div class="invalid-feedback" *ngIf="isFieldInvalid('branchId')">
-              {{ getFieldError('branchId') | translate }}
-            </div>
-          </div>
-
-          <div class="col">
-            <label class="form-label text-secondary-emphasis small fw-medium">
               {{ 'PATIENT.FORM.DATE_OF_BIRTH' | translate }}
               <span class="text-danger">*</span>
             </label>

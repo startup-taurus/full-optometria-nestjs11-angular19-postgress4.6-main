@@ -141,24 +141,53 @@
         }
       </div>
 
-      <div class="col-md-6 mb-3">
-        <label for="openingHours" class="form-label">
+      <div class="col-12 mb-3">
+        <label class="form-label d-block">
           {{ 'BRANCHES_MODULE.OPENING_HOURS' | translate }}
         </label>
-        <input
-          type="text"
-          class="form-control"
-          id="openingHours"
-          formControlName="openingHours"
-          [class.is-invalid]="isFieldInvalid('openingHours')"
-          [placeholder]="
-            'BRANCHES_MODULE.OPENING_HOURS_PLACEHOLDER' | translate
-          "
-        />
-        @if (isFieldInvalid('openingHours')) {
-          <div class="invalid-feedback">
-            {{ getFieldError('openingHours') | translate }}
-          </div>
+
+        <div class="table-responsive border rounded p-2">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>{{ 'WORDS.DAY' | translate }}</th>
+                <th class="text-center">{{ 'WORDS.ENABLED' | translate }}</th>
+                <th>{{ 'WORDS.FROM' | translate }}</th>
+                <th>{{ 'WORDS.TO' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dayControl of scheduleControls; let i = index">
+                <td class="fw-medium">{{ weekDays[i].labelKey | translate }}</td>
+                <td class="text-center">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [formControl]="dayControl.get('enabled')"
+                    (change)="onDayEnabledChange(i)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="time"
+                    class="form-control form-control-sm"
+                    [formControl]="dayControl.get('startTime')"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="time"
+                    class="form-control form-control-sm"
+                    [formControl]="dayControl.get('endTime')"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        @if (scheduleError) {
+          <div class="text-danger mt-2 small">{{ scheduleError | translate }}</div>
         }
       </div>
     </div>

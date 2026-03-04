@@ -18,23 +18,19 @@ import {
 import { HttpClient } from '@angular/common/http'
 import { environment } from '@environment/environment'
 import { BUTTON_ACTIONS } from '@core/helpers/ui/constants'
-import { Branch } from '@core/interfaces/api/user.interface'
 import { Patient } from '@core/interfaces/api/patient.interface'
 import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { ModalWithAction } from '@core/interfaces/ui/bootstrap-modal.interface'
 import { PatientService } from '@core/services/api/patient.service'
-import { BranchService } from '@core/services/api/branch.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
-import { NgSelectModule } from '@ng-select/ng-select'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
-import { Observable, of, Subject, takeUntil, firstValueFrom } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { Subject, takeUntil, firstValueFrom } from 'rxjs'
 
 @Component({
   selector: 'app-patient-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule, NgSelectModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './patient-form-modal.component.html',
   styleUrls: ['./patient-form-modal.component.scss'],
 })
@@ -46,7 +42,6 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   public patientForm!: FormGroup
   public buttonAction: ButtonAction = BUTTON_ACTIONS.ADD
   public selectedPatient?: Patient
-  public branches$: Observable<Branch[]> = of([])
   public loading = false
   public isEditMode = false
   public modalTitle = ''
@@ -60,7 +55,6 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
 
   private _formBuilder = inject(FormBuilder)
   private _patientService = inject(PatientService)
-  private _branchService = inject(BranchService)
   private _activeModal = inject(NgbActiveModal)
   private _bsModalService = inject(
     BootstrapModalService<ModalWithAction<Patient>>
@@ -68,7 +62,6 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   private _http = inject(HttpClient)
 
   ngOnInit(): void {
-    this.loadBranches()
     this.initializeForm()
     this.setModalTitle()
 
@@ -118,25 +111,12 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadBranches(): void {
-    this.branches$ = this._branchService.getAllBranchesForSelector().pipe(
-      tap((branches: Branch[]) => {
-        if (this.isEditMode && this.selectedPatient && this.patientForm) {
-          setTimeout(() => {
-            this.populateForm()
-          }, 100)
-        }
-      })
-    )
-  }
-
   private initializeForm(): void {
     const baseFormConfig: any = {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       documentNumber: ['', [Validators.required, Validators.minLength(1)]],
-      branchId: ['', [Validators.required]],
       dateOfBirth: ['', [Validators.required]],
       mobilePhone: ['', [Validators.pattern(/^\+?[0-9]{10,15}$/)]],
       homePhone: [''],
@@ -162,16 +142,6 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
         } catch (error) {}
       }
 
-      // Extraer branchId del objeto branch si existe
-      let branchId = this.selectedPatient.branchId || ''
-      if (
-        !branchId &&
-        this.selectedPatient.branch &&
-        (this.selectedPatient.branch as any).id
-      ) {
-        branchId = (this.selectedPatient.branch as any).id
-      }
-
       // Cargar foto de perfil si existe
       if (this.selectedPatient.profilePhoto) {
         this.photoPreviewUrl = `${environment.apiBaseUrl}${this.selectedPatient.profilePhoto}`
@@ -183,7 +153,6 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
         lastName: this.selectedPatient.lastName,
         email: this.selectedPatient.email || '',
         documentNumber: this.selectedPatient.documentNumber || '',
-        branchId: branchId,
         dateOfBirth: dateOfBirthForInput,
         address: this.selectedPatient.address || '',
         homePhone: this.selectedPatient.homePhone || '',
@@ -217,15 +186,6 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     // Remover isActive en creación (solo permitirlo en edición)
     if (!this.isEditMode) {
       delete formValue.isActive
-    }
-
-    // Convertir branchId vacío a null
-    if (
-      formValue.branchId === '' ||
-      formValue.branchId === null ||
-      formValue.branchId === undefined
-    ) {
-      delete formValue.branchId
     }
 
     if (formValue.dateOfBirth) {

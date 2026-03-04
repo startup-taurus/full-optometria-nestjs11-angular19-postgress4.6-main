@@ -75,7 +75,12 @@
           </div>
           <div class="col-md-6 mb-2">
             <strong>{{ 'BRANCHES_MODULE.OPENING_HOURS' | translate }}:</strong>
-            <p class="mb-0">{{ selectedBranch.openingHours || 'N/A' }}</p>
+            <p class="mb-0">{{ getFormattedOpeningHours() }}</p>
+            <ul class="mb-0 ps-3 mt-2">
+              <li *ngFor="let scheduleLine of getDetailedOpeningHours()">
+                {{ scheduleLine }}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
