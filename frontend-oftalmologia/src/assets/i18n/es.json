@@ -677,8 +677,8 @@
       "TITLE": "Permisos",
       "LIST_PERMISSIONS": "Lista de permisos",
       "VIEW_PERMISSIONS": "Ver permisos",
-      "NEW_PERMISSION": "Nuevo permiso para el modulo ",
-      "EDIT_PERMISSION": "Editar permiso para el modulo ",
+      "NEW_PERMISSION": "Nuevo permiso para el módulo ",
+      "EDIT_PERMISSION": "Editar permiso para el módulo ",
       "SEARCH_PERMISSIONS": "Buscar Permisos...",
       "ACTIVATE_DEACTIVATE": {
         "ACTIVATE_PERMISSION": "Activar permiso",
