@@ -38,7 +38,7 @@ export class Branch {
   @Column({ name: 'corporate_email', nullable: true })
   corporateEmail: string;
 
-  @Column({ name: 'opening_hours', nullable: true })
+  @Column({ name: 'opening_hours', type: 'text', nullable: true })
   openingHours: string;
 
   @Column({ name: 'is_active', default: true })

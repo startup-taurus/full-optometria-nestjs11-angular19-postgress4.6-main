@@ -29,11 +29,16 @@ import { PatientService } from '@core/services/api/patient.service'
 import { ClinicalHistoriesService } from '@core/services/api/clinical-histories.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
+import { Store } from '@ngrx/store'
+import { AppState } from '@core/states'
+import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
 import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
 import {
   BehaviorSubject,
   catchError,
+  debounceTime,
+  distinctUntilChanged,
   finalize,
   map,
   Observable,
@@ -96,15 +101,18 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
 
   private filter: object = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
+  private hasInitializedBranchSubscription = false
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _patientService = inject(PatientService)
   private _clinicalHistoriesService = inject(ClinicalHistoriesService)
   private _bsModalService = inject(BootstrapModalService)
   private _modal = inject(NgbModal)
+  private _store = inject(Store<AppState>)
 
   ngOnInit(): void {
     this.suscribeToFilter()
+    this.subscribeToBranchChanges()
     this.config$ = this.setConfigDatatable()
     this.reloadDatatable()
   }
@@ -123,6 +131,27 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
           this.reloadDatatable(this.filter)
         },
         error: (err) => {},
+      })
+  }
+
+  private subscribeToBranchChanges(): void {
+    this._store
+      .select(selectSelectedBranchId)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        distinctUntilChanged(),
+        debounceTime(300)
+      )
+      .subscribe({
+        next: () => {
+          if (!this.hasInitializedBranchSubscription) {
+            this.hasInitializedBranchSubscription = true
+            return
+          }
+
+          this.reloadDatatable(this.filter)
+        },
+        error: () => {},
       })
   }
 

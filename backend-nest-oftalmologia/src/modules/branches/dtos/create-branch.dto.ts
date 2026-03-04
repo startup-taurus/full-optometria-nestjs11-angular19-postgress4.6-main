@@ -44,6 +44,6 @@ export class CreateBranchDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(4000)
   openingHours?: string;
 }

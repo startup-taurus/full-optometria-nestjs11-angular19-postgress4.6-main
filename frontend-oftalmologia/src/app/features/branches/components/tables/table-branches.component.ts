@@ -7,7 +7,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   inject,
 } from '@angular/core'
-import { TranslateModule } from '@ngx-translate/core'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { NgbModule, NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs'
@@ -28,6 +28,7 @@ import {
   SWAL_SUCCESS_CONFIG,
   SWAL_ERROR_CONFIG,
 } from '@core/helpers/ui/ui.constants'
+import { formatBranchScheduleForDisplay } from '@core/helpers/branch-schedule.helper'
 
 @Component({
   selector: 'table-branches',
@@ -61,6 +62,7 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   private authService = inject(AuthenticationService)
   private modalService = inject(NgbModal)
   private toastr = inject(ToastrService)
+  private translateService = inject(TranslateService)
 
   @ViewChild('sideFilterPanel', { static: false })
   public sideFilterPanel?: SideFilterPanelComponent
@@ -78,6 +80,27 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  public formatOpeningHours(openingHours?: string): string {
+    return formatBranchScheduleForDisplay(openingHours, {
+      dayLabelResolver: (day) => this.getDayLabel(day),
+      closedLabel: this.translateService.instant('WORDS.CLOSED'),
+    })
+  }
+
+  private getDayLabel(day: number): string {
+    const weekDay = [
+      'WORDS.SUNDAY',
+      'WORDS.MONDAY',
+      'WORDS.TUESDAY',
+      'WORDS.WEDNESDAY',
+      'WORDS.THURSDAY',
+      'WORDS.FRIDAY',
+      'WORDS.SATURDAY',
+    ][day]
+
+    return this.translateService.instant(weekDay)
   }
 
   private loadQuota(): void {
@@ -508,7 +531,7 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
             </div>
             <div class="info-row">
               <div class="info-label">Horario de Atención:</div>
-              <div class="info-value">${branch.openingHours || 'N/A'}</div>
+              <div class="info-value">${this.formatOpeningHours(branch.openingHours)}</div>
             </div>
           </div>
 

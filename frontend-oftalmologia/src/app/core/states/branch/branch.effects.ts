@@ -48,6 +48,14 @@ export class BranchEffects {
       ofType(BranchActions.setBranchFilter),
       withLatestFrom(this.store.select(selectUser)),
       switchMap(([action, user]) => {
+        if (!user?.isAdmin) {
+          return of(
+            BranchActions.setBranchFilterFailure({
+              error: 'No tienes permisos para cambiar de sucursal',
+            })
+          )
+        }
+
         return this.authService.setAdminBranchFilter(action.branchId).pipe(
           map(() =>
             BranchActions.setBranchFilterSuccess({ branchId: action.branchId })
@@ -69,6 +77,10 @@ export class BranchEffects {
       ofType(BranchActions.clearBranchFilter),
       withLatestFrom(this.store.select(selectUser)),
       switchMap(([, user]) => {
+        if (!user?.isAdmin) {
+          return of(BranchActions.clearBranchFilterSuccess())
+        }
+
         return this.authService.clearAdminBranchFilter().pipe(
           map(() => BranchActions.clearBranchFilterSuccess()),
           catchError((error) =>

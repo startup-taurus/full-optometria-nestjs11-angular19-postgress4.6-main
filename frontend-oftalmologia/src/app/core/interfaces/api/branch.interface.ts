@@ -1,3 +1,5 @@
+import { BranchOpeningScheduleDay } from '../../helpers/branch-schedule.helper'
+
 export interface Branch {
   id: string
   name: string
@@ -7,6 +9,7 @@ export interface Branch {
   phone?: string
   corporateEmail?: string
   openingHours?: string
+  openingSchedule?: BranchOpeningScheduleDay[]
   isActive: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -31,6 +34,7 @@ export interface CreateBranchDto {
   phone?: string
   corporateEmail?: string
   openingHours?: string
+  openingSchedule?: BranchOpeningScheduleDay[]
 }
 
 export interface UpdateBranchDto {
@@ -41,6 +45,7 @@ export interface UpdateBranchDto {
   phone?: string
   corporateEmail?: string
   openingHours?: string
+  openingSchedule?: BranchOpeningScheduleDay[]
   isActive?: boolean
 }
 

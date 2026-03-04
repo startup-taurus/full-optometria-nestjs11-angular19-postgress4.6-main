@@ -1,4 +1,8 @@
 import { AbstractControl, ValidationErrors } from '@angular/forms'
+import {
+  BranchOpeningScheduleDay,
+  isDateTimeWithinBranchSchedule,
+} from '../../../core/helpers/branch-schedule.helper'
 
 export class ShiftValidators {
   static futureDateValidator(
@@ -29,22 +33,20 @@ export class ShiftValidators {
     return null
   }
 
-  static appointmentTimeValidator(
-    control: AbstractControl
-  ): ValidationErrors | null {
-    if (!control.value) {
-      return null
+  static appointmentTimeValidator(schedule: BranchOpeningScheduleDay[]) {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null
+      }
+
+      const selectedDate = new Date(control.value)
+      const isWithinSchedule = isDateTimeWithinBranchSchedule(
+        schedule,
+        selectedDate
+      )
+
+      return isWithinSchedule ? null : { invalidTime: true }
     }
-
-    const selectedDate = new Date(control.value)
-    const hours = selectedDate.getHours()
-    const minutes = selectedDate.getMinutes()
-
-    if (hours < 8 || hours >= 18) {
-      return { invalidTime: true }
-    }
-
-    return null
   }
 
   static maxDescriptionLength(maxLength: number) {

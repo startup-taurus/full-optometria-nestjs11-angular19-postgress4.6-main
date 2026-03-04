@@ -22,12 +22,17 @@ export class PatientsService {
     private filesService: FilesService
   ) {}
 
-  async create(createPatientDto: CreatePatientDto, companyId: string | null) {
+  async create(
+    createPatientDto: CreatePatientDto,
+    branchId: string,
+    companyId: string | null
+  ) {
     const {
       email,
       documentNumber,
       dateOfBirth,
       companyId: _,
+      branchId: __,
       ...patientData
     } = createPatientDto;
 
@@ -69,6 +74,7 @@ export class PatientsService {
       companyId: resolvedCompanyId,
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       ...patientData,
+      branchId,
     });
 
     let savedPatient: Patient;
@@ -117,7 +123,11 @@ export class PatientsService {
     };
   }
 
-  async findAll(queryDto: QueryPatientDto, companyId: string | null) {
+  async findAll(
+    queryDto: QueryPatientDto,
+    selectedBranchId: string,
+    companyId: string | null
+  ) {
     const {
       page,
       limit,
@@ -128,7 +138,6 @@ export class PatientsService {
       documentNumber,
       mobilePhone,
       address,
-      branchId,
       isActive,
     } = queryDto;
 
@@ -160,6 +169,9 @@ export class PatientsService {
       ]);
 
     CompanyFilterUtil.applyCompanyFilter(queryBuilder, 'patient', companyId);
+    queryBuilder.andWhere('patient.branchId = :branchId', {
+      branchId: selectedBranchId,
+    });
 
     if (search) {
       queryBuilder.andWhere(
@@ -204,10 +216,6 @@ export class PatientsService {
       });
     }
 
-    if (branchId) {
-      queryBuilder.andWhere('patient.branchId = :branchId', { branchId });
-    }
-
     if (typeof isActive === 'boolean') {
       queryBuilder.andWhere('patient.isActive = :isActive', { isActive });
     }
@@ -231,9 +239,9 @@ export class PatientsService {
     };
   }
 
-  async findOne(id: string, companyId: string | null) {
+  async findOne(id: string, branchId: string, companyId: string | null) {
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
-      { id },
+      { id, branchId },
       companyId
     );
 
@@ -261,10 +269,11 @@ export class PatientsService {
   async update(
     id: string,
     updatePatientDto: UpdatePatientDto,
+    branchId: string,
     companyId: string | null
   ) {
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
-      { id },
+      { id, branchId },
       companyId
     );
 
@@ -334,10 +343,10 @@ export class PatientsService {
       }
     });
 
-    await this.patientRepository.update(id, updateDataMapped);
+    await this.patientRepository.update({ id, branchId }, updateDataMapped);
 
     const updatedPatient = await this.patientRepository.findOne({
-      where: { id },
+      where: CompanyFilterUtil.buildWhereCondition({ id, branchId }, companyId),
       relations: ['branch', 'company'],
     });
 
@@ -351,9 +360,9 @@ export class PatientsService {
     };
   }
 
-  async remove(id: string, companyId: string | null) {
+  async remove(id: string, branchId: string, companyId: string | null) {
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
-      { id },
+      { id, branchId },
       companyId
     );
 
@@ -474,7 +483,11 @@ export class PatientsService {
     };
   }
 
-  async searchPatients(query: string, companyId: string | null) {
+  async searchPatients(
+    query: string,
+    branchId: string,
+    companyId: string | null
+  ) {
     if (!query || query.trim().length < 2) {
       return {
         messageKey: 'PATIENT.SEARCH_QUERY_TOO_SHORT',
@@ -508,6 +521,7 @@ export class PatientsService {
       );
 
     CompanyFilterUtil.applyCompanyFilter(queryBuilder, 'patient', companyId);
+    queryBuilder.andWhere('patient.branchId = :branchId', { branchId });
 
     const patients = await queryBuilder
       .orderBy('patient.firstName', 'ASC')
@@ -522,10 +536,17 @@ export class PatientsService {
 
   async uploadProfilePhoto(
     patientId: string,
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    branchId: string,
+    companyId: string | null
   ): Promise<any> {
+    const whereCondition = CompanyFilterUtil.buildWhereCondition(
+      { id: patientId, branchId },
+      companyId
+    );
+
     const patient = await this.patientRepository.findOne({
-      where: { id: patientId },
+      where: whereCondition,
     });
 
     if (!patient) {
@@ -551,7 +572,7 @@ export class PatientsService {
         });
 
         const updatedPatient = await this.patientRepository.findOne({
-          where: { id: patientId },
+          where: whereCondition,
         });
 
         return {

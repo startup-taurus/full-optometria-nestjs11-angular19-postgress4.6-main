@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
@@ -58,7 +59,12 @@ export class BranchesService {
       });
     }
 
-    const branch = this.branchRepository.create(createBranchDto);
+    const branchPayload: CreateBranchDto = {
+      ...createBranchDto,
+      openingHours: this.normalizeOpeningHours(createBranchDto.openingHours),
+    };
+
+    const branch = this.branchRepository.create(branchPayload);
     const savedBranch = await this.branchRepository.save(branch);
 
     return {
@@ -266,6 +272,13 @@ export class BranchesService {
     }
 
     const { companyId: _, ...safeUpdateData } = updateBranchDto as any;
+
+    if (Object.prototype.hasOwnProperty.call(safeUpdateData, 'openingHours')) {
+      safeUpdateData.openingHours = this.normalizeOpeningHours(
+        safeUpdateData.openingHours
+      );
+    }
+
     Object.assign(branch, safeUpdateData);
     const updatedBranch = await this.branchRepository.save(branch);
 
@@ -579,5 +592,116 @@ export class BranchesService {
         en: 'Branch deleted successfully',
       },
     };
+  }
+
+  private normalizeOpeningHours(openingHours?: string): string | undefined {
+    if (!openingHours?.trim()) {
+      return undefined;
+    }
+
+    const rawValue = openingHours.trim();
+
+    try {
+      const parsedValue = JSON.parse(rawValue);
+      const scheduleSource = Array.isArray(parsedValue)
+        ? parsedValue
+        : parsedValue?.weeklySchedule;
+
+      if (!Array.isArray(scheduleSource) || scheduleSource.length !== 7) {
+        throw new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: {
+            es: 'El horario de atención tiene un formato inválido',
+            en: 'Opening hours format is invalid',
+          },
+        });
+      }
+
+      const normalizedSchedule = scheduleSource
+        .map((item) => this.normalizeScheduleDay(item))
+        .sort((a, b) => a.day - b.day);
+
+      const uniqueDays = new Set(normalizedSchedule.map((item) => item.day));
+      if (uniqueDays.size !== 7) {
+        throw new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: {
+            es: 'El horario de atención debe incluir los 7 días de la semana',
+            en: 'Opening hours must include all 7 days of the week',
+          },
+        });
+      }
+
+      return JSON.stringify(normalizedSchedule);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      return rawValue;
+    }
+  }
+
+  private normalizeScheduleDay(value: any): {
+    day: number;
+    enabled: boolean;
+    startTime: string;
+    endTime: string;
+  } {
+    const day = Number(value?.day);
+    const enabled = Boolean(value?.enabled);
+    const startTime = typeof value?.startTime === 'string' ? value.startTime : '';
+    const endTime = typeof value?.endTime === 'string' ? value.endTime : '';
+
+    if (!Number.isInteger(day) || day < 0 || day > 6) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'El día del horario es inválido',
+          en: 'Schedule day is invalid',
+        },
+      });
+    }
+
+    if (!this.isValidTimeFormat(startTime) || !this.isValidTimeFormat(endTime)) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'El formato de hora del horario es inválido',
+          en: 'Schedule time format is invalid',
+        },
+      });
+    }
+
+    if (this.timeToMinutes(startTime) >= this.timeToMinutes(endTime)) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'La hora de inicio debe ser menor a la hora de fin',
+          en: 'Start time must be earlier than end time',
+        },
+      });
+    }
+
+    return {
+      day,
+      enabled,
+      startTime,
+      endTime,
+    };
+  }
+
+  private isValidTimeFormat(value: string): boolean {
+    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
+  }
+
+  private timeToMinutes(value: string): number {
+    const [hours, minutes] = value.split(':').map(Number);
+    return hours * 60 + minutes;
   }
 }

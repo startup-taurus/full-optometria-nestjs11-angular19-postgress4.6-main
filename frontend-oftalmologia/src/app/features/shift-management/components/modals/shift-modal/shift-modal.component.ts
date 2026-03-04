@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms'
 import { TranslateModule } from '@ngx-translate/core'
+import { TranslateService } from '@ngx-translate/core'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import {
@@ -24,6 +25,7 @@ import { ShiftStatusService } from '../../../../../core/services/api/shift-statu
 import { PatientService } from '../../../../../core/services/api/patient.service'
 import { BranchService } from '../../../../../core/services/api/branch.service'
 import { Patient } from '../../../../../core/interfaces/api/patient.interface'
+import { Branch } from '../../../../../core/interfaces/api/branch.interface'
 import {
   Shift,
   ShiftStatus,
@@ -32,6 +34,12 @@ import {
 } from '../../../../../core/interfaces/api/shift.interface'
 import { ShiftValidators } from '../../../validators/shift.validators'
 import { environment } from '../../../../../../environments/environment'
+import {
+  BranchOpeningScheduleDay,
+  BRANCH_WEEK_DAYS,
+  buildDefaultBranchSchedule,
+  parseBranchSchedule,
+} from '../../../../../core/helpers/branch-schedule.helper'
 
 interface PatientWithFullName extends Patient {
   fullName: string
@@ -56,6 +64,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
   statuses: ShiftStatus[] = []
   selectedPatient: PatientWithFullName | null = null
   currentBranchId: string | null = null
+  branchSchedule: BranchOpeningScheduleDay[] = buildDefaultBranchSchedule()
 
   patientsLoading = false
   statusesLoading = false
@@ -68,7 +77,8 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
     private shiftsService: ShiftsService,
     private shiftStatusService: ShiftStatusService,
     private patientService: PatientService,
-    private branchService: BranchService
+    private branchService: BranchService,
+    private translateService: TranslateService
   ) {
     this.initializeForm()
     this.setupPatientSearch()
@@ -96,7 +106,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
         [
           Validators.required,
           ShiftValidators.futureDateValidator,
-          ShiftValidators.appointmentTimeValidator,
+          ShiftValidators.appointmentTimeValidator(this.branchSchedule),
         ],
       ],
       description: ['', [ShiftValidators.maxDescriptionLength(500)]],
@@ -139,8 +149,49 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((branchState: any) => {
         this.currentBranchId = branchState.selectedBranchId || null
+        this.loadBranchSchedule(this.currentBranchId, branchState.selectedBranch)
         this.loadInitialPatients()
       })
+  }
+
+  private loadBranchSchedule(
+    branchId: string | null,
+    selectedBranch?: Branch | null
+  ): void {
+    if (selectedBranch?.openingHours) {
+      this.branchSchedule = parseBranchSchedule(selectedBranch.openingHours)
+      this.applyAppointmentValidators()
+      return
+    }
+
+    if (!branchId) {
+      this.branchSchedule = buildDefaultBranchSchedule()
+      this.applyAppointmentValidators()
+      return
+    }
+
+    this.branchService
+      .getBranchById(branchId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((branch) => {
+        this.branchSchedule = parseBranchSchedule(branch?.openingHours)
+        this.applyAppointmentValidators()
+      })
+  }
+
+  private applyAppointmentValidators(): void {
+    const appointmentControl = this.shiftForm.get('appointmentDate')
+    if (!appointmentControl) {
+      return
+    }
+
+    appointmentControl.setValidators([
+      Validators.required,
+      ShiftValidators.futureDateValidator,
+      ShiftValidators.appointmentTimeValidator(this.branchSchedule),
+    ])
+
+    appointmentControl.updateValueAndValidity({ emitEvent: false })
   }
 
   private loadInitialPatients(): void {
@@ -352,5 +403,86 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
       }
     }
     return ''
+  }
+
+  getAppointmentDateError(): string {
+    const field = this.shiftForm.get('appointmentDate')
+    if (!field || !field.errors || !(field.dirty || field.touched)) {
+      return ''
+    }
+
+    if (field.errors['required']) {
+      return this.translateService.instant('VALIDATION.REQUIRED')
+    }
+
+    if (field.errors['futureDate']) {
+      return this.translateService.instant('VALIDATION.FUTURE_DATE')
+    }
+
+    if (field.errors['invalidTime']) {
+      const daySchedule = this.getSelectedDaySchedule(field.value)
+      if (!daySchedule) {
+        return this.translateService.instant('VALIDATION.INVALID_TIME')
+      }
+
+      const dayLabel = this.getDayLabel(daySchedule.day)
+
+      if (!daySchedule.enabled) {
+        return this.translateService.instant('VALIDATION.INVALID_TIME_CLOSED_DAY', {
+          day: dayLabel,
+        })
+      }
+
+      return this.translateService.instant('VALIDATION.INVALID_TIME_BRANCH_SCHEDULE', {
+        day: dayLabel,
+        startTime: this.to12Hour(daySchedule.startTime),
+        endTime: this.to12Hour(daySchedule.endTime),
+      })
+    }
+
+    return ''
+  }
+
+  private getSelectedDaySchedule(rawDate: string): BranchOpeningScheduleDay | null {
+    if (!rawDate) {
+      return null
+    }
+
+    const selectedDate = new Date(rawDate)
+    if (Number.isNaN(selectedDate.getTime())) {
+      return null
+    }
+
+    return this.branchSchedule.find((item) => item.day === selectedDate.getDay()) || null
+  }
+
+  private getDayLabel(day: number): string {
+    const date = new Date(2024, 0, day + 7)
+    const locale = (this.translateService.currentLang || 'es').toLowerCase().startsWith('en')
+      ? 'en-US'
+      : 'es-ES'
+
+    try {
+      return date.toLocaleDateString(locale, { weekday: 'long' })
+    } catch {
+      const dayKey = BRANCH_WEEK_DAYS.find((item) => item.day === day)?.labelKey ?? ''
+      return this.translateService.instant(dayKey)
+    }
+  }
+
+  private to12Hour(time: string): string {
+    const [hours, minutes] = time.split(':').map(Number)
+    const date = new Date()
+    date.setHours(hours, minutes, 0, 0)
+
+    const locale = (this.translateService.currentLang || 'es').toLowerCase().startsWith('en')
+      ? 'en-US'
+      : 'es-ES'
+
+    return date.toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    })
   }
 }
