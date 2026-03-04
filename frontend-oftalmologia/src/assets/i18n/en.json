@@ -503,6 +503,11 @@
     "LEAVE_EMPTY_TO_KEEP_CURRENT": "Leave empty to keep current",
     "LEAVE_EMPTY_PASSWORD_HINT": "Leave this field empty if you don't want to change the password",
     "LOADING": "Loading...",
+    "SAVING": "Saving...",
+    "UPDATING": "Updating...",
+    "SEARCHING": "Searching...",
+    "NO_RESULTS": "No results",
+    "NO_RESULTS_MESSAGE": "No results found",
     "VALIDATING": "Validating",
     "ACTIVE": "Active",
     "INACTIVE": "Inactive",
@@ -532,7 +537,8 @@
       "MAX_LENGTH": "Cannot have more than {{max}} characters"
     },
     "NO": "No",
-    "YES": "Yes"
+    "YES": "Yes",
+    "PRESS_ESC_TO_CLOSE": "Press Esc to close"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",

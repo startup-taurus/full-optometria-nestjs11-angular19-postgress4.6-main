@@ -245,34 +245,34 @@
     </div>
 
     @if (loading && shifts.length > 0) {
-      <div class="text-center py-4">
+      <div class="module-loading-state py-4">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
         </div>
+        <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
       </div>
     }
 
     @if (loading && shifts.length === 0) {
       <div class="row mt-4">
         <div class="col-12">
-          <div class="text-center py-5">
+          <div class="module-loading-state py-5">
             <div class="spinner-border text-primary" role="status">
               <span class="visually-hidden">{{
                 'WORDS.LOADING' | translate
               }}</span>
             </div>
-            <p class="text-body-secondary mt-2">
-              {{ 'WORDS.LOADING' | translate }}...
-            </p>
+            <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
           </div>
         </div>
       </div>
     }
 
     @if (!loading && shifts.length === 0) {
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="text-center py-5 bg-transparent">
+      <div class="no-items-found">
+        <div class="row">
+          <div class="col-12">
+            <div class="text-center py-5 bg-transparent">
             <i
               class="ti ti-calendar-off display-4 text-body-secondary mb-3"
             ></i>
@@ -280,10 +280,9 @@
               {{ 'SHIFT_MANAGEMENT_MODULE.NO_APPOINTMENTS_FOUND' | translate }}
             </h5>
             <p class="text-body-secondary">
-              {{
-                'SHIFT_MANAGEMENT_MODULE.NO_APPOINTMENTS_MESSAGE' | translate
-              }}
+              {{ 'COMMON.NO_RESULTS_MESSAGE' | translate }}
             </p>
+            </div>
           </div>
         </div>
       </div>

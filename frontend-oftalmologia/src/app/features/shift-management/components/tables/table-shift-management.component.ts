@@ -303,7 +303,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(ViewShiftModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.selectedShift = shift
@@ -315,7 +315,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(ShiftModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.editMode = true
@@ -336,7 +336,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(ChangeStatusModalComponent, {
       size: 'md',
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.selectedShift = shift
@@ -358,7 +358,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
       {
         size: 'xl',
         backdrop: 'static',
-        keyboard: false,
+        keyboard: true,
       }
     )
 
@@ -667,7 +667,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(ShiftModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.editMode = false

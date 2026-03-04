@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core'
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  HostListener,
+} from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
 
@@ -30,9 +37,18 @@ export class BaseStepModalComponent implements OnInit {
     if (this.stepLabels.length === 0) {
       this.stepLabels = Array.from(
         { length: this.totalSteps },
-        (_, i) => `Pasoo ${i + 1}`
+        (_, i) => `Paso ${i + 1}`
       )
     }
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  public onEscapePressed(event: KeyboardEvent): void {
+    if (this.isLoading) {
+      return
+    }
+    event.preventDefault()
+    this.onCancel()
   }
 
   public getStepClasses(step: number): string {

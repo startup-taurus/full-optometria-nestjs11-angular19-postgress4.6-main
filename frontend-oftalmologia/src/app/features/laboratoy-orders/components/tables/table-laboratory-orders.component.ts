@@ -243,7 +243,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
       {
         size: 'xl',
         backdrop: 'static',
-        keyboard: false,
+        keyboard: true,
       }
     )
 
@@ -352,7 +352,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     const modalRef = this._modalService.open(ViewLaboratoryOrderComponent, {
       size: 'xl',
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.orderId = order.id

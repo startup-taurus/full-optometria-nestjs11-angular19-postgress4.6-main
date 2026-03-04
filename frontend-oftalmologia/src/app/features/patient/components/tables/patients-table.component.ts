@@ -491,7 +491,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       size: 'xl',
       centered: true,
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.editMode = false
@@ -505,7 +505,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       size: 'xl',
       centered: true,
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.editMode = true
@@ -520,7 +520,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       size: 'xl',
       centered: true,
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.clinicalHistoryId = clinicalHistoryId

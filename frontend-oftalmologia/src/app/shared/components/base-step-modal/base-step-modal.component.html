@@ -3,7 +3,8 @@
   <button
     type="button"
     class="btn-close ms-auto"
-    aria-label="Close"
+    [attr.aria-label]="'COMMON.CLOSE' | translate"
+    [title]="'COMMON.CLOSE' | translate"
     (click)="onCancel()"
   ></button>
 </div>
@@ -54,7 +55,7 @@
         [disabled]="isLoading"
       >
         <i class="ti ti-arrow-left me-1"></i>
-        {{ 'PREVIOUS' | translate }}
+        {{ 'COMMON.PREVIOUS' | translate }}
       </button>
     }
   </div>
@@ -66,7 +67,7 @@
       (click)="onCancel()"
       [disabled]="isLoading"
     >
-      {{ 'CANCEL' | translate }}
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
 
     @if (currentStep < totalSteps) {
@@ -76,7 +77,7 @@
         (click)="onNext()"
         [disabled]="!canProceedNext || isLoading"
       >
-        {{ 'NEXT' | translate }}
+        {{ 'COMMON.NEXT' | translate }}
         <i class="ti ti-arrow-right ms-1"></i>
       </button>
     } @else {
@@ -91,15 +92,25 @@
             class="spinner-border spinner-border-sm me-2"
             role="status"
           ></span>
-        }
-        @if (editMode) {
-          <i class="ti ti-check me-1"></i>
-          Actualizar
+          @if (editMode) {
+            {{ 'COMMON.UPDATING' | translate }}
+          } @else {
+            {{ 'COMMON.SAVING' | translate }}
+          }
         } @else {
-          <i class="ti ti-check me-1"></i>
-          Guardar
+          @if (editMode) {
+            <i class="ti ti-check me-1"></i>
+            {{ 'COMMON.UPDATE' | translate }}
+          } @else {
+            <i class="ti ti-check me-1"></i>
+            {{ 'COMMON.SAVE' | translate }}
+          }
         }
       </button>
     }
   </div>
+</div>
+
+<div class="modal-close-hint px-3 pb-2 text-end text-body-secondary">
+  <small>{{ 'COMMON.PRESS_ESC_TO_CLOSE' | translate }}</small>
 </div>

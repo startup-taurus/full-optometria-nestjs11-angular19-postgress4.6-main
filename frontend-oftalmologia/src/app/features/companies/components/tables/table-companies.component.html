@@ -11,6 +11,12 @@
   </div>
 
   @if (loading && companies.length === 0) {
+    <div class="module-loading-state pb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
+      </div>
+      <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
     <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
       @for (item of [1, 2, 3, 4]; track item) {
         <div class="col">
@@ -307,7 +313,7 @@
               {{ 'COMPANIES_MODULE.NO_COMPANIES_FOUND' | translate }}
             </h5>
             <p class="text-body-secondary">
-              {{ 'COMPANIES_MODULE.NO_COMPANIES_MESSAGE' | translate }}
+              {{ 'COMMON.NO_RESULTS_MESSAGE' | translate }}
             </p>
           </div>
         </div>

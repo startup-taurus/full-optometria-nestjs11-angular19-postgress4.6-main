@@ -317,7 +317,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
       size: 'xl',
       centered: true,
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.editMode = !!recordId
@@ -339,7 +339,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
       size: 'xl',
       centered: true,
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.clinicalHistoryId = clinicalHistoryId
@@ -440,7 +440,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
       size: 'xl',
       centered: true,
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.mode = 'create'

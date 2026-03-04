@@ -279,10 +279,11 @@
     </div>
 
     @if (loading && branches.length > 0) {
-      <div class="text-center py-4">
+      <div class="module-loading-state py-4">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
         </div>
+        <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
       </div>
     }
 
@@ -298,7 +299,7 @@
                 {{ 'BRANCHES_MODULE.NO_BRANCHES_FOUND' | translate }}
               </h5>
               <p class="text-body-secondary">
-                {{ 'BRANCHES_MODULE.NO_BRANCHES_MESSAGE' | translate }}
+                {{ 'COMMON.NO_RESULTS_MESSAGE' | translate }}
               </p>
             </div>
           </div>
