@@ -136,7 +136,7 @@
       *ngIf="canShowViewMedicalHistoryButton(row.id)"
       class="btn btn-outline-info btn-xs"
       placement="left"
-      [ngbTooltip]="'Ver historial clínico'"
+      [ngbTooltip]="'PATIENT.BUTTONS.VIEW_MEDICAL_HISTORY' | translate"
       (click)="viewMedicalHistory(row)"
     >
       <i class="fa fa-file-text-o"></i>
@@ -144,7 +144,7 @@
     <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
-      [ngbTooltip]="'Ver Detalles'"
+      [ngbTooltip]="'PATIENT.BUTTONS.VIEW_DETAILS' | translate"
       (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
     >
       <i class="fa fa-eye"></i>
@@ -152,7 +152,7 @@
     <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
-      [ngbTooltip]="'Editar paciente'"
+      [ngbTooltip]="'PATIENT.BUTTONS.EDIT_PATIENT' | translate"
       (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
     >
       <i class="fa fa-edit"></i>
@@ -160,7 +160,7 @@
     <button
       class="btn btn-outline-danger btn-xs"
       placement="left"
-      [ngbTooltip]="'Eliminar paciente'"
+      [ngbTooltip]="'PATIENT.BUTTONS.DELETE_PATIENT' | translate"
       (click)="deletePatient(row)"
     >
       <i class="fa fa-trash"></i>

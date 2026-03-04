@@ -59,7 +59,7 @@
             data-bs-toggle="dropdown"
             data-bs-offset="0,19"
             type="button"
-            aria-haspopup="false"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <img
@@ -86,7 +86,7 @@
               </h6>
             </div>
 
-            <a href="/profile" ngbDropdownItem>
+            <a [routerLink]="['/profile']" ngbDropdownItem>
               <i class="ti ti-user-hexagon me-1 fs-17 align-middle"></i>
               <span class="align-middle">{{
                 'TOPBAR.MY_ACCOUNT' | translate
@@ -95,9 +95,9 @@
 
             <div class="dropdown-divider"></div>
 
-            <a href="/auth/lock-screen" ngbDropdownItem>
+            <a [routerLink]="['/auth/lock-screen']" ngbDropdownItem>
               <i class="ti ti-lock-square-rounded me-1 fs-17 align-middle"></i>
-              <span class="align-middle">Lock Screen</span>
+              <span class="align-middle">{{ 'TOPBAR.LOCK_SCREEN' | translate }}</span>
             </a>
 
             <a

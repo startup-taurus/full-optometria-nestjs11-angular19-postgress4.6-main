@@ -175,7 +175,7 @@
     <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
-      [ngbTooltip]="'Ver Detalles'"
+      [ngbTooltip]="'USER.BUTTONS.VIEW_DETAILS' | translate"
       (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
     >
       <i class="fa fa-eye"></i>
@@ -183,7 +183,7 @@
     <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
-      [ngbTooltip]="'Editar usuario'"
+      [ngbTooltip]="'USER.BUTTONS.EDIT_USER' | translate"
       (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
     >
       <i class="fa fa-edit"></i>
@@ -191,7 +191,7 @@
     <button
       class="btn btn-outline-danger btn-xs"
       placement="left"
-      [ngbTooltip]="'Eliminar usuario'"
+      [ngbTooltip]="'USER.BUTTONS.DELETE_USER' | translate"
       (click)="deleteUser(row)"
     >
       <i class="fa fa-trash"></i>

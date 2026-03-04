@@ -496,7 +496,7 @@
 
   .form-control,
   .form-select {
-    border: 1px solid #e3e6f0;
+    border: 1px solid var(--bs-border-color);
     border-radius: 8px;
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
@@ -521,8 +521,8 @@
   .card-header {
     border-radius: 0.5rem 0.5rem 0 0 !important;
     padding: 1.25rem;
-    background-color: #fff;
-    border-bottom: 1px solid #e9ecef;
+    background-color: var(--bs-body-bg);
+    border-bottom: 1px solid var(--bs-border-color);
 
     .card-title {
       font-weight: 600;
@@ -559,12 +559,12 @@
 
 .common-ngx-datatable {
   .datatable-header {
-    background: #f8f9fa;
-    border-bottom: 2px solid #e9ecef;
+    background: var(--bs-tertiary-bg);
+    border-bottom: 2px solid var(--bs-border-color);
 
     .datatable-header-cell {
       font-weight: 600;
-      color: #495057;
+      color: var(--bs-secondary-color);
       font-size: 0.875rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -576,16 +576,16 @@
       transition: background-color 0.15s ease-in-out;
 
       &:hover {
-        background-color: #f8f9fa;
+        background-color: var(--bs-tertiary-bg);
       }
 
       &.active {
-        background-color: rgba(0, 123, 255, 0.1);
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
       }
 
       .datatable-body-cell {
         font-size: 0.875rem;
-        color: #495057;
+        color: var(--bs-secondary-color);
         vertical-align: middle;
         padding: 0.75rem;
       }
@@ -593,8 +593,8 @@
   }
 
   .datatable-footer {
-    background: #f8f9fa;
-    border-top: 1px solid #e9ecef;
+    background: var(--bs-tertiary-bg);
+    border-top: 1px solid var(--bs-border-color);
 
     .datatable-footer-inner {
       .datatable-pager {
@@ -1404,7 +1404,8 @@ i.text-primary {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
-.lock-screen-back-btn:focus {
-  outline: none;
+.lock-screen-back-btn:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
   box-shadow: 0 8px 22px rgba(var(--bs-primary-rgb), 0.15);
 }

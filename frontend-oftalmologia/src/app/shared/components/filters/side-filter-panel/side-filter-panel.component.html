@@ -10,8 +10,10 @@
       config.badgeCount && config.badgeCount > 0
         ? config.badgeCount +
           ' ' +
-          (config.badgeCount === 1 ? 'filtro aplicado' : 'filtros aplicados') +
-          ' - Clic para modificar'
+          (config.badgeCount === 1
+            ? ('WORDS.FILTER_APPLIED' | translate)
+            : ('WORDS.FILTERS_APPLIED' | translate)) +
+          ' - ' + ('WORDS.CLICK_TO_MODIFY' | translate)
         : (config.title | translate)
     "
   >
@@ -88,9 +90,11 @@
           *ngIf="config.badgeCount && config.badgeCount > 0; else noFilters"
         >
           {{ config.badgeCount }}
-          {{
-            config.badgeCount === 1 ? 'filtro aplicado' : 'filtros aplicados'
-          }}
+          @if (config.badgeCount === 1) {
+            {{ 'WORDS.FILTER_APPLIED' | translate }}
+          } @else {
+            {{ 'WORDS.FILTERS_APPLIED' | translate }}
+          }
         </span>
         <ng-template #noFilters>
           {{ 'USER.FILTER.TITLE' | translate }}
