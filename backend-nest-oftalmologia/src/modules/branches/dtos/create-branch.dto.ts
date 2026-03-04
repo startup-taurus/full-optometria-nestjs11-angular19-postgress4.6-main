@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsEmail,
   Length,
+  MaxLength,
   IsUUID,
 } from 'class-validator';
 
@@ -32,17 +33,17 @@ export class CreateBranchDto {
   @Length(1, 50)
   city: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @Length(1, 20)
-  phone?: string;
+  phone: string;
 
-  @IsOptional()
   @IsEmail()
-  corporateEmail?: string;
+  @IsNotEmpty()
+  corporateEmail: string;
 
   @IsOptional()
   @IsString()
-  @Length(1, 100)
+  @MaxLength(100)
   openingHours?: string;
 }

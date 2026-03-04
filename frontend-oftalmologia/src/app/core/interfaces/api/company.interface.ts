@@ -1,3 +1,10 @@
+export interface PlanQuota {
+  usersCount: number
+  maxUsers: number | null
+  branchesCount: number
+  maxBranches: number | null
+}
+
 export interface Company {
   id: string
   name: string
@@ -13,6 +20,10 @@ export interface Company {
     mimeType: string
   }
   isActive: boolean
+  maxUsers?: number | null
+  maxBranches?: number | null
+  usersCount?: number
+  branchesCount?: number
   createdAt: Date | string
   updatedAt: Date | string
 }
@@ -24,6 +35,8 @@ export interface CreateCompanyDto {
   phone?: string
   slug?: string
   logoFileId?: string
+  maxUsers?: number | null
+  maxBranches?: number | null
 }
 
 export interface CreateCompanyCompleteDto {
@@ -32,6 +45,8 @@ export interface CreateCompanyCompleteDto {
   companyEmail?: string
   companyPhone?: string
   slug?: string
+  maxUsers?: number | null
+  maxBranches?: number | null
   branchName: string
   branchCode: string
   branchAddress: string
@@ -53,6 +68,8 @@ export interface UpdateCompanyDto {
   slug?: string
   logoFileId?: string
   isActive?: boolean
+  maxUsers?: number | null
+  maxBranches?: number | null
 }
 
 export interface QueryCompanyDto {

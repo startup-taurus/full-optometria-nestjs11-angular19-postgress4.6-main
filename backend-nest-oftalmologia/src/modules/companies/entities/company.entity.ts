@@ -35,6 +35,12 @@ export class Company {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
+  @Column({ name: 'max_users', type: 'int', nullable: true, default: null })
+  maxUsers: number | null;
+
+  @Column({ name: 'max_branches', type: 'int', nullable: true, default: null })
+  maxBranches: number | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

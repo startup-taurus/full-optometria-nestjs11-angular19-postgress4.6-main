@@ -149,6 +149,31 @@
                   </div>
                 }
 
+                <div class="col-12 mt-1">
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span
+                      class="badge rounded-pill px-2 py-1 d-flex align-items-center gap-1"
+                      [ngClass]="company.maxUsers !== null && company.maxUsers !== undefined
+                        ? (company.usersCount! >= company.maxUsers! ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success')
+                        : 'bg-secondary-subtle text-secondary'"
+                      title="{{ 'COMPANIES_MODULE.USERS_USAGE_TITLE' | translate }}"
+                    >
+                      <i class="ti ti-users" style="font-size: 11px"></i>
+                      <span>{{ company.usersCount ?? 0 }}/{{ company.maxUsers !== null && company.maxUsers !== undefined ? company.maxUsers : '∞' }}</span>
+                    </span>
+                    <span
+                      class="badge rounded-pill px-2 py-1 d-flex align-items-center gap-1"
+                      [ngClass]="company.maxBranches !== null && company.maxBranches !== undefined
+                        ? (company.branchesCount! >= company.maxBranches! ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success')
+                        : 'bg-secondary-subtle text-secondary'"
+                      title="{{ 'COMPANIES_MODULE.BRANCHES_USAGE_TITLE' | translate }}"
+                    >
+                      <i class="ti ti-building-store" style="font-size: 11px"></i>
+                      <span>{{ company.branchesCount ?? 0 }}/{{ company.maxBranches !== null && company.maxBranches !== undefined ? company.maxBranches : '∞' }}</span>
+                    </span>
+                  </div>
+                </div>
+
                 @if (company.createdAt) {
                   <div class="col-12">
                     <div class="d-flex align-items-center gap-1">

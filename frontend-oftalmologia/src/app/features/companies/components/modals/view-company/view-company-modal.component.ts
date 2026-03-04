@@ -35,6 +35,68 @@ export class ViewCompanyModalComponent {
     return ''
   }
 
+  getUsersUsed(): number {
+    return this.selectedCompany?.usersCount ?? 0
+  }
+
+  getUsersLimit(): number | null {
+    return this.selectedCompany?.maxUsers ?? null
+  }
+
+  getUsersLimitLabel(): string {
+    const limit = this.getUsersLimit()
+    return limit === null ? '∞' : String(limit)
+  }
+
+  getUsersUsagePercent(): number {
+    const limit = this.getUsersLimit()
+    if (!limit || limit <= 0) {
+      return 0
+    }
+
+    return Math.min(100, Math.round((this.getUsersUsed() / limit) * 100))
+  }
+
+  getBranchesUsed(): number {
+    return this.selectedCompany?.branchesCount ?? 0
+  }
+
+  getBranchesLimit(): number | null {
+    return this.selectedCompany?.maxBranches ?? null
+  }
+
+  getBranchesLimitLabel(): string {
+    const limit = this.getBranchesLimit()
+    return limit === null ? '∞' : String(limit)
+  }
+
+  getBranchesUsagePercent(): number {
+    const limit = this.getBranchesLimit()
+    if (!limit || limit <= 0) {
+      return 0
+    }
+
+    return Math.min(100, Math.round((this.getBranchesUsed() / limit) * 100))
+  }
+
+  getUsersRemainingLabel(): string {
+    const limit = this.getUsersLimit()
+    if (limit === null) {
+      return 'Sin límite'
+    }
+
+    return `${Math.max(limit - this.getUsersUsed(), 0)} disponibles`
+  }
+
+  getBranchesRemainingLabel(): string {
+    const limit = this.getBranchesLimit()
+    if (limit === null) {
+      return 'Sin límite'
+    }
+
+    return `${Math.max(limit - this.getBranchesUsed(), 0)} disponibles`
+  }
+
   closeModal(): void {
     this.activeModal.dismiss()
   }

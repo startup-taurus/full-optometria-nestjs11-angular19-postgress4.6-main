@@ -7,6 +7,7 @@ import { UsersController } from './users.controller';
 import { User } from './entities/user.entity';
 import { RolesPermissionsModule } from '../roles-permissions/roles-permissions.module';
 import { FilesModule } from '../files/files.module';
+import { CompanyQuotaModule } from '../company-quota/company-quota.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { FilesModule } from '../files/files.module';
     ConfigModule,
     RolesPermissionsModule,
     FilesModule,
+    CompanyQuotaModule,
     MulterModule.register({
       limits: {
         fileSize: 8 * 1024 * 1024,

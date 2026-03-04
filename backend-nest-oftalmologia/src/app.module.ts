@@ -15,6 +15,7 @@ import { validate } from './config/env.validation';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { RequestActivityInterceptor } from './common/interceptors/request-activity.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { CommonModule } from './common/common.module';
 import { BranchFilterMiddleware } from './common/middleware/branch-filter.middleware';
 import { AuthRoleMiddleware } from './common/middleware/auth-role.middleware';
@@ -37,6 +38,7 @@ import { ClinicalHistoriesModule } from './modules/clinical-histories/clinical-h
 import { LaboratoryOrdersModule } from './modules/laboratory-orders/laboratory-orders.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PatientsModule } from './modules/patients/patients.module';
+import { CompanyQuotaModule } from './modules/company-quota/company-quota.module';
 
 // Entities
 import { User } from './modules/users/entities/user.entity';
@@ -121,6 +123,7 @@ import { Patient } from './modules/patients/entities/patient.entity';
     LaboratoryOrdersModule,
     DashboardModule,
     PatientsModule,
+    CompanyQuotaModule,
   ],
   providers: [
     {
@@ -130,6 +133,10 @@ import { Patient } from './modules/patients/entities/patient.entity';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
     },
     {
       provide: APP_FILTER,

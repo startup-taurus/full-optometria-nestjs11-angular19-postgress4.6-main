@@ -7,7 +7,36 @@
       <i class="ti ti-building me-2"></i>
       {{ 'BRANCHES_MODULE.MANAGE_BRANCHES' | translate }}
     </h5>
-    <div class="d-flex gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <div
+        class="border rounded px-2 py-1"
+      >
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge rounded-pill px-2 py-1" [ngClass]="getBranchesBadgeClass()">
+            <i class="ti ti-building me-1"></i>
+            {{ getBranchesUsed() }}/{{ getBranchesLimitLabel() }}
+          </span>
+          <small class="text-body-secondary">{{ getBranchesRemainingLabel() }}</small>
+          <i
+            class="ti ti-info-circle text-secondary"
+            container="body"
+            placement="left"
+            tooltipClass="quota-tooltip"
+            [ngbTooltip]="getBranchesQuotaTooltip()"
+          ></i>
+        </div>
+        <div class="progress mt-1" style="height: 6px; width: 120px">
+          <div
+            class="progress-bar"
+            role="progressbar"
+            [ngClass]="getBranchesProgressClass()"
+            [style.width.%]="getBranchesUsagePercent()"
+            [attr.aria-valuenow]="getBranchesUsagePercent()"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+      </div>
       @if (sideFilterPanel?.hasActiveFilters()) {
         <button
           class="btn btn-outline-danger btn-sm"

@@ -109,6 +109,8 @@ export class CompaniesService {
       companyEmail,
       companyPhone,
       slug,
+      maxUsers,
+      maxBranches,
       branchName,
       branchCode,
       branchAddress,
@@ -169,6 +171,8 @@ export class CompaniesService {
         email: companyEmail,
         phone: companyPhone,
         slug,
+        maxUsers: maxUsers ?? null,
+        maxBranches: maxBranches ?? null,
       });
       savedCompany = await this.companyRepository.save(company);
 
@@ -180,12 +184,17 @@ export class CompaniesService {
         });
 
         try {
+          const initialBranchPhone = companyPhone?.trim() || mobilePhone?.trim();
+          const initialBranchEmail = companyEmail?.trim() || email?.trim();
+
           branch = await this.branchesService.create({
             companyId: savedCompany.id,
             name: branchName,
             code: branchCode,
             address: branchAddress,
             city: branchCity,
+            phone: initialBranchPhone,
+            corporateEmail: initialBranchEmail,
           });
 
           try {
@@ -269,7 +278,25 @@ export class CompaniesService {
       .take(take)
       .getMany();
 
-    const paginatedResult = PaginationUtil.paginate(companies, totalCount, {
+    const companiesWithUsage = await Promise.all(
+      companies.map(async (company) => {
+        const [usersCount, branchesCount] = await Promise.all([
+          this.userRepository.count({ where: { companyId: company.id } }),
+          this.branchesService
+            .findAll({ page: 1, limit: 1 }, company.id)
+            .then((r) => r.data?.totalCount ?? 0),
+        ]);
+        return {
+          ...company,
+          usersCount,
+          maxUsers: company.maxUsers,
+          branchesCount,
+          maxBranches: company.maxBranches,
+        };
+      })
+    );
+
+    const paginatedResult = PaginationUtil.paginate(companiesWithUsage, totalCount, {
       page,
       limit,
     });
@@ -305,9 +332,22 @@ export class CompaniesService {
       });
     }
 
+    const [usersCount, branchesCount] = await Promise.all([
+      this.userRepository.count({ where: { companyId: id } }),
+      this.branchesService
+        .findAll({ page: 1, limit: 1 }, id)
+        .then((r) => r.data?.totalCount ?? 0),
+    ]);
+
     return {
       messageKey: 'COMPANY.FETCHED',
-      data: company,
+      data: {
+        ...company,
+        usersCount,
+        maxUsers: company.maxUsers,
+        branchesCount,
+        maxBranches: company.maxBranches,
+      },
     };
   }
 

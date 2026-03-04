@@ -146,8 +146,8 @@
   },
 
   "ERROR.VALIDATION": {
-    "es": "Error de validación",
-    "en": "Validation error"
+    "es": "Por favor, revisa los campos obligatorios del formulario",
+    "en": "Please check the required fields in the form"
   },
   "ERROR.NOT_FOUND": {
     "es": "Recurso no encontrado",

@@ -173,6 +173,8 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
           Validators.maxLength(80),
         ],
       ],
+      maxUsers: [null, [Validators.min(1)]],
+      maxBranches: [null, [Validators.min(1)]],
     })
 
     this.stepForms[2] = this._fb.group({
@@ -554,6 +556,8 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       email: this.stepForms[1].value.email || undefined,
       phone: this.stepForms[1].value.phone || undefined,
       slug: this.stepForms[1].value.slug,
+      maxUsers: this.stepForms[1].value.maxUsers || null,
+      maxBranches: this.stepForms[1].value.maxBranches || null,
     }
 
     this._companyService
@@ -692,6 +696,8 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       email: this.selectedCompany.email || '',
       phone: this.selectedCompany.phone || '',
       slug: this.selectedCompany.slug || '',
+      maxUsers: this.selectedCompany.maxUsers ?? null,
+      maxBranches: this.selectedCompany.maxBranches ?? null,
     })
 
     if (this.selectedCompany.logoFile?.path) {
@@ -731,6 +737,8 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
         email: this.stepForms[1].value.email || undefined,
         phone: this.stepForms[1].value.phone || undefined,
         slug: this.stepForms[1].value.slug,
+        maxUsers: this.stepForms[1].value.maxUsers || null,
+        maxBranches: this.stepForms[1].value.maxBranches || null,
       }
 
       if (newLogoFileId) {

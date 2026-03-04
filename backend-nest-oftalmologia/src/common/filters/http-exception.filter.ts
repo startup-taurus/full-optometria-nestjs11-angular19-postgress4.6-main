@@ -63,12 +63,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       errorMessage = extracted.errorMessage;
     }
 
-    const responseMessage = extracted.errorMessage || messageObj;
-
     response.status(status).json({
       statusCode: status,
       status: 'error',
-      message: responseMessage,
+      message: messageObj,
       data: {
         error: errorMessage,
         details: extracted.errorDetails,

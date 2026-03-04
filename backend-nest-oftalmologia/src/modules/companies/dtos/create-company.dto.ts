@@ -6,6 +6,8 @@ import {
   IsOptional,
   IsUUID,
   IsEmail,
+  IsInt,
+  Min,
 } from 'class-validator';
 
 export class CreateCompanyDto {
@@ -39,4 +41,14 @@ export class CreateCompanyDto {
   @IsString()
   @MaxLength(80)
   slug?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxUsers?: number | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxBranches?: number | null;
 }
