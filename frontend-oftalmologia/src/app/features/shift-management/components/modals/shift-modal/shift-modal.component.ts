@@ -301,10 +301,12 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
   }
 
   private createShift(formValue: any): void {
+    const normalizedDescription = formValue.description?.trim() || undefined
+
     const createDto: CreateShiftDto = {
       patientId: formValue.patientId,
-      appointmentDate: new Date(formValue.appointmentDate).toISOString(),
-      description: formValue.description || '',
+      appointmentDate: formValue.appointmentDate,
+      description: normalizedDescription,
     }
 
     this.shiftsService
@@ -322,9 +324,11 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
   }
 
   private updateShift(formValue: any): void {
+    const normalizedDescription = formValue.description?.trim() || ''
+
     const updateDto: UpdateShiftDto = {
-      appointmentDate: new Date(formValue.appointmentDate).toISOString(),
-      description: formValue.description || '',
+      appointmentDate: formValue.appointmentDate,
+      description: normalizedDescription,
       statusId: formValue.statusId,
     }
 
