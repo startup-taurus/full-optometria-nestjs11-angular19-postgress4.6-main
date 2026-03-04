@@ -784,7 +784,7 @@
   "SYSTEM": {
     "ACCESS_DENIED": "Access Denied",
     "PERMISSION_REQUIRED": "Permissions Required",
-    "LOADING_PERMISSIONS": "Loading permissions...",
+    "LOADING_PERMISSIONS": "Loading permissions... ",
     "NO_PERMISSIONS": "No permissions assigned",
     "ERROR": {
       "INSUFFICIENT_PERMISSIONS": "Insufficient permissions"
