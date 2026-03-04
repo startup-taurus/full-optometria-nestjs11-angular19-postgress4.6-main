@@ -1,5 +1,5 @@
 .shift-management-container {
-  max-height: calc(100vh - 250px);
+  max-height: calc(100vh - 210px);
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 8px;
@@ -51,7 +51,7 @@
     cursor: pointer !important;
 
     &:hover {
-      transform: translateY(-2px);
+      transform: translateY(-1px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
     }
 
@@ -93,6 +93,14 @@
         cursor: not-allowed !important;
       }
     }
+  }
+}
+
+@media (max-width: 991.98px) {
+  .shift-management-container {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
   }
 }
 

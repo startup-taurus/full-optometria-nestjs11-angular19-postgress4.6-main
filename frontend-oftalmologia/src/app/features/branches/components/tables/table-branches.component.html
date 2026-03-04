@@ -53,9 +53,9 @@
 
   <!--hacer componente este esqueleton thissss -->
   @if (loading && branches.length === 0) {
-    <div class="row g-3">
+    <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
       @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
-        <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+        <div class="col">
           <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
               <div class="d-flex justify-content-end mb-2">
@@ -91,8 +91,8 @@
     [scrollThreshold]="200"
     (scrolled)="onScrollEnd()"
   >
-    <div class="row g-3">
-      <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+    <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
+      <div class="col">
         <div
           class="card new-item-card new-branch-card h-100 border-0 shadow-sm"
           (click)="onNewBranch()"
@@ -112,7 +112,7 @@
       </div>
 
       @for (branch of branches; track branch.id) {
-        <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+        <div class="col">
           <div class="card common-card branch-card h-100 border-0 shadow-sm">
             <div class="card-body position-relative">
               <!-- Status Badge -->
@@ -180,21 +180,13 @@
                     @if (branch.corporateEmail) {
                       <div class="contact-item">
                         <i class="ti ti-mail me-1"></i>
-                        <small
-                          class="text-body-secondary text-truncate d-inline-block"
-                          style="max-width: 200px"
-                          >{{ branch.corporateEmail }}</small
-                        >
+                        <small class="text-body-secondary text-truncate d-inline-block contact-ellipsis">{{ branch.corporateEmail }}</small>
                       </div>
                     }
                     @if (branch.address) {
                       <div class="contact-item mt-1">
                         <i class="ti ti-map-pin me-1"></i>
-                        <small
-                          class="text-body-secondary text-truncate d-inline-block"
-                          style="max-width: 200px"
-                          >{{ branch.address }}</small
-                        >
+                        <small class="text-body-secondary text-truncate d-inline-block contact-ellipsis">{{ branch.address }}</small>
                       </div>
                     }
                   </div>

@@ -123,6 +123,20 @@
   }
 }
 
+.responsive-card-grid {
+  --bs-gutter-x: 0.9rem;
+  --bs-gutter-y: 0.9rem;
+
+  > [class*='col-'] {
+    min-width: 0;
+  }
+
+  @media (min-width: 1200px) {
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 1rem;
+  }
+}
+
 .common-card {
   border: 0;
   border-radius: 0.75rem;
@@ -131,11 +145,11 @@
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
-  min-height: 280px;
+  min-height: 240px;
 
   &:hover {
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
-    transform: scale(1.05);
+    transform: translateY(-3px);
   }
 
   .card-body {
@@ -257,6 +271,9 @@
 
     small {
       word-break: break-word;
+      display: block;
+      min-width: 0;
+      max-inline-size: 100%;
     }
 
     &:last-child {
@@ -265,15 +282,27 @@
   }
 }
 
+.contact-ellipsis {
+  max-inline-size: min(100%, 17rem);
+
+  @media (max-width: 1199.98px) {
+    max-inline-size: min(100%, 15rem);
+  }
+}
+
 .actions-section {
   margin-top: auto;
   padding-top: 0.75rem;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+  .d-flex {
+    gap: 0.4rem !important;
+  }
 }
 
 .btn-action {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -448,7 +477,13 @@
   }
 
   .common-card {
-    min-height: 260px;
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .common-card {
+    min-height: 220px;
   }
 }
 
@@ -474,22 +509,6 @@
 
     &::placeholder {
       color: #adb5bd;
-    }
-  }
-
-  .btn {
-    border-radius: 8px;
-    font-weight: 500;
-    padding: 0.75rem 1rem;
-
-    &.btn-outline-secondary {
-      border-color: #6c757d;
-      color: #6c757d;
-
-      &:hover {
-        background-color: #6c757d;
-        border-color: #6c757d;
-      }
     }
   }
 }
