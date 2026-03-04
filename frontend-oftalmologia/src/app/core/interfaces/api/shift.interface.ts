@@ -32,7 +32,7 @@ export interface Shift {
 export interface CreateShiftDto {
   patientId: string
   appointmentDate: string
-  description: string
+  description?: string
   notes?: string
 }
 

@@ -15,9 +15,9 @@ export class CreateShiftDto {
   @IsNotEmpty()
   appointmentDate: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsString()

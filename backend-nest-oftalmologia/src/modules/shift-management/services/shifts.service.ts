@@ -62,8 +62,11 @@ export class ShiftsService {
 
     const pendingStatus = await this.getDefaultStatus();
 
+    const normalizedDescription = createShiftDto.description?.trim() ?? '';
+
     const shift = this.shiftRepository.create({
       ...createShiftDto,
+      description: normalizedDescription,
       branchId,
       companyId,
       appointmentDate: appointmentDateTime,
@@ -307,6 +310,10 @@ export class ShiftsService {
 
     if (updateShiftDto.statusId) {
       await this.validateStatus(updateShiftDto.statusId);
+    }
+
+    if (updateShiftDto.description !== undefined) {
+      updateShiftDto.description = updateShiftDto.description.trim();
     }
 
     Object.assign(shift, updateShiftDto);
