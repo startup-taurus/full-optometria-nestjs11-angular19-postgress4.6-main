@@ -10,14 +10,14 @@
   ></button>
 </div>
 
-<div class="modal-progress" *ngIf="!loading && clinicalHistory">
-  <div class="container-fluid px-4 py-2">
+<div class="modal-progress shared-modal-stepper" *ngIf="!loading && clinicalHistory">
+  <div class="container-fluid px-2 px-md-4 py-2">
     <div class="row">
       <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="steps-container">
           <div
             *ngFor="let title of stepTitles; let i = index; let isLast = last"
-            class="d-flex align-items-center"
+            class="step-item"
           >
             <div
               class="step-circle"

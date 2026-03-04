@@ -1,65 +1,3 @@
-.modal-progress {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-
-  .step-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 1;
-    border: 2px solid #6c757d;
-    background-color: #ffffff;
-    color: #6c757d;
-    transition: all 0.3s ease;
-    user-select: none;
-
-    &.active {
-      border-color: #007bff;
-      background-color: #007bff;
-      color: #ffffff;
-      transform: scale(1.1);
-      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-    }
-
-    &.completed {
-      border-color: #28a745;
-      background-color: #28a745;
-      color: #ffffff;
-    }
-
-    &.clickable {
-      cursor: pointer;
-
-      &:hover:not(.active) {
-        border-color: #007bff;
-        background-color: rgba(0, 123, 255, 0.1);
-        transform: scale(1.05);
-      }
-    }
-  }
-
-  .step-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #495057;
-    line-height: 1.4;
-    white-space: nowrap;
-  }
-
-  .step-divider {
-    flex: 1;
-    height: 2px;
-    background-color: #dee2e6;
-    margin: 0 1rem;
-    position: relative;
-    top: 20px;
-  }
-}
 
 :host ::ng-deep .modal-dialog {
   max-width: 1200px;
@@ -224,17 +162,6 @@
     font-size: 1rem;
   }
 
-  .modal-progress {
-    .step-label {
-      font-size: 12px;
-    }
-
-    .step-circle {
-      width: 35px;
-      height: 35px;
-      font-size: 12px;
-    }
-  }
 }
 
 @media (prefers-contrast: high) {

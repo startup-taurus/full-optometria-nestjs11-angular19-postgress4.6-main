@@ -1,5 +1,6 @@
 import {
   Component,
+  HostListener,
   inject,
   ViewChild,
   type OnInit,
@@ -19,6 +20,7 @@ import { UserActions } from '@core/states/auth/auth.actions'
 import { loadPreviewLanguage } from '@core/states/language/language.actions'
 import { selectLanguage } from '@core/states/language/language.selectors'
 import { Store } from '@ngrx/store'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateService } from '@ngx-translate/core'
 import {
   NgProgressComponent,
@@ -39,6 +41,7 @@ import { take } from 'rxjs/operators'
 export class AppComponent implements OnInit {
   private titleService = inject(TitleService)
   private companyLogoService = inject(CompanyLogoService)
+  private ngbModal = inject(NgbModal)
   progressRef!: NgProgressRef
   @ViewChild(NgProgressComponent) progressBar!: NgProgressComponent
   public language$ = this.store.select(selectLanguage)
@@ -61,6 +64,16 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleService.init()
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapePressed(event: KeyboardEvent): void {
+    if (!this.ngbModal.hasOpenModals()) {
+      return
+    }
+
+    event.preventDefault()
+    this.ngbModal.dismissAll('esc')
   }
 
   private initializeSplashScreenLogo(): void {
