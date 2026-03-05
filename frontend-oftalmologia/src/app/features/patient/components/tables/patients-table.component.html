@@ -7,7 +7,7 @@
         <div class="card-header bg-white border-bottom">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 text-primary">
-              <i class="fa fa-users me-2"></i>
+              <i class="ti ti-users me-2"></i>
               {{ 'PATIENT.TABLE.TITLE' | translate }}
             </h5>
             <div class="d-flex gap-2">
@@ -19,7 +19,7 @@
                 (click)="sideFilterPanel.resetFilters()"
                 *ngIf="sideFilterPanel?.hasActiveFilters()"
               >
-                <i class="fa fa-filter filter-crossed"></i>
+                <i class="ti ti-filter-off"></i>
               </button>
 
               <button
@@ -29,7 +29,7 @@
                 [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
                 (click)="reloadDatatable()"
               >
-                <i class="fa fa-repeat"></i>
+                <i class="ti ti-refresh"></i>
               </button>
 
               <button
@@ -39,7 +39,7 @@
                 [ngbTooltip]="'PATIENT.BUTTONS.ADD_PATIENT' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
-                <i class="fa fa-plus"></i>
+                <i class="ti ti-plus"></i>
               </button>
             </div>
           </div>
@@ -125,45 +125,45 @@
       [disabled]="isMedicalHistoryLoading(row.id)"
       (click)="manageMedicalHistory(row)"
     >
-      <i class="fa fa-spinner fa-spin" *ngIf="isMedicalHistoryLoading(row.id)"></i>
+      <i class="ti ti-loader-2 ti-spin" *ngIf="isMedicalHistoryLoading(row.id)"></i>
       <ng-container *ngIf="!isMedicalHistoryLoading(row.id)">
-        <i class="fa fa-pencil" *ngIf="patientHasHistory(row.id) === true"></i>
-        <i class="fa fa-plus" *ngIf="patientHasHistory(row.id) === false"></i>
-        <i class="fa fa-folder-open" *ngIf="patientHasHistory(row.id) === null"></i>
+        <i class="ti ti-pencil" *ngIf="patientHasHistory(row.id) === true"></i>
+        <i class="ti ti-plus" *ngIf="patientHasHistory(row.id) === false"></i>
+        <i class="ti ti-folder-open" *ngIf="patientHasHistory(row.id) === null"></i>
       </ng-container>
     </button>
     <button
       *ngIf="canShowViewMedicalHistoryButton(row.id)"
       class="btn btn-outline-info btn-xs"
       placement="left"
-      [ngbTooltip]="'Ver historial clínico'"
+      [ngbTooltip]="'PATIENT.BUTTONS.VIEW_MEDICAL_HISTORY' | translate"
       (click)="viewMedicalHistory(row)"
     >
-      <i class="fa fa-file-text-o"></i>
+      <i class="ti ti-file-description"></i>
     </button>
     <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
-      [ngbTooltip]="'Ver Detalles'"
+      [ngbTooltip]="'PATIENT.BUTTONS.VIEW_DETAILS' | translate"
       (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
     >
-      <i class="fa fa-eye"></i>
+      <i class="ti ti-eye"></i>
     </button>
     <button
       class="btn btn-outline-secondary btn-xs"
       placement="left"
-      [ngbTooltip]="'Editar paciente'"
+      [ngbTooltip]="'PATIENT.BUTTONS.EDIT_PATIENT' | translate"
       (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
     >
-      <i class="fa fa-edit"></i>
+      <i class="ti ti-edit"></i>
     </button>
     <button
       class="btn btn-outline-danger btn-xs"
       placement="left"
-      [ngbTooltip]="'Eliminar paciente'"
+      [ngbTooltip]="'PATIENT.BUTTONS.DELETE_PATIENT' | translate"
       (click)="deletePatient(row)"
     >
-      <i class="fa fa-trash"></i>
+      <i class="ti ti-trash"></i>
     </button>
   </div>
 </ng-template>

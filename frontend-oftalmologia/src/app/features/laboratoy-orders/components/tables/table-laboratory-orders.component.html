@@ -10,13 +10,13 @@
     <div class="d-flex gap-2">
       @if (sideFilterPanel?.hasActiveFilters()) {
         <button
-          class="btn btn-outline-danger btn-sm"
+          class="btn btn-outline-danger btn-sm filter-clear-btn"
           type="button"
           placement="top"
           [ngbTooltip]="'WORDS.RESET' | translate"
           (click)="sideFilterPanel.resetFilters()"
         >
-          <i class="fa fa-filter"></i>
+          <i class="ti ti-filter-off"></i>
         </button>
       }
       <!-- <button
@@ -62,9 +62,9 @@
     [scrollThreshold]="200"
     (scrolled)="onScrollEnd()"
   >
-    <div class="row g-3">
+    <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
       @for (order of filteredOrders; track order.id) {
-        <div class="col-xl-4 col-lg-6 col-md-6 col-12">
+        <div class="col">
           <div
             class="card common-card order-card h-100 border-0 shadow-sm"
             (click)="onView(order)"
@@ -116,11 +116,7 @@
                     </div>
                     <div class="contact-item">
                       <i class="ti ti-mail me-1"></i>
-                      <small
-                        class="text-body-secondary text-truncate d-inline-block"
-                        style="max-width: 200px"
-                        >{{ order.patient?.email || '-' }}</small
-                      >
+                      <small class="text-body-secondary text-truncate d-inline-block contact-ellipsis">{{ order.patient?.email || '-' }}</small>
                     </div>
                   </div>
                 </div>
@@ -129,19 +125,19 @@
                   <div class="d-flex flex-wrap gap-1 justify-content-center">
                     <button
                       type="button"
-                      class="btn btn-outline-info btn-action"
+                      class="btn btn-outline-secondary btn-action"
                       (click)="onViewClick($event, order)"
                       [title]="'LABORATORY_ORDERS_MODULE.VIEW' | translate"
                     >
-                      <i class="fa fa-eye"></i>
+                      <i class="ti ti-eye"></i>
                     </button>
                     <button
                       type="button"
-                      class="btn btn-outline-warning btn-action"
+                      class="btn btn-outline-secondary btn-action"
                       (click)="onEditClick($event, order)"
                       [title]="'LABORATORY_ORDERS_MODULE.EDIT' | translate"
                     >
-                      <i class="fa fa-edit"></i>
+                      <i class="ti ti-edit"></i>
                     </button>
                     <button
                       type="button"
@@ -149,17 +145,17 @@
                       (click)="onDeleteClick($event, order)"
                       [title]="'LABORATORY_ORDERS_MODULE.DELETE' | translate"
                     >
-                      <i class="fa fa-trash"></i>
+                      <i class="ti ti-trash"></i>
                     </button>
                     <button
                       type="button"
-                      class="btn btn-outline-success btn-action"
+                      class="btn btn-outline-info btn-action"
                       (click)="onChangeStatusClick($event, order)"
                       [title]="
                         'LABORATORY_ORDERS_MODULE.CHANGE_STATUS' | translate
                       "
                     >
-                      <i class="fa fa-toggle-on"></i>
+                      <i class="ti ti-toggle-right"></i>
                     </button>
 
                     <div class="position-relative">
@@ -231,10 +227,11 @@
     </div>
 
     @if (isLoading && filteredOrders.length > 0) {
-      <div class="text-center py-4">
+      <div class="module-loading-state py-4">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
         </div>
+        <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
       </div>
     }
 
@@ -250,7 +247,7 @@
                 {{ 'LABORATORY_ORDERS_MODULE.NO_ORDERS_FOUND' | translate }}
               </h5>
               <p class="text-body-secondary">
-                {{ 'LABORATORY_ORDERS_MODULE.NO_ORDERS_MESSAGE' | translate }}
+                {{ 'COMMON.NO_RESULTS_MESSAGE' | translate }}
               </p>
             </div>
           </div>

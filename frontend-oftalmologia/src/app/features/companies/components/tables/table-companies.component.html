@@ -11,7 +11,13 @@
   </div>
 
   @if (loading && companies.length === 0) {
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+    <div class="module-loading-state pb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
+      </div>
+      <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+    <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
       @for (item of [1, 2, 3, 4]; track item) {
         <div class="col">
           <div class="card h-100 border-0 shadow-sm">
@@ -57,7 +63,7 @@
     </div>
   }
 
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+  <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
     <!-- Card: Crear nueva compañía -->
     <div class="col">
       <div
@@ -211,7 +217,7 @@
               <div class="d-flex gap-1 justify-content-center">
                 <button
                   type="button"
-                  class="btn btn-outline-primary btn-action"
+                  class="btn btn-outline-secondary btn-action"
                   (click)="onViewCompany(company)"
                   [title]="'COMPANIES_MODULE.VIEW_COMPANY' | translate"
                 >
@@ -220,7 +226,7 @@
 
                 <button
                   type="button"
-                  class="btn btn-outline-success btn-action"
+                  class="btn btn-outline-secondary btn-action"
                   (click)="onEditCompany(company)"
                   [title]="'COMPANIES_MODULE.EDIT_COMPANY' | translate"
                 >
@@ -229,7 +235,7 @@
 
                 <button
                   type="button"
-                  class="btn btn-outline-warning btn-action"
+                  class="btn btn-outline-info btn-action"
                   (click)="onChangeStatus(company)"
                   [title]="'COMPANIES_MODULE.TOGGLE_STATUS' | translate"
                 >
@@ -307,7 +313,7 @@
               {{ 'COMPANIES_MODULE.NO_COMPANIES_FOUND' | translate }}
             </h5>
             <p class="text-body-secondary">
-              {{ 'COMPANIES_MODULE.NO_COMPANIES_MESSAGE' | translate }}
+              {{ 'COMMON.NO_RESULTS_MESSAGE' | translate }}
             </p>
           </div>
         </div>

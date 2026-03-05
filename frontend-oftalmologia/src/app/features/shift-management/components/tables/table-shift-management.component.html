@@ -10,13 +10,13 @@
     <div class="d-flex gap-2">
       @if (sideFilterPanel?.hasActiveFilters()) {
         <button
-          class="btn btn-outline-danger btn-sm"
+          class="btn btn-outline-danger btn-sm filter-clear-btn"
           type="button"
           placement="top"
           [ngbTooltip]="'WORDS.RESET' | translate"
           (click)="sideFilterPanel.resetFilters()"
         >
-          <i class="fa fa-filter"></i>
+          <i class="ti ti-filter-off"></i>
         </button>
       }
     </div>
@@ -30,8 +30,8 @@
     [scrollThreshold]="200"
     (scrolled)="onScrollEnd()"
   >
-    <div class="row g-3">
-      <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+    <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
+      <div class="col">
         <div
           class="card new-item-card h-100 border-0 shadow-sm"
           (click)="onNewShift()"
@@ -53,7 +53,7 @@
       </div>
 
       @for (shift of shifts; track shift.id) {
-        <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+        <div class="col">
           <div
             class="card common-card appointment-card h-100 border-0 shadow-sm clickable-card"
             (click)="onCardClick(shift, $event)"
@@ -106,11 +106,7 @@
                     </div>
                     <div class="contact-item">
                       <i class="ti ti-mail me-1"></i>
-                      <small
-                        class="text-body-secondary text-truncate d-inline-block"
-                        style="max-width: 200px"
-                        >{{ shift.patient.email }}</small
-                      >
+                      <small class="text-body-secondary text-truncate d-inline-block contact-ellipsis">{{ shift.patient.email }}</small>
                     </div>
                   </div>
                 </div>
@@ -130,7 +126,7 @@
                   <div class="d-flex flex-wrap gap-1 justify-content-center">
                     <button
                       type="button"
-                      class="btn btn-outline-primary btn-action"
+                      class="btn btn-outline-secondary btn-action"
                       (click)="onViewShift(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.VIEW_APPOINTMENT' | translate
@@ -150,17 +146,17 @@
                     </button>
                     <button
                       type="button"
-                      class="btn btn-outline-success btn-action"
+                      class="btn btn-outline-info btn-action"
                       (click)="onCreateClinicalHistory(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.CREATE_CLINICAL_HISTORY' | translate
                       "
                     >
-                      <i class="fa fa-file-text-o"></i>
+                      <i class="ti ti-file-description"></i>
                     </button>
                     <button
                       type="button"
-                      class="btn btn-outline-warning btn-action"
+                      class="btn btn-outline-info btn-action"
                       (click)="onChangeStatus(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.CHANGE_STATUS' | translate
@@ -249,34 +245,34 @@
     </div>
 
     @if (loading && shifts.length > 0) {
-      <div class="text-center py-4">
+      <div class="module-loading-state py-4">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
         </div>
+        <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
       </div>
     }
 
     @if (loading && shifts.length === 0) {
       <div class="row mt-4">
         <div class="col-12">
-          <div class="text-center py-5">
+          <div class="module-loading-state py-5">
             <div class="spinner-border text-primary" role="status">
               <span class="visually-hidden">{{
                 'WORDS.LOADING' | translate
               }}</span>
             </div>
-            <p class="text-body-secondary mt-2">
-              {{ 'WORDS.LOADING' | translate }}...
-            </p>
+            <p class="loading-label mb-0">{{ 'COMMON.LOADING' | translate }}</p>
           </div>
         </div>
       </div>
     }
 
     @if (!loading && shifts.length === 0) {
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="text-center py-5 bg-transparent">
+      <div class="no-items-found">
+        <div class="row">
+          <div class="col-12">
+            <div class="text-center py-5 bg-transparent">
             <i
               class="ti ti-calendar-off display-4 text-body-secondary mb-3"
             ></i>
@@ -284,10 +280,9 @@
               {{ 'SHIFT_MANAGEMENT_MODULE.NO_APPOINTMENTS_FOUND' | translate }}
             </h5>
             <p class="text-body-secondary">
-              {{
-                'SHIFT_MANAGEMENT_MODULE.NO_APPOINTMENTS_MESSAGE' | translate
-              }}
+              {{ 'COMMON.NO_RESULTS_MESSAGE' | translate }}
             </p>
+            </div>
           </div>
         </div>
       </div>

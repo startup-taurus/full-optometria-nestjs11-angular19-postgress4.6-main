@@ -296,7 +296,7 @@
       {{ 'COMPANIES_MODULE.ROLE_CONFIGURATION' | translate }}
     </h5>
     <div class="alert alert-info">
-      <i class="fas fa-info-circle me-2"></i>
+      <i class="ti ti-info-circle me-2"></i>
       {{ 'COMPANIES_MODULE.ROLE_INFO' | translate }}
     </div>
 
@@ -522,16 +522,12 @@
 
     <form [formGroup]="stepForms[4]" (ngSubmit)="onSave()">
       <div class="mb-4">
-        <h6
-          class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-        >
-          <i class="fa fa-info-circle"></i>
+        <h6 class="form-section-title">
+          <i class="ti ti-info-circle"></i>
           {{ 'USER.FORM.BASIC_INFO' | translate }}
         </h6>
 
-        <div
-          class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3"
-        >
+        <div class="app-form-card">
           <div class="row row-cols-1 row-cols-md-2 g-3">
             <div class="col">
               <label class="form-label text-secondary-emphasis small fw-medium">
@@ -722,16 +718,12 @@
       </div>
 
       <div class="mb-4">
-        <h6
-          class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-        >
-          <i class="fa fa-phone"></i>
+        <h6 class="form-section-title">
+          <i class="ti ti-phone"></i>
           {{ 'USER.FORM.CONTACT_INFO' | translate }}
         </h6>
 
-        <div
-          class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3"
-        >
+        <div class="app-form-card">
           <div class="row row-cols-1 row-cols-md-2 g-3">
             <div class="col">
               <label class="form-label text-secondary-emphasis small fw-medium">
@@ -769,16 +761,12 @@
       </div>
 
       <div class="mb-4">
-        <h6
-          class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-        >
-          <i class="fa fa-lock"></i>
+        <h6 class="form-section-title">
+          <i class="ti ti-lock"></i>
           {{ 'USER.FORM.SECURITY_ACCESS' | translate }}
         </h6>
 
-        <div
-          class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3"
-        >
+        <div class="app-form-card">
           <div class="row row-cols-1 row-cols-md-2 g-3">
             <div class="col">
               <label class="form-label text-secondary-emphasis small fw-medium">

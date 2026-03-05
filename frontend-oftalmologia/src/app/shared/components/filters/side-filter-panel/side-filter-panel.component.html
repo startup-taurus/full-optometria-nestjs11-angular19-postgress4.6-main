@@ -10,16 +10,18 @@
       config.badgeCount && config.badgeCount > 0
         ? config.badgeCount +
           ' ' +
-          (config.badgeCount === 1 ? 'filtro aplicado' : 'filtros aplicados') +
-          ' - Clic para modificar'
+          (config.badgeCount === 1
+            ? ('WORDS.FILTER_APPLIED' | translate)
+            : ('WORDS.FILTERS_APPLIED' | translate)) +
+          ' - ' + ('WORDS.CLICK_TO_MODIFY' | translate)
         : (config.title | translate)
     "
   >
-    <i
-      class="fa fa-filter"
-      [class.fa-times]="isOpen"
-      [class.fa-filter]="!isOpen"
-    ></i>
+    @if (isOpen) {
+      <i class="ti ti-x"></i>
+    } @else {
+      <i class="ti ti-filter"></i>
+    }
 
     <span
       *ngIf="config.showBadge && config.badgeCount && config.badgeCount > 0"
@@ -53,7 +55,7 @@
       [id]="'side-filter-title-' + config.position"
       class="side-filter-panel__title mb-0"
     >
-      <i class="fa fa-filter me-2"></i>
+      <i class="ti ti-filter me-2"></i>
       {{ config.title | translate }}
     </h5>
 
@@ -63,7 +65,7 @@
       (click)="closePanel()"
       [attr.aria-label]="'WORDS.CLOSE' | translate"
     >
-      <i class="fa fa-times"></i>
+      <i class="ti ti-x"></i>
     </button>
   </div>
 
@@ -83,14 +85,16 @@
   <div class="side-filter-panel__footer">
     <div class="text-center">
       <small class="text-muted">
-        <i class="fa fa-info-circle me-1"></i>
+        <i class="ti ti-info-circle me-1"></i>
         <span
           *ngIf="config.badgeCount && config.badgeCount > 0; else noFilters"
         >
           {{ config.badgeCount }}
-          {{
-            config.badgeCount === 1 ? 'filtro aplicado' : 'filtros aplicados'
-          }}
+          @if (config.badgeCount === 1) {
+            {{ 'WORDS.FILTER_APPLIED' | translate }}
+          } @else {
+            {{ 'WORDS.FILTERS_APPLIED' | translate }}
+          }
         </span>
         <ng-template #noFilters>
           {{ 'USER.FILTER.TITLE' | translate }}

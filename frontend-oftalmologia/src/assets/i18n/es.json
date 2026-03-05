@@ -103,7 +103,8 @@
     "SETTINGS": "Ajustes",
     "SUPPORT": "Apoyo",
     "MY_ACCOUNT": "Mi cuenta",
-    "SIGN_OUT": "Sign Out"
+    "SIGN_OUT": "Sign Out",
+    "LOCK_SCREEN": "Bloquear pantalla"
   },
   "PROFILE": {
     "TITLE": "Perfil",
@@ -177,7 +178,8 @@
     "BUTTONS": {
       "ADD_USER": "Agregar usuario",
       "EDIT_USER": "Editar usuario",
-      "VIEW_DETAILS": "Ver detalles"
+      "VIEW_DETAILS": "Ver detalles",
+      "DELETE_USER": "Eliminar usuario"
     },
     "FILTER": {
       "TITLE": "Filtros de Búsqueda",
@@ -389,7 +391,9 @@
     "BUTTONS": {
       "ADD_PATIENT": "Agregar paciente",
       "EDIT_PATIENT": "Editar paciente",
-      "VIEW_DETAILS": "Ver detalles"
+      "VIEW_DETAILS": "Ver detalles",
+      "DELETE_PATIENT": "Eliminar paciente",
+      "VIEW_MEDICAL_HISTORY": "Ver historial cl\u00ednico"
     },
     "FILTER": {
       "TITLE": "Filtros de Búsqueda",
@@ -504,8 +508,11 @@
     "LEAVE_EMPTY_TO_KEEP_CURRENT": "Dejar vacío para mantener la actual",
     "LEAVE_EMPTY_PASSWORD_HINT": "Deja este campo vacío si no deseas cambiar la contraseña",
     "LOADING": "Cargando...",
+    "SAVING": "Guardando...",
+    "UPDATING": "Actualizando...",
     "SEARCHING": "Buscando...",
     "NO_RESULTS": "Sin resultados",
+    "NO_RESULTS_MESSAGE": "No se encontraron resultados",
     "CLEAR_ALL": "Limpiar todo",
     "VALIDATING": "Validando",
     "ACTIVE": "Activo",
@@ -541,6 +548,7 @@
     },
     "NO": "No",
     "YES": "Sí",
+    "PRESS_ESC_TO_CLOSE": "Presiona Esc para cerrar",
     "YES_DELETE": "Sí, Eliminar",
     "DELETED": "¡Eliminado!",
     "DELETE_CONFIG": "Eliminar Configuración"
@@ -758,7 +766,10 @@
     "CURRENT_STATUS": "Estado Actual",
     "NEW_STATUS": "Nuevo Estado",
     "UPDATED_AT": "Actualizado en",
-    "CREATED_AT": "Creado en"
+    "CREATED_AT": "Creado en",
+    "FILTER_APPLIED": "filtro aplicado",
+    "FILTERS_APPLIED": "filtros aplicados",
+    "CLICK_TO_MODIFY": "Clic para modificar"
   },
   "VALIDATION": {
     "REQUIRED": "Este campo es obligatorio",

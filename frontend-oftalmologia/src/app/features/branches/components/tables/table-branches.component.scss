@@ -1,5 +1,5 @@
 .branches-container {
-  max-height: calc(100vh - 250px);
+  max-height: calc(100vh - 210px);
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 8px;
@@ -41,6 +41,15 @@
     .branch-section {
       flex: 1;
     }
+  }
+}
+
+@media (max-width: 991.98px) {
+  .branches-container {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+    padding-bottom: 24px;
   }
 }
 

@@ -12,25 +12,5 @@
   }
 }
 
-.filter-clear-btn {
-  .filter-crossed {
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 120%;
-      height: 2px;
-      background-color: currentColor;
-      transform: translate(-50%, -50%) rotate(45deg);
-    }
-  }
-}
-
-.common-badge {
-  font-weight: 500;
-  padding: 0.35em 0.65em;
-  font-size: 0.75rem;
-}
+// .filter-clear-btn y .common-badge están definidos en los SCSS globales
+// (_buttons.scss y _badge.scss). Se mantiene este archivo para overrides locales.

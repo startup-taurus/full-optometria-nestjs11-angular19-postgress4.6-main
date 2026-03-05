@@ -11,7 +11,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs'
 const DEFAULT_BOOTSTRAP_MODAL_OPTIONS: NgbModalOptions = {
   backdrop: 'static',
   centered: true,
-  keyboard: false,
+  keyboard: true,
   size: 'lg',
 }
 

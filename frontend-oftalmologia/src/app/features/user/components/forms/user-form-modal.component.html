@@ -25,14 +25,12 @@
 <div class="modal-body px-4">
   <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-info-circle"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-info-circle"></i>
         {{ 'USER.FORM.BASIC_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -223,14 +221,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-phone"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-phone"></i>
         {{ 'USER.FORM.CONTACT_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -265,14 +261,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-lock"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-lock"></i>
         {{ 'USER.FORM.SECURITY_ACCESS' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3" *ngIf="!isEditMode">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -318,7 +312,7 @@
           class="alert alert-info border-0 bg-info-subtle rounded-3 d-flex align-items-center"
           *ngIf="isEditMode"
         >
-          <i class="fa fa-info-circle me-2 text-info"></i>
+          <i class="ti ti-info-circle me-2 text-info"></i>
           <span class="small">{{
             'USER.FORM.PASSWORD_CHANGE_NOTE' | translate
           }}</span>
@@ -327,14 +321,12 @@
     </div>
 
     <div class="mb-4" *ngIf="isEditMode">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-cog"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-settings"></i>
         {{ 'USER.FORM.STATUS' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <div class="form-check form-switch d-flex align-items-center">
@@ -350,11 +342,11 @@
                   for="isActive"
                 >
                   <i
-                    class="fa fa-user-check me-2"
+                    class="ti ti-user-check me-2"
                     *ngIf="userForm.get('isActive')?.value"
                   ></i>
                   <i
-                    class="fa fa-user-times me-2"
+                    class="ti ti-user-x me-2"
                     *ngIf="!userForm.get('isActive')?.value"
                   ></i>
                   {{ 'USER.FORM.IS_ACTIVE' | translate }}
@@ -394,11 +386,11 @@
                   for="isLocked"
                 >
                   <i
-                    class="fa fa-lock me-2"
+                    class="ti ti-lock me-2"
                     *ngIf="userForm.get('isLocked')?.value"
                   ></i>
                   <i
-                    class="fa fa-unlock me-2"
+                    class="ti ti-lock-open me-2"
                     *ngIf="!userForm.get('isLocked')?.value"
                   ></i>
                   {{ 'USER.FORM.IS_LOCKED' | translate }}
@@ -438,7 +430,7 @@
     (click)="onCancel()"
     [disabled]="loading"
   >
-    <i class="fa fa-times me-2"></i>
+    <i class="ti ti-x me-2"></i>
     {{ 'WORDS.CANCEL' | translate }}
   </button>
   <button
@@ -448,7 +440,7 @@
     [disabled]="userForm.invalid || loading"
   >
     <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
-    <i class="fa fa-save me-2" *ngIf="!loading"></i>
+    <i class="ti ti-device-floppy me-2" *ngIf="!loading"></i>
     {{ (isEditMode ? 'WORDS.UPDATE' : 'USER.MODAL.CREATE_TITLE') | translate }}
   </button>
 </div>

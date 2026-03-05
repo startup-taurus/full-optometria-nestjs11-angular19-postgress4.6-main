@@ -44,7 +44,7 @@
         [class.bg-danger-subtle]="!selectedUser.isActive"
         [class.text-danger-emphasis]="!selectedUser.isActive"
       >
-        <i class="fa fa-circle me-1" style="font-size: 0.6rem"></i>
+        <i class="ti ti-circle-filled me-1" style="font-size: 0.6rem"></i>
         {{
           (selectedUser.isActive
             ? 'USER.STATUS.ACTIVE'
@@ -55,14 +55,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-user"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-user"></i>
         {{ 'USER.DETAILS.PERSONAL_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -104,14 +102,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-phone"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-phone"></i>
         {{ 'USER.DETAILS.CONTACT_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -135,14 +131,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-shield-alt"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-shield"></i>
         {{ 'USER.DETAILS.SYSTEM_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -152,7 +146,7 @@
               <span
                 class="badge rounded-pill bg-primary-subtle text-primary-emphasis px-3 py-2"
               >
-                <i class="fa fa-user-shield me-1"></i>
+                <i class="ti ti-shield-check me-1"></i>
                 {{ selectedUser.role?.roleName || 'N/A' }}
               </span>
             </div>
@@ -220,14 +214,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-clock"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-clock"></i>
         {{ 'USER.DETAILS.TIMESTAMPS' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -265,7 +257,7 @@
       class="d-flex align-items-center justify-content-center rounded-circle shadow-sm bg-warning bg-opacity-10 mx-auto mb-3"
       style="width: 80px; height: 80px"
     >
-      <i class="fa fa-exclamation-triangle fa-2x text-warning"></i>
+      <i class="ti ti-alert-triangle fa-2x text-warning"></i>
     </div>
     <h5>{{ 'USER.DETAILS.NO_DATA' | translate }}</h5>
     <p class="text-muted">{{ 'USER.DETAILS.NO_DATA_MESSAGE' | translate }}</p>
@@ -276,7 +268,7 @@
   class="modal-footer border-0 pt-0 px-4 pb-3 d-flex justify-content-end gap-2"
 >
   <button type="button" class="btn btn-light px-4" (click)="onClose()">
-    <i class="fa fa-times me-2"></i>
+    <i class="ti ti-x me-2"></i>
     {{ 'WORDS.CLOSE' | translate }}
   </button>
 </div>

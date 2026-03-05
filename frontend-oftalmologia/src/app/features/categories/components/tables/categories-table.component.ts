@@ -219,7 +219,7 @@ export class CategoriesTableComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(CategoryModalComponent, {
       size: 'md',
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.mode = mode
@@ -249,7 +249,7 @@ export class CategoriesTableComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(SubcategoryModalComponent, {
       size: 'md',
       backdrop: 'static',
-      keyboard: false,
+      keyboard: true,
     })
 
     modalRef.componentInstance.mode = mode

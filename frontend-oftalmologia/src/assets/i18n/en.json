@@ -105,7 +105,8 @@
     "SETTINGS": "Settings",
     "SUPPORT": "Support",
     "MY_ACCOUNT": "My Account",
-    "SIGN_OUT": "Sign Out"
+    "SIGN_OUT": "Sign Out",
+    "LOCK_SCREEN": "Lock Screen"
   },
   "PROFILE": {
     "TITLE": "Profile",
@@ -172,7 +173,8 @@
     "BUTTONS": {
       "ADD_USER": "Add User",
       "EDIT_USER": "Edit User",
-      "VIEW_DETAILS": "View Details"
+      "VIEW_DETAILS": "View Details",
+      "DELETE_USER": "Delete User"
     },
     "FILTER": {
       "TITLE": "Search Filters",
@@ -384,7 +386,9 @@
     "BUTTONS": {
       "ADD_PATIENT": "Add patient",
       "EDIT_PATIENT": "Edit patient",
-      "VIEW_DETAILS": "View details"
+      "VIEW_DETAILS": "View details",
+      "DELETE_PATIENT": "Delete patient",
+      "VIEW_MEDICAL_HISTORY": "View clinical history"
     },
     "FILTER": {
       "TITLE": "Search Filters",
@@ -499,6 +503,11 @@
     "LEAVE_EMPTY_TO_KEEP_CURRENT": "Leave empty to keep current",
     "LEAVE_EMPTY_PASSWORD_HINT": "Leave this field empty if you don't want to change the password",
     "LOADING": "Loading...",
+    "SAVING": "Saving...",
+    "UPDATING": "Updating...",
+    "SEARCHING": "Searching...",
+    "NO_RESULTS": "No results",
+    "NO_RESULTS_MESSAGE": "No results found",
     "VALIDATING": "Validating",
     "ACTIVE": "Active",
     "INACTIVE": "Inactive",
@@ -528,7 +537,8 @@
       "MAX_LENGTH": "Cannot have more than {{max}} characters"
     },
     "NO": "No",
-    "YES": "Yes"
+    "YES": "Yes",
+    "PRESS_ESC_TO_CLOSE": "Press Esc to close"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
@@ -744,7 +754,10 @@
     "CURRENT_STATUS": "Current Status",
     "NEW_STATUS": "New Status",
     "UPDATED_AT": "Updated At",
-    "CREATED_AT": "Created At"
+    "CREATED_AT": "Created At",
+    "FILTER_APPLIED": "filter applied",
+    "FILTERS_APPLIED": "filters applied",
+    "CLICK_TO_MODIFY": "Click to modify"
   },
   "VALIDATION": {
     "REQUIRED": "This field is required",
