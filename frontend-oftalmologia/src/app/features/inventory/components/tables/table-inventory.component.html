@@ -17,7 +17,7 @@
                 [ngbTooltip]="'WORDS.RESET' | translate"
                 (click)="clearAllFilters()"
               >
-                <i class="fa fa-filter filter-crossed"></i>
+                <i class="ti ti-filter-off"></i>
               </button>
 
               <button
@@ -27,7 +27,7 @@
                 [ngbTooltip]="'SUPPLIERS.ACTIONS.REFRESH' | translate"
                 (click)="reloadDatatable()"
               >
-                <i class="fa fa-repeat"></i>
+                <i class="ti ti-refresh"></i>
               </button>
 
               <button
@@ -37,7 +37,7 @@
                 [ngbTooltip]="'INVENTORY.ACTIONS.CREATE' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
-                <i class="fa fa-plus"></i>
+                <i class="ti ti-plus"></i>
               </button>
             </div>
           </div>
@@ -53,7 +53,7 @@
           >
             <ng-template #createdByTemplate let-row="row" let-value="value">
               <span class="d-flex align-items-center">
-                <i class="fa fa-user me-2 text-primary"></i>
+                <i class="ti ti-user me-2 text-primary"></i>
                 <span>
                   {{
                     row.createdByUser?.firstName && row.createdByUser?.lastName
@@ -78,7 +78,7 @@
 
             <ng-template #viewsTemplate let-row="row" let-value="value">
               <span class="badge bg-info">
-                <i class="fa fa-eye me-1"></i>
+                <i class="ti ti-eye me-1"></i>
                 {{ row.views || 0 }}
               </span>
             </ng-template>
@@ -137,23 +137,23 @@
               <div class="d-flex gap-1">
                 <button
                   type="button"
-                  class="btn btn-sm btn-outline-info"
+                  class="btn btn-sm btn-outline-secondary"
                   (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
                   [attr.aria-label]="
                     'INVENTORY.ACTIONS.VIEW_DETAILS' | translate
                   "
                   [ngbTooltip]="'INVENTORY.ACTIONS.VIEW_DETAILS' | translate"
                 >
-                  <i class="fa fa-eye"></i>
+                  <i class="ti ti-eye"></i>
                 </button>
                 <button
                   type="button"
-                  class="btn btn-sm btn-outline-warning"
+                  class="btn btn-sm btn-outline-secondary"
                   (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
                   [attr.aria-label]="'INVENTORY.ACTIONS.EDIT' | translate"
                   [ngbTooltip]="'INVENTORY.ACTIONS.EDIT' | translate"
                 >
-                  <i class="fa fa-edit"></i>
+                  <i class="ti ti-edit"></i>
                 </button>
                 <button
                   type="button"
@@ -175,7 +175,7 @@
                     ) | translate
                   "
                 >
-                  <i [class]="row.isActive ? 'fa fa-ban' : 'fa fa-check'"></i>
+                  <i [class]="row.isActive ? 'ti ti-ban' : 'ti ti-check'"></i>
                 </button>
                 <button
                   type="button"
@@ -184,7 +184,7 @@
                   [attr.aria-label]="'INVENTORY.ACTIONS.DELETE' | translate"
                   [ngbTooltip]="'INVENTORY.ACTIONS.DELETE' | translate"
                 >
-                  <i class="fa fa-trash"></i>
+                  <i class="ti ti-trash"></i>
                 </button>
               </div>
             </ng-template>

@@ -16,7 +16,7 @@
             [disabled]="saving"
             [title]="'COMMON.DELETE_CONFIG' | translate"
           >
-            <i class="fa fa-trash-o"></i>
+            <i class="ti ti-trash"></i>
           </button>
         }
       </div>
@@ -27,7 +27,7 @@
     <div class="row mb-4">
       <div class="col-12">
         <div class="alert border-0">
-          <i class="fa fa-building me-2"></i>
+          <i class="ti ti-building me-2"></i>
           <strong
             >{{ 'MEDICAL_HISTORY_CONFIG.CURRENT_BRANCH' | translate }}:</strong
           >
@@ -60,7 +60,7 @@
             style="max-width: 500px; margin: 0 auto"
           >
             <div class="card-body p-4 p-md-5">
-              <i class="fa fa-cogs fa-3x text-muted mb-4"></i>
+              <i class="ti ti-settings text-muted mb-4" style="font-size: 3rem"></i>
               <h4 class="mb-3">
                 {{ 'MEDICAL_HISTORY_CONFIG.WELCOME_TITLE' | translate }}
               </h4>
@@ -79,7 +79,7 @@
                     role="status"
                   ></span>
                 }
-                <i class="fa fa-play me-2"></i>
+                <i class="ti ti-player-play me-2"></i>
                 {{ 'MEDICAL_HISTORY_CONFIG.START_CONFIG' | translate }}
               </button>
             </div>
@@ -102,14 +102,14 @@
                   [class.collapsed]="!isAccordionOpen('step1')"
                   (click)="toggleAccordion('step1')"
                 >
-                  <i class="fa fa-user me-2 me-md-3 text-muted"></i>
+                  <i class="ti ti-user me-2 me-md-3 text-muted"></i>
                   <span class="fw-medium flex-grow-1">{{
                     'MEDICAL_HISTORY_CONFIG.STEP1_TITLE' | translate
                   }}</span>
                   <i
-                    class="fa ms-2"
-                    [class.fa-chevron-down]="!isAccordionOpen('step1')"
-                    [class.fa-chevron-up]="isAccordionOpen('step1')"
+                    class="ti ms-2"
+                    [class.ti-chevron-down]="!isAccordionOpen('step1')"
+                    [class.ti-chevron-up]="isAccordionOpen('step1')"
                   ></i>
                 </button>
               </div>
@@ -221,14 +221,14 @@
                   [class.collapsed]="!isAccordionOpen('step2')"
                   (click)="toggleAccordion('step2')"
                 >
-                  <i class="fa fa-eye me-2 me-md-3 text-muted"></i>
+                  <i class="ti ti-eye me-2 me-md-3 text-muted"></i>
                   <span class="fw-medium flex-grow-1">{{
                     'MEDICAL_HISTORY_CONFIG.STEP2_TITLE' | translate
                   }}</span>
                   <i
-                    class="fa ms-2"
-                    [class.fa-chevron-down]="!isAccordionOpen('step2')"
-                    [class.fa-chevron-up]="isAccordionOpen('step2')"
+                    class="ti ms-2"
+                    [class.ti-chevron-down]="!isAccordionOpen('step2')"
+                    [class.ti-chevron-up]="isAccordionOpen('step2')"
                   ></i>
                 </button>
               </div>
@@ -340,14 +340,14 @@
                   [class.collapsed]="!isAccordionOpen('step3')"
                   (click)="toggleAccordion('step3')"
                 >
-                  <i class="fa fa-stethoscope me-2 me-md-3 text-muted"></i>
+                  <i class="ti ti-stethoscope me-2 me-md-3 text-muted"></i>
                   <span class="fw-medium flex-grow-1">{{
                     'MEDICAL_HISTORY_CONFIG.STEP3_TITLE' | translate
                   }}</span>
                   <i
-                    class="fa ms-2"
-                    [class.fa-chevron-down]="!isAccordionOpen('step3')"
-                    [class.fa-chevron-up]="isAccordionOpen('step3')"
+                    class="ti ms-2"
+                    [class.ti-chevron-down]="!isAccordionOpen('step3')"
+                    [class.ti-chevron-up]="isAccordionOpen('step3')"
                   ></i>
                 </button>
               </div>
@@ -465,7 +465,7 @@
               (click)="resetFormToDefault()"
               [disabled]="saving"
             >
-              <i class="fa fa-undo me-2"></i>
+              <i class="ti ti-rotate-left me-2"></i>
               {{ 'MEDICAL_HISTORY_CONFIG.RESET_TO_DEFAULT' | translate }}
             </button>
             <button
@@ -479,7 +479,7 @@
                   role="status"
                 ></span>
               }
-              <i class="fa fa-floppy-o me-2"></i>
+              <i class="ti ti-device-floppy me-2"></i>
               {{ 'MEDICAL_HISTORY_CONFIG.SAVE_CHANGES' | translate }}
             </button>
           </div>
@@ -492,7 +492,7 @@
     <div class="row">
       <div class="col-12">
         <div class="alert alert-warning text-center py-4 border-0">
-          <i class="fa fa-exclamation-triangle fa-2x mb-3"></i>
+          <i class="ti ti-alert-triangle mb-3" style="font-size: 2rem"></i>
           <h5>{{ 'MEDICAL_HISTORY_CONFIG.NO_BRANCH_SELECTED' | translate }}</h5>
           <p class="mb-0">
             {{ 'MEDICAL_HISTORY_CONFIG.SELECT_BRANCH_TO_CONTINUE' | translate }}

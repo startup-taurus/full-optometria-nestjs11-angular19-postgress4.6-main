@@ -20,7 +20,7 @@
       {{ selectedPatient?.firstName }} {{ selectedPatient?.lastName }}
     </h5>
     <p class="mb-0 text-muted small">
-      <i class="fa fa-id-card me-1"></i>
+      <i class="ti ti-id me-1"></i>
       {{ selectedPatient?.documentNumber }}
     </p>
   </div>
@@ -50,7 +50,7 @@
         [class.bg-danger-subtle]="!selectedPatient.isActive"
         [class.text-danger-emphasis]="!selectedPatient.isActive"
       >
-        <i class="fa fa-circle me-1" style="font-size: 0.6rem"></i>
+        <i class="ti ti-circle-filled me-1" style="font-size: 0.6rem"></i>
         {{
           (selectedPatient.isActive
             ? 'PATIENT.STATUS.ACTIVE'
@@ -61,14 +61,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-user"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-user"></i>
         {{ 'PATIENT.DETAILS.PERSONAL_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -110,14 +108,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-phone"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-phone"></i>
         {{ 'PATIENT.DETAILS.CONTACT_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -141,14 +137,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-building"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-building"></i>
         {{ 'PATIENT.DETAILS.ORGANIZATION_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -159,7 +153,7 @@
                 class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2"
                 *ngIf="selectedPatient.branch"
               >
-                <i class="fa fa-building me-1"></i>
+                <i class="ti ti-building me-1"></i>
                 {{ selectedPatient.branch?.name || 'N/A' }}
               </span>
               <span *ngIf="!selectedPatient.branch">N/A</span>
@@ -175,7 +169,7 @@
                 class="badge rounded-pill bg-info-subtle text-info-emphasis px-3 py-2"
                 *ngIf="selectedPatient.company"
               >
-                <i class="fa fa-briefcase me-1"></i>
+                <i class="ti ti-briefcase me-1"></i>
                 {{ selectedPatient.company?.name || 'N/A' }}
               </span>
               <span *ngIf="!selectedPatient.company">N/A</span>
@@ -186,14 +180,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-clock"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-clock"></i>
         {{ 'PATIENT.DETAILS.TIMESTAMPS' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -222,7 +214,7 @@
       class="d-flex align-items-center justify-content-center rounded-circle shadow-sm bg-warning bg-opacity-10 mx-auto mb-3"
       style="width: 80px; height: 80px"
     >
-      <i class="fa fa-exclamation-triangle fa-2x text-warning"></i>
+      <i class="ti ti-alert-triangle fa-2x text-warning"></i>
     </div>
     <h5>{{ 'PATIENT.DETAILS.NO_DATA' | translate }}</h5>
     <p class="text-muted">

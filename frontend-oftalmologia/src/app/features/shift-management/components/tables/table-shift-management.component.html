@@ -10,13 +10,13 @@
     <div class="d-flex gap-2">
       @if (sideFilterPanel?.hasActiveFilters()) {
         <button
-          class="btn btn-outline-danger btn-sm"
+          class="btn btn-outline-danger btn-sm filter-clear-btn"
           type="button"
           placement="top"
           [ngbTooltip]="'WORDS.RESET' | translate"
           (click)="sideFilterPanel.resetFilters()"
         >
-          <i class="fa fa-filter"></i>
+          <i class="ti ti-filter-off"></i>
         </button>
       }
     </div>
@@ -126,7 +126,7 @@
                   <div class="d-flex flex-wrap gap-1 justify-content-center">
                     <button
                       type="button"
-                      class="btn btn-outline-primary btn-action"
+                      class="btn btn-outline-secondary btn-action"
                       (click)="onViewShift(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.VIEW_APPOINTMENT' | translate
@@ -146,17 +146,17 @@
                     </button>
                     <button
                       type="button"
-                      class="btn btn-outline-success btn-action"
+                      class="btn btn-outline-info btn-action"
                       (click)="onCreateClinicalHistory(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.CREATE_CLINICAL_HISTORY' | translate
                       "
                     >
-                      <i class="fa fa-file-text-o"></i>
+                      <i class="ti ti-file-description"></i>
                     </button>
                     <button
                       type="button"
-                      class="btn btn-outline-warning btn-action"
+                      class="btn btn-outline-info btn-action"
                       (click)="onChangeStatus(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.CHANGE_STATUS' | translate

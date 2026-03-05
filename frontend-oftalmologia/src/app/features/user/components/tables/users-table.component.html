@@ -7,7 +7,7 @@
         <div class="card-header bg-white border-bottom">
           <div class="d-flex justify-content-between align-items-center header-toolbar">
             <h5 class="card-title mb-0 text-primary">
-              <i class="fa fa-users me-2"></i>
+              <i class="ti ti-users me-2"></i>
               {{ 'USER.TABLE.TITLE' | translate }}
             </h5>
             <div class="d-flex align-items-center gap-2 header-actions">
@@ -47,7 +47,7 @@
                 (click)="sideFilterPanel.resetFilters()"
                 *ngIf="sideFilterPanel?.hasActiveFilters()"
               >
-                <i class="fa fa-filter filter-crossed"></i>
+                <i class="ti ti-filter-off"></i>
               </button>
 
               <button
@@ -57,7 +57,7 @@
                 [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
                 (click)="reloadDatatable()"
               >
-                <i class="fa fa-repeat"></i>
+                <i class="ti ti-refresh"></i>
               </button>
 
               <button
@@ -67,7 +67,7 @@
                 [ngbTooltip]="'USER.BUTTONS.ADD_USER' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
-                <i class="fa fa-plus"></i>
+                <i class="ti ti-plus"></i>
               </button>
             </div>
           </div>
@@ -178,7 +178,7 @@
       [ngbTooltip]="'USER.BUTTONS.VIEW_DETAILS' | translate"
       (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
     >
-      <i class="fa fa-eye"></i>
+      <i class="ti ti-eye"></i>
     </button>
     <button
       class="btn btn-outline-secondary btn-xs"
@@ -186,7 +186,7 @@
       [ngbTooltip]="'USER.BUTTONS.EDIT_USER' | translate"
       (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
     >
-      <i class="fa fa-edit"></i>
+      <i class="ti ti-edit"></i>
     </button>
     <button
       class="btn btn-outline-danger btn-xs"
@@ -194,7 +194,7 @@
       [ngbTooltip]="'USER.BUTTONS.DELETE_USER' | translate"
       (click)="deleteUser(row)"
     >
-      <i class="fa fa-trash"></i>
+      <i class="ti ti-trash"></i>
     </button>
   </div>
 </ng-template>

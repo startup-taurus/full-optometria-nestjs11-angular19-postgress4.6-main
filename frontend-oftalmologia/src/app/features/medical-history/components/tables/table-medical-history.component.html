@@ -7,7 +7,7 @@
         <div class="card-header bg-white border-bottom">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 text-primary">
-              <i class="fa fa-history me-2"></i>
+              <i class="ti ti-history me-2"></i>
               {{ 'MEDICAL_HISTORY.TABLE.TITLE' | translate }}
             </h5>
             <div class="d-flex gap-2">
@@ -19,7 +19,7 @@
                 (click)="sideFilterPanel.resetFilters()"
                 *ngIf="sideFilterPanel?.hasActiveFilters()"
               >
-                <i class="fa fa-filter filter-crossed"></i>
+                <i class="ti ti-filter-off"></i>
               </button>
 
               <button
@@ -29,7 +29,7 @@
                 [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
                 (click)="reloadDatatable()"
               >
-                <i class="fa fa-repeat"></i>
+                <i class="ti ti-refresh"></i>
               </button>
 
               <button
@@ -39,7 +39,7 @@
                 [ngbTooltip]="'MEDICAL_HISTORY.BUTTONS.ADD_RECORD' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
-                <i class="fa fa-plus"></i>
+                <i class="ti ti-plus"></i>
               </button>
             </div>
           </div>
@@ -92,13 +92,13 @@
   <div class="d-flex gap-1 flex-wrap">
     <button
       type="button"
-      class="btn btn-sm btn-outline-info"
+      class="btn btn-sm btn-outline-secondary"
       (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
       [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.VIEW_DETAILS' | translate"
       [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.VIEW_DETAILS' | translate"
       placement="left"
     >
-      <i class="fa fa-eye"></i>
+      <i class="ti ti-eye"></i>
     </button>
     <!-- <button
       *ngIf="row.status === 'pendiente'"
@@ -113,13 +113,13 @@
     </button> -->
     <button
       type="button"
-      class="btn btn-sm btn-outline-warning"
+      class="btn btn-sm btn-outline-secondary"
       (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
       [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.EDIT' | translate"
       [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.EDIT' | translate"
       placement="left"
     >
-      <i class="fa fa-edit"></i>
+      <i class="ti ti-edit"></i>
     </button>
     <button
       *ngIf="row.status !== 'cancelado'"
@@ -130,17 +130,17 @@
       [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.DELETE' | translate"
       placement="left"
     >
-      <i class="fa fa-trash"></i>
+      <i class="ti ti-trash"></i>
     </button>
     <button
       type="button"
-      class="btn btn-sm btn-outline-primary"
+      class="btn btn-sm btn-outline-info"
       (click)="createLaboratoryOrder(row)"
       [attr.aria-label]="'Crear Orden Lab'"
       [ngbTooltip]="'LABORATORY_ORDERS.CREATE_TITLE' | translate"
       placement="left"
     >
-      <i class="fa fa-flask"></i>
+      <i class="ti ti-flask"></i>
     </button>
   </div>
 </ng-template>

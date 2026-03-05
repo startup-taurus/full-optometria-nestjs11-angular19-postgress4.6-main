@@ -18,14 +18,12 @@
 <div class="modal-body px-4">
   <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-info-circle"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-info-circle"></i>
         {{ 'PATIENT.FORM.BASIC_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -136,14 +134,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-image"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-photo"></i>
         {{ 'PATIENT.FORM.PROFILE_PHOTO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row">
           <div class="col-12">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -163,7 +159,8 @@
                 />
                 <i
                   *ngIf="!photoPreviewUrl"
-                  class="fa fa-user fa-3x text-muted"
+                  class="ti ti-user text-muted"
+                  style="font-size: 2.5rem;"
                 ></i>
               </div>
 
@@ -174,7 +171,7 @@
                   (click)="triggerPhotoInput()"
                   [disabled]="loading"
                 >
-                  <i class="fa fa-upload me-1"></i>
+                  <i class="ti ti-upload me-1"></i>
                   {{
                     (photoPreviewUrl
                       ? 'PATIENT.FORM.CHANGE_PHOTO'
@@ -190,7 +187,7 @@
                   (click)="removePhoto()"
                   [disabled]="loading"
                 >
-                  <i class="fa fa-trash me-1"></i>
+                  <i class="ti ti-trash me-1"></i>
                   {{ 'PATIENT.FORM.REMOVE_PHOTO' | translate }}
                 </button>
 
@@ -213,14 +210,12 @@
     </div>
 
     <div class="mb-4">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-phone"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-phone"></i>
         {{ 'PATIENT.FORM.CONTACT_INFO' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
@@ -260,14 +255,12 @@
     </div>
 
     <div class="mb-4" *ngIf="isEditMode">
-      <h6
-        class="small text-uppercase text-secondary fw-semibold mb-3 d-flex align-items-center gap-2"
-      >
-        <i class="fa fa-toggle-on"></i>
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-toggle-right"></i>
         {{ 'PATIENT.FORM.STATUS' | translate }}
       </h6>
 
-      <div class="card border-0 bg-light bg-opacity-50 rounded-3 shadow-sm p-3">
+      <div class="app-form-card">
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
             <div class="toggle-switch">

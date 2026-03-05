@@ -21,7 +21,7 @@
             class="product-detail-image"
           />
           <div class="image-overlay">
-            <i class="fa fa-search-plus fa-2x"></i>
+            <i class="ti ti-zoom-in fa-2x"></i>
             <p class="mt-2 mb-0">{{ 'COMMON.CLICK_TO_ENLARGE' | translate }}</p>
           </div>
         </div>
@@ -32,7 +32,7 @@
       <div class="col-md-6">
         <div class="detail-item">
           <label class="detail-label">
-            <i class="fa fa-barcode me-2 text-primary"></i>
+            <i class="ti ti-barcode me-2 text-primary"></i>
             {{ 'INVENTORY.TABLE.CODE' | translate }}:
           </label>
           <div class="detail-value">{{ product.code }}</div>
@@ -41,7 +41,7 @@
       <div class="col-md-6">
         <div class="detail-item">
           <label class="detail-label">
-            <i class="fa fa-box me-2 text-primary"></i>
+            <i class="ti ti-box me-2 text-primary"></i>
             {{ 'INVENTORY.TABLE.NAME' | translate }}:
           </label>
           <div class="detail-value">{{ product.name }}</div>
@@ -53,7 +53,7 @@
       <div class="col-12">
         <div class="detail-item">
           <label class="detail-label">
-            <i class="fa fa-align-left me-2 text-primary"></i>
+            <i class="ti ti-align-left me-2 text-primary"></i>
             {{ 'INVENTORY.TABLE.DESCRIPTION' | translate }}:
           </label>
           <div class="detail-value">{{ getDescription() }}</div>
@@ -65,7 +65,7 @@
       <div class="col-md-6">
         <div class="detail-item">
           <label class="detail-label">
-            <i class="fa fa-copyright me-2 text-warning"></i>
+            <i class="ti ti-copyright me-2 text-warning"></i>
             {{ 'INVENTORY.TABLE.BRAND' | translate }}:
           </label>
           <div class="detail-value">{{ product.brand }}</div>
@@ -74,7 +74,7 @@
       <div class="col-md-6">
         <div class="detail-item">
           <label class="detail-label">
-            <i class="fa fa-circle-notch me-2 text-info"></i>
+            <i class="ti ti-loader me-2 text-info"></i>
             {{ 'INVENTORY.TABLE.STATUS' | translate }}:
           </label>
           <div class="detail-value">
@@ -98,7 +98,7 @@
       <div class="col-md-6">
         <div class="detail-item">
           <label class="detail-label">
-            <i class="fa fa-folder me-2 text-success"></i>
+            <i class="ti ti-folder me-2 text-success"></i>
             {{ 'INVENTORY.TABLE.CATEGORY' | translate }}:
           </label>
           <div class="detail-value">
@@ -109,7 +109,7 @@
       <div class="col-md-6">
         <div class="detail-item">
           <label class="detail-label">
-            <i class="fa fa-folder-open me-2 text-success"></i>
+            <i class="ti ti-folder-open me-2 text-success"></i>
             {{ 'INVENTORY.TABLE.SUBCATEGORY' | translate }}:
           </label>
           <div class="detail-value">
@@ -173,7 +173,7 @@
           >
           <div class="detail-value">
             <span class="badge bg-info">
-              <i class="fa fa-eye me-1"></i>
+              <i class="ti ti-eye me-1"></i>
               {{ product.views || 0 }}
             </span>
           </div>
@@ -219,7 +219,7 @@
 >
   <div class="image-modal-content" (click)="$event.stopPropagation()">
     <button type="button" class="close-modal-btn" (click)="closeImageModal()">
-      <i class="fa fa-times"></i>
+      <i class="ti ti-x"></i>
     </button>
     <img
       [src]="selectedImageUrl"

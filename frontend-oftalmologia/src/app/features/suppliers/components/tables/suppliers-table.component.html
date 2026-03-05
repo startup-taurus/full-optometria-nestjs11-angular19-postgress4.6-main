@@ -17,7 +17,7 @@
                 [ngbTooltip]="'WORDS.RESET' | translate"
                 (click)="clearAllFilters()"
               >
-                <i class="fa fa-filter filter-crossed"></i>
+                <i class="ti ti-filter-off"></i>
               </button>
 
               <button
@@ -27,7 +27,7 @@
                 [ngbTooltip]="'SUPPLIERS.ACTIONS.REFRESH' | translate"
                 (click)="reloadDatatable()"
               >
-                <i class="fa fa-repeat"></i>
+                <i class="ti ti-refresh"></i>
               </button>
 
               <button
@@ -37,7 +37,7 @@
                 [ngbTooltip]="'SUPPLIERS.ACTIONS.CREATE' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
-                <i class="fa fa-plus"></i>
+                <i class="ti ti-plus"></i>
               </button>
             </div>
           </div>
@@ -83,21 +83,21 @@
               <div class="d-flex gap-1">
                 <button
                   type="button"
-                  class="btn btn-sm btn-outline-info"
+                  class="btn btn-sm btn-outline-secondary"
                   (click)="openModal(BUTTON_ACTIONS.VIEW, row)"
                   [attr.aria-label]="'SUPPLIERS.ACTIONS.VIEW' | translate"
                   [ngbTooltip]="'SUPPLIERS.ACTIONS.VIEW' | translate"
                 >
-                  <i class="fa fa-eye"></i>
+                  <i class="ti ti-eye"></i>
                 </button>
                 <button
                   type="button"
-                  class="btn btn-sm btn-outline-warning"
+                  class="btn btn-sm btn-outline-secondary"
                   (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
                   [attr.aria-label]="'SUPPLIERS.ACTIONS.EDIT' | translate"
                   [ngbTooltip]="'SUPPLIERS.ACTIONS.EDIT' | translate"
                 >
-                  <i class="fa fa-edit"></i>
+                  <i class="ti ti-edit"></i>
                 </button>
                 <button
                   type="button"
@@ -106,7 +106,7 @@
                   [attr.aria-label]="'SUPPLIERS.ACTIONS.DELETE' | translate"
                   [ngbTooltip]="'SUPPLIERS.ACTIONS.DELETE' | translate"
                 >
-                  <i class="fa fa-trash"></i>
+                  <i class="ti ti-trash"></i>
                 </button>
               </div>
             </ng-template>
