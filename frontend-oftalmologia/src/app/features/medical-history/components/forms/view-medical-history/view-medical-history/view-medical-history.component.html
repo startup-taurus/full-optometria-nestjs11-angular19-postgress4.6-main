@@ -512,9 +512,49 @@
               </div>
               <div class="col-6">
                 <div class="data-field">
+                  <strong
+                    >{{ 'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate }}:</strong
+                  >
+                  <span>{{
+                    clinicalHistory.finalRxOdCylinder ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
+                  <strong
+                    >{{ 'MEDICAL_HISTORY.FIELDS.AXIS' | translate }}:</strong
+                  >
+                  <span>{{
+                    clinicalHistory.finalRxOdAxis ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
                   <strong>ADD:</strong>
                   <span>{{
                     clinicalHistory.finalRxOdAdd ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
+                  <strong>AV VL:</strong>
+                  <span>{{
+                    clinicalHistory.correctedAvOdVl ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
+                  <strong>AV VP:</strong>
+                  <span>{{
+                    clinicalHistory.correctedAvOdVp ||
                       ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
                   }}</span>
                 </div>
@@ -539,9 +579,49 @@
               </div>
               <div class="col-6">
                 <div class="data-field">
+                  <strong
+                    >{{ 'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate }}:</strong
+                  >
+                  <span>{{
+                    clinicalHistory.finalRxOiCylinder ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
+                  <strong
+                    >{{ 'MEDICAL_HISTORY.FIELDS.AXIS' | translate }}:</strong
+                  >
+                  <span>{{
+                    clinicalHistory.finalRxOiAxis ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
                   <strong>ADD:</strong>
                   <span>{{
                     clinicalHistory.finalRxOiAdd ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
+                  <strong>AV VL:</strong>
+                  <span>{{
+                    clinicalHistory.correctedAvOiVl ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="data-field">
+                  <strong>AV VP:</strong>
+                  <span>{{
+                    clinicalHistory.correctedAvOiVp ||
                       ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
                   }}</span>
                 </div>

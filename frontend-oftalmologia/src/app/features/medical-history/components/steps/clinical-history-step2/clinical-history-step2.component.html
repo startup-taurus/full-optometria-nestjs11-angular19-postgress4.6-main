@@ -769,12 +769,44 @@
                 class="col-6 mb-2"
                 *ngIf="shouldShowField('step2_finalRx', 'finalRxOdSphere')"
               >
-                <label class="form-label small">OD</label>
+                <label class="form-label small">{{
+                  'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
+                }}</label>
                 <input
                   type="text"
                   class="form-control"
                   formControlName="finalRxOdSphere"
-                  placeholder="OD"
+                  [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdCylinder')"
+              >
+                <label class="form-label small">{{
+                  'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                }}</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOdCylinder"
+                  [placeholder]="
+                    'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                  "
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAxis')"
+              >
+                <label class="form-label small">{{
+                  'MEDICAL_HISTORY.FIELDS.AXIS' | translate
+                }}</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOdAxis"
+                  [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
                 />
               </div>
               <div
@@ -825,12 +857,44 @@
                 class="col-6 mb-2"
                 *ngIf="shouldShowField('step2_finalRx', 'finalRxOiSphere')"
               >
-                <label class="form-label small">OI</label>
+                <label class="form-label small">{{
+                  'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
+                }}</label>
                 <input
                   type="text"
                   class="form-control"
                   formControlName="finalRxOiSphere"
-                  placeholder="OI"
+                  [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiCylinder')"
+              >
+                <label class="form-label small">{{
+                  'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                }}</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOiCylinder"
+                  [placeholder]="
+                    'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                  "
+                />
+              </div>
+              <div
+                class="col-6 mb-2"
+                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAxis')"
+              >
+                <label class="form-label small">{{
+                  'MEDICAL_HISTORY.FIELDS.AXIS' | translate
+                }}</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="finalRxOiAxis"
+                  [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
                 />
               </div>
               <div

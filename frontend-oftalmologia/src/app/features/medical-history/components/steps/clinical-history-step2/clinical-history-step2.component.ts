@@ -25,6 +25,7 @@ export class ClinicalHistoryStep2Component {
 
   public lensTypeOptions = [
     'monofocales',
+    'bifocales',
     'progresivos',
     'acomodativos u ocupacionales',
   ]
