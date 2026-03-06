@@ -48,11 +48,10 @@ export class BranchEffects {
       ofType(BranchActions.setBranchFilter),
       withLatestFrom(this.store.select(selectUser)),
       switchMap(([action, user]) => {
+        // Any role can persist and use the selected branch locally.
         if (!user?.isAdmin) {
           return of(
-            BranchActions.setBranchFilterFailure({
-              error: 'No tienes permisos para cambiar de sucursal',
-            })
+            BranchActions.setBranchFilterSuccess({ branchId: action.branchId })
           )
         }
 
@@ -101,6 +100,8 @@ export class BranchEffects {
         ofType(BranchActions.setBranchFilterSuccess),
         tap(({ branchId }) => {
           localStorage.setItem('admin-selected-branch-id', branchId)
+          // Backward compatibility with older storage key used in initializer.
+          localStorage.setItem('admin-branch-filter', branchId)
         })
       ),
     { dispatch: false }
@@ -112,6 +113,7 @@ export class BranchEffects {
         ofType(BranchActions.clearBranchFilterSuccess),
         tap(() => {
           localStorage.removeItem('admin-selected-branch-id')
+          localStorage.removeItem('admin-branch-filter')
         })
       ),
     { dispatch: false }
@@ -169,10 +171,12 @@ export class BranchEffects {
         ofType(BranchActions.initializeFromStorage),
         tap(() => {
           try {
-            const storedBranchId = localStorage.getItem('admin-branch-filter')
+            const storedBranchId =
+              localStorage.getItem('admin-selected-branch-id') ||
+              localStorage.getItem('admin-branch-filter')
             if (storedBranchId) {
               this.store.dispatch(
-                BranchActions.setBranchFilter({ branchId: storedBranchId })
+                BranchActions.setBranchFilterSuccess({ branchId: storedBranchId })
               )
             } else {
             }

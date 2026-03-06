@@ -80,11 +80,11 @@ export class CreateEditSupplierComponent implements OnInit, OnDestroy {
       ],
       phone: [
         { value: this.supplier?.phone || '', disabled: false },
-        [Validators.maxLength(20)],
+        [Validators.required, Validators.maxLength(20)],
       ],
       email: [
         { value: this.supplier?.email || '', disabled: false },
-        [Validators.email],
+        [Validators.required, Validators.email],
       ],
       isActive: [{ value: this.supplier?.isActive ?? true, disabled: false }],
     })

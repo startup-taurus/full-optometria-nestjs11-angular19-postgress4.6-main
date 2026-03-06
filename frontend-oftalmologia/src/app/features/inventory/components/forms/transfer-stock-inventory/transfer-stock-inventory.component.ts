@@ -15,6 +15,7 @@ import Swal from 'sweetalert2'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { TranslateModule } from '@ngx-translate/core'
+import { TranslateService } from '@ngx-translate/core'
 import { Subject, takeUntil } from 'rxjs'
 
 interface TransferStockModalData {
@@ -41,6 +42,7 @@ export class TransferStockInventoryComponent implements OnInit, OnDestroy {
   private _fb = inject(FormBuilder)
   private _productService = inject(ProductService)
   private _branchService = inject(BranchService)
+  private _translate = inject(TranslateService)
   private _bsModalService = inject(
     BootstrapModalService<TransferStockModalData>
   )
@@ -98,10 +100,18 @@ export class TransferStockInventoryComponent implements OnInit, OnDestroy {
     if (quantity > this.product.quantity) {
       Swal.fire({
         icon: 'error',
-        title: 'Stock insuficiente',
-        text: `La cantidad a transferir (${quantity}) excede el stock disponible (${this.product.quantity})`,
-        confirmButtonText: 'Entendido',
-        confirmButtonColor: '#d33'
+        title: this._translate.instant(
+          'INVENTORY.TRANSFER_STOCK.INSUFFICIENT_STOCK_TITLE'
+        ),
+        text: this._translate.instant(
+          'INVENTORY.TRANSFER_STOCK.INSUFFICIENT_STOCK_TEXT',
+          {
+            quantity,
+            stock: this.product.quantity,
+          }
+        ),
+        confirmButtonText: this._translate.instant('COMMON.ACCEPT'),
+        confirmButtonColor: '#d33',
       })
       return
     }
@@ -125,7 +135,9 @@ export class TransferStockInventoryComponent implements OnInit, OnDestroy {
           this.isLoading = false
           this.errorMessage =
             error?.error?.message?.es ||
-            'No se pudo completar la transferencia de stock'
+            this._translate.instant(
+              'INVENTORY.TRANSFER_STOCK.ERROR_MESSAGE'
+            )
         },
       })
   }

@@ -497,7 +497,24 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.editMode = false
     modalRef.componentInstance.preSelectedPatientId = patientId
 
-    modalRef.result.then(() => {}).catch(() => {})
+    modalRef.result
+      .then((result) => {
+        if (result === true) {
+          this._clinicalHistoriesService
+            .getByPatient(patientId)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe({
+              next: (clinicalHistories: ClinicalHistory[]) => {
+                this.medicalHistoryCache.set(
+                  patientId,
+                  clinicalHistories.length > 0 ? clinicalHistories[0] : null
+                )
+              },
+              error: () => {},
+            })
+        }
+      })
+      .catch(() => {})
   }
 
   private openEditMedicalHistoryModal(clinicalHistory: ClinicalHistory): void {
@@ -512,7 +529,25 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.selectedRecord = clinicalHistory
     modalRef.componentInstance.recordId = clinicalHistory.id
 
-    modalRef.result.then(() => {}).catch(() => {})
+    modalRef.result
+      .then((result) => {
+        if (result === true) {
+          const patientId = clinicalHistory.patientId
+          this._clinicalHistoriesService
+            .getByPatient(patientId)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe({
+              next: (clinicalHistories: ClinicalHistory[]) => {
+                this.medicalHistoryCache.set(
+                  patientId,
+                  clinicalHistories.length > 0 ? clinicalHistories[0] : null
+                )
+              },
+              error: () => {},
+            })
+        }
+      })
+      .catch(() => {})
   }
 
   private openViewMedicalHistoryModal(clinicalHistoryId: string): void {

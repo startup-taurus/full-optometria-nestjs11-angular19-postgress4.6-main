@@ -168,4 +168,12 @@ export interface PreloadedOrderData {
   oiCylinder?: string
   oiAxis?: string
   oiAdd?: string
+  odHeight?: string
+  odDnp?: string
+  oiHeight?: string
+  oiDnp?: string
+  cbase?: string
+  sunDegree?: string
+  prism?: string
+  base?: string
 }

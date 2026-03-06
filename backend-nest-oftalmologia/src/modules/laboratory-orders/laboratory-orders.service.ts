@@ -310,6 +310,16 @@ export class LaboratoryOrdersService {
       });
     }
 
+    const latestOrderWhereCondition = CompanyFilterUtil.buildWhereCondition(
+      { clinicalHistoryId, branchId },
+      companyId
+    );
+
+    const latestOrder = await this.laboratoryOrderRepository.findOne({
+      where: latestOrderWhereCondition,
+      order: { createdAt: 'DESC' },
+    });
+
     return {
       clinicalHistoryId: clinicalHistory.id,
       patientId: clinicalHistory.patientId,
@@ -328,6 +338,14 @@ export class LaboratoryOrdersService {
       oiCylinder: clinicalHistory.finalRxOiCylinder,
       oiAxis: clinicalHistory.finalRxOiAxis,
       oiAdd: clinicalHistory.finalRxOiAdd,
+      odHeight: latestOrder?.odHeight ?? null,
+      odDnp: latestOrder?.odDnp ?? null,
+      oiHeight: latestOrder?.oiHeight ?? null,
+      oiDnp: latestOrder?.oiDnp ?? null,
+      cbase: latestOrder?.cbase ?? null,
+      sunDegree: latestOrder?.sunDegree ?? null,
+      prism: latestOrder?.prism ?? null,
+      base: latestOrder?.base ?? null,
     };
   }
 
