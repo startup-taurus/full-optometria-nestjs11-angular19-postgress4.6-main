@@ -1500,6 +1500,7 @@
     "TITLE": "Suppliers",
     "NAME": "Name",
     "CREATE_SUPPLIER": "Create Supplier",
+    "EDIT_SUPPLIER": "Edit Supplier",
     "VIEW_SUPPLIER": "View Supplier",
     "NAME_PLACEHOLDER": "Enter supplier name",
     "DOCUMENT_NUMBER": "Document ID",
@@ -1508,6 +1509,13 @@
     "EMAIL_PLACEHOLDER": "Enter email address",
     "PHONE": "Phone",
     "PHONE_PLACEHOLDER": "Enter phone number",
+    "WEBSITE": "Website",
+    "WEBSITE_PLACEHOLDER": "Enter website (optional)",
+    "ADDRESS": "Address",
+    "ADDRESS_PLACEHOLDER": "Enter address (optional)",
+    "NOTES": "Notes",
+    "NOTES_PLACEHOLDER": "Enter supplier notes (optional)",
+    "CONTACT_ACTIONS": "Contact actions",
     "STATUS": "Status",
     "FILTERS": {
       "TITLE": "Supplier Filters",
@@ -1525,6 +1533,7 @@
       "RUT": "Document ID",
       "EMAIL": "Email",
       "PHONE": "Phone",
+      "CONTACT": "Contact",
       "STATUS": "Status",
       "CREATED_AT": "Created",
       "UPDATED_AT": "Updated",
@@ -1536,7 +1545,11 @@
       "CREATE": "Create Supplier",
       "EDIT": "Edit",
       "DELETE": "Delete",
-      "VIEW": "View Details"
+      "VIEW": "View Details",
+      "REFRESH": "Refresh",
+      "WHATSAPP": "WhatsApp",
+      "SEND_EMAIL": "Send email",
+      "OPEN_WEBSITE": "Open website"
     },
     "MESSAGES": {
       "CREATE_SUCCESS": "Supplier created successfully",

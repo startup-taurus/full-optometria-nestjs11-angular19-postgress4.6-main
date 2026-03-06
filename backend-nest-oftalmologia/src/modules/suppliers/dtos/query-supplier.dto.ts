@@ -29,6 +29,14 @@ export class QuerySupplierDto {
   phone?: string;
 
   @IsOptional()
+  @IsString()
+  website?: string;
+
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value === 'true')
   isActive?: boolean;

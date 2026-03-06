@@ -95,7 +95,7 @@ export class SuppliersService {
 
     if (queryDto.search) {
       queryBuilder.andWhere(
-        'supplier.name ILIKE :search OR supplier.documentNumber ILIKE :search OR supplier.email ILIKE :search OR supplier.phone ILIKE :search',
+        'supplier.name ILIKE :search OR supplier.documentNumber ILIKE :search OR supplier.email ILIKE :search OR supplier.phone ILIKE :search OR supplier.website ILIKE :search OR supplier.address ILIKE :search',
         { search: `%${queryDto.search}%` }
       );
     }
@@ -121,6 +121,18 @@ export class SuppliersService {
     if (queryDto.phone) {
       queryBuilder.andWhere('supplier.phone ILIKE :phone', {
         phone: `%${queryDto.phone}%`,
+      });
+    }
+
+    if (queryDto.website) {
+      queryBuilder.andWhere('supplier.website ILIKE :website', {
+        website: `%${queryDto.website}%`,
+      });
+    }
+
+    if (queryDto.address) {
+      queryBuilder.andWhere('supplier.address ILIKE :address', {
+        address: `%${queryDto.address}%`,
       });
     }
 

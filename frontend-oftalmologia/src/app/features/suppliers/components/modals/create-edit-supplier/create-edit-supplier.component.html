@@ -60,7 +60,6 @@
         <div class="form-group mb-3">
           <label for="phone" class="form-label">
             {{ 'SUPPLIERS.PHONE' | translate }}
-            <span class="text-danger">*</span>
           </label>
           <input
             type="text"
@@ -80,7 +79,6 @@
         <div class="form-group mb-3">
           <label for="email" class="form-label">
             {{ 'SUPPLIERS.EMAIL' | translate }}
-            <span class="text-danger">*</span>
           </label>
           <input
             type="email"
@@ -92,6 +90,67 @@
           />
           <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
             {{ getFieldError('email') | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label for="website" class="form-label">
+            {{ 'SUPPLIERS.WEBSITE' | translate }}
+          </label>
+          <input
+            type="text"
+            id="website"
+            class="form-control"
+            formControlName="website"
+            [class.is-invalid]="isFieldInvalid('website')"
+            [placeholder]="'SUPPLIERS.WEBSITE_PLACEHOLDER' | translate"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('website')">
+            {{ getFieldError('website') | translate }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label for="address" class="form-label">
+            {{ 'SUPPLIERS.ADDRESS' | translate }}
+          </label>
+          <input
+            type="text"
+            id="address"
+            class="form-control"
+            formControlName="address"
+            [class.is-invalid]="isFieldInvalid('address')"
+            [placeholder]="'SUPPLIERS.ADDRESS_PLACEHOLDER' | translate"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('address')">
+            {{ getFieldError('address') | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group mb-3">
+          <label for="notes" class="form-label">
+            {{ 'SUPPLIERS.NOTES' | translate }}
+          </label>
+          <textarea
+            id="notes"
+            rows="3"
+            class="form-control"
+            formControlName="notes"
+            [class.is-invalid]="isFieldInvalid('notes')"
+            [placeholder]="'SUPPLIERS.NOTES_PLACEHOLDER' | translate"
+          ></textarea>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('notes')">
+            {{ getFieldError('notes') | translate }}
           </div>
         </div>
       </div>

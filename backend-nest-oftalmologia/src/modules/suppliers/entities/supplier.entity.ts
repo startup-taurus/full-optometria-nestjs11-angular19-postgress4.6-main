@@ -33,6 +33,15 @@ export class Supplier {
   @Column({ nullable: true })
   email: string;
 
+  @Column({ nullable: true })
+  website: string;
+
+  @Column({ nullable: true })
+  address: string;
+
+  @Column({ type: 'text', nullable: true })
+  notes: string;
+
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 

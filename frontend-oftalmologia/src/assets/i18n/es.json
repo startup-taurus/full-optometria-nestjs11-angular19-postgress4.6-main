@@ -1496,6 +1496,13 @@
     "PHONE_PLACEHOLDER": "Ingrese el número de teléfono",
     "EMAIL": "Correo Electrónico",
     "EMAIL_PLACEHOLDER": "Ingrese el correo electrónico",
+    "WEBSITE": "Página web",
+    "WEBSITE_PLACEHOLDER": "Ingrese la página web (opcional)",
+    "ADDRESS": "Dirección",
+    "ADDRESS_PLACEHOLDER": "Ingrese la dirección (opcional)",
+    "NOTES": "Notas",
+    "NOTES_PLACEHOLDER": "Ingrese notas del proveedor (opcional)",
+    "CONTACT_ACTIONS": "Acciones de contacto",
     "IS_ACTIVE": "Activo",
     "STATUS": "Estado",
     "FILTERS": {
@@ -1514,6 +1521,7 @@
       "RUT": "Cédula",
       "EMAIL": "Correo",
       "PHONE": "Teléfono",
+      "CONTACT": "Contacto",
       "STATUS": "Estado",
       "CREATED_AT": "Creado",
       "UPDATED_AT": "Actualizado",
@@ -1526,7 +1534,10 @@
       "EDIT": "Editar",
       "DELETE": "Eliminar",
       "VIEW": "Ver Detalles",
-      "REFRESH": "Recargar"
+      "REFRESH": "Recargar",
+      "WHATSAPP": "WhatsApp",
+      "SEND_EMAIL": "Enviar correo",
+      "OPEN_WEBSITE": "Abrir web"
     },
     "MESSAGES": {
       "CREATE_SUCCESS": "Proveedor creado exitosamente",

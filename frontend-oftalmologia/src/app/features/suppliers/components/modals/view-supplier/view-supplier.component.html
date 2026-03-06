@@ -55,6 +55,56 @@
               }}
             </p>
           </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'SUPPLIERS.WEBSITE' | translate }}:</strong>
+            <p class="mb-0">
+              {{ supplier.website || ('COMMON.NOT_SPECIFIED' | translate) }}
+            </p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'SUPPLIERS.ADDRESS' | translate }}:</strong>
+            <p class="mb-0">
+              {{ supplier.address || ('COMMON.NOT_SPECIFIED' | translate) }}
+            </p>
+          </div>
+          <div class="col-md-12 mb-2">
+            <strong>{{ 'SUPPLIERS.NOTES' | translate }}:</strong>
+            <p class="mb-0">
+              {{ supplier.notes || ('COMMON.NOT_SPECIFIED' | translate) }}
+            </p>
+          </div>
+          <div class="col-12 mt-2">
+            <strong class="d-block mb-2">{{ 'SUPPLIERS.CONTACT_ACTIONS' | translate }}:</strong>
+            <div class="d-flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                (click)="openSupplierWhatsApp()"
+                [disabled]="!canOpenWhatsApp()"
+              >
+                <i class="ti ti-brand-whatsapp me-1"></i>
+                {{ 'SUPPLIERS.ACTIONS.WHATSAPP' | translate }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="openSupplierEmail()"
+                [disabled]="!supplier.email"
+              >
+                <i class="ti ti-mail me-1"></i>
+                {{ 'SUPPLIERS.ACTIONS.SEND_EMAIL' | translate }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-info"
+                (click)="openSupplierWebsite()"
+                [disabled]="!supplier.website"
+              >
+                <i class="ti ti-world me-1"></i>
+                {{ 'SUPPLIERS.ACTIONS.OPEN_WEBSITE' | translate }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

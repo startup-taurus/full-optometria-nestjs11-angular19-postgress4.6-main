@@ -6,6 +6,9 @@ export interface Supplier {
   documentNumber?: string
   phone?: string
   email?: string
+  website?: string
+  address?: string
+  notes?: string
   isActive: boolean
   branchId: string
   branch?: Branch
@@ -18,6 +21,9 @@ export interface CreateSupplierRequest {
   documentNumber?: string
   phone?: string
   email?: string
+  website?: string
+  address?: string
+  notes?: string
 }
 
 export interface UpdateSupplierRequest {
@@ -25,11 +31,16 @@ export interface UpdateSupplierRequest {
   documentNumber?: string
   phone?: string
   email?: string
+  website?: string
+  address?: string
+  notes?: string
   isActive?: boolean
 }
 
 export interface QuerySupplierRequest {
   search?: string
+  website?: string
+  address?: string
   isActive?: boolean
   page?: number
   limit?: number
