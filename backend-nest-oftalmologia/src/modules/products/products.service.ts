@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Subcategory } from '../subcategories/entities/subcategory.entity';
@@ -14,6 +14,7 @@ import { File } from '../files/entities/file.entity';
 import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
 import { Company } from '../companies/entities/company.entity';
 import { Branch } from '../branches/entities/branch.entity';
+import { User } from '../users/entities/user.entity';
 import { InventoryTransfer } from './entities/inventory-transfer.entity';
 import { StockMovement } from './entities/stock-movement.entity';
 import { CreateProductDto } from './dtos/create-product.dto';
@@ -1042,10 +1043,12 @@ export class ProductsService {
     branchId: string,
     companyId: string | null
   ) {
+
     const queryBuilder = this.inventoryTransferRepository
       .createQueryBuilder('transfer')
       .leftJoinAndSelect('transfer.sourceProduct', 'sourceProduct')
-      .leftJoinAndSelect('transfer.targetProduct', 'targetProduct');
+      .leftJoinAndSelect('transfer.targetProduct', 'targetProduct')
+      .leftJoinAndSelect('transfer.createdByUser', 'createdByUser');
 
     if (companyId) {
       queryBuilder.where('transfer.companyId = :companyId', { companyId });
@@ -1054,15 +1057,19 @@ export class ProductsService {
     }
 
     const direction = queryDto.direction || 'all';
-    if (direction === 'sent') {
-      queryBuilder.andWhere('transfer.sourceBranchId = :branchId', { branchId });
-    } else if (direction === 'received') {
-      queryBuilder.andWhere('transfer.targetBranchId = :branchId', { branchId });
-    } else {
-      queryBuilder.andWhere(
-        '(transfer.sourceBranchId = :branchId OR transfer.targetBranchId = :branchId)',
-        { branchId }
-      );
+    const hasBranchId = !!branchId;
+
+    if (hasBranchId) {
+      if (direction === 'sent') {
+        queryBuilder.andWhere('transfer.sourceBranchId = :branchId', { branchId });
+      } else if (direction === 'received') {
+        queryBuilder.andWhere('transfer.targetBranchId = :branchId', { branchId });
+      } else {
+        queryBuilder.andWhere(
+          '(transfer.sourceBranchId = :branchId OR transfer.targetBranchId = :branchId)',
+          { branchId }
+        );
+      }
     }
 
     if (queryDto.productId) {
@@ -1076,7 +1083,71 @@ export class ProductsService {
       .orderBy('transfer.createdAt', 'DESC')
       .getMany();
 
-    return history;
+    if (!history.length) {
+      return history;
+    }
+
+    const transferIds = history.map((transfer) => transfer.id);
+    const userIds = [
+      ...new Set(
+        history
+          .map((transfer) => transfer.createdByUserId)
+          .filter((id): id is string => !!id)
+      ),
+    ];
+
+    const movementRepository = this.dataSource.getRepository(StockMovement);
+    const relatedMovements = await movementRepository.find({
+      where: {
+        referenceType: 'TRANSFERENCIA',
+        referenceId: In(transferIds),
+      },
+    });
+
+    const usersById = new Map<string, User>();
+    if (userIds.length) {
+      const userRepository = this.dataSource.getRepository(User);
+      const users = await userRepository.find({
+        where: { id: In(userIds) },
+      });
+
+      users.forEach((user) => {
+        usersById.set(user.id, user);
+      });
+    }
+
+    const movementsByTransferId = new Map<string, StockMovement[]>();
+    relatedMovements.forEach((movement) => {
+      if (!movement.referenceId) {
+        return;
+      }
+
+      const current = movementsByTransferId.get(movement.referenceId) || [];
+      current.push(movement);
+      movementsByTransferId.set(movement.referenceId, current);
+    });
+
+    return history.map((transfer) => {
+      const transferMovements = movementsByTransferId.get(transfer.id) || [];
+      const sourceMovement = transferMovements.find(
+        (movement) => movement.movementType === 'SALIDA_TRANSFERENCIA'
+      );
+      const targetMovement = transferMovements.find(
+        (movement) => movement.movementType === 'INGRESO_TRANSFERENCIA'
+      );
+      const transferUser =
+        transfer.createdByUser ||
+        (transfer.createdByUserId
+          ? usersById.get(transfer.createdByUserId)
+          : undefined);
+
+      return {
+        ...transfer,
+        createdByUser: transferUser || null,
+        sourceBalanceAfterTransfer: sourceMovement?.balanceAfter ?? null,
+        targetBalanceAfterTransfer: targetMovement?.balanceAfter ?? null,
+      };
+    });
   }
 
   private async resolveOrCreateDestinationCategory(

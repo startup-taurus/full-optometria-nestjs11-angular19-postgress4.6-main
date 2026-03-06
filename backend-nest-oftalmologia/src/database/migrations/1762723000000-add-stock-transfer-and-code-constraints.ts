@@ -34,6 +34,21 @@ export class AddStockTransferAndCodeConstraints1762723000000
             CONSTRAINT "fk_inventory_transfers_target_product" FOREIGN KEY ("target_product_id") REFERENCES "products"("id") ON DELETE RESTRICT,
             CONSTRAINT "fk_inventory_transfers_created_by" FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL
           );
+        ELSE
+          ALTER TABLE "inventory_transfers"
+          ADD COLUMN IF NOT EXISTS "created_by_user_id" uuid NULL;
+
+          IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.table_constraints
+            WHERE table_schema = 'public'
+              AND table_name = 'inventory_transfers'
+              AND constraint_name = 'fk_inventory_transfers_created_by'
+          ) THEN
+            ALTER TABLE "inventory_transfers"
+            ADD CONSTRAINT "fk_inventory_transfers_created_by"
+            FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL;
+          END IF;
         END IF;
       END $$;
     `);
@@ -73,6 +88,21 @@ export class AddStockTransferAndCodeConstraints1762723000000
             CONSTRAINT "fk_stock_movements_product" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT,
             CONSTRAINT "fk_stock_movements_created_by" FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL
           );
+        ELSE
+          ALTER TABLE "stock_movements"
+          ADD COLUMN IF NOT EXISTS "created_by_user_id" uuid NULL;
+
+          IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.table_constraints
+            WHERE table_schema = 'public'
+              AND table_name = 'stock_movements'
+              AND constraint_name = 'fk_stock_movements_created_by'
+          ) THEN
+            ALTER TABLE "stock_movements"
+            ADD CONSTRAINT "fk_stock_movements_created_by"
+            FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL;
+          END IF;
         END IF;
       END $$;
     `);

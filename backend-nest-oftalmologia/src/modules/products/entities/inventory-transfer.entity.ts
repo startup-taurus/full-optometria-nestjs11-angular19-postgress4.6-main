@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Product } from './product.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('inventory_transfers')
 export class InventoryTransfer {
@@ -50,4 +51,8 @@ export class InventoryTransfer {
   @ManyToOne(() => Product)
   @JoinColumn({ name: 'target_product_id' })
   targetProduct: Product;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'created_by_user_id' })
+  createdByUser: User;
 }
