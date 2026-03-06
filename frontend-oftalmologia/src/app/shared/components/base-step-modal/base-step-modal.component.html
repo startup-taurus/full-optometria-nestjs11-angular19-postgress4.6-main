@@ -63,7 +63,7 @@
   <div class="footer-right d-flex gap-2">
     <button
       type="button"
-      class="btn btn-outline-secondary"
+      class="btn btn-secondary"
       (click)="onCancel()"
       [disabled]="isLoading"
     >
@@ -83,7 +83,7 @@
     } @else {
       <button
         type="button"
-        class="btn btn-success"
+        class="btn btn-primary"
         (click)="onSave()"
         [disabled]="!canSave || isLoading"
       >
@@ -99,10 +99,8 @@
           }
         } @else {
           @if (editMode) {
-            <i class="ti ti-check me-1"></i>
             {{ 'COMMON.UPDATE' | translate }}
           } @else {
-            <i class="ti ti-check me-1"></i>
             {{ 'COMMON.SAVE' | translate }}
           }
         }

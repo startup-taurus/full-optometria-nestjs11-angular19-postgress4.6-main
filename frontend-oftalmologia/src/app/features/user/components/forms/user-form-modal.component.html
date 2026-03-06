@@ -426,21 +426,19 @@
 >
   <button
     type="button"
-    class="btn btn-light px-4"
+    class="btn btn-secondary"
     (click)="onCancel()"
     [disabled]="loading"
   >
-    <i class="ti ti-x me-2"></i>
     {{ 'WORDS.CANCEL' | translate }}
   </button>
   <button
     type="submit"
-    class="btn btn-primary px-4"
+    class="btn btn-primary"
     (click)="onSubmit()"
     [disabled]="userForm.invalid || loading"
   >
     <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
-    <i class="ti ti-device-floppy me-2" *ngIf="!loading"></i>
     {{ (isEditMode ? 'WORDS.UPDATE' : 'USER.MODAL.CREATE_TITLE') | translate }}
   </button>
 </div>
