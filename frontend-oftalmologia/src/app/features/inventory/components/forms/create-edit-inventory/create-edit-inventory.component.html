@@ -246,30 +246,22 @@
           'INVENTORY.TABLE.IMAGE' | translate
         }}</label>
 
-        <div
-          class="image-preview-container mb-3"
-          *ngIf="
-            imagePreview ||
-            (isEdit && product?.images && product?.images.length > 0)
-          "
-        >
-          <div class="image-preview-wrapper">
-            <img
-              [src]="imagePreview || getProductImageUrl()"
-              alt="Product image preview"
-              class="img-thumbnail"
-            />
-            <button
-              type="button"
-              class="btn btn-danger btn-sm remove-image-btn"
-              (click)="removeImage()"
-              *ngIf="
-                imagePreview ||
-                (isEdit && product?.images && product?.images.length > 0)
-              "
-            >
-              <i class="ti ti-x"></i>
-            </button>
+        <div class="image-preview-container mb-3" *ngIf="imagePreviews.length > 0">
+          <div class="image-preview-grid">
+            <div class="image-preview-wrapper" *ngFor="let image of imagePreviews; let i = index">
+              <img
+                [src]="getPreviewUrl(image)"
+                alt="Product image preview"
+                class="img-thumbnail"
+              />
+              <button
+                type="button"
+                class="btn btn-danger btn-sm remove-image-btn"
+                (click)="removeImage(image, i)"
+              >
+                <i class="ti ti-x"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -278,28 +270,26 @@
             type="file"
             class="form-control"
             #fileInput
+            multiple
             accept="image/png,image/jpeg,image/jpg,image/webp"
             (change)="onFileSelected($event)"
-            [disabled]="isLoading"
+            [disabled]="isLoading || imagePreviews.length >= maxImages"
           />
           <button
             type="button"
             class="btn btn-outline-secondary"
             (click)="fileInput.click()"
-            [disabled]="isLoading"
+            [disabled]="isLoading || imagePreviews.length >= maxImages"
           >
             <i class="ti ti-cloud-upload me-2"></i>
-            {{
-              (imagePreview ||
-              (isEdit && product?.images && product?.images.length > 0)
-                ? 'INVENTORY.FORM.CHANGE_IMAGE'
-                : 'INVENTORY.FORM.SELECT_IMAGE'
-              ) | translate
-            }}
+            {{ 'INVENTORY.FORM.SELECT_IMAGE' | translate }}
           </button>
         </div>
         <small class="form-text text-muted">
           {{ 'INVENTORY.FORM.IMAGE_FORMATS' | translate }}
+        </small>
+        <small class="form-text text-muted d-block">
+          {{ imagePreviews.length }}/{{ maxImages }} imágenes
         </small>
         <div class="alert alert-danger mt-2" *ngIf="imageError">
           <i class="ti ti-alert-triangle me-2"></i>

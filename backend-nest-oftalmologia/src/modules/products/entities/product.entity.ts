@@ -9,6 +9,7 @@ import {
   OneToMany,
   BeforeInsert,
   BeforeUpdate,
+  Unique,
 } from 'typeorm';
 import { Branch } from '../../branches/entities/branch.entity';
 import { Category } from '../../categories/entities/category.entity';
@@ -19,6 +20,7 @@ import { File } from '../../files/entities/file.entity';
 import { Company } from '../../companies/entities/company.entity';
 
 @Entity('products')
+@Unique(['branchId', 'code'])
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;

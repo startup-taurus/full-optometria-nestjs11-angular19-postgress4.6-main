@@ -12,6 +12,7 @@ import { BUTTON_ACTIONS } from '@core/helpers/ui/constants'
 import { DEFAULT_NGX_DATATABLE_PAGINATION } from '@core/helpers/ui/ngx-datatable.constant'
 import { FORMAT_FOR_DATES } from '@core/helpers/ui/ui.constants'
 import { Product } from '@core/interfaces/api/inventory.interface'
+import { Branch } from '@core/interfaces/api/branch.interface'
 import {
   BootstrapModalConfig,
   ModalWithAction,
@@ -19,6 +20,7 @@ import {
 import { NgxDatatableConfig } from '@core/interfaces/ui/ngx-datatable.interface'
 import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { ProductService } from '@core/services/api/product.service'
+import { BranchService } from '@core/services/api/branch.service'
 import {
   ProductsManagementService,
   ProductWithRelations,
@@ -50,6 +52,7 @@ import {
 import { FilterInventoryComponent } from '../filters/filter-inventory/filter-inventory.component'
 import { ViewInventoryComponent } from '../forms/view-inventory/view-inventory.component'
 import { CreateEditInventoryComponent } from '../forms/create-edit-inventory/create-edit-inventory.component'
+import { TransferStockInventoryComponent } from '../forms/transfer-stock-inventory/transfer-stock-inventory.component'
 import Swal from 'sweetalert2'
 import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } from '@core/helpers/ui/ui.constants'
 
@@ -103,16 +106,30 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   private filter: object = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
   private isInitialLoad = true
+  private branchNameMap = new Map<string, string>()
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _productService = inject(ProductService)
+  private _branchService = inject(BranchService)
   private _productsManagementService = inject(ProductsManagementService)
   private _bsModalService = inject(BootstrapModalService)
   private _store = inject(Store<AppState>)
 
   ngOnInit(): void {
     this.initializeSubscriptions()
+    this.loadBranchNames()
     this.config$ = this.setConfigDatatable()
+  }
+
+  private loadBranchNames(): void {
+    this._branchService
+      .getAllBranchesForSelector()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((branches: Branch[]) => {
+        this.branchNameMap = new Map(
+          branches.map((branch) => [branch.id, branch.name])
+        )
+      })
   }
 
   ngOnDestroy(): void {
@@ -258,7 +275,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         {
           name: 'INVENTORY.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
-          width: 190,
+          width: 280,
           sortable: false,
         },
       ],
@@ -360,6 +377,145 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  public openTransferModal(product: Product): void {
+    if (!product || product.quantity <= 0) {
+      return
+    }
+
+    const modalRef = this._bsModalService.openModal({
+      component: TransferStockInventoryComponent,
+      options: {
+        size: 'lg',
+        backdrop: 'static',
+        centered: true,
+      },
+      data: {
+        selectedRow: product,
+      },
+    })
+
+    if (modalRef) {
+      modalRef.closed.subscribe((result: string) => {
+        if (result === 'transferred') {
+          this.reloadDatatable(this.filter)
+        }
+      })
+    }
+  }
+
+  public showTransferHistory(product: Product): void {
+    this._productService
+      .getTransferHistory({ productId: product.id, direction: 'all' })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          const responseData = response?.data as any
+          const history = this.extractTransferHistory(responseData)
+
+          if (!history.length) {
+            Swal.fire({
+              title: 'Sin historial',
+              text: 'No hay transferencias registradas para este producto.',
+              icon: 'info',
+            })
+            return
+          }
+
+          const html = this.buildTransferHistoryHtml(history, product)
+
+          Swal.fire({
+            title: 'Historial de transferencias',
+            html,
+            width: 980,
+            confirmButtonText: 'Cerrar',
+          })
+        },
+        error: () => {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo cargar el historial de transferencias.',
+            icon: 'error',
+          })
+        },
+      })
+  }
+
+  private extractTransferHistory(payload: any): any[] {
+    if (Array.isArray(payload)) {
+      return payload
+    }
+
+    if (Array.isArray(payload?.result)) {
+      return payload.result
+    }
+
+    if (Array.isArray(payload?.data)) {
+      return payload.data
+    }
+
+    if (Array.isArray(payload?.data?.result)) {
+      return payload.data.result
+    }
+
+    if (Array.isArray(payload?.data?.data)) {
+      return payload.data.data
+    }
+
+    return []
+  }
+
+  private getBranchName(branchId: string | undefined): string {
+    if (!branchId) {
+      return 'Sucursal no identificada'
+    }
+
+    return this.branchNameMap.get(branchId) || branchId
+  }
+
+  private buildTransferHistoryHtml(history: any[], currentProduct: Product): string {
+    const cards = history.slice(0, 25).map((item: any) => {
+      const isSent = item.sourceProductId === currentProduct.id
+      const movementLabel = isSent ? 'Enviado' : 'Recibido'
+      const movementColor = isSent ? '#dc3545' : '#198754'
+      const sourceBranch = this.getBranchName(item.sourceBranchId)
+      const targetBranch = this.getBranchName(item.targetBranchId)
+      const productName = item.sourceProduct?.name || item.targetProduct?.name || currentProduct.name || '-'
+      const productCode = item.sourceCode || currentProduct.code || '-'
+      const quantity = item.quantity ?? '-'
+      const sourceBalanceAfter = item.sourceBalanceAfterTransfer ?? '-'
+      const targetBalanceAfter = item.targetBalanceAfterTransfer ?? '-'
+      const transferNote = item.note || 'Sin nota'
+      const sentBy = item.createdByUser
+        ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() || item.createdByUser.username || item.createdByUser.email || '-'
+        : '-'
+      const date = item.createdAt
+        ? new Date(item.createdAt).toLocaleString('es-EC')
+        : '-'
+
+      return `
+        <div style="border:1px solid #e9ecef;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#ffffff;box-shadow:0 1px 2px rgba(16,24,40,0.06);text-align:left;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <span style="display:inline-block;padding:4px 10px;border-radius:999px;background:${movementColor};color:#fff;font-weight:700;font-size:12px;">${movementLabel}</span>
+            <span style="color:#667085;font-size:12px;">${date}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;font-size:13px;color:#1f2937;">
+            <div><strong>Desde:</strong> ${sourceBranch}</div>
+            <div><strong>Hacia:</strong> ${targetBranch}</div>
+            <div><strong>Código:</strong> ${productCode}</div>
+            <div><strong>Producto:</strong> ${productName}</div>
+            <div><strong>Cantidad:</strong> ${quantity}</div>
+            <div><strong>Enviado por:</strong> ${sentBy}</div>
+            <div><strong>Stock origen después:</strong> ${sourceBalanceAfter}</div>
+            <div><strong>Stock destino después:</strong> ${targetBalanceAfter}</div>
+            <div style="grid-column:1 / -1;"><strong>Nota:</strong> ${transferNote}</div>
+          </div>
+        </div>
+      `
+    })
+
+    return `<div style="max-height:68vh;overflow:auto;padding:2px 2px 0 2px;background:#f8fafc;border-radius:10px;">${cards.join('')}</div>`
+  }
+
   public toggleProductStatus(product: Product): void {
     const newStatus = !product.isActive
     const action = newStatus ? 'activar' : 'desactivar'
@@ -409,7 +565,6 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
               this.reloadDatatable(this.filter)
             },
             error: (err) => {
-              console.error(`Error ${action}ing product:`, err)
               Swal.fire({
                 title: 'Error',
                 text: `No se pudo ${action} el producto. Por favor, inténtelo de nuevo.`,

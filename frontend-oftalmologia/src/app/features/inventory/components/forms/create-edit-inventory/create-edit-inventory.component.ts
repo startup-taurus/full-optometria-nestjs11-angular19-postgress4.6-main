@@ -23,7 +23,16 @@ import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { TranslateModule } from '@ngx-translate/core'
-import { Observable, of, map, tap, Subject, takeUntil } from 'rxjs'
+import { Observable, of, map, tap, Subject, takeUntil, forkJoin } from 'rxjs'
+
+interface ProductImagePreview {
+  id?: string
+  path?: string
+  previewUrl: string
+  isCover: boolean
+  isExisting: boolean
+  file?: File
+}
 
 @Component({
   selector: 'create-edit-inventory',
@@ -45,9 +54,9 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
   public filteredSubcategories$: Observable<Subcategory[]> = of([])
   public suppliers$: Observable<Supplier[]> = of([])
 
-  public imageFile: File | null = null
-  public imagePreview: string | null = null
+  public imagePreviews: ProductImagePreview[] = []
   public imageError: string | null = null
+  public readonly maxImages = 5
 
   private unsubscribe$ = new Subject<void>()
 
@@ -86,9 +95,26 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
           if (this.form) {
             this.initializeForm()
             this.setupSubcategoryFiltering()
+            this.initializeExistingImages()
           }
         }
       })
+  }
+
+  private initializeExistingImages(): void {
+    this.imagePreviews = []
+
+    if (!this.isEdit || !this.product?.images?.length) {
+      return
+    }
+
+    this.imagePreviews = this.product.images.map((image) => ({
+      id: image.id,
+      path: image.path,
+      previewUrl: this._productService.getImageUrl(image.path),
+      isCover: image.isCover,
+      isExisting: true,
+    }))
   }
 
   private initializeForm(): void {
@@ -234,20 +260,41 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
 
       request$.subscribe({
         next: (response: any) => {
-          if (this.imageFile) {
+          const newImages = this.imagePreviews.filter(
+            (image) => !image.isExisting && image.file
+          )
+
+          if (newImages.length > 0) {
             const productId = this.isEdit ? this.product!.id : response.data.data.id
-            this._productService
-              .uploadProductImage(productId, this.imageFile, true)
-              .subscribe({
-                next: () => {
-                  this.isLoading = false
-                  this._activeModal.close(this.isEdit ? 'updated' : 'created')
-                },
-                error: (error) => {
-                  this.isLoading = false
-                  this._activeModal.close(this.isEdit ? 'updated' : 'created')
-                },
-              })
+
+            const existingHasCover = this.imagePreviews.some(
+              (img) => img.isExisting && img.isCover
+            )
+            let hasAssignedCover = existingHasCover
+
+            const uploadRequests = newImages.map((image) => {
+              const shouldBeCover = !hasAssignedCover
+              if (shouldBeCover) {
+                hasAssignedCover = true
+              }
+
+              return this._productService.uploadProductImage(
+                productId,
+                image.file as File,
+                shouldBeCover
+              )
+            })
+
+            forkJoin(uploadRequests).subscribe({
+              next: () => {
+                this.isLoading = false
+                this._activeModal.close(this.isEdit ? 'updated' : 'created')
+              },
+              error: () => {
+                this.isLoading = false
+                this._activeModal.close(this.isEdit ? 'updated' : 'created')
+              },
+            })
           } else {
             this.isLoading = false
             this._activeModal.close(this.isEdit ? 'updated' : 'created')
@@ -263,76 +310,76 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
   public onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement
     if (input.files && input.files.length > 0) {
-      const file = input.files[0]
-
       this.imageError = null
 
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'image/webp',
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.imageError = 'Solo se permiten archivos PNG, JPG, JPEG, WEBP'
-        this.imageFile = null
-        this.imagePreview = null
-        return
-      }
-
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
       const maxSize = 8 * 1024 * 1024
-      if (file.size > maxSize) {
-        this.imageError = 'El tamaño del archivo no debe exceder 8MB'
-        this.imageFile = null
-        this.imagePreview = null
-        return
-      }
+      const selectedFiles = Array.from(input.files)
 
-      this.imageFile = file
-
-      const reader = new FileReader()
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        if (e.target?.result) {
-          this.imagePreview = e.target.result as string
+      for (const file of selectedFiles) {
+        if (this.imagePreviews.length >= this.maxImages) {
+          this.imageError = `Solo puedes subir hasta ${this.maxImages} imágenes`
+          break
         }
+
+        if (!allowedTypes.includes(file.type)) {
+          this.imageError = 'Solo se permiten archivos PNG, JPG, JPEG, WEBP'
+          continue
+        }
+
+        if (file.size > maxSize) {
+          this.imageError = 'El tamaño del archivo no debe exceder 8MB'
+          continue
+        }
+
+        const reader = new FileReader()
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          if (e.target?.result) {
+            this.imagePreviews.push({
+              previewUrl: e.target.result as string,
+              isCover: false,
+              isExisting: false,
+              file,
+            })
+          }
+        }
+        reader.readAsDataURL(file)
       }
-      reader.readAsDataURL(file)
     }
+
+    input.value = ''
   }
 
-  public removeImage(): void {
-    this.imageFile = null
-    this.imagePreview = null
+  public removeImage(image: ProductImagePreview, index: number): void {
     this.imageError = null
 
-    if (this.isEdit && this.product?.images && this.product.images.length > 0) {
-      const imageId = this.product.images[0].id
+    if (image.isExisting && this.product?.id && image.id) {
       this._productService
-        .deleteProductImage(this.product.id, imageId)
+        .deleteProductImage(this.product.id, image.id)
+        .pipe(takeUntil(this.unsubscribe$))
         .subscribe({
           next: () => {
-            if (this.product) {
-              this.product.images = []
+            this.imagePreviews.splice(index, 1)
+            if (this.product?.images) {
+              this.product.images = this.product.images.filter(
+                (img) => img.id !== image.id
+              )
             }
           },
           error: (error) => {
-            if (error.status === 404) {
-              if (this.product) {
-                this.product.images = []
-              }
+            if (error?.status === 404) {
+              this.imagePreviews.splice(index, 1)
             }
           },
         })
+      return
     }
+
+    this.imagePreviews.splice(index, 1)
   }
 
-  public getProductImageUrl(): string {
-    if (this.product?.images && this.product.images.length > 0) {
-      const coverImage = this.product.images.find((img) => img.isCover)
-      const imagePath = coverImage?.path || this.product.images[0].path
-      return this._productService.getImageUrl(imagePath)
-    }
-    return 'assets/images/lentes.png'
+  public getPreviewUrl(image: ProductImagePreview): string {
+    return image.previewUrl || 'assets/images/lentes.png'
   }
 
   public closeModal(): void {

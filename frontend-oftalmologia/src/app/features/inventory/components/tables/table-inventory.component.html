@@ -157,6 +157,25 @@
                 </button>
                 <button
                   type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="openTransferModal(row)"
+                  [disabled]="row.quantity <= 0"
+                  [attr.aria-label]="'Transferir stock'"
+                  [ngbTooltip]="'Transferir stock'"
+                >
+                  <i class="ti ti-arrows-right-left"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="showTransferHistory(row)"
+                  [attr.aria-label]="'Ver historial de transferencias'"
+                  [ngbTooltip]="'Ver historial de transferencias'"
+                >
+                  <i class="ti ti-history"></i>
+                </button>
+                <button
+                  type="button"
                   class="btn btn-sm"
                   [ngClass]="
                     row.isActive ? 'btn-outline-danger' : 'btn-outline-success'

@@ -436,7 +436,7 @@
                   <div class="col-lg-5">
                     <div class="product-image-zone">
                       <img
-                        [src]="getImageUrl(selectedProduct)"
+                        [src]="selectedProductImageUrl || getImageUrl(selectedProduct)"
                         [alt]="selectedProduct.name"
                         class="product-main-image"
                         (click)="openImageModal(selectedProduct)"
@@ -449,6 +449,17 @@
                         ></iconify-icon>
                         <span>Click para ver completa</span>
                       </div>
+                    </div>
+                    <div class="product-gallery-thumbs mt-2">
+                      <button
+                        type="button"
+                        class="thumb-btn"
+                        *ngFor="let galleryImage of getProductGallery(selectedProduct)"
+                        [class.active]="galleryImage === selectedProductImageUrl"
+                        (click)="selectProductImage(galleryImage)"
+                      >
+                        <img [src]="galleryImage" alt="Imagen del producto" />
+                      </button>
                     </div>
                   </div>
 

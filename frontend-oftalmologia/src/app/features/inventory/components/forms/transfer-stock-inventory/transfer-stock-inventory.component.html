@@ -1,0 +1,79 @@
+<div class="modal-header">
+  <h5 class="modal-title">Transferir stock</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="modal-body">
+    <div class="mb-3 product-summary" *ngIf="product">
+      <div><strong>Código:</strong> {{ product.code }}</div>
+      <div><strong>Producto:</strong> {{ product.name }}</div>
+      <div><strong>Stock actual:</strong> {{ product.quantity }}</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Sucursal destino</label>
+      <ng-select
+        formControlName="destinationBranchId"
+        bindLabel="name"
+        bindValue="id"
+        [clearable]="false"
+        [placeholder]="'Selecciona una sucursal'"
+      >
+        <ng-option *ngFor="let branch of availableBranches" [value]="branch.id">
+          {{ branch.name }}
+        </ng-option>
+      </ng-select>
+      <div
+        class="invalid-feedback d-block"
+        *ngIf="form.get('destinationBranchId')?.invalid && form.get('destinationBranchId')?.touched"
+      >
+        Debes seleccionar una sucursal destino
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Cantidad a transferir</label>
+      <input
+        type="number"
+        min="1"
+        class="form-control"
+        formControlName="quantity"
+      />
+      <div
+        class="invalid-feedback d-block"
+        *ngIf="form.get('quantity')?.invalid && form.get('quantity')?.touched"
+      >
+        Ingresa una cantidad valida mayor a 0
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Nota (opcional)</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        formControlName="note"
+      ></textarea>
+    </div>
+
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">
+      Cancelar
+    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="isLoading || form.invalid">
+      <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+      Transferir
+    </button>
+  </div>
+</form>
