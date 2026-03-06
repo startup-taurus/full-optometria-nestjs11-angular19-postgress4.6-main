@@ -10,6 +10,12 @@ import { map, Observable, tap, catchError } from 'rxjs'
 import { ApiMessage } from '@core/interfaces/api/message.interface'
 import { Product } from '@core/interfaces/api/inventory.interface'
 
+export interface TransferStockPayload {
+  destinationBranchId: string
+  quantity: number
+  note?: string
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -128,6 +134,35 @@ export class ProductService {
       return 'assets/images/lentes.png'
     }
     return `${environment.fileBaseUrl}/${imagePath}`
+  }
+
+  public transferStock(
+    productId: string,
+    payload: TransferStockPayload
+  ): Observable<ApiResponse<any>> {
+    const endpoint = `${this.API_URL}/${productId}/transfer-stock`
+    return this._httpClient
+      .post<ApiResponse<any>>(endpoint, payload)
+      .pipe(tap((res) => this.showNotification(res.message, 'INVENTORY.TITLE')))
+  }
+
+  public getTransferHistory(params?: {
+    direction?: 'sent' | 'received' | 'all'
+    productId?: string
+  }): Observable<ApiResponse<any[]>> {
+    const endpoint = `${this.API_URL}/transfers/history`
+    let httpParams = new HttpParams()
+
+    if (params?.direction) {
+      httpParams = httpParams.set('direction', params.direction)
+    }
+    if (params?.productId) {
+      httpParams = httpParams.set('productId', params.productId)
+    }
+
+    return this._httpClient.get<ApiResponse<any[]>>(endpoint, {
+      params: httpParams,
+    })
   }
 
   private showNotification(

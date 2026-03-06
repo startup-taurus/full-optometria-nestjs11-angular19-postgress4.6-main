@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Subcategory } from '../subcategories/entities/subcategory.entity';
@@ -13,10 +13,15 @@ import { Supplier } from '../suppliers/entities/supplier.entity';
 import { File } from '../files/entities/file.entity';
 import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
 import { Company } from '../companies/entities/company.entity';
+import { Branch } from '../branches/entities/branch.entity';
+import { InventoryTransfer } from './entities/inventory-transfer.entity';
+import { StockMovement } from './entities/stock-movement.entity';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { QueryProductDto } from './dtos/query-product.dto';
 import { PublicQueryProductDto } from './dtos/public-query-product.dto';
+import { TransferProductStockDto } from './dtos/transfer-product-stock.dto';
+import { QueryProductTransferHistoryDto } from './dtos/query-product-transfer-history.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 import {
@@ -29,9 +34,12 @@ import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import sharp from 'sharp';
 
+const MAX_PRODUCT_IMAGES = 5;
+
 @Injectable()
 export class ProductsService {
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
     @InjectRepository(Category)
@@ -45,7 +53,9 @@ export class ProductsService {
     @InjectRepository(LaboratoryOrder)
     private laboratoryOrderRepository: Repository<LaboratoryOrder>,
     @InjectRepository(Company)
-    private companyRepository: Repository<Company>
+    private companyRepository: Repository<Company>,
+    @InjectRepository(InventoryTransfer)
+    private inventoryTransferRepository: Repository<InventoryTransfer>
   ) {}
 
   async create(
@@ -816,6 +826,356 @@ export class ProductsService {
     };
   }
 
+  async transferStock(
+    productId: string,
+    transferDto: TransferProductStockDto,
+    sourceBranchId: string,
+    companyId: string | null,
+    userId?: string
+  ) {
+    const quantity = Number(transferDto.quantity);
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'La cantidad a transferir debe ser mayor a 0',
+          en: 'Transfer quantity must be greater than 0',
+        },
+      });
+    }
+
+    if (transferDto.destinationBranchId === sourceBranchId) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'La sucursal destino debe ser diferente a la sucursal origen',
+          en: 'Destination branch must be different from source branch',
+        },
+      });
+    }
+
+    const result = await this.dataSource.transaction(async (manager) => {
+      const sourceWhere: any = { id: productId, branchId: sourceBranchId };
+      if (companyId) {
+        sourceWhere.companyId = companyId;
+      }
+
+      const sourceProduct = await manager.findOne(Product, {
+        where: sourceWhere,
+        relations: ['category', 'subcategory'],
+      });
+
+      if (!sourceProduct) {
+        throw new NotFoundException({
+          statusCode: 404,
+          success: false,
+          message: {
+            es: 'Producto origen no encontrado',
+            en: 'Source product not found',
+          },
+        });
+      }
+
+      if (!sourceProduct.isActive) {
+        throw new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: {
+            es: 'No se puede transferir un producto inactivo',
+            en: 'Cannot transfer an inactive product',
+          },
+        });
+      }
+
+      if (sourceProduct.quantity < quantity) {
+        throw new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: {
+            es: 'La cantidad a transferir excede el stock disponible',
+            en: 'Transfer quantity exceeds available stock',
+          },
+        });
+      }
+
+      const destinationWhere: any = {
+        id: transferDto.destinationBranchId,
+        isActive: true,
+      };
+      if (sourceProduct.companyId) {
+        destinationWhere.companyId = sourceProduct.companyId;
+      }
+
+      const destinationBranch = await manager.findOne(Branch, {
+        where: destinationWhere,
+      });
+
+      if (!destinationBranch) {
+        throw new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: {
+            es: 'La sucursal destino no existe o no está activa',
+            en: 'Destination branch does not exist or is not active',
+          },
+        });
+      }
+
+      const destinationProductWhere: any = {
+        branchId: transferDto.destinationBranchId,
+        code: sourceProduct.code,
+      };
+      if (sourceProduct.companyId) {
+        destinationProductWhere.companyId = sourceProduct.companyId;
+      }
+
+      let destinationProduct = await manager.findOne(Product, {
+        where: destinationProductWhere,
+      });
+      let destinationCreated = false;
+
+      if (!destinationProduct) {
+        const destinationCategory = await this.resolveOrCreateDestinationCategory(
+          manager,
+          sourceProduct,
+          transferDto.destinationBranchId
+        );
+
+        const destinationSubcategory =
+          await this.resolveOrCreateDestinationSubcategory(
+            manager,
+            sourceProduct,
+            destinationCategory,
+            transferDto.destinationBranchId
+          );
+
+        destinationProduct = manager.create(Product, {
+          companyId: sourceProduct.companyId,
+          branchId: transferDto.destinationBranchId,
+          code: sourceProduct.code,
+          name: sourceProduct.name,
+          description: sourceProduct.description,
+          categoryId: destinationCategory.id,
+          subcategoryId: destinationSubcategory.id,
+          brand: sourceProduct.brand,
+          unitPrice: sourceProduct.unitPrice,
+          quantity: 0,
+          defaultSupplierId: null,
+          createdByUserId: userId,
+          isActive: true,
+        });
+        destinationCreated = true;
+      }
+
+      sourceProduct.quantity -= quantity;
+      destinationProduct.quantity += quantity;
+
+      const savedDestinationProduct = await manager.save(Product, destinationProduct);
+      const savedSourceProduct = await manager.save(Product, sourceProduct);
+
+      const transfer = manager.create(InventoryTransfer, {
+        companyId: sourceProduct.companyId,
+        sourceBranchId,
+        targetBranchId: transferDto.destinationBranchId,
+        sourceProductId: savedSourceProduct.id,
+        targetProductId: savedDestinationProduct.id,
+        sourceCode: savedSourceProduct.code,
+        quantity,
+        note: transferDto.note || null,
+        createdByUserId: userId,
+      });
+
+      const savedTransfer = await manager.save(InventoryTransfer, transfer);
+
+      const sourceMovement = manager.create(StockMovement, {
+        companyId: sourceProduct.companyId,
+        branchId: sourceBranchId,
+        productId: savedSourceProduct.id,
+        movementType: 'SALIDA_TRANSFERENCIA',
+        quantity,
+        balanceAfter: savedSourceProduct.quantity,
+        referenceType: 'TRANSFERENCIA',
+        referenceId: savedTransfer.id,
+        note: transferDto.note || null,
+        createdByUserId: userId,
+      });
+
+      const destinationMovement = manager.create(StockMovement, {
+        companyId: sourceProduct.companyId,
+        branchId: transferDto.destinationBranchId,
+        productId: savedDestinationProduct.id,
+        movementType: 'INGRESO_TRANSFERENCIA',
+        quantity,
+        balanceAfter: savedDestinationProduct.quantity,
+        referenceType: 'TRANSFERENCIA',
+        referenceId: savedTransfer.id,
+        note: transferDto.note || null,
+        createdByUserId: userId,
+      });
+
+      await manager.save(StockMovement, sourceMovement);
+      await manager.save(StockMovement, destinationMovement);
+
+      return {
+        transfer: savedTransfer,
+        sourceProduct: savedSourceProduct,
+        destinationProduct: savedDestinationProduct,
+        destinationCreated,
+      };
+    });
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: {
+        es: 'Transferencia realizada exitosamente',
+        en: 'Stock transfer completed successfully',
+      },
+      data: result,
+    };
+  }
+
+  async getTransferHistory(
+    queryDto: QueryProductTransferHistoryDto,
+    branchId: string,
+    companyId: string | null
+  ) {
+    const queryBuilder = this.inventoryTransferRepository
+      .createQueryBuilder('transfer')
+      .leftJoinAndSelect('transfer.sourceProduct', 'sourceProduct')
+      .leftJoinAndSelect('transfer.targetProduct', 'targetProduct');
+
+    if (companyId) {
+      queryBuilder.where('transfer.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.where('1 = 1');
+    }
+
+    const direction = queryDto.direction || 'all';
+    if (direction === 'sent') {
+      queryBuilder.andWhere('transfer.sourceBranchId = :branchId', { branchId });
+    } else if (direction === 'received') {
+      queryBuilder.andWhere('transfer.targetBranchId = :branchId', { branchId });
+    } else {
+      queryBuilder.andWhere(
+        '(transfer.sourceBranchId = :branchId OR transfer.targetBranchId = :branchId)',
+        { branchId }
+      );
+    }
+
+    if (queryDto.productId) {
+      queryBuilder.andWhere(
+        '(transfer.sourceProductId = :productId OR transfer.targetProductId = :productId)',
+        { productId: queryDto.productId }
+      );
+    }
+
+    const history = await queryBuilder
+      .orderBy('transfer.createdAt', 'DESC')
+      .getMany();
+
+    return history;
+  }
+
+  private async resolveOrCreateDestinationCategory(
+    manager: any,
+    sourceProduct: Product,
+    destinationBranchId: string
+  ): Promise<Category> {
+    const sourceCategory = await manager.findOne(Category, {
+      where: { id: sourceProduct.categoryId },
+    });
+
+    if (!sourceCategory) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'La categoría del producto origen no existe',
+          en: 'Source product category does not exist',
+        },
+      });
+    }
+
+    const destinationCategoryWhere: any = {
+      branchId: destinationBranchId,
+      name: sourceCategory.name,
+    };
+    if (sourceCategory.companyId) {
+      destinationCategoryWhere.companyId = sourceCategory.companyId;
+    }
+
+    const destinationCategory = await manager.findOne(Category, {
+      where: destinationCategoryWhere,
+    });
+
+    if (destinationCategory) {
+      return destinationCategory;
+    }
+
+    const newCategory = manager.create(Category, {
+      companyId: sourceCategory.companyId,
+      branchId: destinationBranchId,
+      name: sourceCategory.name,
+      description: sourceCategory.description,
+      isActive: sourceCategory.isActive,
+    });
+
+    return manager.save(Category, newCategory);
+  }
+
+  private async resolveOrCreateDestinationSubcategory(
+    manager: any,
+    sourceProduct: Product,
+    destinationCategory: Category,
+    destinationBranchId: string
+  ): Promise<Subcategory> {
+    const sourceSubcategory = await manager.findOne(Subcategory, {
+      where: { id: sourceProduct.subcategoryId },
+    });
+
+    if (!sourceSubcategory) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'La subcategoría del producto origen no existe',
+          en: 'Source product subcategory does not exist',
+        },
+      });
+    }
+
+    const destinationSubcategoryWhere: any = {
+      branchId: destinationBranchId,
+      categoryId: destinationCategory.id,
+      name: sourceSubcategory.name,
+    };
+    if (sourceSubcategory.companyId) {
+      destinationSubcategoryWhere.companyId = sourceSubcategory.companyId;
+    }
+
+    const destinationSubcategory = await manager.findOne(Subcategory, {
+      where: destinationSubcategoryWhere,
+    });
+
+    if (destinationSubcategory) {
+      return destinationSubcategory;
+    }
+
+    const newSubcategory = manager.create(Subcategory, {
+      companyId: sourceSubcategory.companyId,
+      branchId: destinationBranchId,
+      categoryId: destinationCategory.id,
+      name: sourceSubcategory.name,
+      description: sourceSubcategory.description,
+      isActive: sourceSubcategory.isActive,
+    });
+
+    return manager.save(Subcategory, newSubcategory);
+  }
+
   async uploadProductImage(
     productId: string,
     file: Express.Multer.File,
@@ -874,6 +1234,26 @@ export class ProductsService {
         message: {
           es: 'El tamaño del archivo excede el límite de 8MB',
           en: 'File size exceeds 8MB limit',
+        },
+      });
+    }
+
+    const existingImagesCount = await this.fileRepository.count({
+      where: {
+        entityType: 'product',
+        entityId: productId,
+        fileCategory: 'product_image',
+        isActive: true,
+      },
+    });
+
+    if (existingImagesCount >= MAX_PRODUCT_IMAGES) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: `Solo se permiten ${MAX_PRODUCT_IMAGES} imágenes por producto`,
+          en: `Only ${MAX_PRODUCT_IMAGES} images per product are allowed`,
         },
       });
     }

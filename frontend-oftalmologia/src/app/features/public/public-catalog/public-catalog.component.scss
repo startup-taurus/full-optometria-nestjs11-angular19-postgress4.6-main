@@ -577,6 +577,31 @@
     }
   }
 
+  .product-gallery-thumbs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(56px, 1fr));
+    gap: 0.5rem;
+
+    .thumb-btn {
+      border: 1px solid #d4dce4;
+      border-radius: 8px;
+      padding: 0;
+      background: #fff;
+      overflow: hidden;
+      height: 56px;
+
+      &.active {
+        border-color: #2a6f97;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+
   .product-info-zone {
     display: flex;
     flex-direction: column;
@@ -936,6 +961,14 @@
           width: 24px;
           height: 24px;
         }
+      }
+    }
+
+    .product-gallery-thumbs {
+      grid-template-columns: repeat(4, minmax(52px, 1fr));
+
+      .thumb-btn {
+        height: 52px;
       }
     }
 

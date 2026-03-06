@@ -50,6 +50,7 @@ import {
 import { FilterInventoryComponent } from '../filters/filter-inventory/filter-inventory.component'
 import { ViewInventoryComponent } from '../forms/view-inventory/view-inventory.component'
 import { CreateEditInventoryComponent } from '../forms/create-edit-inventory/create-edit-inventory.component'
+import { TransferStockInventoryComponent } from '../forms/transfer-stock-inventory/transfer-stock-inventory.component'
 import Swal from 'sweetalert2'
 import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } from '@core/helpers/ui/ui.constants'
 
@@ -258,7 +259,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         {
           name: 'INVENTORY.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
-          width: 190,
+          width: 280,
           sortable: false,
         },
       ],
@@ -358,6 +359,79 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         })
       }
     }
+  }
+
+  public openTransferModal(product: Product): void {
+    if (!product || product.quantity <= 0) {
+      return
+    }
+
+    const modalRef = this._bsModalService.openModal({
+      component: TransferStockInventoryComponent,
+      options: {
+        size: 'lg',
+        backdrop: 'static',
+        centered: true,
+      },
+      data: {
+        selectedRow: product,
+      },
+    })
+
+    if (modalRef) {
+      modalRef.closed.subscribe((result: string) => {
+        if (result === 'transferred') {
+          this.reloadDatatable(this.filter)
+        }
+      })
+    }
+  }
+
+  public showTransferHistory(product: Product): void {
+    this._productService
+      .getTransferHistory({ productId: product.id, direction: 'all' })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          const responseData = response?.data as any
+          const history = responseData?.result || responseData || []
+
+          if (!history.length) {
+            Swal.fire({
+              title: 'Sin historial',
+              text: 'No hay transferencias registradas para este producto.',
+              icon: 'info',
+            })
+            return
+          }
+
+          const html = history
+            .slice(0, 20)
+            .map((item: any) => {
+              const type =
+                item.sourceProductId === product.id ? 'Enviado' : 'Recibido'
+              const date = item.createdAt
+                ? new Date(item.createdAt).toLocaleString()
+                : '-'
+              return `<div style="text-align:left;margin-bottom:8px;"><strong>${type}</strong> | Cantidad: ${item.quantity} | Codigo: ${item.sourceCode} | Fecha: ${date}</div>`
+            })
+            .join('')
+
+          Swal.fire({
+            title: 'Historial de transferencias',
+            html,
+            width: 800,
+            confirmButtonText: 'Cerrar',
+          })
+        },
+        error: () => {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo cargar el historial de transferencias.',
+            icon: 'error',
+          })
+        },
+      })
   }
 
   public toggleProductStatus(product: Product): void {

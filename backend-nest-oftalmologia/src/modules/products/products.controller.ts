@@ -21,6 +21,8 @@ import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { QueryProductDto } from './dtos/query-product.dto';
 import { PublicQueryProductDto } from './dtos/public-query-product.dto';
+import { TransferProductStockDto } from './dtos/transfer-product-stock.dto';
+import { QueryProductTransferHistoryDto } from './dtos/query-product-transfer-history.dto';
 import { BranchContext } from '../../common/decorators/branch-context.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CompanyId } from '../../common/decorators/company-id.decorator';
@@ -83,6 +85,16 @@ export class ProductsController {
     @CompanyId() companyId: string | null
   ) {
     return this.productsService.findAll(queryDto, branchId, companyId);
+  }
+
+  @Get('transfers/history')
+  @UseGuards(AuthGuard('jwt'))
+  async getTransferHistory(
+    @Query(ValidationPipe) queryDto: QueryProductTransferHistoryDto,
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null
+  ) {
+    return this.productsService.getTransferHistory(queryDto, branchId, companyId);
   }
 
   @Get(':id')
@@ -160,4 +172,23 @@ export class ProductsController {
       branchId
     );
   }
+
+  @Post(':id/transfer-stock')
+  @UseGuards(AuthGuard('jwt'))
+  async transferStock(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(ValidationPipe) transferDto: TransferProductStockDto,
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null,
+    @CurrentUser() user: any
+  ) {
+    return this.productsService.transferStock(
+      id,
+      transferDto,
+      branchId,
+      companyId,
+      user?.id
+    );
+  }
+
 }

@@ -50,6 +50,7 @@ export class PublicCatalogComponent implements OnInit {
 
   showProductModal = false
   selectedProduct: PublicProduct | null = null
+  selectedProductImageUrl = ''
 
   searchName = ''
   searchDescription = ''
@@ -225,15 +226,18 @@ export class PublicCatalogComponent implements OnInit {
 
   openProductModal(product: PublicProduct): void {
     this.selectedProduct = product
+    this.selectedProductImageUrl = this.getImageUrl(product)
     this.showProductModal = true
     document.body.style.overflow = 'hidden'
 
     this.catalogService.getProductById(product.id).subscribe({
       next: (updatedProduct) => {
         this.selectedProduct = updatedProduct
+        this.selectedProductImageUrl = this.getImageUrl(updatedProduct)
       },
       error: () => {
         this.selectedProduct = product
+        this.selectedProductImageUrl = this.getImageUrl(product)
       },
     })
   }
@@ -241,6 +245,7 @@ export class PublicCatalogComponent implements OnInit {
   closeProductModal(): void {
     this.showProductModal = false
     this.selectedProduct = null
+    this.selectedProductImageUrl = ''
     document.body.style.overflow = 'auto'
   }
   getWhatsAppLink(product: PublicProduct): string {
@@ -276,11 +281,25 @@ export class PublicCatalogComponent implements OnInit {
   }
 
   openImageModal(product: PublicProduct): void {
-    this.selectedImageUrl = this.getImageUrl(product)
+    this.selectedImageUrl = this.selectedProductImageUrl || this.getImageUrl(product)
     this.selectedProductName = product.name
     this.selectedProductCode = product.brand
     this.showImageModal = true
     document.body.style.overflow = 'hidden'
+  }
+
+  getProductGallery(product: PublicProduct | null): string[] {
+    if (!product?.images?.length) {
+      return ['assets/images/lentes.png']
+    }
+
+    return product.images
+      .map((img) => this.catalogService.getImageUrl(img.path))
+      .filter((url) => !!url)
+  }
+
+  selectProductImage(url: string): void {
+    this.selectedProductImageUrl = url
   }
 
   closeImageModal(): void {
