@@ -891,6 +891,22 @@
       "TITLE": "Inventory Filters",
       "ACTIVE": "Active",
       "INACTIVE": "Inactive"
+    },
+    "TRANSFER_STOCK": {
+      "TITLE": "Transfer stock",
+      "PRODUCT_CODE": "Code",
+      "PRODUCT_NAME": "Product",
+      "CURRENT_STOCK": "Current stock",
+      "DESTINATION_BRANCH": "Destination branch",
+      "SELECT_BRANCH": "Select a branch",
+      "DESTINATION_BRANCH_REQUIRED": "You must select a destination branch",
+      "QUANTITY_TO_TRANSFER": "Quantity to transfer",
+      "INVALID_QUANTITY": "Enter a valid quantity greater than 0",
+      "NOTE_OPTIONAL": "Note (optional)",
+      "SUBMIT": "Transfer",
+      "INSUFFICIENT_STOCK_TITLE": "Insufficient stock",
+      "INSUFFICIENT_STOCK_TEXT": "The quantity to transfer ({{quantity}}) exceeds available stock ({{stock}})",
+      "ERROR_MESSAGE": "Could not complete the stock transfer"
     }
   },
   "MEDICAL_HISTORY": {

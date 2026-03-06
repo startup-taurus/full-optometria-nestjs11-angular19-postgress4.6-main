@@ -82,7 +82,9 @@ export const branchReducer = createReducer(
   })),
 
   on(BranchActions.initializeBranchState, (state) => {
-    const savedBranchId = localStorage.getItem('admin-selected-branch-id')
+    const savedBranchId =
+      localStorage.getItem('admin-selected-branch-id') ||
+      localStorage.getItem('admin-branch-filter')
     return {
       ...state,
       selectedBranchId: savedBranchId || null,
@@ -95,6 +97,7 @@ export const branchReducer = createReducer(
 
   on(BranchActions.initializeUserBranch, (state, { userBranchId }) => ({
     ...state,
-    selectedBranchId: userBranchId,
+    // Keep persisted/manual selection if present; fallback to user default branch.
+    selectedBranchId: state.selectedBranchId ?? userBranchId,
   }))
 )

@@ -906,6 +906,22 @@
       "TITLE": "Filtros de Inventario",
       "ACTIVE": "Activo",
       "INACTIVE": "Inactivo"
+    },
+    "TRANSFER_STOCK": {
+      "TITLE": "Transferir stock",
+      "PRODUCT_CODE": "Código",
+      "PRODUCT_NAME": "Producto",
+      "CURRENT_STOCK": "Stock actual",
+      "DESTINATION_BRANCH": "Sucursal destino",
+      "SELECT_BRANCH": "Selecciona una sucursal",
+      "DESTINATION_BRANCH_REQUIRED": "Debes seleccionar una sucursal destino",
+      "QUANTITY_TO_TRANSFER": "Cantidad a transferir",
+      "INVALID_QUANTITY": "Ingresa una cantidad válida mayor a 0",
+      "NOTE_OPTIONAL": "Nota (opcional)",
+      "SUBMIT": "Transferir",
+      "INSUFFICIENT_STOCK_TITLE": "Stock insuficiente",
+      "INSUFFICIENT_STOCK_TEXT": "La cantidad a transferir ({{quantity}}) excede el stock disponible ({{stock}})",
+      "ERROR_MESSAGE": "No se pudo completar la transferencia de stock"
     }
   },
   "MEDICAL_HISTORY": {

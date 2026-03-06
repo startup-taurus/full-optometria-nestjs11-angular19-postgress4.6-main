@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h5 class="modal-title">Transferir stock</h5>
+  <h5 class="modal-title">{{ 'INVENTORY.TRANSFER_STOCK.TITLE' | translate }}</h5>
   <button
     type="button"
     class="btn-close"
@@ -11,19 +11,28 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="modal-body">
     <div class="mb-3 product-summary" *ngIf="product">
-      <div><strong>Código:</strong> {{ product.code }}</div>
-      <div><strong>Producto:</strong> {{ product.name }}</div>
-      <div><strong>Stock actual:</strong> {{ product.quantity }}</div>
+      <div>
+        <strong>{{ 'INVENTORY.TRANSFER_STOCK.PRODUCT_CODE' | translate }}:</strong>
+        {{ product.code }}
+      </div>
+      <div>
+        <strong>{{ 'INVENTORY.TRANSFER_STOCK.PRODUCT_NAME' | translate }}:</strong>
+        {{ product.name }}
+      </div>
+      <div>
+        <strong>{{ 'INVENTORY.TRANSFER_STOCK.CURRENT_STOCK' | translate }}:</strong>
+        {{ product.quantity }}
+      </div>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Sucursal destino</label>
+      <label class="form-label">{{ 'INVENTORY.TRANSFER_STOCK.DESTINATION_BRANCH' | translate }}</label>
       <ng-select
         formControlName="destinationBranchId"
         bindLabel="name"
         bindValue="id"
         [clearable]="false"
-        [placeholder]="'Selecciona una sucursal'"
+        [placeholder]="'INVENTORY.TRANSFER_STOCK.SELECT_BRANCH' | translate"
       >
         <ng-option *ngFor="let branch of availableBranches" [value]="branch.id">
           {{ branch.name }}
@@ -33,12 +42,12 @@
         class="invalid-feedback d-block"
         *ngIf="form.get('destinationBranchId')?.invalid && form.get('destinationBranchId')?.touched"
       >
-        Debes seleccionar una sucursal destino
+        {{ 'INVENTORY.TRANSFER_STOCK.DESTINATION_BRANCH_REQUIRED' | translate }}
       </div>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Cantidad a transferir</label>
+      <label class="form-label">{{ 'INVENTORY.TRANSFER_STOCK.QUANTITY_TO_TRANSFER' | translate }}</label>
       <input
         type="number"
         min="1"
@@ -49,12 +58,12 @@
         class="invalid-feedback d-block"
         *ngIf="form.get('quantity')?.invalid && form.get('quantity')?.touched"
       >
-        Ingresa una cantidad valida mayor a 0
+        {{ 'INVENTORY.TRANSFER_STOCK.INVALID_QUANTITY' | translate }}
       </div>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Nota (opcional)</label>
+      <label class="form-label">{{ 'INVENTORY.TRANSFER_STOCK.NOTE_OPTIONAL' | translate }}</label>
       <textarea
         class="form-control"
         rows="3"
@@ -69,11 +78,11 @@
 
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="closeModal()">
-      Cancelar
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
     <button type="submit" class="btn btn-primary" [disabled]="isLoading || form.invalid">
       <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-      Transferir
+      {{ 'INVENTORY.TRANSFER_STOCK.SUBMIT' | translate }}
     </button>
   </div>
 </form>
