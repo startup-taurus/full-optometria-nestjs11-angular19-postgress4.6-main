@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core'
+import { Component, HostListener, OnInit, inject, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { Router, RouterModule, ActivatedRoute } from '@angular/router'
@@ -58,27 +58,58 @@ export class PublicCatalogComponent implements OnInit {
   maxPrice: number | undefined = undefined
   sortBy: 'views' | 'price-asc' | 'price-desc' | 'newest' = 'newest'
 
-  showFilters = false
+  isFiltersDrawerOpen = false
+  private pendingProductIdFromUrl: string | null = null
+  private hasProcessedInitialProductFromUrl = false
 
   get filterToggleIcon(): string {
-    return this.showFilters ? 'mdi:chevron-up' : 'mdi:chevron-down'
+    return this.isFiltersDrawerOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'
   }
 
   ngOnInit(): void {
-    if (window.innerWidth >= 992) {
-      this.showFilters = true
-    }
-
     this.route.paramMap.subscribe((params) => {
       const companyParam = params.get('companyName')
       if (companyParam) {
         this.companyName.set(companyParam)
+        this.hasProcessedInitialProductFromUrl = false
         this.validateCompanyAndLoad()
       } else {
         this.isValidCompany.set(false)
         this.isCheckingCompany.set(false)
       }
     })
+
+    this.route.queryParamMap.subscribe((params) => {
+      this.pendingProductIdFromUrl = params.get('productId')
+    })
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (!this.isMobileViewport()) {
+      this.isFiltersDrawerOpen = false
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapePressed(): void {
+    if (this.showImageModal) {
+      this.closeImageModal()
+      return
+    }
+
+    if (this.showProductModal) {
+      this.closeProductModal()
+      return
+    }
+
+    if (this.isFiltersDrawerOpen) {
+      this.closeFiltersDrawer()
+    }
+  }
+
+  isMobileViewport(): boolean {
+    return window.innerWidth < 992
   }
   private validateCompanyAndLoad(): void {
     const companyNameValue = this.companyName()
@@ -154,6 +185,14 @@ export class PublicCatalogComponent implements OnInit {
         }
 
         this.loading.set(false)
+
+        if (
+          !this.hasProcessedInitialProductFromUrl &&
+          this.pendingProductIdFromUrl
+        ) {
+          this.openProductFromUrl(this.pendingProductIdFromUrl)
+        }
+
         window.scrollTo({ top: 0, behavior: 'smooth' })
       },
       error: (error) => {
@@ -169,6 +208,7 @@ export class PublicCatalogComponent implements OnInit {
   onSearch(): void {
     this.currentPage.set(1)
     this.loadProducts()
+    this.closeFiltersDrawer()
   }
 
   onFilterChange(): void {
@@ -188,6 +228,7 @@ export class PublicCatalogComponent implements OnInit {
     this.sortBy = 'newest'
     this.currentPage.set(1)
     this.loadProducts()
+    this.closeFiltersDrawer()
   }
 
   goToPage(page: number): void {
@@ -225,19 +266,15 @@ export class PublicCatalogComponent implements OnInit {
   }
 
   openProductModal(product: PublicProduct): void {
-    this.selectedProduct = product
-    this.selectedProductImageUrl = this.getImageUrl(product)
-    this.showProductModal = true
-    document.body.style.overflow = 'hidden'
+    this.applySelectedProduct(product)
+    this.updateProductQueryParam(product.id)
 
     this.catalogService.getProductById(product.id).subscribe({
       next: (updatedProduct) => {
-        this.selectedProduct = updatedProduct
-        this.selectedProductImageUrl = this.getImageUrl(updatedProduct)
+        this.applySelectedProduct(updatedProduct)
       },
       error: () => {
-        this.selectedProduct = product
-        this.selectedProductImageUrl = this.getImageUrl(product)
+        this.applySelectedProduct(product)
       },
     })
   }
@@ -247,6 +284,42 @@ export class PublicCatalogComponent implements OnInit {
     this.selectedProduct = null
     this.selectedProductImageUrl = ''
     document.body.style.overflow = 'auto'
+    this.updateProductQueryParam(null)
+  }
+
+  async shareProduct(product: PublicProduct | null, event?: Event): Promise<void> {
+    event?.stopPropagation()
+
+    if (!product) return
+
+    const shareUrl = this.getProductShareUrl(product.id)
+    const shareData = {
+      title: product.name,
+      text: `Mira este producto: ${product.name}`,
+      url: shareUrl,
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        return
+      }
+
+      await this.copyToClipboard(shareUrl)
+      await Swal.fire({
+        icon: 'success',
+        title: 'Enlace copiado',
+        text: 'Puedes compartir el producto con ese enlace.',
+        timer: 1800,
+        showConfirmButton: false,
+      })
+    } catch {
+      await Swal.fire({
+        icon: 'error',
+        title: 'No se pudo compartir',
+        text: 'Intenta nuevamente en unos segundos.',
+      })
+    }
   }
   getWhatsAppLink(product: PublicProduct): string {
     return this.catalogService.generateWhatsAppLink(product)
@@ -311,7 +384,13 @@ export class PublicCatalogComponent implements OnInit {
   }
 
   toggleFilters(): void {
-    this.showFilters = !this.showFilters
+    if (this.isMobileViewport()) {
+      this.isFiltersDrawerOpen = !this.isFiltersDrawerOpen
+    }
+  }
+
+  closeFiltersDrawer(): void {
+    this.isFiltersDrawerOpen = false
   }
 
   getPaginationArray(): number[] {
@@ -344,5 +423,57 @@ export class PublicCatalogComponent implements OnInit {
     }
 
     return rangeWithDots
+  }
+
+  private applySelectedProduct(product: PublicProduct): void {
+    this.selectedProduct = product
+    this.selectedProductImageUrl = this.getImageUrl(product)
+    this.showProductModal = true
+    document.body.style.overflow = 'hidden'
+  }
+
+  private openProductFromUrl(productId: string): void {
+    this.hasProcessedInitialProductFromUrl = true
+
+    this.catalogService.getProductById(productId).subscribe({
+      next: (product) => {
+        this.applySelectedProduct(product)
+      },
+      error: () => {
+        this.pendingProductIdFromUrl = null
+        this.updateProductQueryParam(null)
+      },
+    })
+  }
+
+  private updateProductQueryParam(productId: string | null): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { productId },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    })
+  }
+
+  private getProductShareUrl(productId: string): string {
+    const companySegment = this.companyName() ? `/${this.companyName()}` : ''
+    return `${window.location.origin}/catalog${companySegment}?productId=${productId}`
+  }
+
+  private async copyToClipboard(text: string): Promise<void> {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return
+    }
+
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
   }
 }
