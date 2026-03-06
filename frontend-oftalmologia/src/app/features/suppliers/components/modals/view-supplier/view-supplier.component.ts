@@ -47,4 +47,50 @@ export class ViewSupplierComponent implements OnInit, OnDestroy {
   public onClose(): void {
     this._activeModal.dismiss()
   }
+
+  public openSupplierWhatsApp(): void {
+    const phone = this.formatPhoneForWhatsApp(this.supplier?.phone)
+    if (!phone || !this.supplier) {
+      return
+    }
+
+    const message = encodeURIComponent(
+      `Hola, me gustaría obtener información sobre ${this.supplier.name}.`
+    )
+    window.open(`https://wa.me/${phone}?text=${message}`, '_blank')
+  }
+
+  public openSupplierEmail(): void {
+    if (!this.supplier?.email) {
+      return
+    }
+
+    const subject = encodeURIComponent(`Consulta - proveedor ${this.supplier.name}`)
+    window.location.href = `mailto:${this.supplier.email}?subject=${subject}`
+  }
+
+  public openSupplierWebsite(): void {
+    if (!this.supplier?.website) {
+      return
+    }
+
+    const normalizedWebsite = /^(https?:\/\/)/i.test(this.supplier.website)
+      ? this.supplier.website
+      : `https://${this.supplier.website}`
+
+    window.open(normalizedWebsite, '_blank')
+  }
+
+  public canOpenWhatsApp(): boolean {
+    return !!this.formatPhoneForWhatsApp(this.supplier?.phone)
+  }
+
+  private formatPhoneForWhatsApp(phone?: string): string {
+    if (!phone) {
+      return ''
+    }
+
+    const cleanPhone = phone.replace(/\D/g, '')
+    return cleanPhone.length >= 8 ? cleanPhone : ''
+  }
 }

@@ -84,6 +84,8 @@ export class SuppliersTableComponent
   public statusTemplate?: TemplateRef<HTMLElement>
   @ViewChild('actionsTemplate', { static: false })
   public actionsTemplate?: TemplateRef<HTMLElement>
+  @ViewChild('contactTemplate', { static: false })
+  public contactTemplate?: TemplateRef<HTMLElement>
   @ViewChild('sideFilterPanel', { static: false })
   public sideFilterPanel?: SideFilterPanelComponent
 
@@ -210,6 +212,12 @@ export class SuppliersTableComponent
           cellTemplate: this.updatedAtTemplate,
           prop: 'updatedAt',
           width: 150,
+        },
+        {
+          name: 'SUPPLIERS.TABLE.CONTACT',
+          cellTemplate: this.contactTemplate,
+          width: 160,
+          sortable: false,
         },
         {
           name: 'SUPPLIERS.TABLE.ACTIONS',
@@ -375,5 +383,51 @@ export class SuppliersTableComponent
     this.filter = {}
     this._filterCommunicationService.resetFilter()
     this.reloadDatatable(this.filter)
+  }
+
+  public openSupplierWhatsApp(supplier: Supplier): void {
+    const phone = this.formatPhoneForWhatsApp(supplier.phone)
+    if (!phone) {
+      return
+    }
+
+    const message = encodeURIComponent(
+      `Hola, me gustaría obtener información sobre ${supplier.name}.`
+    )
+    window.open(`https://wa.me/${phone}?text=${message}`, '_blank')
+  }
+
+  public openSupplierEmail(supplier: Supplier): void {
+    if (!supplier.email) {
+      return
+    }
+
+    const subject = encodeURIComponent(`Consulta - proveedor ${supplier.name}`)
+    window.location.href = `mailto:${supplier.email}?subject=${subject}`
+  }
+
+  public openSupplierWebsite(supplier: Supplier): void {
+    if (!supplier.website) {
+      return
+    }
+
+    const normalizedWebsite = /^(https?:\/\/)/i.test(supplier.website)
+      ? supplier.website
+      : `https://${supplier.website}`
+
+    window.open(normalizedWebsite, '_blank')
+  }
+
+  public canOpenWhatsApp(supplier: Supplier): boolean {
+    return !!this.formatPhoneForWhatsApp(supplier.phone)
+  }
+
+  private formatPhoneForWhatsApp(phone?: string): string {
+    if (!phone) {
+      return ''
+    }
+
+    const cleanPhone = phone.replace(/\D/g, '')
+    return cleanPhone.length >= 8 ? cleanPhone : ''
   }
 }

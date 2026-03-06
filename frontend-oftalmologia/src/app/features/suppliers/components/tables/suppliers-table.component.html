@@ -79,6 +79,41 @@
               </span>
             </ng-template>
 
+            <ng-template #contactTemplate let-row="row">
+              <div class="d-flex gap-1">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  (click)="openSupplierWhatsApp(row)"
+                  [disabled]="!canOpenWhatsApp(row)"
+                  [attr.aria-label]="'SUPPLIERS.ACTIONS.WHATSAPP' | translate"
+                  [ngbTooltip]="'SUPPLIERS.ACTIONS.WHATSAPP' | translate"
+                >
+                  <i class="ti ti-brand-whatsapp"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="openSupplierEmail(row)"
+                  [disabled]="!row.email"
+                  [attr.aria-label]="'SUPPLIERS.ACTIONS.SEND_EMAIL' | translate"
+                  [ngbTooltip]="'SUPPLIERS.ACTIONS.SEND_EMAIL' | translate"
+                >
+                  <i class="ti ti-mail"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-info"
+                  (click)="openSupplierWebsite(row)"
+                  [disabled]="!row.website"
+                  [attr.aria-label]="'SUPPLIERS.ACTIONS.OPEN_WEBSITE' | translate"
+                  [ngbTooltip]="'SUPPLIERS.ACTIONS.OPEN_WEBSITE' | translate"
+                >
+                  <i class="ti ti-world"></i>
+                </button>
+              </div>
+            </ng-template>
+
             <ng-template #actionsTemplate let-row="row">
               <div class="d-flex gap-1">
                 <button

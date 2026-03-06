@@ -27,6 +27,8 @@ export interface SupplierFilter {
   documentNumber?: string
   email?: string
   phone?: string
+  website?: string
+  address?: string
   isActive?: boolean
   page?: number
   limit?: number
@@ -122,6 +124,8 @@ export class SuppliersManagementService {
     if (filter.documentNumber) params['documentNumber'] = filter.documentNumber
     if (filter.email) params['email'] = filter.email
     if (filter.phone) params['phone'] = filter.phone
+    if (filter.website) params['website'] = filter.website
+    if (filter.address) params['address'] = filter.address
     if (filter.isActive !== undefined)
       params['isActive'] = filter.isActive.toString()
     if (filter.page) params['page'] = filter.page.toString()

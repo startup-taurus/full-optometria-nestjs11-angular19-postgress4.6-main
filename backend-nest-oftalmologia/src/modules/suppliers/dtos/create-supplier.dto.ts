@@ -25,4 +25,19 @@ export class CreateSupplierDto {
   @IsOptional()
   @IsEmail()
   email?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  website?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  address?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 1000)
+  notes?: string;
 }
