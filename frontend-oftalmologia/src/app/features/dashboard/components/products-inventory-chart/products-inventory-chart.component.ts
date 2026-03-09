@@ -182,6 +182,37 @@ export class ProductsInventoryChartComponent
         ...this.chartOptions.xaxis,
         categories: data.labels,
       },
+      tooltip: {
+        ...this.chartOptions.tooltip,
+        custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+          const value = series[seriesIndex][dataPointIndex]
+          const category = w.globals.labels[dataPointIndex]
+          
+          let products: string[] = []
+          if (dataPointIndex === 0) {
+            products = data.details.lowStock.slice(0, 3)
+          } else if (dataPointIndex === 1) {
+            products = data.details.mediumStock.slice(0, 3)
+          } else if (dataPointIndex === 2) {
+            products = data.details.highStock.slice(0, 3)
+          }
+
+          const productsList = products.length > 0
+            ? products.map(p => `<li style="margin: 2px 0;">${p}</li>`).join('')
+            : '<li style="margin: 2px 0; color: #94a3b8;">No hay productos</li>'
+
+          return `
+            <div style="padding: 12px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <div style="font-weight: 600; color: #1e293b; margin-bottom: 8px;">${category}</div>
+              <div style="color: #64748b; margin-bottom: 6px; font-size: 13px;">${value} productos totales</div>
+              <div style="font-weight: 500; color: #475569; font-size: 12px; margin-bottom: 4px;">Top 3:</div>
+              <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #334155;">
+                ${productsList}
+              </ul>
+            </div>
+          `
+        },
+      },
     }
   }
 }

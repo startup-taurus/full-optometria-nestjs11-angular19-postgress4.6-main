@@ -19,6 +19,7 @@ export class ViewInventoryComponent implements OnInit, OnDestroy {
   public product?: Product
   public showImageModal = false
   public selectedImageUrl = ''
+  public selectedImageIndex = 0
 
   private unsubscribe$ = new Subject<void>()
 
@@ -78,12 +79,50 @@ export class ViewInventoryComponent implements OnInit, OnDestroy {
   }
 
   public openImageModal(): void {
-    this.selectedImageUrl = this.getProductImageUrl()
+    const images = this.product?.images || []
+
+    if (images.length > 0) {
+      const coverIndex = images.findIndex((img) => img.isCover)
+      this.selectedImageIndex = coverIndex >= 0 ? coverIndex : 0
+      this.selectedImageUrl = this._productService.getImageUrl(
+        images[this.selectedImageIndex]?.path
+      )
+    } else {
+      this.selectedImageIndex = 0
+      this.selectedImageUrl = this.getProductImageUrl()
+    }
+
     this.showImageModal = true
   }
 
   public closeImageModal(): void {
     this.showImageModal = false
     this.selectedImageUrl = ''
+    this.selectedImageIndex = 0
+  }
+
+  public showPreviousImage(): void {
+    const images = this.product?.images || []
+    if (images.length <= 1) {
+      return
+    }
+
+    this.selectedImageIndex =
+      (this.selectedImageIndex - 1 + images.length) % images.length
+    this.selectedImageUrl = this._productService.getImageUrl(
+      images[this.selectedImageIndex]?.path
+    )
+  }
+
+  public showNextImage(): void {
+    const images = this.product?.images || []
+    if (images.length <= 1) {
+      return
+    }
+
+    this.selectedImageIndex = (this.selectedImageIndex + 1) % images.length
+    this.selectedImageUrl = this._productService.getImageUrl(
+      images[this.selectedImageIndex]?.path
+    )
   }
 }

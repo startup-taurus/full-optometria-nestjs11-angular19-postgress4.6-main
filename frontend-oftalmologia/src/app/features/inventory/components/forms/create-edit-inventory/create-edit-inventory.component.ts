@@ -23,7 +23,7 @@ import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { TranslateModule } from '@ngx-translate/core'
-import { Observable, of, map, tap, Subject, takeUntil, forkJoin } from 'rxjs'
+import { Observable, of, map, Subject, takeUntil, forkJoin } from 'rxjs'
 
 interface ProductImagePreview {
   id?: string
@@ -75,6 +75,7 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
     this.initializeForm()
     this.loadSelectData()
     this.setupSubcategoryFiltering()
+    this.initializeExistingImages()
   }
 
   ngOnDestroy(): void {
@@ -162,32 +163,13 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
   }
 
   private loadSelectData(): void {
-    this.categories$ = this._categoryService
-      .getAll()
-      .pipe(
-        tap((categories: any) =>
-          console.log(' [CreateEditInventory] Categories loaded:', categories)
-        )
-      )
+    this.categories$ = this._categoryService.getAll()
 
-    this.subcategories$ = this._subcategoryService
-      .getAll()
-      .pipe(
-        tap((subcategories: any) =>
-          console.log(
-            ' [CreateEditInventory] Subcategories loaded:',
-            subcategories
-          )
-        )
-      )
+    this.subcategories$ = this._subcategoryService.getAll()
 
     this.suppliers$ = this._supplierService.findSuppliers({}).pipe(
-      tap((res: any) =>
-        console.log(' [CreateEditInventory] Suppliers response:', res)
-      ),
       map((res: any) => {
         const suppliers = res.data?.data?.result || []
-        console.log(' [CreateEditInventory] Mapped suppliers:', suppliers)
         return suppliers
       })
     )

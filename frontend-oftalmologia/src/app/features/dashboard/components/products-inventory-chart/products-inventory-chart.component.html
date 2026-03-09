@@ -63,6 +63,34 @@
           </ul>
         </div>
       }
+
+      @if (chartData()!.details.mediumStock.length > 0) {
+        <div class="alert alert-warning mt-3">
+          <strong>{{ 'DASHBOARD.PRODUCTS_INVENTORY.MEDIUM_STOCK_TITLE' | translate }}:</strong>
+          <p class="mb-1">
+            {{ 'DASHBOARD.PRODUCTS_INVENTORY.MEDIUM_STOCK_MESSAGE' | translate }}
+          </p>
+          <ul class="mb-0 mt-2">
+            @for (product of chartData()!.details.mediumStock; track product) {
+              <li>{{ product }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (chartData()!.details.highStock.length > 0) {
+        <div class="alert alert-success mt-3">
+          <strong>{{ 'DASHBOARD.PRODUCTS_INVENTORY.HIGH_STOCK_TITLE' | translate }}:</strong>
+          <p class="mb-1">
+            {{ 'DASHBOARD.PRODUCTS_INVENTORY.HIGH_STOCK_MESSAGE' | translate }}
+          </p>
+          <ul class="mb-0 mt-2">
+            @for (product of chartData()!.details.highStock; track product) {
+              <li>{{ product }}</li>
+            }
+          </ul>
+        </div>
+      }
     } @else {
       <div class="text-center py-5 text-muted">
         <i class="ti ti-package fs-1 mb-2"></i>

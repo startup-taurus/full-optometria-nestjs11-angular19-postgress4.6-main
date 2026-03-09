@@ -81,13 +81,13 @@ export class ProductService {
       .pipe(tap((res) => this.showNotification(res.message, 'INVENTORY.TITLE')))
   }
 
-  public getProductById(id: string): Observable<ApiResponse<Product>> {
+  public getProductById(id: string): Observable<Product> {
     const endpoint = `${this.API_URL}/${id}`
 
-    return this._httpClient.get<ApiResponse<Product>>(endpoint).pipe(
-      tap({
-        next: (response) => {},
-        error: (error) => {},
+    return this._httpClient.get<any>(endpoint).pipe(
+      map((response) => {
+        const product = response?.data?.data?.data || response?.data?.data || response?.data
+        return product as Product
       })
     )
   }
