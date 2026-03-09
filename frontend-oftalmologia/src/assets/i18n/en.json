@@ -723,7 +723,7 @@
     "RELOAD_TABLE": "Reload Table",
     "RELOAD": "Reload",
     "RESULTS": "Results",
-    "NGX_DATATABLE_EMPTY_MESSAGE": "No data found. If you applied filters, try adjusting them or broaden your search criteria.",
+    "NGX_DATATABLE_EMPTY_MESSAGE": "No data found.",
     "YES": "Yes",
     "NO": "No",
     "NO_ITEMS_FOUND": "No items found",

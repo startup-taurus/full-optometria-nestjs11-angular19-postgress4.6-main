@@ -736,7 +736,7 @@
     "RELOAD_TABLE": "Cuadro de carga",
     "RELOAD": "Recargar",
     "RESULTS": "Resultados",
-    "NGX_DATATABLE_EMPTY_MESSAGE": "No se han encontrado datos. Si aplica filtros, intente ajustarlos o ampliar sus criterios de búsqueda.",
+    "NGX_DATATABLE_EMPTY_MESSAGE": "No se han encontrado datos.",
     "YES": "Sí",
     "NO": "No",
     "NO_ITEMS_FOUND": "No se han encontrado objetos",
