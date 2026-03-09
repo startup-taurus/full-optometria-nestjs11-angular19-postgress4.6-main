@@ -761,7 +761,10 @@
     "CREATED_AT": "Created At",
     "FILTER_APPLIED": "filter applied",
     "FILTERS_APPLIED": "filters applied",
-    "CLICK_TO_MODIFY": "Click to modify"
+    "CLICK_TO_MODIFY": "Click to modify",
+    "VIEW": "View",
+    "DELETE": "Delete",
+    "SAVING": "Saving..."
   },
   "VALIDATION": {
     "REQUIRED": "This field is required",
@@ -1881,5 +1884,83 @@
     "MAX_BRANCHES_HINT": "Leave empty for no limit",
     "USERS_USAGE_TITLE": "Users: current / maximum",
     "BRANCHES_USAGE_TITLE": "Branches: current / maximum"
+  },
+  "FEEDBACK": {
+    "TITLE": "Feedback",
+    "ADMIN_TITLE": "Company feedback",
+    "ADMIN_ACCESS_TITLE": "Supervision view",
+    "ADMIN_ACCESS_TEXT": "As superadmin you can view feedback grouped by company.",
+    "GO_TO_ADMIN": "Go to admin view",
+    "FIELDS": {
+      "TYPE": "Type",
+      "TITLE": "Title",
+      "DESCRIPTION": "Description",
+      "STATUS": "Status",
+      "ATTACHMENTS": "Attachments",
+      "CREATED_AT": "Created",
+      "COMPANY": "Company",
+      "BRANCH": "Branch",
+      "USER": "User"
+    },
+    "TYPES": {
+      "SUGGESTION": "Suggestion",
+      "REPORT": "Report"
+    },
+    "STATUS": {
+      "NUEVO": "New",
+      "EN_REVISION": "In review",
+      "RESUELTO": "Resolved"
+    },
+    "FILTER": {
+      "ALL_TYPES": "All types",
+      "ALL_STATUS": "All statuses"
+    },
+    "TABLE": {
+      "ACTIONS": "Actions"
+    },
+    "ADMIN": {
+      "TABLE_TITLE": "Feedback from all companies"
+    },
+    "CREATE": {
+      "TITLE": "Send feedback",
+      "SUBMIT": "Send feedback",
+      "BASIC_INFO": "Feedback information",
+      "TITLE_PLACEHOLDER": "Write a descriptive title...",
+      "DESCRIPTION_PLACEHOLDER": "Describe your suggestion or report in detail...",
+      "ADD_FILES": "Add file",
+      "ATTACHMENTS_HELP": "Up to 3 images. Allowed formats: PNG, JPG, WEBP, GIF. Max 10 MB per file."
+    },
+    "VALIDATION": {
+      "TITLE_REQUIRED": "Title is required (minimum 3 characters)",
+      "DESCRIPTION_REQUIRED": "Description is required (minimum 5 characters)"
+    },
+    "DETAIL": {
+      "TITLE": "Feedback details",
+      "CONTENT": "Content",
+      "ORGANIZATION": "Organization",
+      "TIMESTAMPS": "Date",
+      "CHANGE_STATUS": "Change status",
+      "ATTACHMENTS": "Attached files",
+      "ATTACHMENTS_NOT_LOADED": "Attachments are only loaded when opening detail from API.",
+      "NO_DATA": "No data"
+    },
+    "LIST": {
+      "TITLE": "My feedback",
+      "EMPTY": "No feedback found"
+    },
+    "MESSAGES": {
+      "CREATED_SUCCESS": "Feedback created successfully",
+      "CREATED_ERROR": "Could not create feedback",
+      "LOAD_ERROR": "Could not load feedback",
+      "DELETE_CONFIRM_TITLE": "Delete feedback",
+      "DELETE_CONFIRM_TEXT": "This action cannot be undone",
+      "DELETE_SUCCESS": "Feedback deleted successfully",
+      "DELETE_ERROR": "Could not delete feedback",
+      "MAX_FILES_ERROR": "Only up to 3 attachments are allowed",
+      "FILE_TOO_LARGE": "File {{name}} exceeds the limit of {{max}} MB",
+      "ONLY_IMAGES_ALLOWED": "Only image files are allowed (PNG, JPG, WEBP, GIF)",
+      "STATUS_UPDATED": "Status updated successfully",
+      "STATUS_UPDATE_ERROR": "Could not update status"
+    }
   }
 }

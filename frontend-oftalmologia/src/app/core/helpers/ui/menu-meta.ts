@@ -67,6 +67,19 @@ export const MENU_ITEMS: MenuItemType[] = [
     requiredPermissions: [PERMISSION_IDS.PATIENTS],
   },
   {
+    key: 'FEEDBACK_USER',
+    label: 'FEEDBACK_USER',
+    icon: 'ti-message-report',
+    url: '/feedback',
+    requiredPermissions: [PERMISSION_IDS.FEEDBACK],
+  },
+  {
+    key: 'FEEDBACK_ADMIN',
+    label: 'FEEDBACK_ADMIN',
+    icon: 'ti-message-2-cog',
+    url: '/system-management/feedback',
+  },
+  {
     key: 'ROLES_AND_PERMISSIONS',
     label: 'ROLES_AND_PERMISSIONS',
     icon: 'ti-user-shield',

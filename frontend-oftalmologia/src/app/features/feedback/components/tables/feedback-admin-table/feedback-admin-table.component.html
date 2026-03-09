@@ -1,0 +1,142 @@
+<div class="card common-datatable-card border-0 shadow-sm">
+  <div class="card-header bg-white border-bottom">
+    <div
+      class="d-flex justify-content-between align-items-center flex-wrap gap-2"
+    >
+      <h5 class="card-title mb-0 text-primary">
+        <i class="ti ti-messages me-2"></i>
+        {{ 'FEEDBACK.ADMIN.TABLE_TITLE' | translate }}
+      </h5>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <select
+          class="form-select form-select-sm"
+          style="width: 150px"
+          [(ngModel)]="filters.type"
+          (change)="applyFilters()"
+        >
+          <option value="">
+            {{ 'FEEDBACK.FILTER.ALL_TYPES' | translate }}
+          </option>
+          <option value="suggestion">
+            {{ 'FEEDBACK.TYPES.SUGGESTION' | translate }}
+          </option>
+          <option value="report">
+            {{ 'FEEDBACK.TYPES.REPORT' | translate }}
+          </option>
+        </select>
+        <select
+          class="form-select form-select-sm"
+          style="width: 160px"
+          [(ngModel)]="filters.status"
+          (change)="applyFilters()"
+        >
+          <option value="">
+            {{ 'FEEDBACK.FILTER.ALL_STATUS' | translate }}
+          </option>
+          <option value="nuevo">
+            {{ 'FEEDBACK.STATUS.NUEVO' | translate }}
+          </option>
+          <option value="en_revision">
+            {{ 'FEEDBACK.STATUS.EN_REVISION' | translate }}
+          </option>
+          <option value="resuelto">
+            {{ 'FEEDBACK.STATUS.RESUELTO' | translate }}
+          </option>
+        </select>
+        <button
+          class="btn btn-outline-danger btn-sm"
+          type="button"
+          [ngbTooltip]="'WORDS.RESET' | translate"
+          placement="top"
+          *ngIf="hasActiveFilters()"
+          (click)="clearFilters()"
+        >
+          <i class="ti ti-filter-off"></i>
+        </button>
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          (click)="reloadDatatable()"
+        >
+          <i class="ti ti-refresh"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <shared-ngx-datatable
+      [config]="config$ | async"
+      [data]="data$ | async"
+      (onChangeLimit)="onChangeLimit($event)"
+      (onChangePage)="onChangePage($event)"
+      class="common-ngx-datatable"
+    ></shared-ngx-datatable>
+  </div>
+</div>
+
+<ng-template #companyTemplate let-row="row">
+  <span class="badge common-badge bg-info" *ngIf="row.company">{{
+    row.company.name
+  }}</span>
+  <span class="text-muted small" *ngIf="!row.company">-</span>
+</ng-template>
+
+<ng-template #userTemplate let-row="row">
+  <div class="small" *ngIf="row.createdByUser">
+    <div class="fw-medium">
+      {{ row.createdByUser.firstName }} {{ row.createdByUser.lastName }}
+    </div>
+    <span class="text-muted">{{ row.createdByUser.email }}</span>
+  </div>
+  <span class="text-muted small" *ngIf="!row.createdByUser">-</span>
+</ng-template>
+
+<ng-template #typeTemplate let-row="row">
+  <span class="badge common-badge" [ngClass]="getTypeBadgeClass(row.type)">
+    {{ 'FEEDBACK.TYPES.' + row.type.toUpperCase() | translate }}
+  </span>
+</ng-template>
+
+<ng-template #titleTemplate let-row="row">
+  <div
+    class="fw-semibold text-truncate"
+    style="max-width: 220px"
+    [title]="row.title"
+  >
+    {{ row.title }}
+  </div>
+  <small class="text-muted text-truncate d-block" style="max-width: 220px">{{
+    row.description
+  }}</small>
+</ng-template>
+
+<ng-template #statusTemplate let-row="row">
+  <span class="badge common-badge" [ngClass]="getStatusBadgeClass(row.status)">
+    {{ 'FEEDBACK.STATUS.' + row.status.toUpperCase() | translate }}
+  </span>
+</ng-template>
+
+<ng-template #createdAtTemplate let-row="row">
+  <span class="small">{{ row.createdAt | date: FORMAT_FOR_DATES }}</span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row="row">
+  <div class="d-flex gap-1">
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      [ngbTooltip]="'WORDS.VIEW' | translate"
+      placement="top"
+      (click)="openDetail(row)"
+    >
+      <i class="ti ti-eye"></i>
+    </button>
+    <button
+      class="btn btn-outline-danger btn-xs"
+      [ngbTooltip]="'WORDS.DELETE' | translate"
+      placement="top"
+      (click)="remove(row)"
+    >
+      <i class="ti ti-trash"></i>
+    </button>
+  </div>
+</ng-template>

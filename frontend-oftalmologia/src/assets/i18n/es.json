@@ -95,7 +95,9 @@
     "MEDICAL_HISTORY_CONFIGURATION": "Configuración Clínica",
     "CLINICAL_MANAGEMENT": "Gestión Clínica",
     "COMPANIES": "Compañias",
-    "PATIENTS": "Pacientes"
+    "PATIENTS": "Pacientes",
+    "FEEDBACK_USER": "Feedback",
+    "FEEDBACK_ADMIN": "Feedback General"
   },
   "TOPBAR": {
     "SEARCH": "Busca algo...",
@@ -773,7 +775,10 @@
     "CREATED_AT": "Creado en",
     "FILTER_APPLIED": "filtro aplicado",
     "FILTERS_APPLIED": "filtros aplicados",
-    "CLICK_TO_MODIFY": "Clic para modificar"
+    "CLICK_TO_MODIFY": "Clic para modificar",
+    "VIEW": "Ver",
+    "DELETE": "Eliminar",
+    "SAVING": "Guardando..."
   },
   "VALIDATION": {
     "REQUIRED": "Este campo es obligatorio",
@@ -1871,5 +1876,83 @@
     "MAX_BRANCHES_HINT": "Dejar vacío para sin límite",
     "USERS_USAGE_TITLE": "Usuarios: actual / máximo",
     "BRANCHES_USAGE_TITLE": "Sucursales: actual / máximo"
+  },
+  "FEEDBACK": {
+    "TITLE": "Feedback",
+    "ADMIN_TITLE": "Feedback por compañías",
+    "ADMIN_ACCESS_TITLE": "Vista de supervisión",
+    "ADMIN_ACCESS_TEXT": "Como superadmin puedes ver feedback agrupado por compañía.",
+    "GO_TO_ADMIN": "Ir a vista admin",
+    "FIELDS": {
+      "TYPE": "Tipo",
+      "TITLE": "Título",
+      "DESCRIPTION": "Descripción",
+      "STATUS": "Estado",
+      "ATTACHMENTS": "Adjuntos",
+      "CREATED_AT": "Creado",
+      "COMPANY": "Compañía",
+      "BRANCH": "Sucursal",
+      "USER": "Usuario"
+    },
+    "TYPES": {
+      "SUGGESTION": "Sugerencia",
+      "REPORT": "Reporte"
+    },
+    "STATUS": {
+      "NUEVO": "Nuevo",
+      "EN_REVISION": "En revisión",
+      "RESUELTO": "Resuelto"
+    },
+    "FILTER": {
+      "ALL_TYPES": "Todos los tipos",
+      "ALL_STATUS": "Todos los estados"
+    },
+    "TABLE": {
+      "ACTIONS": "Acciones"
+    },
+    "ADMIN": {
+      "TABLE_TITLE": "Feedback de todas las compañías"
+    },
+    "CREATE": {
+      "TITLE": "Enviar feedback",
+      "SUBMIT": "Enviar feedback",
+      "BASIC_INFO": "Información del feedback",
+      "TITLE_PLACEHOLDER": "Escribe un título descriptivo...",
+      "DESCRIPTION_PLACEHOLDER": "Describe detalladamente tu sugerencia o reporte...",
+      "ADD_FILES": "Agregar archivo",
+      "ATTACHMENTS_HELP": "Máximo 3 imágenes. Formatos permitidos: PNG, JPG, WEBP, GIF. Máx. 10 MB por archivo."
+    },
+    "VALIDATION": {
+      "TITLE_REQUIRED": "El título es requerido (mínimo 3 caracteres)",
+      "DESCRIPTION_REQUIRED": "La descripción es requerida (mínimo 5 caracteres)"
+    },
+    "DETAIL": {
+      "TITLE": "Detalle del feedback",
+      "CONTENT": "Contenido",
+      "ORGANIZATION": "Organización",
+      "TIMESTAMPS": "Fecha",
+      "CHANGE_STATUS": "Cambiar estado",
+      "ATTACHMENTS": "Archivos adjuntos",
+      "ATTACHMENTS_NOT_LOADED": "Los archivos adjuntos sólo se cargan al abrir el detalle desde la API.",
+      "NO_DATA": "Sin datos"
+    },
+    "LIST": {
+      "TITLE": "Mis feedback",
+      "EMPTY": "No hay feedback registrado"
+    },
+    "MESSAGES": {
+      "CREATED_SUCCESS": "Feedback creado correctamente",
+      "CREATED_ERROR": "No se pudo crear el feedback",
+      "LOAD_ERROR": "No se pudo cargar el feedback",
+      "DELETE_CONFIRM_TITLE": "Eliminar feedback",
+      "DELETE_CONFIRM_TEXT": "Esta acción no se puede deshacer",
+      "DELETE_SUCCESS": "Feedback eliminado correctamente",
+      "DELETE_ERROR": "No se pudo eliminar el feedback",
+      "MAX_FILES_ERROR": "Solo se permiten hasta 3 adjuntos",
+      "FILE_TOO_LARGE": "El archivo {{name}} supera el límite de {{max}} MB",
+      "ONLY_IMAGES_ALLOWED": "Solo se permiten archivos de imagen (PNG, JPG, WEBP, GIF)",
+      "STATUS_UPDATED": "Estado actualizado correctamente",
+      "STATUS_UPDATE_ERROR": "No se pudo actualizar el estado"
+    }
   }
 }

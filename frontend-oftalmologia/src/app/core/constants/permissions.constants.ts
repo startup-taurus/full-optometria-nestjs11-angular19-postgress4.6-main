@@ -43,6 +43,9 @@ export const PERMISSION_IDS = {
 
   //pacientes
   PATIENTS: '1d77ac5d-4342-49b6-8a91-3a120aab48cd',
+
+  //feedback
+  FEEDBACK: '7ec21b5c-03fa-415c-b6de-59fea2dd2cea',
 } as const
 
 // Mapeo de nombres de permisos a IDs para compatibilidad hacia atrás
@@ -55,6 +58,7 @@ export const PERMISSION_NAME_TO_ID_MAP: { [key: string]: string } = {
   BRANCHES: PERMISSION_IDS.BRANCHES,
   CALENDAR: PERMISSION_IDS.CALENDAR,
   BRANCH_SELECTOR: PERMISSION_IDS.BRANCH_SELECTOR,
+  FEEDBACK: PERMISSION_IDS.FEEDBACK,
 }
 
 // Mapeo de módulos a IDs de permisos
@@ -74,6 +78,7 @@ export const MODULE_NAME_TO_PERMISSION_MAP: { [key: string]: string } = {
   CATEGORIES: PERMISSION_IDS.CATEGORIES,
   COMPANIES: PERMISSION_IDS.COMPANIES,
   PATIENTS: PERMISSION_IDS.PATIENTS,
+  FEEDBACK: PERMISSION_IDS.FEEDBACK,
 }
 
 // Alias más legibles para templates
@@ -92,6 +97,7 @@ export const PERMISSIONS = {
   companies: PERMISSION_IDS.COMPANIES,
   branchSelector: PERMISSION_IDS.BRANCH_SELECTOR,
   patients: PERMISSION_IDS.PATIENTS,
+  feedback: PERMISSION_IDS.FEEDBACK,
 } as const
 
 export type PermissionId = (typeof PERMISSION_IDS)[keyof typeof PERMISSION_IDS]

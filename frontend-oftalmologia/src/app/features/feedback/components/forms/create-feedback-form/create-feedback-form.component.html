@@ -1,0 +1,191 @@
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-bottom">
+    <h5 class="card-title mb-0 text-primary">
+      <i class="ti ti-edit me-2"></i>
+      {{ 'FEEDBACK.CREATE.TITLE' | translate }}
+    </h5>
+  </div>
+
+  <div class="card-body">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-4">
+        <h6 class="form-section-title mb-3">
+          <i class="ti ti-info-circle"></i>
+          {{ 'FEEDBACK.CREATE.BASIC_INFO' | translate }}
+        </h6>
+        <div class="app-form-card">
+          <div class="row row-cols-1 g-3">
+            <div class="col">
+              <label class="form-label text-secondary-emphasis small fw-medium">
+                {{ 'FEEDBACK.FIELDS.TYPE' | translate }}
+                <span class="text-danger">*</span>
+              </label>
+              <select
+                class="form-select"
+                formControlName="type"
+                [class.is-invalid]="isFieldInvalid('type')"
+              >
+                <option value="suggestion">
+                  {{ 'FEEDBACK.TYPES.SUGGESTION' | translate }}
+                </option>
+                <option value="report">
+                  {{ 'FEEDBACK.TYPES.REPORT' | translate }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col">
+              <label class="form-label text-secondary-emphasis small fw-medium">
+                {{ 'FEEDBACK.FIELDS.TITLE' | translate }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="title"
+                [class.is-invalid]="isFieldInvalid('title')"
+                [placeholder]="'FEEDBACK.CREATE.TITLE_PLACEHOLDER' | translate"
+              />
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('title')">
+                {{ 'FEEDBACK.VALIDATION.TITLE_REQUIRED' | translate }}
+              </div>
+            </div>
+
+            <div class="col">
+              <label class="form-label text-secondary-emphasis small fw-medium">
+                {{ 'FEEDBACK.FIELDS.DESCRIPTION' | translate }}
+                <span class="text-danger">*</span>
+              </label>
+              <textarea
+                rows="5"
+                class="form-control"
+                formControlName="description"
+                [class.is-invalid]="isFieldInvalid('description')"
+                [placeholder]="
+                  'FEEDBACK.CREATE.DESCRIPTION_PLACEHOLDER' | translate
+                "
+              ></textarea>
+              <div
+                class="invalid-feedback"
+                *ngIf="isFieldInvalid('description')"
+              >
+                {{ 'FEEDBACK.VALIDATION.DESCRIPTION_REQUIRED' | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h6 class="form-section-title mb-3">
+          <i class="ti ti-paperclip"></i>
+          {{ 'FEEDBACK.FIELDS.ATTACHMENTS' | translate }}
+          <span class="text-muted small fw-normal ms-2"
+            >{{ filePreviews.length }}/{{ maxFiles }}</span
+          >
+        </h6>
+        <div class="app-form-card">
+          <div class="row g-2 mb-3" *ngIf="filePreviews.length > 0">
+            <div
+              class="col-6 col-md-4"
+              *ngFor="let preview of filePreviews; let i = index"
+            >
+              <div
+                class="border rounded overflow-hidden position-relative"
+                *ngIf="preview.isImage"
+              >
+                <img
+                  *ngIf="preview.previewUrl"
+                  [src]="preview.previewUrl"
+                  class="img-fluid w-100"
+                  style="height: 120px; object-fit: cover"
+                  [alt]="preview.file.name"
+                />
+                <div
+                  class="d-flex align-items-center justify-content-center bg-secondary-subtle h-100"
+                  style="height: 120px"
+                  *ngIf="!preview.previewUrl"
+                >
+                  <div
+                    class="spinner-border spinner-border-sm text-secondary"
+                  ></div>
+                </div>
+                <div
+                  class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-50 py-1 px-2"
+                >
+                  <small
+                    class="text-white text-truncate d-block"
+                    style="font-size: 0.7rem"
+                    >{{ preview.file.name }}</small
+                  >
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-xs position-absolute top-0 end-0 m-1"
+                  (click)="removeFile(i)"
+                >
+                  <i class="ti ti-x"></i>
+                </button>
+              </div>
+              <div
+                class="border rounded p-3 d-flex align-items-center gap-2 position-relative"
+                *ngIf="!preview.isImage"
+              >
+                <i class="ti ti-file text-secondary fs-4 flex-shrink-0"></i>
+                <div class="overflow-hidden flex-grow-1">
+                  <div class="small text-truncate fw-medium">
+                    {{ preview.file.name }}
+                  </div>
+                  <small class="text-muted"
+                    >{{ (preview.file.size / 1024).toFixed(0) }} KB</small
+                  >
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-xs flex-shrink-0"
+                  (click)="removeFile(i)"
+                >
+                  <i class="ti ti-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <input
+              #fileInput
+              type="file"
+              class="d-none"
+              multiple
+              accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+              (change)="onFilesSelected($event)"
+            />
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              (click)="triggerFileInput()"
+              [disabled]="!canAddMore || isSubmitting"
+            >
+              <i class="ti ti-cloud-upload me-2"></i>
+              {{ 'FEEDBACK.CREATE.ADD_FILES' | translate }}
+            </button>
+            <small class="text-muted d-block mt-2">{{
+              'FEEDBACK.CREATE.ATTACHMENTS_HELP' | translate
+            }}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            *ngIf="isSubmitting"
+          ></span>
+          <i class="ti ti-send me-2" *ngIf="!isSubmitting"></i>
+          {{ 'FEEDBACK.CREATE.SUBMIT' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

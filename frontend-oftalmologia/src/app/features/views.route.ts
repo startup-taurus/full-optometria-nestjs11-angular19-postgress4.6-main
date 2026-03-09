@@ -89,4 +89,9 @@ export const VIEWS_ROUTES: Route[] = [
     loadChildren: () =>
       import('./companies/companies.route').then((mod) => mod.COMPANIES_ROUTES),
   },
+  {
+    path: 'feedback',
+    loadChildren: () =>
+      import('./feedback/feedback.route').then((mod) => mod.FEEDBACK_ROUTES),
+  },
 ]
