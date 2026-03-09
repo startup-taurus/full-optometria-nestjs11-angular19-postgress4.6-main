@@ -158,6 +158,26 @@
   (click)="closeImageModal()"
 >
   <div class="image-modal-content" (click)="$event.stopPropagation()">
+    <button
+      type="button"
+      class="image-nav-btn image-nav-left"
+      *ngIf="product?.images && product.images.length > 1"
+      (click)="showPreviousImage()"
+      [attr.aria-label]="'WORDS.PREVIOUS' | translate"
+    >
+      <i class="ti ti-chevron-left"></i>
+    </button>
+
+    <button
+      type="button"
+      class="image-nav-btn image-nav-right"
+      *ngIf="product?.images && product.images.length > 1"
+      (click)="showNextImage()"
+      [attr.aria-label]="'WORDS.NEXT' | translate"
+    >
+      <i class="ti ti-chevron-right"></i>
+    </button>
+
     <button type="button" class="close-modal-btn" (click)="closeImageModal()">
       <i class="ti ti-x"></i>
     </button>
@@ -169,6 +189,9 @@
     <div class="modal-image-info">
       <h5>{{ product?.name }}</h5>
       <p class="text-muted mb-0">{{ product?.code }}</p>
+      <p class="text-muted mb-0" *ngIf="product?.images && product.images.length > 1">
+        {{ selectedImageIndex + 1 }} / {{ product.images.length }}
+      </p>
     </div>
   </div>
 </div>

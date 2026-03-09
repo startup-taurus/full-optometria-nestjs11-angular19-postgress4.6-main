@@ -7,7 +7,6 @@ import {
   filter,
   catchError,
   of,
-  tap,
   startWith,
   retry,
   timeout,
@@ -73,8 +72,7 @@ export class ProductsManagementService {
   ) {}
 
   private extractProductsData(response: any): Product[] {
-    const result = response?.data?.data?.result || []
-    return result
+    return response?.data?.data?.result || []
   }
 
   getProducts(filter: ProductFilter = {}): Observable<Product[]> {
@@ -83,17 +81,8 @@ export class ProductsManagementService {
         params: this.buildParams(filter),
       })
       .pipe(
-        tap((response) =>
-          console.log('[ProductsService] Products HTTP response:', response)
-        ),
         map((response) => this.extractProductsData(response)),
-        tap((products) =>
-          console.log('[ProductsService] Final products:', products)
-        ),
-        catchError((error) => {
-          console.error('[ProductsService] Error loading products:', error)
-          return of([])
-        })
+        catchError(() => of([]))
       )
   }
 
@@ -116,11 +105,6 @@ export class ProductsManagementService {
         map((response: any) => response?.data?.data?.result || [])
       ),
     }).pipe(
-      tap(() =>
-        console.log(
-          'hh'
-        )
-      ),
       map(({ products, categories, subcategories, suppliers }) => {
         const productsWithRelations: ProductWithRelations[] = products.map(
           (product: Product) => {
@@ -197,7 +181,7 @@ export class ProductsManagementService {
 
   getProductById(id: string): Observable<Product> {
     return this.productService.getProductById(id).pipe(
-      map((response) => response?.data || null),
+      map((response) => response || null),
       filter((result): result is Product => result !== null),
       catchError((error) => {
         throw error

@@ -579,7 +579,11 @@
       "HIGH_STOCK": "High Stock",
       "PRODUCTS": "products",
       "ALERT_TITLE": "Low Stock Alert",
-      "ALERT_MESSAGE": "The following products have low stock:"
+      "ALERT_MESSAGE": "The following products have low stock:",
+      "MEDIUM_STOCK_TITLE": "Medium Stock (10-49 units)",
+      "MEDIUM_STOCK_MESSAGE": "Products with moderate stock that require monitoring.",
+      "HIGH_STOCK_TITLE": "High Stock (≥50 units)",
+      "HIGH_STOCK_MESSAGE": "Products with abundant and well-stocked inventory."
     },
     "SHIFT_STATUS": {
       "TITLE": "Shift Status Distribution",

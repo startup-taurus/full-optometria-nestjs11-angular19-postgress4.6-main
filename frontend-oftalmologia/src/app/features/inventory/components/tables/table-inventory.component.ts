@@ -351,29 +351,58 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     }
 
     if (buttonAction === BUTTON_ACTIONS.EDIT && product) {
-      const modalConfig: BootstrapModalConfig<ModalWithAction<Product>> = {
-        component: CreateEditInventoryComponent,
-        options: {
-          size: 'xl',
-          backdrop: 'static',
-          centered: true,
-          windowClass: 'modal-xl modal-dialog-centered',
-        },
-        data: {
-          buttonAction: BUTTON_ACTIONS.EDIT,
-          selectedRow: product,
-        },
-      }
-
-      const modalRef = this._bsModalService.openModal(modalConfig)
-
-      if (modalRef) {
-        modalRef.closed.subscribe((result: string) => {
-          if (result === 'updated') {
-            this.reloadDatatable(this.filter)
+      this._productService.getProductById(product.id).subscribe({
+        next: (fullProduct) => {
+          const modalConfig: BootstrapModalConfig<ModalWithAction<Product>> = {
+            component: CreateEditInventoryComponent,
+            options: {
+              size: 'xl',
+              backdrop: 'static',
+              centered: true,
+              windowClass: 'modal-xl modal-dialog-centered',
+            },
+            data: {
+              buttonAction: BUTTON_ACTIONS.EDIT,
+              selectedRow: fullProduct,
+            },
           }
-        })
-      }
+
+          const modalRef = this._bsModalService.openModal(modalConfig)
+
+          if (modalRef) {
+            modalRef.closed.subscribe((result: string) => {
+              if (result === 'updated') {
+                this.reloadDatatable(this.filter)
+              }
+            })
+          }
+        },
+        error: () => {
+          const modalConfig: BootstrapModalConfig<ModalWithAction<Product>> = {
+            component: CreateEditInventoryComponent,
+            options: {
+              size: 'xl',
+              backdrop: 'static',
+              centered: true,
+              windowClass: 'modal-xl modal-dialog-centered',
+            },
+            data: {
+              buttonAction: BUTTON_ACTIONS.EDIT,
+              selectedRow: product,
+            },
+          }
+
+          const modalRef = this._bsModalService.openModal(modalConfig)
+
+          if (modalRef) {
+            modalRef.closed.subscribe((result: string) => {
+              if (result === 'updated') {
+                this.reloadDatatable(this.filter)
+              }
+            })
+          }
+        },
+      })
     }
   }
 

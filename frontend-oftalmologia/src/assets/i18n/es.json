@@ -592,7 +592,11 @@
       "HIGH_STOCK": "Stock Alto",
       "PRODUCTS": "productos",
       "ALERT_TITLE": "Alerta de Stock Bajo",
-      "ALERT_MESSAGE": "Los siguientes productos tienen stock bajo:"
+      "ALERT_MESSAGE": "Los siguientes productos tienen stock bajo:",
+      "MEDIUM_STOCK_TITLE": "Stock Medio (10-49 unidades)",
+      "MEDIUM_STOCK_MESSAGE": "Productos con stock moderado que requieren monitoreo.",
+      "HIGH_STOCK_TITLE": "Stock Alto (≥50 unidades)",
+      "HIGH_STOCK_MESSAGE": "Productos con inventario abundante y bien surtido."
     },
     "SHIFT_STATUS": {
       "TITLE": "Distribución de Estados de Turnos",
