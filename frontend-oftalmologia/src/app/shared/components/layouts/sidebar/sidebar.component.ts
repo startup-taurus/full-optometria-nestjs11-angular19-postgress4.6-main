@@ -106,6 +106,10 @@ export class SidebarComponent implements OnInit {
         return this.permissionsService.isSuperAdmin()
       }
 
+      if (item.key === 'FEEDBACK_ADMIN') {
+        return this.permissionsService.isSuperAdmin()
+      }
+
       if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
         return true
       }

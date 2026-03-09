@@ -1,0 +1,365 @@
+<div
+  class="modal-header border-0 pb-0 pt-3 px-4 d-flex align-items-center gap-3"
+>
+  <div class="flex-grow-1">
+    <h5 class="mb-0 fw-semibold text-dark">
+      <i class="ti ti-message-dots me-2 text-primary"></i>
+      {{ 'FEEDBACK.DETAIL.TITLE' | translate }}
+    </h5>
+  </div>
+  <button
+    type="button"
+    class="btn-close"
+    (click)="onClose()"
+    aria-label="Close"
+  ></button>
+</div>
+
+<div class="modal-body px-4">
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-3 text-muted">{{ 'WORDS.LOADING' | translate }}</p>
+  </div>
+
+  <ng-container *ngIf="selectedFeedback && !loading">
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <span
+        class="badge rounded-pill px-3 py-2"
+        [ngClass]="getTypeBadgeClass(selectedFeedback.type)"
+      >
+        <i class="ti ti-tag me-1"></i>
+        {{
+          'FEEDBACK.TYPES.' + selectedFeedback.type.toUpperCase() | translate
+        }}
+      </span>
+      <span
+        class="badge rounded-pill px-3 py-2"
+        [ngClass]="getStatusBadgeClass(selectedFeedback.status)"
+      >
+        <i class="ti ti-circle-filled me-1" style="font-size: 0.6rem"></i>
+        {{
+          'FEEDBACK.STATUS.' + selectedFeedback.status.toUpperCase() | translate
+        }}
+      </span>
+    </div>
+
+    <div class="mb-4">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-file-text"></i>
+        {{ 'FEEDBACK.DETAIL.CONTENT' | translate }}
+      </h6>
+      <div class="app-form-card">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'FEEDBACK.FIELDS.TITLE' | translate }}
+            </label>
+            <div class="form-control-plaintext text-body fw-semibold">
+              {{ selectedFeedback.title }}
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'FEEDBACK.FIELDS.DESCRIPTION' | translate }}
+            </label>
+            <div
+              class="form-control-plaintext text-body"
+              style="white-space: pre-line"
+            >
+              {{ selectedFeedback.description }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4" *ngIf="isAdmin">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-building"></i>
+        {{ 'FEEDBACK.DETAIL.ORGANIZATION' | translate }}
+      </h6>
+      <div class="app-form-card">
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">{{
+              'FEEDBACK.FIELDS.COMPANY' | translate
+            }}</label>
+            <div class="form-control-plaintext">
+              <span
+                class="badge rounded-pill bg-info-subtle text-info-emphasis px-3 py-2"
+                *ngIf="selectedFeedback.company"
+              >
+                <i class="ti ti-briefcase me-1"></i
+                >{{ selectedFeedback.company.name }}
+              </span>
+              <span class="text-muted" *ngIf="!selectedFeedback.company"
+                >N/A</span
+              >
+            </div>
+          </div>
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">{{
+              'FEEDBACK.FIELDS.BRANCH' | translate
+            }}</label>
+            <div class="form-control-plaintext">
+              <span
+                class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2"
+                *ngIf="selectedFeedback.branch"
+              >
+                <i class="ti ti-building me-1"></i
+                >{{ selectedFeedback.branch.name }}
+              </span>
+              <span class="text-muted" *ngIf="!selectedFeedback.branch"
+                >N/A</span
+              >
+            </div>
+          </div>
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">{{
+              'FEEDBACK.FIELDS.USER' | translate
+            }}</label>
+            <div
+              class="form-control-plaintext text-body fw-medium"
+              *ngIf="selectedFeedback.createdByUser"
+            >
+              {{ selectedFeedback.createdByUser.firstName }}
+              {{ selectedFeedback.createdByUser.lastName }}
+              <br />
+              <small class="text-muted">{{
+                selectedFeedback.createdByUser.email
+              }}</small>
+            </div>
+            <div
+              class="form-control-plaintext text-muted"
+              *ngIf="!selectedFeedback.createdByUser"
+            >
+              N/A
+            </div>
+          </div>
+          <div class="col">
+            <label class="form-label text-secondary-emphasis small fw-medium">{{
+              'FEEDBACK.FIELDS.CREATED_AT' | translate
+            }}</label>
+            <div class="form-control-plaintext text-body fw-medium">
+              {{ formatDateTime(selectedFeedback.createdAt) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4" *ngIf="!isAdmin">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-clock"></i>
+        {{ 'FEEDBACK.DETAIL.TIMESTAMPS' | translate }}
+      </h6>
+      <div class="app-form-card">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label text-secondary-emphasis small fw-medium">{{
+              'FEEDBACK.FIELDS.CREATED_AT' | translate
+            }}</label>
+            <div class="form-control-plaintext text-body fw-medium">
+              {{ formatDateTime(selectedFeedback.createdAt) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4" *ngIf="isAdmin">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-settings"></i>
+        {{ 'FEEDBACK.DETAIL.CHANGE_STATUS' | translate }}
+      </h6>
+      <div class="app-form-card">
+        <div class="row g-3 align-items-center">
+          <div class="col-12 col-md-6">
+            <label class="form-label text-secondary-emphasis small fw-medium">{{
+              'FEEDBACK.FIELDS.STATUS' | translate
+            }}</label>
+            <select
+              class="form-select"
+              [value]="selectedFeedback.status"
+              (change)="onStatusChange($event)"
+              [disabled]="updatingStatus"
+            >
+              <option value="nuevo">
+                {{ 'FEEDBACK.STATUS.NUEVO' | translate }}
+              </option>
+              <option value="en_revision">
+                {{ 'FEEDBACK.STATUS.EN_REVISION' | translate }}
+              </option>
+              <option value="resuelto">
+                {{ 'FEEDBACK.STATUS.RESUELTO' | translate }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="col-12 col-md-6 d-flex align-items-end"
+            *ngIf="updatingStatus"
+          >
+            <div
+              class="spinner-border spinner-border-sm text-primary"
+              role="status"
+            ></div>
+            <span class="ms-2 small text-muted">{{
+              'WORDS.SAVING' | translate
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="mb-4"
+      *ngIf="
+        (selectedFeedback.attachments &&
+          selectedFeedback.attachments.length > 0) ||
+        selectedFeedback.attachmentsCount
+      "
+    >
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-paperclip"></i>
+        {{ 'FEEDBACK.DETAIL.ATTACHMENTS' | translate }}
+        <span class="badge bg-secondary ms-2">{{
+          selectedFeedback.attachments?.length ||
+            selectedFeedback.attachmentsCount
+        }}</span>
+      </h6>
+      <div
+        class="app-form-card"
+        *ngIf="
+          selectedFeedback.attachments &&
+          selectedFeedback.attachments.length > 0
+        "
+      >
+        <div class="row g-3">
+          <div
+            class="col-6 col-md-4"
+            *ngFor="
+              let attachment of selectedFeedback.attachments;
+              let i = index
+            "
+          >
+            <div
+              class="border rounded overflow-hidden position-relative"
+              *ngIf="isImage(attachment.mimeType)"
+              style="cursor: pointer"
+            >
+              <img
+                [src]="getFileUrl(attachment.path)"
+                [alt]="attachment.originalName"
+                class="img-fluid w-100"
+                style="height: 140px; object-fit: cover"
+                (click)="openLightbox(getImageIndex(attachment))"
+              />
+              <div
+                class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-50 py-1 px-2"
+              >
+                <small
+                  class="text-white text-truncate d-block"
+                  style="font-size: 0.7rem"
+                  >{{ attachment.originalName }}</small
+                >
+              </div>
+              <button
+                type="button"
+                (click)="
+                  openLightbox(getImageIndex(attachment));
+                  $event.stopPropagation()
+                "
+                class="btn btn-xs btn-light position-absolute top-0 end-0 m-1"
+              >
+                <i class="ti ti-zoom-in"></i>
+              </button>
+            </div>
+            <div
+              class="border rounded p-3 d-flex align-items-center gap-2"
+              *ngIf="!isImage(attachment.mimeType)"
+            >
+              <i class="ti ti-file text-secondary fs-4 flex-shrink-0"></i>
+              <div class="overflow-hidden">
+                <div class="small text-truncate fw-medium">
+                  {{ attachment.originalName }}
+                </div>
+                <small class="text-muted">{{ attachment.mimeType }}</small>
+              </div>
+              <a
+                [href]="getFileUrl(attachment.path)"
+                target="_blank"
+                class="btn btn-xs btn-outline-primary ms-auto flex-shrink-0"
+              >
+                <i class="ti ti-download"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="app-form-card"
+        *ngIf="
+          !selectedFeedback.attachments ||
+          selectedFeedback.attachments.length === 0
+        "
+      >
+        <p class="text-muted small mb-0">
+          <i class="ti ti-info-circle me-1"></i>
+          {{ 'FEEDBACK.DETAIL.ATTACHMENTS_NOT_LOADED' | translate }}
+        </p>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="text-center py-5" *ngIf="!selectedFeedback && !loading">
+    <i class="ti ti-alert-triangle fa-2x text-warning d-block mb-3"></i>
+    <h5>{{ 'FEEDBACK.DETAIL.NO_DATA' | translate }}</h5>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="onClose()">
+    {{ 'WORDS.CLOSE' | translate }}
+  </button>
+</div>
+
+<div class="lightbox-overlay" *ngIf="lightboxOpen" (click)="closeLightbox()">
+  <button type="button" class="lightbox-close" (click)="closeLightbox()">
+    <i class="ti ti-x"></i>
+  </button>
+
+  <button
+    type="button"
+    class="lightbox-nav lightbox-prev"
+    (click)="prevImage(); $event.stopPropagation()"
+    *ngIf="imageAttachments.length > 1"
+  >
+    <i class="ti ti-chevron-left"></i>
+  </button>
+
+  <button
+    type="button"
+    class="lightbox-nav lightbox-next"
+    (click)="nextImage(); $event.stopPropagation()"
+    *ngIf="imageAttachments.length > 1"
+  >
+    <i class="ti ti-chevron-right"></i>
+  </button>
+
+  <div class="lightbox-content" (click)="$event.stopPropagation()">
+    <img
+      *ngIf="getCurrentImage()"
+      [src]="getFileUrl(getCurrentImage().path)"
+      [alt]="getCurrentImage().originalName"
+      class="lightbox-image"
+    />
+    <div class="lightbox-info" *ngIf="getCurrentImage()">
+      <span class="lightbox-filename">{{
+        getCurrentImage().originalName
+      }}</span>
+      <span class="lightbox-counter" *ngIf="imageAttachments.length > 1">
+        {{ currentImageIndex + 1 }} / {{ imageAttachments.length }}
+      </span>
+    </div>
+  </div>
+</div>

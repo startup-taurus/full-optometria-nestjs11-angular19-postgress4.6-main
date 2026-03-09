@@ -39,6 +39,7 @@ import { LaboratoryOrdersModule } from './modules/laboratory-orders/laboratory-o
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PatientsModule } from './modules/patients/patients.module';
 import { CompanyQuotaModule } from './modules/company-quota/company-quota.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 
 // Entities
 import { User } from './modules/users/entities/user.entity';
@@ -62,6 +63,7 @@ import { ClinicalFormConfig } from './modules/clinical-form-config/entities/clin
 import { ClinicalHistory } from './modules/clinical-histories/entities/clinical-history.entity';
 import { LaboratoryOrder } from './modules/laboratory-orders/entities/laboratory-order.entity';
 import { Patient } from './modules/patients/entities/patient.entity';
+import { Feedback } from './modules/feedback/entities/feedback.entity';
 
 @Module({
   imports: [
@@ -101,6 +103,7 @@ import { Patient } from './modules/patients/entities/patient.entity';
           ClinicalHistory,
           LaboratoryOrder,
           Patient,
+          Feedback,
         ],
         synchronize: false,
         dropSchema: false,
@@ -128,6 +131,7 @@ import { Patient } from './modules/patients/entities/patient.entity';
     DashboardModule,
     PatientsModule,
     CompanyQuotaModule,
+    FeedbackModule,
   ],
   providers: [
     {

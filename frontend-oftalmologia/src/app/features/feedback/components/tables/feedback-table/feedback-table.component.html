@@ -1,0 +1,72 @@
+<div class="card common-datatable-card border-0 shadow-sm">
+  <div class="card-header bg-white border-bottom">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0 text-primary">
+        <i class="ti ti-message-dots me-2"></i>
+        {{ 'FEEDBACK.LIST.TITLE' | translate }}
+      </h5>
+      <button class="btn btn-outline-secondary btn-sm" (click)="reloadDatatable()">
+        <i class="ti ti-refresh"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <shared-ngx-datatable
+      [config]="config$ | async"
+      [data]="data$ | async"
+      (onChangeLimit)="onChangeLimit($event)"
+      (onChangePage)="onChangePage($event)"
+      class="common-ngx-datatable"
+    ></shared-ngx-datatable>
+  </div>
+</div>
+
+<!-- Cell templates -->
+<ng-template #typeTemplate let-row="row">
+  <span class="badge common-badge" [ngClass]="getTypeBadgeClass(row.type)">
+    {{ ('FEEDBACK.TYPES.' + row.type.toUpperCase()) | translate }}
+  </span>
+</ng-template>
+
+<ng-template #statusTemplate let-row="row">
+  <span class="badge common-badge" [ngClass]="getStatusBadgeClass(row.status)">
+    {{ ('FEEDBACK.STATUS.' + row.status.toUpperCase()) | translate }}
+  </span>
+</ng-template>
+
+<ng-template #titleTemplate let-row="row">
+  <div class="fw-semibold text-truncate" style="max-width:240px" [title]="row.title">{{ row.title }}</div>
+  <small class="text-muted text-truncate d-block" style="max-width:240px">{{ row.description }}</small>
+</ng-template>
+
+<ng-template #attachmentsTemplate let-row="row">
+  <span class="badge bg-secondary-subtle text-secondary-emphasis">
+    <i class="ti ti-paperclip me-1"></i>{{ row.attachmentsCount || 0 }}
+  </span>
+</ng-template>
+
+<ng-template #createdAtTemplate let-row="row">
+  <span class="small">{{ row.createdAt | date: FORMAT_FOR_DATES }}</span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row="row">
+  <div class="d-flex gap-1">
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      [ngbTooltip]="'WORDS.VIEW' | translate"
+      placement="top"
+      (click)="openDetail(row)"
+    >
+      <i class="ti ti-eye"></i>
+    </button>
+    <button
+      class="btn btn-outline-danger btn-xs"
+      [ngbTooltip]="'WORDS.DELETE' | translate"
+      placement="top"
+      (click)="deleteItem(row)"
+    >
+      <i class="ti ti-trash"></i>
+    </button>
+  </div>
+</ng-template>
