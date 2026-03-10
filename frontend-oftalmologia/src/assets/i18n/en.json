@@ -781,7 +781,9 @@
     "MIN_VALUE_1": "The minimum allowed value is 1",
     "DISCOUNT_VALUE_MAX": "Percentage discount cannot be greater than 100",
     "DISCOUNT_VALUE_MIN": "Discount must be greater than 0",
-    "END_DATE_AFTER_START": "End date must be after start date"
+    "END_DATE_AFTER_START": "End date must be after start date",
+    "FIXED_AMOUNT_EXCEEDS_PRICE": "The fixed discount amount cannot be greater than or equal to the product base price",
+    "START_DATE_IN_PAST": "Start date cannot be before today's date"
   },
   "SWEET_ALERT":{
     "ARE_YOU_SURE": "Are you sure?",

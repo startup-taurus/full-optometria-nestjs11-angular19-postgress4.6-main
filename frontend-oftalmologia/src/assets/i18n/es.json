@@ -797,7 +797,9 @@
     "MIN_VALUE_1": "El valor mínimo permitido es 1",
     "DISCOUNT_VALUE_MAX": "El descuento porcentual no puede ser mayor a 100",
     "DISCOUNT_VALUE_MIN": "El descuento debe ser mayor a 0",
-    "END_DATE_AFTER_START": "La fecha de fin debe ser posterior a la fecha de inicio"
+    "END_DATE_AFTER_START": "La fecha de fin debe ser posterior a la fecha de inicio",
+    "FIXED_AMOUNT_EXCEEDS_PRICE": "El monto del descuento no puede ser mayor o igual al precio base del producto",
+    "START_DATE_IN_PAST": "La fecha de inicio no puede ser anterior a la fecha actual"
   },
   "SWEET_ALERT":{
     "ARE_YOU_SURE": "¿Estas seguro?",

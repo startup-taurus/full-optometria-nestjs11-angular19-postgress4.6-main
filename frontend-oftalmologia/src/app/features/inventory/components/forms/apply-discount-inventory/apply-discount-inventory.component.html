@@ -127,6 +127,15 @@
         <div
           class="invalid-feedback"
           *ngIf="
+            form.get('discountValue')?.hasError('fixedAmountExceedsPrice') &&
+            form.get('discountValue')?.touched
+          "
+        >
+          {{ 'VALIDATION.FIXED_AMOUNT_EXCEEDS_PRICE' | translate }}
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="
             form.get('discountValue')?.hasError('min') &&
             form.get('discountValue')?.touched
           "
@@ -178,6 +187,8 @@
               type="date"
               class="form-control form-control-lg"
               formControlName="startDate"
+              [min]="todayString"
+              [class.is-invalid]="form.hasError('startDateInPast')"
             />
           </div>
           <div class="col-md-6">
@@ -197,6 +208,12 @@
         >
           {{ 'VALIDATION.END_DATE_AFTER_START' | translate }}
         </div>
+        <div
+          class="invalid-feedback d-block mt-2"
+          *ngIf="form.hasError('startDateInPast')"
+        >
+          {{ 'VALIDATION.START_DATE_IN_PAST' | translate }}
+        </div>
         <small class="form-text text-muted mt-2 d-block">
           Si no defines fechas, el descuento estará activo indefinidamente.
         </small>
@@ -209,46 +226,25 @@
         {{ 'INVENTORY.APPLY_DISCOUNT.STATUS' | translate }}
       </h6>
       <div class="app-form-card">
-        <div class="form-check form-switch d-flex align-items-center">
+        <div class="toggle-switch">
           <input
-            class="form-check-input me-3"
             type="checkbox"
-            formControlName="isActive"
             id="isDiscountActive"
+            class="toggle-input"
+            formControlName="isActive"
           />
-          <div class="flex-grow-1">
-            <label
-              class="form-check-label fw-medium d-flex align-items-center"
-              for="isDiscountActive"
-            >
-              <i
-                class="ti ti-discount-check me-2"
-                *ngIf="form.get('isActive')?.value"
-              ></i>
-              <i
-                class="ti ti-discount-off me-2"
-                *ngIf="!form.get('isActive')?.value"
-              ></i>
-              {{ 'INVENTORY.APPLY_DISCOUNT.IS_ACTIVE' | translate }}
-              <span
-                class="badge ms-2"
-                [ngClass]="{
-                  'bg-success': form.get('isActive')?.value,
-                  'bg-danger': !form.get('isActive')?.value,
-                }"
-              >
-                {{
-                  (form.get('isActive')?.value
-                    ? 'WORDS.ACTIVE'
-                    : 'WORDS.INACTIVE'
-                  ) | translate
-                }}
-              </span>
-            </label>
-            <small class="form-text text-muted d-block">
-              {{ 'INVENTORY.APPLY_DISCOUNT.IS_ACTIVE_HELP' | translate }}
-            </small>
-          </div>
+          <label for="isDiscountActive" class="toggle-label">
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">
+              {{
+                (form.get('isActive')?.value ? 'WORDS.ACTIVE' : 'WORDS.INACTIVE')
+                  | translate
+              }}
+            </span>
+          </label>
+          <small class="form-text text-muted d-block">
+            {{ 'INVENTORY.APPLY_DISCOUNT.IS_ACTIVE_HELP' | translate }}
+          </small>
         </div>
       </div>
     </div>

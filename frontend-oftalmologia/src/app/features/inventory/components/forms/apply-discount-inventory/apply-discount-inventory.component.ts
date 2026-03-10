@@ -45,6 +45,10 @@ export class ApplyDiscountInventoryComponent implements OnInit, OnDestroy {
   public errorMessage: string | null = null
   public readonly finalPriceValue = signal<number>(0)
 
+  public get todayString(): string {
+    return new Date().toISOString().split('T')[0]
+  }
+
   private unsubscribe$ = new Subject<void>()
 
   private _activeModal = inject(NgbActiveModal)
@@ -70,12 +74,12 @@ export class ApplyDiscountInventoryComponent implements OnInit, OnDestroy {
     this.form = this._fb.group(
       {
         discountType: ['PERCENTAGE', [Validators.required]],
-        discountValue: [null, [Validators.required, Validators.min(0.01)]],
+        discountValue: [null, [Validators.required, Validators.min(0.01), Validators.max(100)]],
         startDate: [null],
         endDate: [null],
         isActive: [true],
       },
-      { validators: [this.endDateAfterStartDateValidator()] }
+      { validators: [this.endDateAfterStartDateValidator(), this.startDateNotInPastValidator()] }
     )
   }
 
@@ -87,6 +91,7 @@ export class ApplyDiscountInventoryComponent implements OnInit, OnDestroy {
         this.product = data?.selectedRow
 
         if (!this.product?.discount) {
+          this.updateDiscountValueValidators()
           this._updateFinalPrice()
           return
         }
@@ -102,6 +107,7 @@ export class ApplyDiscountInventoryComponent implements OnInit, OnDestroy {
             : null,
           isActive: this.product.hasActiveDiscount ?? true,
         })
+        this.updateDiscountValueValidators()
         this._updateFinalPrice()
       })
   }
@@ -110,16 +116,50 @@ export class ApplyDiscountInventoryComponent implements OnInit, OnDestroy {
     this.form
       .get('discountType')
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((value: 'PERCENTAGE' | 'FIXED_AMOUNT') => {
-        const validators = [Validators.required, Validators.min(0.01)]
-        if (value === 'PERCENTAGE') {
-          validators.push(Validators.max(100))
-        }
-
-        const control = this.form.get('discountValue')
-        control?.setValidators(validators)
-        control?.updateValueAndValidity()
+      .subscribe(() => {
+        this.updateDiscountValueValidators()
       })
+  }
+
+  private updateDiscountValueValidators(): void {
+    const type = this.form.get('discountType')?.value as 'PERCENTAGE' | 'FIXED_AMOUNT'
+    const control = this.form.get('discountValue')
+    if (type === 'PERCENTAGE') {
+      control?.setValidators([Validators.required, Validators.min(0.01), Validators.max(100)])
+    } else {
+      control?.setValidators([
+        Validators.required,
+        Validators.min(0.01),
+        this.fixedAmountLessThanPriceValidator(),
+      ])
+    }
+    control?.updateValueAndValidity()
+  }
+
+  private fixedAmountLessThanPriceValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!this.product) return null
+      const value = Number(control.value)
+      const unitPrice = Number(this.product.unitPrice)
+      if (value > 0 && value >= unitPrice) {
+        return { fixedAmountExceedsPrice: true }
+      }
+      return null
+    }
+  }
+
+  private startDateNotInPastValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const startDate = control.get('startDate')?.value
+      if (!startDate) return null
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const selected = new Date(startDate + 'T00:00:00')
+      if (selected < today) {
+        return { startDateInPast: true }
+      }
+      return null
+    }
   }
 
   private _updateFinalPrice(): void {
