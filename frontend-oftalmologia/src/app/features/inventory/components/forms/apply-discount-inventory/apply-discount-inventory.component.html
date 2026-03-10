@@ -1,0 +1,302 @@
+<div
+  class="modal-header border-0 pb-0 pt-3 px-4 d-flex align-items-center gap-3"
+>
+  <div class="flex-grow-1">
+    <h5 class="mb-0 fw-semibold text-dark">
+      {{ 'INVENTORY.APPLY_DISCOUNT.TITLE' | translate }}
+    </h5>
+  </div>
+  <button
+    type="button"
+    class="btn-close"
+    (click)="closeModal()"
+    aria-label="Close"
+  ></button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="modal-body px-4">
+    <div class="mb-4" *ngIf="product">
+      <div class="app-form-card bg-light border-0">
+        <div class="d-flex align-items-center gap-3">
+          <div class="flex-shrink-0">
+            <div
+              class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+              style="width: 48px; height: 48px"
+            >
+              <i class="ti ti-tag fs-20 text-primary"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-dark">{{ product.name }}</div>
+            <div class="small text-muted">{{ product.code }}</div>
+          </div>
+          <div class="text-end flex-shrink-0">
+            <div class="small text-muted">Precio base</div>
+            <div class="fw-bold text-dark">
+              {{ product.unitPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-percentage"></i>
+        {{ 'INVENTORY.APPLY_DISCOUNT.DISCOUNT_TYPE' | translate }}
+      </h6>
+      <div class="app-form-card">
+        <div
+          class="btn-group w-100"
+          role="group"
+          aria-label="Tipo de descuento"
+        >
+          <input
+            type="radio"
+            class="btn-check"
+            id="typePercentage"
+            value="PERCENTAGE"
+            formControlName="discountType"
+            autocomplete="off"
+          />
+          <label class="btn btn-outline-primary" for="typePercentage">
+            <i class="ti ti-percentage me-2"></i>
+            {{
+              'INVENTORY.APPLY_DISCOUNT.DISCOUNT_TYPE_OPTIONS.PERCENTAGE'
+                | translate
+            }}
+          </label>
+          <input
+            type="radio"
+            class="btn-check"
+            id="typeFixed"
+            value="FIXED_AMOUNT"
+            formControlName="discountType"
+            autocomplete="off"
+          />
+          <label class="btn btn-outline-primary" for="typeFixed">
+            <i class="ti ti-currency-dollar me-2"></i>
+            {{
+              'INVENTORY.APPLY_DISCOUNT.DISCOUNT_TYPE_OPTIONS.FIXED_AMOUNT'
+                | translate
+            }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-calculator"></i>
+        {{ 'INVENTORY.APPLY_DISCOUNT.DISCOUNT_VALUE' | translate }}
+      </h6>
+      <div class="app-form-card">
+        <label class="form-label text-secondary-emphasis small fw-medium">
+          {{ 'INVENTORY.APPLY_DISCOUNT.DISCOUNT_VALUE' | translate }}
+          <span class="text-danger">*</span>
+          <span class="ms-1 text-muted small">
+            ({{ form.get('discountType')?.value === 'PERCENTAGE' ? '%' : '$' }})
+          </span>
+        </label>
+        <input
+          type="number"
+          class="form-control form-control-lg"
+          formControlName="discountValue"
+          min="0.01"
+          step="0.01"
+          [placeholder]="
+            form.get('discountType')?.value === 'PERCENTAGE'
+              ? 'Ej: 20'
+              : 'Ej: 5.00'
+          "
+          [class.is-invalid]="
+            form.get('discountValue')?.invalid &&
+            form.get('discountValue')?.touched
+          "
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="
+            form.get('discountValue')?.hasError('max') &&
+            form.get('discountValue')?.touched
+          "
+        >
+          {{ 'VALIDATION.DISCOUNT_VALUE_MAX' | translate }}
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="
+            form.get('discountValue')?.hasError('min') &&
+            form.get('discountValue')?.touched
+          "
+        >
+          {{ 'VALIDATION.DISCOUNT_VALUE_MIN' | translate }}
+        </div>
+
+        <div class="price-preview-row mt-3" *ngIf="product">
+          <div class="price-col">
+            <div class="small text-muted mb-1">
+              {{ 'INVENTORY.APPLY_DISCOUNT.ORIGINAL_PRICE' | translate }}
+            </div>
+            <div class="fw-bold text-dark">
+              {{ product.unitPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
+            </div>
+          </div>
+          <div class="price-arrow">
+            <i class="ti ti-arrow-right text-muted fs-18"></i>
+          </div>
+          <div class="price-col text-end">
+            <div class="small text-muted mb-1">
+              {{ 'INVENTORY.APPLY_DISCOUNT.FINAL_PRICE' | translate }}
+            </div>
+            <div class="fw-bold text-danger fs-5">
+              {{ finalPriceValue() | currency: 'USD' : 'symbol' : '1.2-2' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-calendar"></i>
+        Vigencia
+        <span
+          class="badge bg-secondary-subtle text-secondary-emphasis ms-2 fw-normal small"
+        >
+          Opcional
+        </span>
+      </h6>
+      <div class="app-form-card">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'INVENTORY.APPLY_DISCOUNT.START_DATE' | translate }}
+            </label>
+            <input
+              type="date"
+              class="form-control form-control-lg"
+              formControlName="startDate"
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary-emphasis small fw-medium">
+              {{ 'INVENTORY.APPLY_DISCOUNT.END_DATE' | translate }}
+            </label>
+            <input
+              type="date"
+              class="form-control form-control-lg"
+              formControlName="endDate"
+            />
+          </div>
+        </div>
+        <div
+          class="invalid-feedback d-block mt-2"
+          *ngIf="form.hasError('endDateAfterStart')"
+        >
+          {{ 'VALIDATION.END_DATE_AFTER_START' | translate }}
+        </div>
+        <small class="form-text text-muted mt-2 d-block">
+          Si no defines fechas, el descuento estará activo indefinidamente.
+        </small>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h6 class="form-section-title mb-3">
+        <i class="ti ti-settings"></i>
+        {{ 'INVENTORY.APPLY_DISCOUNT.STATUS' | translate }}
+      </h6>
+      <div class="app-form-card">
+        <div class="form-check form-switch d-flex align-items-center">
+          <input
+            class="form-check-input me-3"
+            type="checkbox"
+            formControlName="isActive"
+            id="isDiscountActive"
+          />
+          <div class="flex-grow-1">
+            <label
+              class="form-check-label fw-medium d-flex align-items-center"
+              for="isDiscountActive"
+            >
+              <i
+                class="ti ti-discount-check me-2"
+                *ngIf="form.get('isActive')?.value"
+              ></i>
+              <i
+                class="ti ti-discount-off me-2"
+                *ngIf="!form.get('isActive')?.value"
+              ></i>
+              {{ 'INVENTORY.APPLY_DISCOUNT.IS_ACTIVE' | translate }}
+              <span
+                class="badge ms-2"
+                [ngClass]="{
+                  'bg-success': form.get('isActive')?.value,
+                  'bg-danger': !form.get('isActive')?.value,
+                }"
+              >
+                {{
+                  (form.get('isActive')?.value
+                    ? 'WORDS.ACTIVE'
+                    : 'WORDS.INACTIVE'
+                  ) | translate
+                }}
+              </span>
+            </label>
+            <small class="form-text text-muted d-block">
+              {{ 'INVENTORY.APPLY_DISCOUNT.IS_ACTIVE_HELP' | translate }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="alert alert-danger d-flex align-items-center gap-2"
+      *ngIf="errorMessage"
+    >
+      <i class="ti ti-alert-circle fs-18"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-danger me-auto"
+      (click)="removeDiscount()"
+      [disabled]="isLoading || !product?.hasActiveDiscount"
+    >
+      <i class="ti ti-trash me-1"></i>
+      {{ 'INVENTORY.APPLY_DISCOUNT.REMOVE_BUTTON' | translate }}
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="closeModal()"
+      [disabled]="isLoading"
+    >
+      {{ 'INVENTORY.APPLY_DISCOUNT.CANCEL_BUTTON' | translate }}
+    </button>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="isLoading || form.invalid"
+    >
+      <span
+        *ngIf="isLoading"
+        class="spinner-border spinner-border-sm me-2"
+      ></span>
+      <i class="ti ti-percentage me-1" *ngIf="!isLoading"></i>
+      {{
+        isLoading
+          ? ('COMMON.SAVING' | translate)
+          : ('INVENTORY.APPLY_DISCOUNT.APPLY_BUTTON' | translate)
+      }}
+    </button>
+  </div>
+</form>

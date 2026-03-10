@@ -10,7 +10,9 @@ import { Supplier } from '../suppliers/entities/supplier.entity';
 import { File } from '../files/entities/file.entity';
 import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
 import { Company } from '../companies/entities/company.entity';
+import { Branch } from '../branches/entities/branch.entity';
 import { InventoryTransfer } from './entities/inventory-transfer.entity';
+import { ProductDiscount } from './entities/product-discount.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,9 @@ import { InventoryTransfer } from './entities/inventory-transfer.entity';
       File,
       LaboratoryOrder,
       Company,
+      Branch,
       InventoryTransfer,
+      ProductDiscount,
     ]),
     MulterModule.register({
       limits: {

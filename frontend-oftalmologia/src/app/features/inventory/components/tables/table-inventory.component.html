@@ -89,6 +89,27 @@
               </span>
             </ng-template>
 
+            <ng-template #discountTemplate let-row="row">
+              <div *ngIf="row.hasActiveDiscount && row.discount; else noDiscount">
+                <div class="d-flex flex-column gap-1">
+                  <span class="badge bg-danger" style="width: fit-content">
+                    -{{ row.discount.value }}{{ row.discount.type === 'PERCENTAGE' ? '%' : ' USD' }}
+                  </span>
+                  <div class="lh-1">
+                    <span class="text-muted text-decoration-line-through small me-1">
+                      {{ row.unitPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
+                    </span>
+                    <span class="text-danger fw-bold small">
+                      {{ row.discount.finalPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noDiscount>
+                <span class="text-muted">—</span>
+              </ng-template>
+            </ng-template>
+
             <ng-template #quantityTemplate let-row="row" let-value="value">
               <span
                 class="badge"
@@ -204,6 +225,16 @@
                         container="body"
                       >
                         <i class="ti ti-history"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-secondary action-icon-btn"
+                        (click)="openApplyDiscountModal(row)"
+                        [ngbTooltip]="
+                          'INVENTORY.ACTIONS.APPLY_DISCOUNT' | translate
+                        "
+                        container="body"
+                      >
+                        <i class="ti ti-percentage"></i>
                       </button>
                       <button
                         class="btn btn-sm action-icon-btn"

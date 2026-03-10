@@ -37,6 +37,7 @@ export class PublicCatalogComponent implements OnInit {
     categories: [],
     subcategories: [],
     brands: [],
+    branches: [],
   })
 
   loading = signal(false)
@@ -57,6 +58,7 @@ export class PublicCatalogComponent implements OnInit {
   searchDescription = ''
   selectedBrand = ''
   selectedCategoryId = ''
+  selectedBranchId = ''
   showOnlyAvailable = false
   minPrice: number | undefined = undefined
   maxPrice: number | undefined = undefined
@@ -81,6 +83,14 @@ export class PublicCatalogComponent implements OnInit {
 
   get hasPriceFilter(): boolean {
     return this.minPrice !== undefined || this.maxPrice !== undefined
+  }
+
+  get selectedBranchName(): string {
+    if (!this.selectedBranchId) return ''
+    return (
+      this.filters().branches?.find((b) => b.id === this.selectedBranchId)
+        ?.name ?? ''
+    )
   }
 
   private getSelectedCategoryIds(): string[] {
@@ -178,6 +188,7 @@ export class PublicCatalogComponent implements OnInit {
             categories: [],
             subcategories: [],
             brands: [],
+            branches: [],
           })
         }
       },
@@ -217,6 +228,8 @@ export class PublicCatalogComponent implements OnInit {
     } else if (selectedCategoryIds.length > 1) {
       query.categoryIds = selectedCategoryIds
     }
+
+    if (this.selectedBranchId) query.branchId = this.selectedBranchId
 
     this.catalogService.getProducts(query).subscribe({
       next: (response) => {
@@ -285,6 +298,11 @@ export class PublicCatalogComponent implements OnInit {
     this.onFilterChange()
   }
 
+  clearBranchFilter(): void {
+    this.selectedBranchId = ''
+    this.onFilterChange()
+  }
+
   clearAvailabilityFilter(): void {
     this.showOnlyAvailable = false
     this.onFilterChange()
@@ -301,6 +319,7 @@ export class PublicCatalogComponent implements OnInit {
     this.searchDescription = ''
     this.selectedBrand = ''
     this.selectedCategoryId = ''
+    this.selectedBranchId = ''
     this.showOnlyAvailable = false
     this.minPrice = undefined
     this.maxPrice = undefined
@@ -378,7 +397,10 @@ export class PublicCatalogComponent implements OnInit {
     this.updateProductQueryParam(null)
   }
 
-  async shareProduct(product: PublicProduct | null, event?: Event): Promise<void> {
+  async shareProduct(
+    product: PublicProduct | null,
+    event?: Event
+  ): Promise<void> {
     event?.stopPropagation()
 
     if (!product) return
@@ -445,7 +467,8 @@ export class PublicCatalogComponent implements OnInit {
   }
 
   openImageModal(product: PublicProduct): void {
-    this.selectedImageUrl = this.selectedProductImageUrl || this.getImageUrl(product)
+    this.selectedImageUrl =
+      this.selectedProductImageUrl || this.getImageUrl(product)
     this.selectedProductName = product.name
     this.selectedProductCode = product.brand
     this.showImageModal = true

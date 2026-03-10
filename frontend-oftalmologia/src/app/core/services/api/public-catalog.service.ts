@@ -39,6 +39,7 @@ export class PublicCatalogService {
     if (query.maxPrice !== undefined)
       params = params.set('maxPrice', query.maxPrice.toString())
     if (query.sortBy) params = params.set('sortBy', query.sortBy)
+    if (query.branchId) params = params.set('branchId', query.branchId)
     if (query.page) params = params.set('page', query.page.toString())
     if (query.limit) params = params.set('limit', query.limit.toString())
 

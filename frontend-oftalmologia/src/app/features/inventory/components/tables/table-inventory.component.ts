@@ -54,6 +54,7 @@ import { ViewInventoryComponent } from '../forms/view-inventory/view-inventory.c
 import { CreateEditInventoryComponent } from '../forms/create-edit-inventory/create-edit-inventory.component'
 import { TransferStockInventoryComponent } from '../forms/transfer-stock-inventory/transfer-stock-inventory.component'
 import { AddStockInventoryComponent } from '../forms/add-stock-inventory/add-stock-inventory.component'
+import { ApplyDiscountInventoryComponent } from '../forms/apply-discount-inventory/apply-discount-inventory.component'
 import Swal from 'sweetalert2'
 import {
   SWAL_DELETE_CONFIRM_CONFIG,
@@ -100,6 +101,8 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   public descriptionTemplate?: TemplateRef<HTMLElement>
   @ViewChild('viewsTemplate', { static: true })
   public viewsTemplate?: TemplateRef<HTMLElement>
+  @ViewChild('discountTemplate', { static: true })
+  public discountTemplate?: TemplateRef<HTMLElement>
   @ViewChild('actionsTemplate', { static: true })
   public actionsTemplate?: TemplateRef<HTMLElement>
   @ViewChild('sideFilterPanel', { static: false })
@@ -248,6 +251,13 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           prop: 'unitPrice',
           cellTemplate: this.priceTemplate ?? undefined,
           width: 120,
+          sortable: false,
+        },
+        {
+          name: 'INVENTORY.TABLE.DISCOUNT',
+          prop: 'hasActiveDiscount',
+          cellTemplate: this.discountTemplate ?? undefined,
+          width: 150,
           sortable: false,
         },
         {
@@ -453,6 +463,28 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     if (modalRef) {
       modalRef.closed.subscribe((result: string) => {
         if (result === 'stock-added') {
+          this.reloadDatatable(this.filter)
+        }
+      })
+    }
+  }
+
+  public openApplyDiscountModal(product: Product): void {
+    const modalRef = this._bsModalService.openModal({
+      component: ApplyDiscountInventoryComponent,
+      options: {
+        size: 'lg',
+        backdrop: 'static',
+        centered: true,
+      },
+      data: {
+        selectedRow: product,
+      },
+    })
+
+    if (modalRef) {
+      modalRef.closed.subscribe((result: string) => {
+        if (result === 'discount-applied' || result === 'discount-removed') {
           this.reloadDatatable(this.filter)
         }
       })

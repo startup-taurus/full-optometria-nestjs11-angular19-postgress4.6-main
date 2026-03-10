@@ -91,6 +91,10 @@ export class PublicQueryProductDto {
   sortBy?: 'views' | 'price-asc' | 'price-desc' | 'newest';
 
   @IsOptional()
+  @IsUUID()
+  branchId?: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
