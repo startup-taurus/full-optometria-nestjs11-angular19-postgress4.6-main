@@ -36,6 +36,7 @@ export class PublicCatalogComponent implements OnInit {
   filters = signal<PublicProductFilters>({
     categories: [],
     subcategories: [],
+    brands: [],
   })
 
   loading = signal(false)
@@ -54,6 +55,9 @@ export class PublicCatalogComponent implements OnInit {
 
   searchName = ''
   searchDescription = ''
+  selectedBrand = ''
+  selectedCategoryId = ''
+  showOnlyAvailable = false
   minPrice: number | undefined = undefined
   maxPrice: number | undefined = undefined
   sortBy: 'views' | 'price-asc' | 'price-desc' | 'newest' = 'newest'
@@ -64,6 +68,37 @@ export class PublicCatalogComponent implements OnInit {
 
   get filterToggleIcon(): string {
     return this.isFiltersDrawerOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'
+  }
+
+  get selectedCategoryName(): string {
+    if (!this.selectedCategoryId) return ''
+
+    const category = this.filters().categories.find(
+      (item) => item.id === this.selectedCategoryId
+    )
+    return category?.name ?? ''
+  }
+
+  get hasPriceFilter(): boolean {
+    return this.minPrice !== undefined || this.maxPrice !== undefined
+  }
+
+  private getSelectedCategoryIds(): string[] {
+    if (!this.selectedCategoryId) return []
+
+    const selectedCategory = this.filters().categories.find(
+      (item) => item.id === this.selectedCategoryId
+    )
+
+    if (!selectedCategory) {
+      return [this.selectedCategoryId]
+    }
+
+    if (selectedCategory.ids && selectedCategory.ids.length > 0) {
+      return selectedCategory.ids
+    }
+
+    return [selectedCategory.id]
   }
 
   ngOnInit(): void {
@@ -142,6 +177,7 @@ export class PublicCatalogComponent implements OnInit {
           this.filters.set({
             categories: [],
             subcategories: [],
+            brands: [],
           })
         }
       },
@@ -160,6 +196,8 @@ export class PublicCatalogComponent implements OnInit {
       limit: 12,
     }
 
+    this.normalizePriceRange()
+
     const searchTerms: string[] = []
     if (this.searchName) searchTerms.push(this.searchName)
     if (this.searchDescription) searchTerms.push(this.searchDescription)
@@ -167,9 +205,18 @@ export class PublicCatalogComponent implements OnInit {
       query.search = searchTerms.join(' ')
     }
 
+    if (this.selectedBrand) query.brand = this.selectedBrand
+    query.inStock = this.showOnlyAvailable
     if (this.minPrice !== undefined) query.minPrice = this.minPrice
     if (this.maxPrice !== undefined) query.maxPrice = this.maxPrice
     if (this.sortBy) query.sortBy = this.sortBy
+
+    const selectedCategoryIds = this.getSelectedCategoryIds()
+    if (selectedCategoryIds.length === 1) {
+      query.categoryId = selectedCategoryIds[0]
+    } else if (selectedCategoryIds.length > 1) {
+      query.categoryIds = selectedCategoryIds
+    }
 
     this.catalogService.getProducts(query).subscribe({
       next: (response) => {
@@ -220,9 +267,41 @@ export class PublicCatalogComponent implements OnInit {
     this.onFilterChange()
   }
 
+  onBrandChange(): void {
+    this.onFilterChange()
+  }
+
+  onAvailabilityChange(): void {
+    this.onFilterChange()
+  }
+
+  clearCategoryFilter(): void {
+    this.selectedCategoryId = ''
+    this.onFilterChange()
+  }
+
+  clearBrandFilter(): void {
+    this.selectedBrand = ''
+    this.onFilterChange()
+  }
+
+  clearAvailabilityFilter(): void {
+    this.showOnlyAvailable = false
+    this.onFilterChange()
+  }
+
+  clearPriceFilter(): void {
+    this.minPrice = undefined
+    this.maxPrice = undefined
+    this.onFilterChange()
+  }
+
   clearFilters(): void {
     this.searchName = ''
     this.searchDescription = ''
+    this.selectedBrand = ''
+    this.selectedCategoryId = ''
+    this.showOnlyAvailable = false
     this.minPrice = undefined
     this.maxPrice = undefined
     this.sortBy = 'newest'
@@ -247,6 +326,18 @@ export class PublicCatalogComponent implements OnInit {
     if (this.currentPage() > 1) {
       this.currentPage.update((p) => p - 1)
       this.loadProducts()
+    }
+  }
+
+  private normalizePriceRange(): void {
+    if (
+      this.minPrice !== undefined &&
+      this.maxPrice !== undefined &&
+      this.minPrice > this.maxPrice
+    ) {
+      const minPrice = this.maxPrice
+      this.maxPrice = this.minPrice
+      this.minPrice = minPrice
     }
   }
 

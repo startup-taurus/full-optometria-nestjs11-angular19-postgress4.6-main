@@ -34,15 +34,19 @@ export interface PublicProduct {
 }
 
 export interface PublicProductFilters {
-  categories: { id: string; name: string }[]
+  categories: { id: string; name: string; ids?: string[] }[]
   subcategories: { id: string; name: string; categoryId: string }[]
+  brands: string[]
 }
 
 export interface PublicProductQuery {
   companyName?: string
   search?: string
+  brand?: string
   categoryId?: string
+  categoryIds?: string[]
   subcategoryId?: string
+  inStock?: boolean
   minPrice?: number
   maxPrice?: number
   sortBy?: 'views' | 'price-asc' | 'price-desc' | 'newest'

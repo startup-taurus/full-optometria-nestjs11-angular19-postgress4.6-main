@@ -25,6 +25,19 @@ export class SubcategoriesService {
     private productRepository: Repository<Product>
   ) {}
 
+  private normalizeName(value?: string): string {
+    return (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  private sanitizeName(value?: string): string {
+    return (value || '').replace(/\s+/g, ' ').trim();
+  }
+
   async create(
     createSubcategoryDto: CreateSubcategoryDto,
     branchId: string,
@@ -53,8 +66,9 @@ export class SubcategoriesService {
       });
     }
 
+    const normalizedName = this.normalizeName(createSubcategoryDto.name);
+    const sanitizedName = this.sanitizeName(createSubcategoryDto.name);
     const subcategoryWhereCondition: any = {
-      name: createSubcategoryDto.name,
       categoryId: createSubcategoryDto.categoryId,
       branchId,
     };
@@ -62,9 +76,14 @@ export class SubcategoriesService {
       subcategoryWhereCondition.companyId = companyId;
     }
 
-    const existingSubcategory = await this.subcategoryRepository.findOne({
+    const existingSubcategories = await this.subcategoryRepository.find({
       where: subcategoryWhereCondition,
+      select: ['id', 'name'],
     });
+
+    const existingSubcategory = existingSubcategories.find(
+      (item) => this.normalizeName(item.name) === normalizedName
+    );
 
     if (existingSubcategory) {
       throw new ConflictException({
@@ -79,6 +98,7 @@ export class SubcategoriesService {
 
     const subcategory = this.subcategoryRepository.create({
       ...createSubcategoryDto,
+      name: sanitizedName,
       branchId,
       companyId,
     });
@@ -232,24 +252,35 @@ export class SubcategoriesService {
       }
     }
 
-    if (
-      updateSubcategoryDto.name &&
-      (updateSubcategoryDto.name !== subcategory.name ||
-        (updateSubcategoryDto.categoryId &&
-          updateSubcategoryDto.categoryId !== subcategory.categoryId))
-    ) {
-      const categoryIdToCheck =
-        updateSubcategoryDto.categoryId || subcategory.categoryId;
+    const categoryIdToCheck = updateSubcategoryDto.categoryId || subcategory.categoryId;
+    const nextName = updateSubcategoryDto.name || subcategory.name;
+    const normalizedNextName = this.normalizeName(nextName);
+    const normalizedCurrentName = this.normalizeName(subcategory.name);
+    const categoryChanged = categoryIdToCheck !== subcategory.categoryId;
+    const nameChanged = normalizedNextName !== normalizedCurrentName;
 
-      const existingSubcategory = await this.subcategoryRepository.findOne({
-        where: {
-          name: updateSubcategoryDto.name,
-          categoryId: categoryIdToCheck,
-          branchId,
-        },
+    if (nameChanged || categoryChanged) {
+      const duplicateWhereCondition: any = {
+        categoryId: categoryIdToCheck,
+        branchId,
+      };
+
+      if (companyId) {
+        duplicateWhereCondition.companyId = companyId;
+      }
+
+      const existingSubcategories = await this.subcategoryRepository.find({
+        where: duplicateWhereCondition,
+        select: ['id', 'name'],
       });
 
-      if (existingSubcategory && existingSubcategory.id !== id) {
+      const existingSubcategory = existingSubcategories.find(
+        (item) =>
+          item.id !== subcategory.id &&
+          this.normalizeName(item.name) === normalizedNextName
+      );
+
+      if (existingSubcategory) {
         throw new ConflictException({
           statusCode: 409,
           success: false,
@@ -267,6 +298,11 @@ export class SubcategoriesService {
       branchId: __,
       ...safeUpdateData
     } = updateSubcategoryDto as any;
+
+    if (safeUpdateData.name) {
+      safeUpdateData.name = this.sanitizeName(safeUpdateData.name);
+    }
+
     Object.assign(subcategory, safeUpdateData);
     const updatedSubcategory = await this.subcategoryRepository.save(
       subcategory

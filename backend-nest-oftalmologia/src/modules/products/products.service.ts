@@ -59,6 +59,106 @@ export class ProductsService {
     private inventoryTransferRepository: Repository<InventoryTransfer>
   ) {}
 
+  private normalizeFilterKey(value?: string): string {
+    return (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  private groupCategoriesForPublicFilters(
+    categories: Array<{ id: string; name: string }>
+  ) {
+    const groupedMap = new Map<string, { id: string; name: string; ids: string[] }>();
+    const categoryIdMap = new Map<string, string>();
+
+    for (const category of categories) {
+      const key = this.normalizeFilterKey(category.name);
+      if (!key) continue;
+
+      const existing = groupedMap.get(key);
+      if (!existing) {
+        groupedMap.set(key, {
+          id: category.id,
+          name: category.name.trim(),
+          ids: [category.id],
+        });
+        categoryIdMap.set(category.id, category.id);
+        continue;
+      }
+
+      if (!existing.ids.includes(category.id)) {
+        existing.ids.push(category.id);
+      }
+
+      categoryIdMap.set(category.id, existing.id);
+    }
+
+    const groupedCategories = Array.from(groupedMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+    );
+
+    return { groupedCategories, categoryIdMap };
+  }
+
+  private groupSubcategoriesForPublicFilters(
+    subcategories: Array<{ id: string; name: string; categoryId: string }>,
+    categoryIdMap: Map<string, string>
+  ) {
+    const groupedMap = new Map<
+      string,
+      { id: string; name: string; categoryId: string; ids: string[] }
+    >();
+
+    for (const subcategory of subcategories) {
+      const representativeCategoryId = categoryIdMap.get(subcategory.categoryId);
+      if (!representativeCategoryId) continue;
+
+      const normalizedName = this.normalizeFilterKey(subcategory.name);
+      if (!normalizedName) continue;
+
+      const key = `${representativeCategoryId}::${normalizedName}`;
+      const existing = groupedMap.get(key);
+
+      if (!existing) {
+        groupedMap.set(key, {
+          id: subcategory.id,
+          name: subcategory.name.trim(),
+          categoryId: representativeCategoryId,
+          ids: [subcategory.id],
+        });
+        continue;
+      }
+
+      if (!existing.ids.includes(subcategory.id)) {
+        existing.ids.push(subcategory.id);
+      }
+    }
+
+    return Array.from(groupedMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+    );
+  }
+
+  private groupBrandsForPublicFilters(brands: string[]) {
+    const groupedMap = new Map<string, string>();
+
+    for (const brand of brands) {
+      const normalizedBrand = this.normalizeFilterKey(brand);
+      if (!normalizedBrand) continue;
+
+      if (!groupedMap.has(normalizedBrand)) {
+        groupedMap.set(normalizedBrand, brand.trim());
+      }
+    }
+
+    return Array.from(groupedMap.values()).sort((a, b) =>
+      a.localeCompare(b, 'es', { sensitivity: 'base' })
+    );
+  }
+
   async create(
     createProductDto: CreateProductDto,
     branchId: string,
@@ -522,9 +622,19 @@ export class ProductsService {
       );
     }
 
-    if (queryDto.categoryId) {
-      queryBuilder.andWhere('product.categoryId = :categoryId', {
-        categoryId: queryDto.categoryId,
+    if (queryDto.brand) {
+      queryBuilder.andWhere('LOWER(TRIM(product.brand)) = :brand', {
+        brand: queryDto.brand.trim().toLowerCase(),
+      });
+    }
+
+    const selectedCategoryIds = Array.from(
+      new Set([...(queryDto.categoryIds || []), ...(queryDto.categoryId ? [queryDto.categoryId] : [])])
+    );
+
+    if (selectedCategoryIds.length > 0) {
+      queryBuilder.andWhere('product.categoryId IN (:...categoryIds)', {
+        categoryIds: selectedCategoryIds,
       });
     }
 
@@ -543,6 +653,12 @@ export class ProductsService {
     if (queryDto.maxPrice !== undefined) {
       queryBuilder.andWhere('product.unitPrice <= :maxPrice', {
         maxPrice: queryDto.maxPrice,
+      });
+    }
+
+    if (queryDto.inStock === true) {
+      queryBuilder.andWhere('product.quantity > :minQuantity', {
+        minQuantity: 0,
       });
     }
 
@@ -765,6 +881,31 @@ export class ProductsService {
       .orderBy('subcategory.name', 'ASC')
       .getMany();
 
+    const brandQueryBuilder = this.productRepository
+      .createQueryBuilder('product')
+      .select('product.brand', 'brand')
+      .where('product.isActive = :isActive', { isActive: true })
+      .andWhere('product.brand IS NOT NULL')
+      .andWhere("TRIM(product.brand) <> ''");
+
+    if (companyId) {
+      brandQueryBuilder.andWhere('product.companyId = :companyId', {
+        companyId,
+      });
+    }
+
+    const brandRows = await brandQueryBuilder.getRawMany<{ brand: string }>();
+    const brands = this.groupBrandsForPublicFilters(
+      brandRows.map((row) => row.brand)
+    );
+
+    const { groupedCategories, categoryIdMap } =
+      this.groupCategoriesForPublicFilters(categories);
+    const groupedSubcategories = this.groupSubcategoriesForPublicFilters(
+      subcategories,
+      categoryIdMap
+    );
+
     return {
       statusCode: 200,
       success: true,
@@ -773,8 +914,9 @@ export class ProductsService {
         en: 'Filters retrieved successfully',
       },
       data: {
-        categories,
-        subcategories,
+        categories: groupedCategories,
+        subcategories: groupedSubcategories,
+        brands,
       },
     };
   }
