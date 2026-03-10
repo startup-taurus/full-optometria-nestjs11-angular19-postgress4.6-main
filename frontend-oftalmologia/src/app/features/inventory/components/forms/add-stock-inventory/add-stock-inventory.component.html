@@ -1,0 +1,126 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ 'INVENTORY.ADD_STOCK.TITLE' | translate }}</h5>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="modal-body">
+    <div class="mb-3 product-summary" *ngIf="product">
+      <div>
+        <strong>{{ 'INVENTORY.ADD_STOCK.PRODUCT_CODE' | translate }}:</strong>
+        {{ product.code }}
+      </div>
+      <div>
+        <strong>{{ 'INVENTORY.ADD_STOCK.PRODUCT_NAME' | translate }}:</strong>
+        {{ product.name }}
+      </div>
+      <div>
+        <strong>{{ 'INVENTORY.ADD_STOCK.CURRENT_STOCK' | translate }}:</strong>
+        {{ product.quantity ?? 0 }}
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">{{
+        'INVENTORY.ADD_STOCK.QUANTITY_TO_ADD' | translate
+      }}</label>
+      <div class="qty-control">
+        <button
+          type="button"
+          class="btn btn-outline-secondary qty-side-btn"
+          (click)="decrement()"
+          [disabled]="(form.get('quantityToAdd')?.value ?? 1) <= 1"
+        >
+          <i class="ti ti-minus"></i>
+        </button>
+        <input
+          type="number"
+          class="form-control qty-center-input"
+          formControlName="quantityToAdd"
+          min="1"
+          max="99999"
+          [class.is-invalid]="
+            form.get('quantityToAdd')?.invalid &&
+            form.get('quantityToAdd')?.touched
+          "
+        />
+        <button
+          type="button"
+          class="btn btn-outline-secondary qty-side-btn"
+          (click)="increment()"
+        >
+          <i class="ti ti-plus"></i>
+        </button>
+      </div>
+      <div
+        class="invalid-feedback d-block"
+        *ngIf="
+          form.get('quantityToAdd')?.invalid &&
+          form.get('quantityToAdd')?.touched
+        "
+      >
+        {{ 'INVENTORY.ADD_STOCK.INVALID_QUANTITY' | translate }}
+      </div>
+    </div>
+
+    <div class="stock-summary mb-2" *ngIf="product">
+      <div class="summary-row">
+        <span class="text-muted">{{
+          'INVENTORY.ADD_STOCK.CURRENT_STOCK' | translate
+        }}</span>
+        <span>{{ product.quantity ?? 0 }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="text-muted">{{
+          'INVENTORY.ADD_STOCK.TO_ADD' | translate
+        }}</span>
+        <span>+{{ form.get('quantityToAdd')?.value || 0 }}</span>
+      </div>
+      <div class="summary-row summary-total-row">
+        <span class="fw-semibold">{{
+          'INVENTORY.ADD_STOCK.NEW_TOTAL' | translate
+        }}</span>
+        <span class="fw-bold">{{ newTotal }}</span>
+      </div>
+    </div>
+
+    <div
+      class="alert alert-danger d-flex align-items-center gap-2"
+      *ngIf="errorMessage"
+    >
+      <i class="ti ti-alert-circle fs-18"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="closeModal()"
+      [disabled]="isLoading"
+    >
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="isLoading || form.invalid"
+    >
+      <span
+        *ngIf="isLoading"
+        class="spinner-border spinner-border-sm me-2"
+      ></span>
+      {{
+        isLoading
+          ? ('COMMON.SAVING' | translate)
+          : ('INVENTORY.ADD_STOCK.SUBMIT' | translate)
+      }}
+    </button>
+  </div>
+</form>

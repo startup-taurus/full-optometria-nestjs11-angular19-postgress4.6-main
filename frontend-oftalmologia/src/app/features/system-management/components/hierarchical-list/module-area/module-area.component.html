@@ -6,7 +6,7 @@
           {{ 'ROLES_AND_PERMISSIONS.MODULE.LIST_MODULES' | translate }}
         </p>
       </div>
-      <div ngbDropdown class="lh-1">
+      <div ngbDropdown class="lh-1" *ngIf="isSuperAdmin">
         <a
           ngbDropdownToggle
           class="dropdown-toggle cursor-pointer drop-arrow-none card-drop"
@@ -86,7 +86,7 @@
                 </div>
                 <div class="d-flex gap-1 text-muted">
                   <i
-                    *ngIf="item.isActive"
+                    *ngIf="item.isActive && isSuperAdmin"
                     class="ti ti-pencil fs-16"
                     ngbTooltip="{{
                       'ROLES_AND_PERMISSIONS.MODULE.EDIT_MODULE' | translate
@@ -95,6 +95,7 @@
                   >
                   </i>
                   <i
+                    *ngIf="isSuperAdmin"
                     class="ti ti-plus fs-16 text-primary"
                     (click)="openModalPermission(item.id, $event)"
                     ngbTooltip="{{

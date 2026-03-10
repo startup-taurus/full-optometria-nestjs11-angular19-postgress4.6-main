@@ -134,7 +134,7 @@
             </ng-template>
 
             <ng-template #actionsTemplate let-row="row">
-              <div class="d-flex gap-1">
+              <div class="d-flex gap-1 align-items-center">
                 <button
                   type="button"
                   class="btn btn-sm btn-outline-secondary"
@@ -146,65 +146,96 @@
                 >
                   <i class="ti ti-eye"></i>
                 </button>
+
                 <button
                   type="button"
                   class="btn btn-sm btn-outline-secondary"
-                  (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
-                  [attr.aria-label]="'INVENTORY.ACTIONS.EDIT' | translate"
-                  [ngbTooltip]="'INVENTORY.ACTIONS.EDIT' | translate"
+                  (click)="openAddStockModal(row)"
+                  [attr.aria-label]="'INVENTORY.ADD_STOCK.TITLE' | translate"
+                  [ngbTooltip]="'INVENTORY.ADD_STOCK.TITLE' | translate"
                 >
-                  <i class="ti ti-edit"></i>
+                  <i class="ti ti-package-import"></i>
                 </button>
+
                 <button
                   type="button"
-                  class="btn btn-sm btn-outline-primary"
+                  class="btn btn-sm btn-outline-secondary"
                   (click)="openTransferModal(row)"
                   [disabled]="row.quantity <= 0"
-                  [attr.aria-label]="'Transferir stock'"
-                  [ngbTooltip]="'Transferir stock'"
+                  [attr.aria-label]="
+                    'INVENTORY.TRANSFER_STOCK.TITLE' | translate
+                  "
+                  [ngbTooltip]="'INVENTORY.TRANSFER_STOCK.TITLE' | translate"
                 >
                   <i class="ti ti-arrows-right-left"></i>
                 </button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-secondary"
-                  (click)="showTransferHistory(row)"
-                  [attr.aria-label]="'Ver historial de transferencias'"
-                  [ngbTooltip]="'Ver historial de transferencias'"
+
+                <div
+                  ngbDropdown
+                  container="body"
+                  placement="bottom-end auto"
+                  [autoClose]="'inside'"
                 >
-                  <i class="ti ti-history"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-sm"
-                  [ngClass]="
-                    row.isActive ? 'btn-outline-danger' : 'btn-outline-success'
-                  "
-                  (click)="toggleProductStatus(row)"
-                  [attr.aria-label]="
-                    (row.isActive
-                      ? 'INVENTORY.ACTIONS.DEACTIVATE_PRODUCT'
-                      : 'INVENTORY.ACTIONS.ACTIVATE'
-                    ) | translate
-                  "
-                  [ngbTooltip]="
-                    (row.isActive
-                      ? 'INVENTORY.ACTIONS.DEACTIVATE_PRODUCT'
-                      : 'INVENTORY.ACTIONS.ACTIVATE'
-                    ) | translate
-                  "
-                >
-                  <i [class]="row.isActive ? 'ti ti-ban' : 'ti ti-check'"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="deleteProduct(row)"
-                  [attr.aria-label]="'INVENTORY.ACTIONS.DELETE' | translate"
-                  [ngbTooltip]="'INVENTORY.ACTIONS.DELETE' | translate"
-                >
-                  <i class="ti ti-trash"></i>
-                </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary no-caret"
+                    ngbDropdownToggle
+                    [ngbTooltip]="'COMMON.ACTIONS' | translate"
+                    container="body"
+                  >
+                    <i class="ti ti-dots-vertical"></i>
+                  </button>
+                  <div ngbDropdownMenu class="actions-icon-grid p-2">
+                    <div class="d-grid grid-2col gap-1">
+                      <button
+                        class="btn btn-sm btn-outline-secondary action-icon-btn"
+                        (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
+                        [ngbTooltip]="'INVENTORY.ACTIONS.EDIT' | translate"
+                        container="body"
+                      >
+                        <i class="ti ti-edit"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-secondary action-icon-btn"
+                        (click)="showTransferHistory(row)"
+                        [ngbTooltip]="
+                          'INVENTORY.ACTIONS.TRANSFER_HISTORY' | translate
+                        "
+                        container="body"
+                      >
+                        <i class="ti ti-history"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm action-icon-btn"
+                        [ngClass]="
+                          row.isActive
+                            ? 'btn-outline-warning'
+                            : 'btn-outline-success'
+                        "
+                        (click)="toggleProductStatus(row)"
+                        [ngbTooltip]="
+                          (row.isActive
+                            ? 'INVENTORY.ACTIONS.DEACTIVATE_PRODUCT'
+                            : 'INVENTORY.ACTIONS.ACTIVATE'
+                          ) | translate
+                        "
+                        container="body"
+                      >
+                        <i
+                          [ngClass]="row.isActive ? 'ti ti-ban' : 'ti ti-check'"
+                        ></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-danger action-icon-btn"
+                        (click)="deleteProduct(row)"
+                        [ngbTooltip]="'INVENTORY.ACTIONS.DELETE' | translate"
+                        container="body"
+                      >
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </ng-template>
           </shared-ngx-datatable>

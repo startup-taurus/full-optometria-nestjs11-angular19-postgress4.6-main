@@ -27,6 +27,7 @@ import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service
 import { ModuleFormComponent } from '../../forms/module-form/module-form.component'
 import { MODAL_TYPE } from '@core/helpers/global/global.constants'
 import { PermissionFormComponent } from '../../forms/permission-form/permission-form.component'
+import { PermissionsService } from '@core/services/api/permissions.service'
 
 @Component({
   selector: 'module-area',
@@ -42,6 +43,7 @@ export class ModuleAreaComponent implements OnInit, OnDestroy {
   public isLoading: boolean = false
   public selectedRoleId: string | null = null
   public selectedModuleId: string | null = null
+  public isSuperAdmin: boolean = false
   private readonly pageSize = 100
 
   private searchSubject = new Subject<string>()
@@ -50,8 +52,10 @@ export class ModuleAreaComponent implements OnInit, OnDestroy {
   private _moduleService = inject(ModuleService)
   private _selectionService = inject(SelectionService)
   private _bootstrapModalService = inject(BootstrapModalService)
+  private _permissionsService = inject(PermissionsService)
 
   ngOnInit(): void {
+    this.isSuperAdmin = this._permissionsService.isSuperAdmin()
     this.initializeSubscriptions()
   }
 

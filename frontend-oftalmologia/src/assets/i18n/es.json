@@ -836,7 +836,8 @@
       "EDIT_PRODUCT": "Editar Producto",
       "DEACTIVATE_PRODUCT": "Desactivar Producto",
       "ACTIVATE": "Activar Producto",
-      "DELETE": "Eliminar Producto"
+      "DELETE": "Eliminar Producto",
+      "TRANSFER_HISTORY": "Historial de transferencias"
       
     },
     "DETAILS": {
@@ -931,6 +932,18 @@
       "INSUFFICIENT_STOCK_TITLE": "Stock insuficiente",
       "INSUFFICIENT_STOCK_TEXT": "La cantidad a transferir ({{quantity}}) excede el stock disponible ({{stock}})",
       "ERROR_MESSAGE": "No se pudo completar la transferencia de stock"
+    },
+    "ADD_STOCK": {
+      "TITLE": "Agregar stock",
+      "PRODUCT_CODE": "Código",
+      "PRODUCT_NAME": "Producto",
+      "CURRENT_STOCK": "Stock actual",
+      "QUANTITY_TO_ADD": "Cantidad a agregar",
+      "INVALID_QUANTITY": "Ingresa una cantidad válida mayor a 0",
+      "TO_ADD": "A agregar",
+      "NEW_TOTAL": "Nuevo total",
+      "SUBMIT": "Agregar stock",
+      "ERROR_MESSAGE": "No se pudo agregar el stock"
     }
   },
   "MEDICAL_HISTORY": {
