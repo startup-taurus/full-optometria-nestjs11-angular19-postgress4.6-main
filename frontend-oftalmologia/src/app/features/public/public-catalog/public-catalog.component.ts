@@ -137,11 +137,19 @@ export class PublicCatalogComponent implements OnInit {
       const companyParam = params.get('companyName')
       if (companyParam) {
         this.companyName.set(companyParam)
+        localStorage.setItem('catalog_company_name', companyParam)
         this.hasProcessedInitialProductFromUrl = false
         this.validateCompanyAndLoad()
       } else {
-        this.isValidCompany.set(false)
-        this.isCheckingCompany.set(false)
+        const savedCompany = localStorage.getItem('catalog_company_name')
+        if (savedCompany) {
+          this.companyName.set(savedCompany)
+          this.hasProcessedInitialProductFromUrl = false
+          this.validateCompanyAndLoad()
+        } else {
+          this.isValidCompany.set(false)
+          this.isCheckingCompany.set(false)
+        }
       }
     })
 
@@ -185,20 +193,29 @@ export class PublicCatalogComponent implements OnInit {
   private validateCompanyAndLoad(): void {
     const companyNameValue = this.companyName()
 
+    if (!companyNameValue) {
+      this.isValidCompany.set(false)
+      this.isCheckingCompany.set(false)
+      return
+    }
+
     this.catalogService.validateCompany(companyNameValue).subscribe({
       next: (response) => {
         if (response.isValid) {
           this.isValidCompany.set(true)
+          localStorage.setItem('catalog_company_name', companyNameValue)
           this.loadFilters()
           this.loadProducts()
         } else {
           this.isValidCompany.set(false)
+          localStorage.removeItem('catalog_company_name')
         }
         this.isCheckingCompany.set(false)
       },
       error: () => {
         this.isValidCompany.set(false)
         this.isCheckingCompany.set(false)
+        localStorage.removeItem('catalog_company_name')
       },
     })
   }
@@ -227,8 +244,15 @@ export class PublicCatalogComponent implements OnInit {
   loadProducts(): void {
     this.loading.set(true)
 
+    const companyName = this.companyName()
+    if (!companyName) {
+      this.loading.set(false)
+      this.products.set([])
+      return
+    }
+
     const query: PublicProductQuery = {
-      companyName: this.companyName(),
+      companyName,
       page: this.currentPage(),
       limit: 12,
     }
@@ -260,7 +284,10 @@ export class PublicCatalogComponent implements OnInit {
     this.catalogService.getProducts(query).subscribe({
       next: (response) => {
         if (response && response.items && Array.isArray(response.items)) {
-          this.products.set(response.items)
+          const filteredItems = response.items.filter(
+            (product) => product.branch?.id !== undefined
+          )
+          this.products.set(filteredItems)
           this.totalCount.set(response.totalCount || 0)
           this.totalPages.set(response.totalPages || 0)
           this.backendError.set(false)
@@ -606,7 +633,8 @@ export class PublicCatalogComponent implements OnInit {
 
     const companyParam = this.companyName()
     if (companyParam) {
-      sessionStorage.setItem('catalog_company', companyParam)
+      localStorage.setItem('catalog_company', companyParam)
+      localStorage.setItem('catalog_company_name', companyParam)
     }
 
     window.location.href = '/auth/login'
@@ -707,6 +735,11 @@ export class PublicCatalogComponent implements OnInit {
   private openProductFromUrl(productId: string): void {
     this.hasProcessedInitialProductFromUrl = true
 
+    const companyName = this.companyName()
+    if (companyName) {
+      localStorage.setItem('catalog_company_name', companyName)
+    }
+
     this.catalogService.getProductById(productId).subscribe({
       next: (product) => {
         this.applySelectedProduct(product)
@@ -729,7 +762,8 @@ export class PublicCatalogComponent implements OnInit {
 
   private getProductShareUrl(productId: string): string {
     const companySegment = this.companyName() ? `/${this.companyName()}` : ''
-    return `${window.location.origin}/catalog${companySegment}?productId=${productId}`
+    const baseUrl = `${window.location.origin}/catalog${companySegment}`
+    return `${baseUrl}?productId=${productId}`
   }
 
   private async copyToClipboard(text: string): Promise<void> {
