@@ -90,20 +90,50 @@ export class PublicCatalogService {
   }
 
   generateWhatsAppLink(product: PublicProduct): string {
-    if (!product.createdByUser?.mobilePhone) {
+    const branchPhone = this.formatPhoneForWhatsApp(product.branch?.phone || '')
+    const creatorPhone = this.formatPhoneForWhatsApp(
+      product.createdByUser?.mobilePhone || ''
+    )
+    const targetPhone = branchPhone || creatorPhone
+
+    if (!targetPhone) {
       return ''
-    }
-
-    let cleanPhone = product.createdByUser.mobilePhone.replace(/\D/g, '')
-
-    if (!cleanPhone.startsWith('593') && cleanPhone.length <= 10) {
-      cleanPhone = '593' + cleanPhone
     }
 
     const message = `Hola, me interesa el producto *${product.name}*. ¿Podrías darme más información?`
     const encodedMessage = encodeURIComponent(message)
 
-    return `https://wa.me/${cleanPhone}?text=${encodedMessage}`
+    return `https://wa.me/${targetPhone}?text=${encodedMessage}`
+  }
+
+  generateCartWhatsAppLink(phone: string, message: string): string {
+    const cleanPhone = this.formatPhoneForWhatsApp(phone)
+    if (!cleanPhone) {
+      return ''
+    }
+
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`
+  }
+
+  formatPhoneForWhatsApp(phone: string): string {
+    if (!phone) return ''
+
+    const digits = phone.replace(/\D/g, '')
+    if (!digits) return ''
+
+    if (/^5939\d{8}$/.test(digits)) {
+      return digits
+    }
+
+    if (/^09\d{8}$/.test(digits)) {
+      return `593${digits.slice(1)}`
+    }
+
+    if (/^9\d{8}$/.test(digits)) {
+      return `593${digits}`
+    }
+
+    return ''
   }
 
   getImageUrl(path: string): string {

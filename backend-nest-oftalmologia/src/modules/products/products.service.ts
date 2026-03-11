@@ -637,21 +637,49 @@ export class ProductsService {
     const { page = 1, limit = 12, companyName, companySlug } = queryDto;
     const skip = (page - 1) * limit;
 
-    let companyId: string | null = null;
+    let companyId: string;
     if (companySlug) {
       const company = await this.companyRepository.findOne({
         where: { slug: companySlug, isActive: true },
       });
-      if (company) {
-        companyId = company.id;
+      if (!company) {
+        throw new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: {
+            es: 'Empresa con slug no encontrada',
+            en: 'Company with slug not found',
+          },
+        });
       }
+      companyId = company.id;
     } else if (companyName) {
       const company = await this.companyRepository.findOne({
-        where: { name: companyName, isActive: true },
+        where: [
+          { slug: companyName, isActive: true },
+          { name: companyName, isActive: true },
+        ],
       });
-      if (company) {
-        companyId = company.id;
+      if (!company) {
+        throw new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: {
+            es: 'Empresa no encontrada',
+            en: 'Company not found',
+          },
+        });
       }
+      companyId = company.id;
+    } else {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'Se requiere el nombre o slug de la empresa',
+          en: 'Company name or slug is required',
+        },
+      });
     }
 
     const queryBuilder = this.productRepository
@@ -660,11 +688,8 @@ export class ProductsService {
       .leftJoinAndSelect('product.subcategory', 'subcategory')
       .leftJoinAndSelect('product.branch', 'branch')
       .leftJoinAndSelect('product.createdByUser', 'user')
-      .where('product.isActive = :isActive', { isActive: true });
-
-    if (companyId) {
-      queryBuilder.andWhere('product.companyId = :companyId', { companyId });
-    }
+      .where('product.isActive = :isActive', { isActive: true })
+      .andWhere('product.companyId = :companyId', { companyId })
 
     if (queryDto.search) {
       queryBuilder.andWhere(
@@ -783,6 +808,7 @@ export class ProductsService {
                 id: product.branch.id,
                 name: product.branch.name,
                 address: product.branch.address,
+                phone: product.branch.phone,
               }
             : null,
           createdByUser: product.createdByUser
@@ -897,6 +923,7 @@ export class ProductsService {
               id: product.branch.id,
               name: product.branch.name,
               address: product.branch.address,
+              phone: product.branch.phone,
             }
           : null,
         createdByUser: product.createdByUser
@@ -1001,7 +1028,7 @@ export class ProductsService {
     }
 
     const branches = await branchQueryBuilder
-      .select(['branch.id', 'branch.name'])
+      .select(['branch.id', 'branch.name', 'branch.phone'])
       .orderBy('branch.name', 'ASC')
       .getMany();
 
