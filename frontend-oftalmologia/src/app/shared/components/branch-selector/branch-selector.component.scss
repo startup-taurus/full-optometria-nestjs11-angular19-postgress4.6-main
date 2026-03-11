@@ -1,6 +1,6 @@
 .branch-selector {
   .card {
-    border: 1px solid #e3e6ef;
+    border: 1px solid var(--bs-border-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 
@@ -18,7 +18,7 @@
     align-items: center;
     white-space: nowrap;
     font-size: 0.9rem;
-    color: #495057;
+    color: var(--bs-body-color);
 
     i {
       font-size: 1.1rem;
@@ -42,22 +42,22 @@
       }
 
       .ng-select-container {
-        background-color: #fff;
+        background-color: var(--bs-body-bg);
         border-radius: 0.375rem;
-        border: 1px solid #ced4da;
+        border: 1px solid var(--bs-border-color);
         min-height: 38px;
       }
 
       .ng-placeholder {
-        color: #6c757d;
+        color: var(--bs-secondary-color);
         display: block;
         line-height: 1.5;
       }
 
       .ng-option {
         &.ng-option-highlighted {
-          background-color: #f8f9fa;
-          color: #495057;
+          background-color: var(--bs-tertiary-bg);
+          color: var(--bs-body-color);
         }
 
         &.ng-option-selected {
@@ -69,7 +69,7 @@
   }
 
   .filter-status {
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid var(--bs-border-color);
     padding-top: 0.5rem;
     margin-top: 0.5rem;
 
@@ -138,23 +138,31 @@
     .ng-select {
       &.ng-select-single {
         .ng-select-container {
-          background-color: var(--bs-tertiary-bg);
-          border: 1px solid var(--bs-border-color-translucent);
+          background-color: transparent;
+          border: 1px solid #fff;
           border-radius: 8px;
           min-height: 40px;
           padding: 0 8px;
           transition: all 0.3s ease;
           cursor: pointer;
+          color: #fff;
 
           &:hover {
-            border-color: var(--bs-primary);
-            box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.1);
+            border-color: #fff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
           }
 
           .ng-value-container {
             padding-left: 0;
+
+            .ng-value {
+              color: #fff;
+              opacity: 1;
+            }
+
             .ng-placeholder {
-              color: var(--bs-secondary-color);
+              color: #fff;
+              opacity: 0.95;
               font-size: 0.9rem;
               font-weight: 500;
             }
@@ -162,7 +170,13 @@
 
           .ng-arrow-wrapper {
             .ng-arrow {
-              border-color: var(--bs-body-color) transparent transparent;
+              width: 14px;
+              height: 14px;
+              border: 0 !important;
+              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 6l5 5 5-5'/%3E%3C/svg%3E");
+              background-repeat: no-repeat;
+              background-position: center;
+              background-size: 14px 14px;
               transition: transform 0.2s ease;
             }
           }
@@ -170,10 +184,11 @@
           .ng-clear-wrapper {
             .ng-clear {
               font-size: 16px;
-              color: var(--bs-secondary-color);
+              color: #fff;
+              opacity: 1;
               transition: color 0.2s ease;
               &:hover {
-                color: var(--bs-danger);
+                color: #fff;
               }
             }
           }
@@ -181,9 +196,9 @@
 
         &.ng-select-focused .ng-select-container,
         &.ng-select-opened .ng-select-container {
-          background-color: var(--bs-body-bg);
-          border-color: var(--bs-primary);
-          box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.15);
+          background-color: transparent;
+          border-color: #fff;
+          box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
         }
 
         &.ng-select-opened .ng-arrow {
@@ -197,15 +212,23 @@
       align-items: center;
       font-size: 0.9rem;
       font-weight: 600;
-      color: var(--bs-body-color);
+      color: #fff;
+      opacity: 1;
+
+      .label-text {
+        color: #fff;
+        opacity: 1;
+      }
 
       .ti {
         font-size: 1.1rem;
-        color: var(--bs-primary);
+        color: #fff;
+        opacity: 1;
       }
     }
 
     .ng-dropdown-panel {
+      background-color: var(--bs-body-bg);
       border: 1px solid var(--bs-border-color-translucent);
       border-radius: 8px;
       box-shadow: var(--bs-box-shadow-lg);
@@ -243,6 +266,7 @@
 
       .ng-option {
         padding: 0;
+        background-color: var(--bs-body-bg);
 
         &.ng-option-highlighted {
           .branch-option {
@@ -256,7 +280,7 @@
         }
 
         &.ng-option-selected {
-          background-color: transparent;
+          background-color: var(--bs-body-bg);
 
           .branch-option {
             color: var(--bs-primary);
@@ -272,14 +296,14 @@
 
     &.branch-filtered {
       .ng-select .ng-select-container {
-        background-color: rgba(var(--bs-success-rgb), 0.1);
-        border-color: rgba(var(--bs-success-rgb), 0.5);
+        background-color: transparent;
+        border-color: rgba(255, 255, 255, 0.8);
       }
 
       .selected-branch-label {
-        color: var(--bs-success-dark);
+        color: #fff;
         .ti {
-          color: var(--bs-success);
+          color: #fff;
         }
       }
     }
@@ -296,6 +320,33 @@
         .ng-placeholder,
         .ng-value-container .ng-value {
           font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}
+
+[data-bs-theme='dark'] {
+  .branch-selector-topbar {
+    .branch-select-minimal {
+      .ng-select.ng-select-single {
+        .ng-select-container {
+          background-color: transparent;
+          border-color: rgba(255, 255, 255, 0.5);
+
+          .ng-arrow-wrapper .ng-arrow {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 6l5 5 5-5'/%3E%3C/svg%3E") !important;
+          }
+        }
+      }
+
+      .ng-dropdown-panel {
+        background-color: var(--bs-body-bg);
+        border-color: var(--bs-border-color);
+
+        .branch-option {
+          background-color: var(--bs-body-bg);
+          color: var(--bs-body-color);
         }
       }
     }

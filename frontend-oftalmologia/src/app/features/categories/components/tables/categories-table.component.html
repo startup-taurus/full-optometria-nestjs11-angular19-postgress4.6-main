@@ -1,5 +1,5 @@
 <div class="card shadow-sm">
-  <div class="card-header bg-light border-bottom">
+  <div class="card-header border-bottom">
     <div class="d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
         <i class="ti ti-category text-primary me-2 fs-5"></i>
@@ -85,10 +85,14 @@
               <i class="ti ti-folder category-icon-color fs-5"></i>
             </div>
             <div class="category-info">
-              <h6 class="mb-1 fw-semibold category-title">{{ category.name }}</h6>
-              <small class="text-muted category-description" *ngIf="category.description">{{
-                category.description
-              }}</small>
+              <h6 class="mb-1 fw-semibold category-title">
+                {{ category.name }}
+              </h6>
+              <small
+                class="text-muted category-description"
+                *ngIf="category.description"
+                >{{ category.description }}</small
+              >
             </div>
           </div>
 
@@ -161,10 +165,14 @@
                 <i class="ti ti-file-text text-secondary fs-5"></i>
               </div>
               <div class="subcategory-info flex-grow-1">
-                <h6 class="mb-0 fw-semibold subcategory-title">{{ subcategory.name }}</h6>
-                <small class="text-muted subcategory-description" *ngIf="subcategory.description">{{
-                  subcategory.description
-                }}</small>
+                <h6 class="mb-0 fw-semibold subcategory-title">
+                  {{ subcategory.name }}
+                </h6>
+                <small
+                  class="text-muted subcategory-description"
+                  *ngIf="subcategory.description"
+                  >{{ subcategory.description }}</small
+                >
               </div>
               <div class="subcategory-meta">
                 <div class="subcategory-status">
@@ -176,8 +184,10 @@
                     [class.text-danger]="!subcategory.isActive"
                   >
                     {{
-                      (subcategory.isActive ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE')
-                        | translate
+                      (subcategory.isActive
+                        ? 'COMMON.ACTIVE'
+                        : 'COMMON.INACTIVE'
+                      ) | translate
                     }}
                   </span>
                 </div>

@@ -29,7 +29,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { DEFAULT_GLOBAL_TOASTR_CONFIG } from '@core/helpers/ui/ui.constants'
 import { permissionsInitializerFactory } from '@core/initializers/permissions.initializer'
 import { branchReduxInitializerFactory } from '@core/initializers/branch-redux.initializer'
-import { themeCustomizerInitializer } from '@core/initializers/theme-customizer.initializer'
+import { localStorageSyncReducer } from '@core/states/layout/layout-reducers'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -48,12 +48,12 @@ export const appConfig: ApplicationConfig = {
           deps: [HttpClient],
         },
       }),
-      StoreModule.forRoot(ROOT_REDUCERS),
+      StoreModule.forRoot(ROOT_REDUCERS, {
+        metaReducers: [localStorageSyncReducer],
+      }),
       EffectsModule.forRoot(ROOT_EFFECTS),
       StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
     ),
-
-    themeCustomizerInitializer,
     {
       provide: APP_INITIALIZER,
       useFactory: permissionsInitializerFactory,

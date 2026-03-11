@@ -1,5 +1,5 @@
 .product-summary {
-  background: #f8f9fa;
+  background: var(--bs-secondary-bg);
   border-radius: 8px;
   padding: 0.75rem;
 }
@@ -37,7 +37,7 @@
 }
 
 .stock-summary {
-  background: #f8f9fa;
+  background: var(--bs-secondary-bg);
   border-radius: 8px;
   padding: 0.75rem 1rem;
 
@@ -46,7 +46,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.35rem 0;
-    border-bottom: 1px dashed #dee2e6;
+    border-bottom: 1px dashed var(--bs-border-color);
 
     &:last-child {
       border-bottom: none;
@@ -54,7 +54,7 @@
   }
 
   .summary-total-row {
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid var(--bs-border-color);
     border-bottom: none;
     margin-top: 0.25rem;
     padding-top: 0.5rem;

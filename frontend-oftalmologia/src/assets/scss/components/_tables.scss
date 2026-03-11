@@ -41,7 +41,28 @@ th {
 [data-bs-theme="dark"] {
     .table-light {
         --#{$prefix}table-color: var(--#{$prefix}body-color);
-        --#{$prefix}table-bg: var(--#{$prefix}light);
+        --#{$prefix}table-bg: var(--#{$prefix}secondary-bg);
         --#{$prefix}table-border-color: var(--#{$prefix}border-color);
+    }
+
+    .table,
+    .table-custom {
+        --#{$prefix}table-color: var(--#{$prefix}body-color);
+        --#{$prefix}table-bg: transparent;
+        --#{$prefix}table-border-color: var(--#{$prefix}border-color);
+
+        thead > tr > th,
+        thead > tr > td {
+            background-color: var(--#{$prefix}tertiary-bg);
+            color: var(--#{$prefix}secondary-color);
+            border-color: var(--#{$prefix}border-color);
+        }
+
+        tbody > tr > td,
+        tbody > tr > th {
+            color: var(--#{$prefix}body-color);
+            border-color: var(--#{$prefix}border-color);
+            background-color: transparent;
+        }
     }
 }

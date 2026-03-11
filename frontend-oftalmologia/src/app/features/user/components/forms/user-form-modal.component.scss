@@ -48,7 +48,7 @@
     cursor: pointer;
     user-select: none;
     font-weight: 500;
-    color: #495057;
+    color: var(--bs-body-color);
     margin-left: 0.5rem;
 
     &::after {
@@ -120,8 +120,8 @@
       left: 2px;
       width: calc(1.5rem - 4px);
       height: calc(1.5rem - 4px);
-      background-color: #f8f9fa;
-      border: 1px solid #dee2e6;
+      background-color: var(--bs-tertiary-bg);
+      border: 1px solid var(--bs-border-color);
       border-radius: 50%;
       transition:
         transform 0.3s ease,
@@ -140,8 +140,8 @@
 
     &:not(:checked)::before {
       transform: translateX(0);
-      background-color: #e9ecef;
-      border-color: #adb5bd;
+      background-color: var(--bs-secondary-bg);
+      border-color: var(--bs-border-color);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
   }
@@ -217,8 +217,8 @@
   .ng-select {
     &.ng-select-focused {
       .ng-select-container {
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
       }
     }
 
@@ -234,7 +234,7 @@
     }
 
     .ng-select-container {
-      border: 1px solid #ced4da;
+      border: 1px solid var(--bs-border-color);
       border-radius: 0.375rem;
       font-size: 0.875rem;
       min-height: calc(2.25rem + 2px);
@@ -244,7 +244,7 @@
         padding-right: 0.75rem;
 
         .ng-placeholder {
-          color: #6c757d;
+          color: var(--bs-secondary-color);
         }
       }
     }
@@ -252,12 +252,12 @@
 }
 
 .border-bottom {
-  border-bottom: 2px solid #e9ecef !important;
+  border-bottom: 2px solid var(--bs-border-color) !important;
 }
 
 h6 {
   font-weight: 600;
-  color: #495057;
+  color: var(--bs-body-color);
 }
 
 // Media queries

@@ -20,8 +20,8 @@
 
   .dropdown {
     &.language-box {
-      background-color: #fff;
-      border: 1px solid #72717136;
+      background-color: var(--bs-body-bg);
+      border: 1px solid var(--bs-border-color);
       border-radius: 8px;
       padding: 4px 8px;
       margin: 0;
@@ -34,7 +34,7 @@
     }
 
     .language-selector {
-      background: transparent;
+      background: var(--bs-body-bg);
       border: none;
       padding: 4px;
       display: flex;
@@ -45,7 +45,7 @@
       min-width: 40px;
       
       &:hover, &:focus, &:active {
-        background: transparent;
+        background: var(--bs-body-bg);
         box-shadow: none;
         color: var(--bs-primary);
       }
@@ -66,6 +66,8 @@
     }
 
     .dropdown-menu {
+      background-color: var(--bs-body-bg);
+      color: var(--bs-body-color);
       min-width: 160px;
       padding: 0.5rem 0;
       margin-top: 8px;

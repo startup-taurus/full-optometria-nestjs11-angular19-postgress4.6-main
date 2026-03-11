@@ -17,8 +17,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  background: white;
-  color: var(--bs-dark);
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   position: sticky;

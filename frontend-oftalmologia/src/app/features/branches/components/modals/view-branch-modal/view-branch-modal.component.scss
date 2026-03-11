@@ -1,16 +1,16 @@
 .branch-details {
   .card {
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    border: 1px solid var(--bs-border-color);
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   }
 
   strong {
-    color: #6c757d;
+    color: var(--bs-secondary-color);
     font-size: 0.875rem;
   }
 
   p {
-    color: #212529;
+    color: var(--bs-body-color);
     font-size: 1rem;
   }
 }

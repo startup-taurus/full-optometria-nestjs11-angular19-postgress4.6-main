@@ -3,6 +3,33 @@
   border-radius: 4px !important;
   background-color: transparent !important;
 
+  .datatable-header,
+  .datatable-header-inner,
+  .datatable-header .datatable-row-left,
+  .datatable-header .datatable-row-center,
+  .datatable-header .datatable-row-right {
+    background-color: var(--bs-tertiary-bg) !important;
+  }
+
+  .datatable-body,
+  .datatable-scroll,
+  .datatable-row-wrapper,
+  .datatable-body-row,
+  .datatable-row-group,
+  .datatable-body-cell,
+  .datatable-body-cell-label,
+  .datatable-footer,
+  .datatable-footer .datatable-footer-inner {
+    background-color: transparent !important;
+    color: var(--bs-body-color) !important;
+  }
+
+  .datatable-body-cell,
+  .datatable-body-cell-label,
+  .datatable-body-cell-label * {
+    color: var(--bs-body-color) !important;
+  }
+
   &.single-selection,
   &.multi-selection,
   &.multi-click-selection {
@@ -48,7 +75,7 @@
     left: 0;
     .datatable-header-cell,
     .datatable-body-cell {
-      border-right: 1px solid #efefef;
+      border-right: 1px solid var(--bs-border-color);
       width: 100% !important;
       display: flex;
       align-items: center;
@@ -65,7 +92,7 @@
     right: 0;
     .datatable-header-cell,
     .datatable-body-cell {
-      border-left: 1px solid #efefef;
+      border-left: 1px solid var(--bs-border-color);
       width: 100% !important;
       display: flex;
       align-items: center;
@@ -75,9 +102,9 @@
 
   .datatable-body .progress-linear .container {
     max-width: none;
-    background-color: rgba(#84a7cd, 0.03);
+    background-color: rgba(var(--bs-primary-rgb), 0.08);
     .bar {
-      background-color: #214178;
+      background-color: var(--bs-primary);
     }
   }
 
@@ -85,19 +112,19 @@
     transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover .datatable-row-group {
-      background-color: #d7e2e9 !important;
+      background-color: rgba(var(--bs-primary-rgb), 0.12) !important;
     }
 
     &:focus .datatable-row-group {
-      background-color: #d7e2e9 !important;
+      background-color: rgba(var(--bs-primary-rgb), 0.12) !important;
     }
 
     &.active .datatable-row-group {
-      background-color: #d7e2e9 !important;
+      background-color: rgba(var(--bs-primary-rgb), 0.16) !important;
     }
 
     &.active:hover .datatable-row-group {
-      background-color: #d7e2e9 !important;
+      background-color: rgba(var(--bs-primary-rgb), 0.18) !important;
     }
   }
 
@@ -121,6 +148,8 @@
     flex-wrap: wrap;
     height: auto !important;
     overflow: hidden;
+    border-top: 1px solid var(--bs-border-color);
+    color: var(--bs-body-color);
 
     .footer-left,
     .datatable-pager {
@@ -140,6 +169,52 @@
     .datatable-pager {
       flex: 1 30% !important;
       justify-content: flex-end;
+    }
+  }
+
+  .datatable-header {
+    border-bottom: 1px solid var(--bs-border-color);
+
+    .datatable-header-cell {
+      color: var(--bs-secondary-color) !important;
+      background-color: var(--bs-tertiary-bg) !important;
+      border-bottom: 1px solid var(--bs-border-color) !important;
+    }
+  }
+
+  .datatable-footer {
+    border-top: 1px solid var(--bs-border-color);
+  }
+
+  .datatable-footer .form-select,
+  .datatable-footer select {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color) !important;
+    color: var(--bs-body-color) !important;
+  }
+
+  .datatable-body-cell,
+  .datatable-body-row {
+    color: var(--bs-body-color) !important;
+    background-color: transparent !important;
+  }
+}
+
+[data-bs-theme='dark'] {
+  .ngx-datatable.material {
+    .datatable-header,
+    .datatable-header-inner,
+    .datatable-header .datatable-row-left,
+    .datatable-header .datatable-row-center,
+    .datatable-header .datatable-row-right {
+      background-color: var(--bs-tertiary-bg) !important;
+    }
+
+    .datatable-header .datatable-header-cell,
+    .datatable-header .datatable-header-cell .datatable-header-cell-template-wrap {
+      background-color: var(--bs-tertiary-bg) !important;
+      color: var(--bs-secondary-color) !important;
+      border-bottom: 1px solid var(--bs-border-color) !important;
     }
   }
 }
