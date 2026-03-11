@@ -6,10 +6,12 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { PublicCatalogService } from '@core/services/api/public-catalog.service'
 import { AuthenticationService } from '@core/services/api/auth.service'
 import {
+  CartBranchGroup,
   PublicProduct,
   PublicProductFilters,
   PublicProductQuery,
 } from '@core/interfaces/api/public-product.interface'
+import { CartService } from '@core/services/ui/cart.service'
 import { DefaultZgamesComponent } from '../default-zgames/default-zgames.component'
 import Swal from 'sweetalert2'
 
@@ -26,6 +28,7 @@ export class PublicCatalogComponent implements OnInit {
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
   private readonly authService = inject(AuthenticationService)
+  private readonly cartService = inject(CartService)
 
   companyName = signal<string>('')
   isValidCompany = signal<boolean>(false)
@@ -53,6 +56,8 @@ export class PublicCatalogComponent implements OnInit {
   showProductModal = false
   selectedProduct: PublicProduct | null = null
   selectedProductImageUrl = ''
+  selectedProductQuantity = 1
+  isCartOpen = false
 
   searchName = ''
   searchDescription = ''
@@ -67,6 +72,22 @@ export class PublicCatalogComponent implements OnInit {
   isFiltersDrawerOpen = false
   private pendingProductIdFromUrl: string | null = null
   private hasProcessedInitialProductFromUrl = false
+
+  get cartCount(): number {
+    return this.cartService.totalItems()
+  }
+
+  get cartTotal(): number {
+    return this.cartService.totalAmount()
+  }
+
+  get cartGroups(): CartBranchGroup[] {
+    return this.cartService.groupedByBranch()
+  }
+
+  get hasCartItems(): boolean {
+    return !this.cartService.isEmpty()
+  }
 
   get filterToggleIcon(): string {
     return this.isFiltersDrawerOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'
@@ -138,6 +159,11 @@ export class PublicCatalogComponent implements OnInit {
 
   @HostListener('document:keydown.escape')
   onEscapePressed(): void {
+    if (this.isCartOpen) {
+      this.closeCart()
+      return
+    }
+
     if (this.showImageModal) {
       this.closeImageModal()
       return
@@ -376,6 +402,7 @@ export class PublicCatalogComponent implements OnInit {
   }
 
   openProductModal(product: PublicProduct): void {
+    this.selectedProductQuantity = 1
     this.applySelectedProduct(product)
     this.updateProductQueryParam(product.id)
 
@@ -393,8 +420,139 @@ export class PublicCatalogComponent implements OnInit {
     this.showProductModal = false
     this.selectedProduct = null
     this.selectedProductImageUrl = ''
-    document.body.style.overflow = 'auto'
+    this.selectedProductQuantity = 1
+    this.updateBodyScrollState()
     this.updateProductQueryParam(null)
+  }
+
+  toggleCart(): void {
+    this.isCartOpen = !this.isCartOpen
+    this.updateBodyScrollState()
+  }
+
+  closeCart(): void {
+    this.isCartOpen = false
+    this.updateBodyScrollState()
+  }
+
+  addToCart(product: PublicProduct, quantity = 1, event?: Event): void {
+    event?.stopPropagation()
+
+    const safeQuantity =
+      Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1
+    this.cartService.addProduct(
+      product,
+      this.getImageUrl(product),
+      safeQuantity
+    )
+
+    this.showToast(
+      'success',
+      'Producto agregado',
+      `${product.name} se añadió al carrito.`
+    )
+  }
+
+  getProductQuantityInCart(product: PublicProduct): number {
+    const branchId = product.branch?.id || 'sin-sucursal'
+    const item = this.cartService
+      .items()
+      .find(
+        (current) =>
+          current.productId === product.id && current.branchId === branchId
+      )
+
+    return item?.quantity ?? 0
+  }
+
+  increaseCartItem(productId: string, branchId: string): void {
+    this.cartService.increaseQuantity(productId, branchId)
+  }
+
+  decreaseCartItem(productId: string, branchId: string): void {
+    this.cartService.decreaseQuantity(productId, branchId)
+  }
+
+  setCartItemQuantity(
+    productId: string,
+    branchId: string,
+    value: string
+  ): void {
+    const parsed = Number.parseInt(value, 10)
+    if (!Number.isFinite(parsed)) {
+      return
+    }
+
+    this.cartService.setQuantity(productId, branchId, parsed)
+  }
+
+  removeCartItem(productId: string, branchId: string): void {
+    this.cartService.removeItem(productId, branchId)
+  }
+
+  clearCart(): void {
+    this.cartService.clearCart()
+  }
+
+  async acquireCartByWhatsApp(): Promise<void> {
+    const groups = this.cartGroups
+    if (!groups.length) {
+      return
+    }
+
+    const links: string[] = []
+    const missingPhones: string[] = []
+
+    for (const group of groups) {
+      const branchPhone = this.resolveBranchPhoneForGroup(group)
+
+      if (!branchPhone) {
+        missingPhones.push(group.branchName)
+        continue
+      }
+
+      const message = this.buildBranchMessage(group)
+      const link = this.catalogService.generateCartWhatsAppLink(
+        branchPhone,
+        message
+      )
+
+      if (link) {
+        links.push(link)
+      } else {
+        missingPhones.push(group.branchName)
+      }
+    }
+
+    if (!links.length) {
+      this.showToast(
+        'warning',
+        'No se pudo generar WhatsApp',
+        'No hay teléfonos disponibles en las sucursales del carrito.'
+      )
+      return
+    }
+
+    links.forEach((link, index) => {
+      setTimeout(() => {
+        window.open(link, '_blank', 'noopener,noreferrer')
+      }, index * 180)
+    })
+
+    if (missingPhones.length) {
+      this.showToast(
+        'info',
+        'Algunas sucursales no tienen teléfono',
+        `No se pudo enviar para: ${missingPhones.join(', ')}`
+      )
+      return
+    }
+
+    this.showToast(
+      'success',
+      'WhatsApp abierto',
+      'Se abrió el resumen de tu carrito.'
+    )
   }
 
   async shareProduct(
@@ -472,7 +630,7 @@ export class PublicCatalogComponent implements OnInit {
     this.selectedProductName = product.name
     this.selectedProductCode = product.brand
     this.showImageModal = true
-    document.body.style.overflow = 'hidden'
+    this.updateBodyScrollState()
   }
 
   getProductGallery(product: PublicProduct | null): string[] {
@@ -494,7 +652,7 @@ export class PublicCatalogComponent implements OnInit {
     this.selectedImageUrl = ''
     this.selectedProductName = ''
     this.selectedProductCode = ''
-    document.body.style.overflow = 'auto'
+    this.updateBodyScrollState()
   }
 
   toggleFilters(): void {
@@ -543,7 +701,7 @@ export class PublicCatalogComponent implements OnInit {
     this.selectedProduct = product
     this.selectedProductImageUrl = this.getImageUrl(product)
     this.showProductModal = true
-    document.body.style.overflow = 'hidden'
+    this.updateBodyScrollState()
   }
 
   private openProductFromUrl(productId: string): void {
@@ -589,5 +747,68 @@ export class PublicCatalogComponent implements OnInit {
     textarea.select()
     document.execCommand('copy')
     document.body.removeChild(textarea)
+  }
+
+  private updateBodyScrollState(): void {
+    const shouldLockBody =
+      this.isCartOpen || this.showProductModal || this.showImageModal
+    document.body.style.overflow = shouldLockBody ? 'hidden' : 'auto'
+  }
+
+  private buildBranchMessage(group: CartBranchGroup): string {
+    const lines = group.items.map((item, index) => {
+      const subtotal = item.unitPrice * item.quantity
+      return `${index + 1}. ${item.name}\nCantidad: ${item.quantity}\nPrecio: $${item.unitPrice.toFixed(2)}\nSubtotal: $${subtotal.toFixed(2)}`
+    })
+
+    return [
+      `Hola, quisiera consultar por estos productos de la sucursal *${group.branchName}*`,
+      '',
+      ...lines,
+      '',
+      `Total: *$${group.totalAmount.toFixed(2)}*`,
+    ].join('\n')
+  }
+
+  private resolveBranchPhoneForGroup(group: CartBranchGroup): string {
+    const phoneFromFilters = this.filters().branches.find(
+      (branch) => branch.id === group.branchId
+    )?.phone
+
+    const phoneFromProducts = this.products().find((product) => {
+      const branchId = product.branch?.id || 'sin-sucursal'
+      return branchId === group.branchId
+    })?.branch?.phone
+
+    const fallbackFromCart = group.branchPhone
+
+    const candidates = [phoneFromFilters, phoneFromProducts, fallbackFromCart]
+    for (const candidate of candidates) {
+      if (!candidate) continue
+
+      const formatted = this.catalogService.formatPhoneForWhatsApp(candidate)
+      if (formatted) {
+        return formatted
+      }
+    }
+
+    return ''
+  }
+
+  private showToast(
+    icon: 'success' | 'error' | 'warning' | 'info' | 'question',
+    title: string,
+    text: string
+  ): void {
+    void Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon,
+      title,
+      text,
+      timer: 2200,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    })
   }
 }

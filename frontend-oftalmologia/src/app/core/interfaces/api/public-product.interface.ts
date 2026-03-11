@@ -20,6 +20,7 @@ export interface PublicProduct {
     id: string
     name: string
     address: string
+    phone?: string
   } | null
   createdByUser: {
     firstName: string
@@ -44,7 +45,7 @@ export interface PublicProductFilters {
   categories: { id: string; name: string; ids?: string[] }[]
   subcategories: { id: string; name: string; categoryId: string }[]
   brands: string[]
-  branches: { id: string; name: string }[]
+  branches: { id: string; name: string; phone?: string }[]
 }
 
 export interface PublicProductQuery {
@@ -69,4 +70,25 @@ export interface PublicProductResponse {
   page: number
   limit: number
   totalPages: number
+}
+
+export interface CartItem {
+  productId: string
+  name: string
+  brand: string
+  imageUrl: string
+  branchId: string
+  branchName: string
+  branchPhone: string
+  unitPrice: number
+  quantity: number
+}
+
+export interface CartBranchGroup {
+  branchId: string
+  branchName: string
+  branchPhone: string
+  items: CartItem[]
+  totalAmount: number
+  totalItems: number
 }

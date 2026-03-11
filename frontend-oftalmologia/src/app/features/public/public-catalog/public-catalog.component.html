@@ -20,6 +20,22 @@
           <div>
             <button
               type="button"
+              class="btn btn-cart-header me-2"
+              [class.has-items]="hasCartItems"
+              (click)="toggleCart()"
+              aria-label="Abrir carrito"
+            >
+              <iconify-icon
+                [icon]="hasCartItems ? 'mdi:cart' : 'mdi:cart-outline'"
+                width="24"
+                height="24"
+              ></iconify-icon>
+              <span class="cart-count-badge" *ngIf="cartCount > 0">{{
+                cartCount
+              }}</span>
+            </button>
+            <button
+              type="button"
               (click)="goToLogin()"
               class="btn btn-light btn-login"
               aria-label="Iniciar Sesión"
@@ -511,51 +527,73 @@
                         </div>
 
                         <div class="product-footer">
-                          <div class="product-price">
-                            @if (
-                              product.hasActiveDiscount && product.discount
-                            ) {
-                              <div class="d-flex flex-column align-items-start">
-                                <span class="badge text-bg-danger mb-1">
-                                  -{{ product.discount.value
-                                  }}{{
-                                    product.discount.type === 'PERCENTAGE'
-                                      ? '%'
-                                      : ''
-                                  }}
-                                </span>
-                                <span
-                                  class="text-muted text-decoration-line-through small"
+                          <div class="product-summary-row">
+                            <div class="product-price">
+                              @if (
+                                product.hasActiveDiscount && product.discount
+                              ) {
+                                <div
+                                  class="d-flex flex-column align-items-start"
                                 >
-                                  {{
-                                    product.unitPrice
-                                      | currency: 'USD' : 'symbol' : '1.2-2'
-                                  }}
+                                  <span class="badge text-bg-danger mb-1">
+                                    -{{ product.discount.value
+                                    }}{{
+                                      product.discount.type === 'PERCENTAGE'
+                                        ? '%'
+                                        : ''
+                                    }}
+                                  </span>
+                                  <span
+                                    class="text-muted text-decoration-line-through small"
+                                  >
+                                    {{
+                                      product.unitPrice
+                                        | currency: 'USD' : 'symbol' : '1.2-2'
+                                    }}
+                                  </span>
+                                  <span class="text-danger fw-bold">
+                                    {{
+                                      product.discount.finalPrice
+                                        | currency: 'USD' : 'symbol' : '1.2-2'
+                                    }}
+                                  </span>
+                                </div>
+                              } @else {
+                                {{
+                                  product.unitPrice
+                                    | currency: 'USD' : 'symbol' : '1.2-2'
+                                }}
+                              }
+                            </div>
+
+                            <div class="product-footer-meta">
+                              @if (getProductQuantityInCart(product) > 0) {
+                                <span class="in-cart-count">
+                                  En carrito:
+                                  {{ getProductQuantityInCart(product) }}
                                 </span>
-                                <span class="text-danger fw-bold">
-                                  {{
-                                    product.discount.finalPrice
-                                      | currency: 'USD' : 'symbol' : '1.2-2'
-                                  }}
-                                </span>
-                              </div>
-                            } @else {
-                              {{
-                                product.unitPrice
-                                  | currency: 'USD' : 'symbol' : '1.2-2'
-                              }}
-                            }
+                              }
+
+                              <span class="product-stock">
+                                <iconify-icon
+                                  icon="mdi:package-variant"
+                                  width="16"
+                                  height="16"
+                                ></iconify-icon>
+                                {{ product.quantity }}
+                              </span>
+                            </div>
                           </div>
 
-                          <div class="product-footer-actions">
-                            <span class="product-stock">
-                              <iconify-icon
-                                icon="mdi:package-variant"
-                                width="16"
-                                height="16"
-                              ></iconify-icon>
-                              {{ product.quantity }}
-                            </span>
+                          <div class="product-actions-row">
+                            <button
+                              type="button"
+                              class="btn btn-add-cart"
+                              (click)="addToCart(product, 1, $event)"
+                            >
+                              <i class="bi bi-cart-plus-fill me-1"></i>
+                              Agregar al carrito
+                            </button>
 
                             <button
                               type="button"
@@ -563,7 +601,7 @@
                               (click)="openProductModal(product)"
                             >
                               <i class="bi bi-eye-fill me-1"></i>
-                              Vista rapida
+                              Vista rápida
                             </button>
                           </div>
                         </div>
@@ -834,6 +872,30 @@
                 </button>
 
                 @if (selectedProduct) {
+                  <div class="modal-cart-tools">
+                    <div class="quantity-control">
+                      <label for="modal-qty" class="qty-label">Cantidad</label>
+                      <input
+                        id="modal-qty"
+                        type="number"
+                        min="1"
+                        class="form-control"
+                        [(ngModel)]="selectedProductQuantity"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn btn-add-cart-modal"
+                      (click)="
+                        addToCart(selectedProduct, selectedProductQuantity)
+                      "
+                    >
+                      <i class="bi bi-cart-plus-fill"></i>
+                      Agregar al carrito
+                    </button>
+                  </div>
+
                   <button
                     type="button"
                     class="btn btn-secondary-custom"
@@ -925,6 +987,139 @@
           </div>
         </div>
       </div>
+
+      @if (isCartOpen) {
+        <div class="cart-overlay" (click)="closeCart()"></div>
+      }
+
+      <aside class="cart-drawer" [class.open]="isCartOpen">
+        <div class="cart-drawer-header">
+          <div>
+            <h5 class="mb-0">
+              <i class="bi bi-cart-check me-2"></i>
+              Carrito
+            </h5>
+            @if (hasCartItems) {
+              <small class="text-muted"
+                >{{ cartCount }} producto{{ cartCount !== 1 ? 's' : '' }}</small
+              >
+            }
+          </div>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Cerrar carrito"
+            (click)="closeCart()"
+          ></button>
+        </div>
+
+        <div class="cart-drawer-body">
+          @if (!hasCartItems) {
+            <div class="cart-empty-state">
+              <i class="bi bi-cart-x"></i>
+              <p class="mb-0">Tu carrito está vacío</p>
+            </div>
+          } @else {
+            @for (group of cartGroups; track group.branchId) {
+              <div class="cart-branch-group">
+                <div class="group-title">
+                  <h6 class="mb-1">{{ group.branchName }}</h6>
+                  <small class="text-muted"
+                    >{{ group.totalItems }} item{{
+                      group.totalItems !== 1 ? 's' : ''
+                    }}</small
+                  >
+                </div>
+
+                @for (item of group.items; track item.productId) {
+                  <div class="cart-item-row">
+                    <img [src]="item.imageUrl" [alt]="item.name" />
+                    <div class="item-content">
+                      <p class="item-name mb-1">{{ item.name }}</p>
+                      <small class="text-muted"
+                        >${{ item.unitPrice | number: '1.2-2' }}</small
+                      >
+                      <div class="item-actions mt-2">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          (click)="
+                            decreaseCartItem(item.productId, item.branchId)
+                          "
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          [value]="item.quantity"
+                          (change)="
+                            setCartItemQuantity(
+                              item.productId,
+                              item.branchId,
+                              $any($event.target).value
+                            )
+                          "
+                        />
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          (click)="
+                            increaseCartItem(item.productId, item.branchId)
+                          "
+                        >
+                          +
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-link text-danger"
+                          (click)="
+                            removeCartItem(item.productId, item.branchId)
+                          "
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                    </div>
+                    <div class="item-subtotal">
+                      ${{ item.unitPrice * item.quantity | number: '1.2-2' }}
+                    </div>
+                  </div>
+                }
+
+                <div class="group-total">
+                  Subtotal sucursal:
+                  <strong>${{ group.totalAmount | number: '1.2-2' }}</strong>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="cart-drawer-footer" *ngIf="hasCartItems">
+          <div class="total-row">
+            <span>Total carrito</span>
+            <strong>${{ cartTotal | number: '1.2-2' }}</strong>
+          </div>
+          <div class="cart-footer-actions">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="clearCart()"
+            >
+              Empezar de nuevo
+            </button>
+            <button
+              type="button"
+              class="btn btn-whatsapp-checkout"
+              (click)="acquireCartByWhatsApp()"
+            >
+              <i class="bi bi-whatsapp me-1"></i>
+              Consultar por WhatsApp
+            </button>
+          </div>
+        </div>
+      </aside>
     }
   }
 </div>

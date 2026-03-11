@@ -783,6 +783,7 @@ export class ProductsService {
                 id: product.branch.id,
                 name: product.branch.name,
                 address: product.branch.address,
+                phone: product.branch.phone,
               }
             : null,
           createdByUser: product.createdByUser
@@ -897,6 +898,7 @@ export class ProductsService {
               id: product.branch.id,
               name: product.branch.name,
               address: product.branch.address,
+              phone: product.branch.phone,
             }
           : null,
         createdByUser: product.createdByUser
@@ -1001,7 +1003,7 @@ export class ProductsService {
     }
 
     const branches = await branchQueryBuilder
-      .select(['branch.id', 'branch.name'])
+      .select(['branch.id', 'branch.name', 'branch.phone'])
       .orderBy('branch.name', 'ASC')
       .getMany();
 
