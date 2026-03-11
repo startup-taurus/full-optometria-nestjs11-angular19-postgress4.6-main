@@ -80,12 +80,8 @@ export class ResetPasswordComponent implements OnInit {
             message: response.message || 'Contraseña restablecida exitosamente'
           });
         },
-        error: (error) => {
+        error: () => {
           this.isLoading = false;
-          this.notificationService.showNotification({
-            type: 'error',
-            message: error.error?.message || 'Error al restablecer la contraseña'
-          });
         }
       });
     } else {

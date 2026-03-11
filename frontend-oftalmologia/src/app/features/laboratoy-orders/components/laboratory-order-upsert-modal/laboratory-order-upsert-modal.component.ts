@@ -377,17 +377,9 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
         this.activeModal.close({ success: true, data: response })
       },
-      error: (error: any) => {
+      error: () => {
         this.isSaving = false
-
-        this._notificationService.showNotification({
-          type: 'error',
-          message: error?.error?.message || {
-            es: 'Error al crear la orden',
-            en: 'Error creating order',
-          },
-          title: 'LABORATORY_ORDERS_MODULE.TITLE',
-        })
+        // El interceptor global ya muestra el mensaje de error localizado
       },
     })
   }
@@ -410,17 +402,9 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
         this.activeModal.close({ success: true, data: response })
       },
-      error: (error: any) => {
+      error: () => {
         this.isSaving = false
-
-        this._notificationService.showNotification({
-          type: 'error',
-          message: error?.error?.message || {
-            es: 'Error al actualizar la orden',
-            en: 'Error updating order',
-          },
-          title: 'LABORATORY_ORDERS_MODULE.TITLE',
-        })
+        // El interceptor global ya muestra el mensaje de error localizado
       },
     })
   }

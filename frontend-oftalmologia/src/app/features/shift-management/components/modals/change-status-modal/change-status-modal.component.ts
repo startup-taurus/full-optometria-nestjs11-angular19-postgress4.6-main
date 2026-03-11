@@ -9,6 +9,7 @@ import { ShiftsService } from '../../../../../core/services/api/shifts.service'
 import { ShiftStatusService } from '../../../../../core/services/api/shift-status.service'
 import { Shift, ShiftStatus } from '../../../../../core/interfaces/api/shift.interface'
 import { environment } from '../../../../../../environments/environment'
+import { formatAppointmentDateTime } from '@core/helpers/date-time/appointment-date-time.helper'
 
 @Component({
   selector: 'app-change-status-modal',
@@ -72,8 +73,7 @@ export class ChangeStatusModalComponent implements OnInit, OnDestroy {
 
   getFormattedAppointmentDate(): string {
     if (!this.selectedShift) return ''
-    const date = new Date(this.selectedShift.appointmentDate)
-    return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    return formatAppointmentDateTime(this.selectedShift.appointmentDate)
   }
 
   getCurrentStatusName(): string {

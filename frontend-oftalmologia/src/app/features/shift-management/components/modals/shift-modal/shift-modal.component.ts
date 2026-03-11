@@ -40,6 +40,10 @@ import {
   buildDefaultBranchSchedule,
   parseBranchSchedule,
 } from '../../../../../core/helpers/branch-schedule.helper'
+import {
+  localDateTimeToIso,
+  toDateTimeLocalValue,
+} from '../../../../../core/helpers/date-time/appointment-date-time.helper'
 
 interface PatientWithFullName extends Patient {
   fullName: string
@@ -251,8 +255,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
       this.patients = [this.selectedPatient, ...this.patients]
     }
 
-    const appointmentDate = new Date(this.selectedShift.appointmentDate)
-    const formattedDate = this.formatDateForInput(appointmentDate)
+    const formattedDate = toDateTimeLocalValue(this.selectedShift.appointmentDate)
 
     this.shiftForm.patchValue({
       patientId: this.selectedShift.patientId,
@@ -262,16 +265,6 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
     })
 
     this.shiftForm.get('patientId')?.disable()
-  }
-
-  private formatDateForInput(date: Date): string {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`
   }
 
   onPatientSelected(patientId: string): void {
@@ -305,7 +298,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
 
     const createDto: CreateShiftDto = {
       patientId: formValue.patientId,
-      appointmentDate: formValue.appointmentDate,
+      appointmentDate: localDateTimeToIso(formValue.appointmentDate),
       description: normalizedDescription,
     }
 
@@ -327,7 +320,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
     const normalizedDescription = formValue.description?.trim() || ''
 
     const updateDto: UpdateShiftDto = {
-      appointmentDate: formValue.appointmentDate,
+      appointmentDate: localDateTimeToIso(formValue.appointmentDate),
       description: normalizedDescription,
       statusId: formValue.statusId,
     }
