@@ -23,6 +23,10 @@ import { ShiftsService } from '@core/services/api/shifts.service'
 import { Shift, QueryShiftDto } from '@core/interfaces/api/shift.interface'
 import { BranchFilterState } from '@core/services/api/branch.service'
 import { ToastrNotificationService } from '@core/services/ui/notification.service'
+import {
+  localDateTimeToIso,
+  toDateTimeLocalValue,
+} from '@core/helpers/date-time/appointment-date-time.helper'
 
 interface CalendarShift extends Shift {
   displayDate: Date
@@ -259,7 +263,7 @@ export class CalendaryComponent implements OnInit, OnDestroy {
       const shiftId = this.selectedShift()!.id
 
       const updateData = {
-        appointmentDate: new Date(formValue.appointmentDate).toISOString(),
+        appointmentDate: localDateTimeToIso(formValue.appointmentDate),
         description: formValue.description,
       }
 
@@ -375,12 +379,7 @@ export class CalendaryComponent implements OnInit, OnDestroy {
   }
 
   formatDateTimeForInput(date: Date): string {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${year}-${month}-${day}T${hours}:${minutes}`
+    return toDateTimeLocalValue(date)
   }
 
   formatDate(date: Date | string): string {
@@ -398,6 +397,7 @@ export class CalendaryComponent implements OnInit, OnDestroy {
     return d.toLocaleTimeString('es-ES', {
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     })
   }
 

@@ -23,6 +23,8 @@ import { QueryProductDto } from './dtos/query-product.dto';
 import { PublicQueryProductDto } from './dtos/public-query-product.dto';
 import { TransferProductStockDto } from './dtos/transfer-product-stock.dto';
 import { QueryProductTransferHistoryDto } from './dtos/query-product-transfer-history.dto';
+import { ProductDiscount, DiscountType } from './entities/product-discount.entity';
+import { CreateApplyDiscountDto } from './dtos/create-apply-discount.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 import {
@@ -55,9 +57,113 @@ export class ProductsService {
     private laboratoryOrderRepository: Repository<LaboratoryOrder>,
     @InjectRepository(Company)
     private companyRepository: Repository<Company>,
-    @InjectRepository(InventoryTransfer)
-    private inventoryTransferRepository: Repository<InventoryTransfer>
+     @InjectRepository(InventoryTransfer)
+     private inventoryTransferRepository: Repository<InventoryTransfer>,
+     @InjectRepository(ProductDiscount)
+     private productDiscountRepository: Repository<ProductDiscount>,
+     @InjectRepository(Branch)
+     private branchRepository: Repository<Branch>
   ) {}
+
+  private normalizeFilterKey(value?: string): string {
+    return (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  private groupCategoriesForPublicFilters(
+    categories: Array<{ id: string; name: string }>
+  ) {
+    const groupedMap = new Map<string, { id: string; name: string; ids: string[] }>();
+    const categoryIdMap = new Map<string, string>();
+
+    for (const category of categories) {
+      const key = this.normalizeFilterKey(category.name);
+      if (!key) continue;
+
+      const existing = groupedMap.get(key);
+      if (!existing) {
+        groupedMap.set(key, {
+          id: category.id,
+          name: category.name.trim(),
+          ids: [category.id],
+        });
+        categoryIdMap.set(category.id, category.id);
+        continue;
+      }
+
+      if (!existing.ids.includes(category.id)) {
+        existing.ids.push(category.id);
+      }
+
+      categoryIdMap.set(category.id, existing.id);
+    }
+
+    const groupedCategories = Array.from(groupedMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+    );
+
+    return { groupedCategories, categoryIdMap };
+  }
+
+  private groupSubcategoriesForPublicFilters(
+    subcategories: Array<{ id: string; name: string; categoryId: string }>,
+    categoryIdMap: Map<string, string>
+  ) {
+    const groupedMap = new Map<
+      string,
+      { id: string; name: string; categoryId: string; ids: string[] }
+    >();
+
+    for (const subcategory of subcategories) {
+      const representativeCategoryId = categoryIdMap.get(subcategory.categoryId);
+      if (!representativeCategoryId) continue;
+
+      const normalizedName = this.normalizeFilterKey(subcategory.name);
+      if (!normalizedName) continue;
+
+      const key = `${representativeCategoryId}::${normalizedName}`;
+      const existing = groupedMap.get(key);
+
+      if (!existing) {
+        groupedMap.set(key, {
+          id: subcategory.id,
+          name: subcategory.name.trim(),
+          categoryId: representativeCategoryId,
+          ids: [subcategory.id],
+        });
+        continue;
+      }
+
+      if (!existing.ids.includes(subcategory.id)) {
+        existing.ids.push(subcategory.id);
+      }
+    }
+
+    return Array.from(groupedMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+    );
+  }
+
+  private groupBrandsForPublicFilters(brands: string[]) {
+    const groupedMap = new Map<string, string>();
+
+    for (const brand of brands) {
+      const normalizedBrand = this.normalizeFilterKey(brand);
+      if (!normalizedBrand) continue;
+
+      if (!groupedMap.has(normalizedBrand)) {
+        groupedMap.set(normalizedBrand, brand.trim());
+      }
+    }
+
+    return Array.from(groupedMap.values()).sort((a, b) =>
+      a.localeCompare(b, 'es', { sensitivity: 'base' })
+    );
+  }
 
   async create(
     createProductDto: CreateProductDto,
@@ -186,6 +292,15 @@ export class ProductsService {
 
     const [products, totalCount] = await queryBuilder.getManyAndCount();
 
+    // Batch load discounts for all products in a single query
+    const discountMap = new Map<string, ProductDiscount>();
+    if (products.length > 0) {
+      const discounts = await this.productDiscountRepository.find({
+        where: products.map((p) => ({ productId: p.id, branchId: p.branchId })),
+      });
+      discounts.forEach((d) => discountMap.set(`${d.productId}:${d.branchId}`, d));
+    }
+
     const productsWithImages = await Promise.all(
       products.map(async (product) => {
         const images = await this.fileRepository.find({
@@ -201,6 +316,10 @@ export class ProductsService {
           },
         });
 
+        const discount = discountMap.get(`${product.id}:${product.branchId}`) || null;
+        const { finalPrice } = this.calculateFinalPrice(Number(product.unitPrice), discount);
+        const discountActive = !!discount && this.isDiscountActive(discount);
+
         return {
           ...product,
           images: images.map((img) => ({
@@ -208,6 +327,20 @@ export class ProductsService {
             path: img.path,
             isCover: img.isCover,
           })),
+          hasActiveDiscount: discountActive,
+          ...(discountActive
+            ? {
+                discount: {
+                  type: discount!.discountType,
+                  value: Number(discount!.discountValue),
+                  finalPrice: Number(finalPrice.toFixed(2)),
+                  originalPrice: Number(product.unitPrice),
+                  startDate: discount!.startDate,
+                  endDate: discount!.endDate,
+                  isActive: discount!.isActive,
+                },
+              }
+            : {}),
         };
       })
     );
@@ -269,6 +402,10 @@ export class ProductsService {
       },
     });
 
+    const discount = await this.findActiveDiscount(product.id, product.branchId);
+    const { finalPrice } = this.calculateFinalPrice(Number(product.unitPrice), discount);
+    const discountActive = !!discount && this.isDiscountActive(discount);
+
     return {
       statusCode: 200,
       success: true,
@@ -283,6 +420,20 @@ export class ProductsService {
           path: img.path,
           isCover: img.isCover,
         })),
+        hasActiveDiscount: discountActive,
+        ...(discountActive
+          ? {
+              discount: {
+                type: discount!.discountType,
+                value: Number(discount!.discountValue),
+                finalPrice: Number(finalPrice.toFixed(2)),
+                originalPrice: Number(product.unitPrice),
+                startDate: discount!.startDate,
+                endDate: discount!.endDate,
+                isActive: discount!.isActive,
+              },
+            }
+          : {}),
       },
     };
   }
@@ -522,15 +673,34 @@ export class ProductsService {
       );
     }
 
-    if (queryDto.categoryId) {
-      queryBuilder.andWhere('product.categoryId = :categoryId', {
-        categoryId: queryDto.categoryId,
+    if (queryDto.brand) {
+      queryBuilder.andWhere('LOWER(TRIM(product.brand)) = :brand', {
+        brand: queryDto.brand.trim().toLowerCase(),
+      });
+    }
+
+    const selectedCategoryIds = Array.from(
+      new Set([
+        ...(queryDto.categoryIds || []),
+        ...(queryDto.categoryId ? [queryDto.categoryId] : []),
+      ])
+    );
+
+    if (selectedCategoryIds.length > 0) {
+      queryBuilder.andWhere('product.categoryId IN (:...categoryIds)', {
+        categoryIds: selectedCategoryIds,
       });
     }
 
     if (queryDto.subcategoryId) {
       queryBuilder.andWhere('product.subcategoryId = :subcategoryId', {
         subcategoryId: queryDto.subcategoryId,
+      });
+    }
+
+    if (queryDto.branchId) {
+      queryBuilder.andWhere('product.branchId = :branchId', {
+        branchId: queryDto.branchId,
       });
     }
 
@@ -543,6 +713,12 @@ export class ProductsService {
     if (queryDto.maxPrice !== undefined) {
       queryBuilder.andWhere('product.unitPrice <= :maxPrice', {
         maxPrice: queryDto.maxPrice,
+      });
+    }
+
+    if (queryDto.inStock === true) {
+      queryBuilder.andWhere('product.quantity > :minQuantity', {
+        minQuantity: 0,
       });
     }
 
@@ -564,7 +740,6 @@ export class ProductsService {
     }
 
     queryBuilder.skip(skip).take(limit);
-
     const [products, totalCount] = await queryBuilder.getManyAndCount();
 
     const productsWithImages = await Promise.all(
@@ -580,6 +755,12 @@ export class ProductsService {
             createdAt: 'ASC',
           },
         });
+
+        const discount = await this.findActiveDiscount(product.id, product.branchId);
+        const { finalPrice } = this.calculateFinalPrice(
+          Number(product.unitPrice),
+          discount
+        );
 
         return {
           id: product.id,
@@ -616,6 +797,17 @@ export class ProductsService {
             path: img.path,
             isCover: img.isCover,
           })),
+          hasActiveDiscount: !!discount && this.isDiscountActive(discount),
+          ...(discount && this.isDiscountActive(discount)
+            ? {
+                discount: {
+                  type: discount.discountType,
+                  value: Number(discount.discountValue),
+                  finalPrice: Number(finalPrice.toFixed(2)),
+                  originalPrice: Number(product.unitPrice),
+                },
+              }
+            : {}),
         };
       })
     );
@@ -671,6 +863,12 @@ export class ProductsService {
       },
     });
 
+    const discount = await this.findActiveDiscount(product.id, product.branchId);
+    const { finalPrice } = this.calculateFinalPrice(
+      Number(product.unitPrice),
+      discount
+    );
+
     return {
       statusCode: 200,
       success: true,
@@ -713,6 +911,17 @@ export class ProductsService {
           path: img.path,
           isCover: img.isCover,
         })),
+        hasActiveDiscount: !!discount && this.isDiscountActive(discount),
+        ...(discount && this.isDiscountActive(discount)
+          ? {
+              discount: {
+                type: discount.discountType,
+                value: Number(discount.discountValue),
+                finalPrice: Number(finalPrice.toFixed(2)),
+                originalPrice: Number(product.unitPrice),
+              },
+            }
+          : {}),
       },
     };
   }
@@ -765,6 +974,44 @@ export class ProductsService {
       .orderBy('subcategory.name', 'ASC')
       .getMany();
 
+    const brandQueryBuilder = this.productRepository
+      .createQueryBuilder('product')
+      .select('product.brand', 'brand')
+      .where('product.isActive = :isActive', { isActive: true })
+      .andWhere('product.brand IS NOT NULL')
+      .andWhere("TRIM(product.brand) <> ''");
+
+    if (companyId) {
+      brandQueryBuilder.andWhere('product.companyId = :companyId', {
+        companyId,
+      });
+    }
+
+    const brandRows = await brandQueryBuilder.getRawMany<{ brand: string }>();
+    const brands = this.groupBrandsForPublicFilters(
+      brandRows.map((row) => row.brand)
+    );
+
+    const branchQueryBuilder = this.branchRepository
+      .createQueryBuilder('branch')
+      .where('branch.isActive = :isActive', { isActive: true });
+
+    if (companyId) {
+      branchQueryBuilder.andWhere('branch.companyId = :companyId', { companyId });
+    }
+
+    const branches = await branchQueryBuilder
+      .select(['branch.id', 'branch.name'])
+      .orderBy('branch.name', 'ASC')
+      .getMany();
+
+    const { groupedCategories, categoryIdMap } =
+      this.groupCategoriesForPublicFilters(categories);
+    const groupedSubcategories = this.groupSubcategoriesForPublicFilters(
+      subcategories,
+      categoryIdMap
+    );
+
     return {
       statusCode: 200,
       success: true,
@@ -773,8 +1020,10 @@ export class ProductsService {
         en: 'Filters retrieved successfully',
       },
       data: {
-        categories,
-        subcategories,
+        categories: groupedCategories,
+        subcategories: groupedSubcategories,
+        brands,
+        branches,
       },
     };
   }
@@ -1575,4 +1824,165 @@ export class ProductsService {
       });
     }
   }
+
+  private isDiscountActive(discount: ProductDiscount): boolean {
+    if (!discount.isActive) return false;
+
+    const now = new Date();
+    if (discount.startDate && new Date(discount.startDate) > now) return false;
+    if (discount.endDate) {
+      const endOfDay = new Date(discount.endDate);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+      if (endOfDay < now) return false;
+    }
+
+    return true;
+  }
+
+  private calculateFinalPrice(
+    unitPrice: number,
+    discount: ProductDiscount | null
+  ): { finalPrice: number; hasDiscount: boolean } {
+    if (!discount || !this.isDiscountActive(discount)) {
+      return { finalPrice: unitPrice, hasDiscount: false };
+    }
+
+    let finalPrice = unitPrice;
+    if (discount.discountType === DiscountType.PERCENTAGE) {
+      finalPrice = unitPrice * (1 - Number(discount.discountValue) / 100);
+    } else if (discount.discountType === DiscountType.FIXED_AMOUNT) {
+      finalPrice = unitPrice - Number(discount.discountValue);
+    }
+
+    return {
+      finalPrice: Math.max(finalPrice, 0),
+      hasDiscount: true,
+    };
+  }
+
+  private async findActiveDiscount(
+    productId: string,
+    branchId: string
+  ): Promise<ProductDiscount | null> {
+    return this.productDiscountRepository.findOne({
+      where: {
+        productId,
+        branchId,
+      },
+    });
+  }
+
+  async applyDiscount(
+    productId: string,
+    branchId: string,
+    companyId: string | null,
+    dto: CreateApplyDiscountDto
+  ) {
+    const product = await this.productRepository.findOne({
+      where: { id: productId, branchId },
+    });
+
+    if (!product) {
+      throw new NotFoundException({
+        statusCode: 404,
+        success: false,
+        message: {
+          es: 'Producto no encontrado',
+          en: 'Product not found',
+        },
+      });
+    }
+
+    if (dto.startDate && dto.endDate && new Date(dto.endDate) <= new Date(dto.startDate)) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'La fecha fin debe ser mayor a la fecha inicio',
+          en: 'End date must be greater than start date',
+        },
+      });
+    }
+
+    let discount = await this.findActiveDiscount(productId, branchId);
+
+    if (discount) {
+      discount.discountType = dto.discountType;
+      discount.discountValue = dto.discountValue;
+      discount.isActive = dto.isActive ?? true;
+      discount.startDate = dto.startDate || null;
+      discount.endDate = dto.endDate || null;
+      discount.updatedAt = new Date();
+    } else {
+      discount = this.productDiscountRepository.create({
+        productId,
+        branchId,
+        companyId: companyId || product.companyId,
+        discountType: dto.discountType,
+        discountValue: dto.discountValue,
+        isActive: dto.isActive ?? true,
+        startDate: dto.startDate || null,
+        endDate: dto.endDate || null,
+      });
+    }
+
+    await this.productDiscountRepository.save(discount);
+
+    return {
+      statusCode: 201,
+      success: true,
+      message: {
+        es: 'Descuento aplicado exitosamente',
+        en: 'Discount applied successfully',
+      },
+      data: discount,
+    };
+  }
+
+  async removeDiscount(productId: string, branchId: string) {
+    const discount = await this.findActiveDiscount(productId, branchId);
+
+    if (!discount) {
+      throw new NotFoundException({
+        statusCode: 404,
+        success: false,
+        message: {
+          es: 'Descuento no encontrado',
+          en: 'Discount not found',
+        },
+      });
+    }
+
+    discount.isActive = false;
+    await this.productDiscountRepository.save(discount);
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: {
+        es: 'Descuento eliminado exitosamente',
+        en: 'Discount removed successfully',
+      },
+    };
+  }
+
+  async getActiveDiscounts(branchId: string) {
+    const discounts = await this.productDiscountRepository.find({
+      where: { branchId, isActive: true },
+      relations: ['product'],
+      order: { updatedAt: 'DESC' },
+    });
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: {
+        es: 'Descuentos obtenidos exitosamente',
+        en: 'Discounts retrieved successfully',
+      },
+      data: discounts,
+    };
+  }
 }
+
+

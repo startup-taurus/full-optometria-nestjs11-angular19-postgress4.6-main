@@ -42,6 +42,16 @@ export interface Supplier {
   updatedAt?: Date | string
 }
 
+export interface ProductDiscount {
+  type: string
+  value: number
+  finalPrice: number
+  originalPrice: number
+  startDate?: string | Date | null
+  endDate?: string | Date | null
+  isActive?: boolean
+}
+
 export interface Product {
   id: string
   branchId: string
@@ -71,6 +81,8 @@ export interface Product {
     mobilePhone: string
   }
   images?: ProductImage[]
+  hasActiveDiscount?: boolean
+  discount?: ProductDiscount
 }
 
 export interface ProductImage {

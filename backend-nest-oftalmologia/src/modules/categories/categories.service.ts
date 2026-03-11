@@ -26,22 +26,39 @@ export class CategoriesService {
     private productRepository: Repository<Product>
   ) {}
 
+  private normalizeName(value?: string): string {
+    return (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  private sanitizeName(value?: string): string {
+    return (value || '').replace(/\s+/g, ' ').trim();
+  }
+
   async create(
     createCategoryDto: CreateCategoryDto,
     branchId: string,
     companyId: string | null
   ) {
-    const whereCondition: any = {
-      name: createCategoryDto.name,
-      branchId,
-    };
+    const normalizedName = this.normalizeName(createCategoryDto.name);
+    const sanitizedName = this.sanitizeName(createCategoryDto.name);
+    const whereCondition: any = { branchId };
     if (companyId) {
       whereCondition.companyId = companyId;
     }
 
-    const existingCategory = await this.categoryRepository.findOne({
+    const existingCategories = await this.categoryRepository.find({
       where: whereCondition,
+      select: ['id', 'name'],
     });
+
+    const existingCategory = existingCategories.find(
+      (item) => this.normalizeName(item.name) === normalizedName
+    );
 
     if (existingCategory) {
       throw new ConflictException({
@@ -56,6 +73,7 @@ export class CategoriesService {
 
     const category = this.categoryRepository.create({
       ...createCategoryDto,
+      name: sanitizedName,
       branchId,
       companyId,
     });
@@ -176,23 +194,37 @@ export class CategoriesService {
       });
     }
 
-    if (updateCategoryDto.name && updateCategoryDto.name !== category.name) {
-      const existingCategory = await this.categoryRepository.findOne({
-        where: {
-          name: updateCategoryDto.name,
-          branchId,
-        },
-      });
+    if (updateCategoryDto.name) {
+      const normalizedNewName = this.normalizeName(updateCategoryDto.name);
+      const normalizedCurrentName = this.normalizeName(category.name);
 
-      if (existingCategory) {
-        throw new ConflictException({
-          statusCode: 409,
-          success: false,
-          message: {
-            es: 'Ya existe una categoría con este nombre en esta sucursal',
-            en: 'A category with this name already exists in this branch',
-          },
+      if (normalizedNewName !== normalizedCurrentName) {
+        const duplicateWhereCondition: any = { branchId };
+        if (companyId) {
+          duplicateWhereCondition.companyId = companyId;
+        }
+
+        const existingCategories = await this.categoryRepository.find({
+          where: duplicateWhereCondition,
+          select: ['id', 'name'],
         });
+
+        const existingCategory = existingCategories.find(
+          (item) =>
+            item.id !== category.id &&
+            this.normalizeName(item.name) === normalizedNewName
+        );
+
+        if (existingCategory) {
+          throw new ConflictException({
+            statusCode: 409,
+            success: false,
+            message: {
+              es: 'Ya existe una categoría con este nombre en esta sucursal',
+              en: 'A category with this name already exists in this branch',
+            },
+          });
+        }
       }
     }
 
@@ -201,6 +233,11 @@ export class CategoriesService {
       branchId: __,
       ...safeUpdateData
     } = updateCategoryDto as any;
+
+    if (safeUpdateData.name) {
+      safeUpdateData.name = this.sanitizeName(safeUpdateData.name);
+    }
+
     Object.assign(category, safeUpdateData);
     const updatedCategory = await this.categoryRepository.save(category);
 

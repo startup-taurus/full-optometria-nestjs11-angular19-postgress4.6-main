@@ -26,6 +26,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
+import { PermissionsService } from '@core/services/api/permissions.service'
 import { PermissionFormComponent } from '../../forms/permission-form/permission-form.component'
 
 @Component({
@@ -46,6 +47,7 @@ export class PermissionRigthSideBarComponent implements OnInit, OnDestroy {
   public selectedRoleId: string | null = null
   public currentPage: number = 1
   public pageSize: number = 100
+  public isSuperAdmin: boolean = false
 
   private searchSubject = new Subject<string>()
   private destroy$ = new Subject<void>()
@@ -53,8 +55,10 @@ export class PermissionRigthSideBarComponent implements OnInit, OnDestroy {
   private _permissionsService = inject(PermissionService)
   private _selectionService = inject(SelectionService)
   private _bootstrapModalService = inject(BootstrapModalService)
+  private _permissions = inject(PermissionsService)
 
   ngOnInit(): void {
+    this.isSuperAdmin = this._permissions.isSuperAdmin()
     this.initializeSubscriptions()
   }
 

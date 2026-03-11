@@ -24,6 +24,7 @@ import { PublicQueryProductDto } from './dtos/public-query-product.dto';
 import { TransferProductStockDto } from './dtos/transfer-product-stock.dto';
 import { QueryProductTransferHistoryDto } from './dtos/query-product-transfer-history.dto';
 import { BranchContext } from '../../common/decorators/branch-context.decorator';
+import { CreateApplyDiscountDto } from './dtos/create-apply-discount.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CompanyId } from '../../common/decorators/company-id.decorator';
 
@@ -95,6 +96,12 @@ export class ProductsController {
     @CompanyId() companyId: string | null
   ) {
     return this.productsService.getTransferHistory(queryDto, branchId, companyId);
+  }
+
+  @Get('discounts/active')
+  @UseGuards(AuthGuard('jwt'))
+  async getActiveDiscounts(@BranchContext() branchId: string) {
+    return this.productsService.getActiveDiscounts(branchId);
   }
 
   @Get(':id')
@@ -189,6 +196,26 @@ export class ProductsController {
       companyId,
       user?.id
     );
+  }
+
+  @Post(':id/apply-discount')
+  @UseGuards(AuthGuard('jwt'))
+  async applyDiscount(
+    @Param('id', ParseUUIDPipe) productId: string,
+    @Body(ValidationPipe) dto: CreateApplyDiscountDto,
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null
+  ) {
+    return this.productsService.applyDiscount(productId, branchId, companyId, dto);
+  }
+
+  @Delete(':id/remove-discount')
+  @UseGuards(AuthGuard('jwt'))
+  async removeDiscount(
+    @Param('id', ParseUUIDPipe) productId: string,
+    @BranchContext() branchId: string
+  ) {
+    return this.productsService.removeDiscount(productId, branchId);
   }
 
 }

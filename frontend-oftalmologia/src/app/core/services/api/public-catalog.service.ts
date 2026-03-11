@@ -24,14 +24,22 @@ export class PublicCatalogService {
 
     if (query.companyName) params = params.set('companyName', query.companyName)
     if (query.search) params = params.set('search', query.search)
+    if (query.brand) params = params.set('brand', query.brand)
     if (query.categoryId) params = params.set('categoryId', query.categoryId)
+    if (query.categoryIds?.length) {
+      params = params.set('categoryIds', query.categoryIds.join(','))
+    }
     if (query.subcategoryId)
       params = params.set('subcategoryId', query.subcategoryId)
+    if (query.inStock !== undefined) {
+      params = params.set('inStock', String(query.inStock))
+    }
     if (query.minPrice !== undefined)
       params = params.set('minPrice', query.minPrice.toString())
     if (query.maxPrice !== undefined)
       params = params.set('maxPrice', query.maxPrice.toString())
     if (query.sortBy) params = params.set('sortBy', query.sortBy)
+    if (query.branchId) params = params.set('branchId', query.branchId)
     if (query.page) params = params.set('page', query.page.toString())
     if (query.limit) params = params.set('limit', query.limit.toString())
 

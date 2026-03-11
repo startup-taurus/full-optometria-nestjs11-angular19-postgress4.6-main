@@ -736,7 +736,7 @@
     "RELOAD_TABLE": "Cuadro de carga",
     "RELOAD": "Recargar",
     "RESULTS": "Resultados",
-    "NGX_DATATABLE_EMPTY_MESSAGE": "No se han encontrado datos. Si aplica filtros, intente ajustarlos o ampliar sus criterios de búsqueda.",
+    "NGX_DATATABLE_EMPTY_MESSAGE": "No se han encontrado datos.",
     "YES": "Sí",
     "NO": "No",
     "NO_ITEMS_FOUND": "No se han encontrado objetos",
@@ -794,7 +794,12 @@
     "INVALID_TIME_BRANCH_SCHEDULE": "El horario de atención para {{day}} es de {{startTime}} a {{endTime}}",
     "INVALID_TIME_CLOSED_DAY": "La sucursal no atiende el día {{day}}",
     "INVALID_INTERVAL": "Los minutos deben ser en intervalos de 15 (ej: 00, 15, 30, 45)",
-    "MIN_VALUE_1": "El valor mínimo permitido es 1"
+    "MIN_VALUE_1": "El valor mínimo permitido es 1",
+    "DISCOUNT_VALUE_MAX": "El descuento porcentual no puede ser mayor a 100",
+    "DISCOUNT_VALUE_MIN": "El descuento debe ser mayor a 0",
+    "END_DATE_AFTER_START": "La fecha de fin debe ser posterior a la fecha de inicio",
+    "FIXED_AMOUNT_EXCEEDS_PRICE": "El monto del descuento no puede ser mayor o igual al precio base del producto",
+    "START_DATE_IN_PAST": "La fecha de inicio no puede ser anterior a la fecha actual"
   },
   "SWEET_ALERT":{
     "ARE_YOU_SURE": "¿Estas seguro?",
@@ -836,7 +841,9 @@
       "EDIT_PRODUCT": "Editar Producto",
       "DEACTIVATE_PRODUCT": "Desactivar Producto",
       "ACTIVATE": "Activar Producto",
-      "DELETE": "Eliminar Producto"
+      "DELETE": "Eliminar Producto",
+      "TRANSFER_HISTORY": "Historial de transferencias",
+      "APPLY_DISCOUNT": "Aplicar descuento"
       
     },
     "DETAILS": {
@@ -845,7 +852,8 @@
       "STOCK_INFO": "Información de Stock",
       "SUPPLIER_INFO": "Información del Proveedor",
       "DEFAULT_SUPPLIER": "Proveedor Predeterminado",
-      "IMAGE_INFO": "Información de la Imagen"
+      "IMAGE_INFO": "Información de la Imagen",
+      "DISCOUNT_INFO": "Descuento Activo"
     },
     "FORM": {
       "CREATE": "Crear Producto",
@@ -872,6 +880,7 @@
       "SUBCATEGORY": "Subcategoría",
       "BRAND": "Marca",
       "UNIT_PRICE": "Precio Unitario",
+      "DISCOUNT": "Descuento",
       "QUANTITY": "Cantidad",
       "VIEWS": "Vistas",
       "SUPPLIER": "Proveedor",
@@ -931,6 +940,37 @@
       "INSUFFICIENT_STOCK_TITLE": "Stock insuficiente",
       "INSUFFICIENT_STOCK_TEXT": "La cantidad a transferir ({{quantity}}) excede el stock disponible ({{stock}})",
       "ERROR_MESSAGE": "No se pudo completar la transferencia de stock"
+    },
+    "ADD_STOCK": {
+      "TITLE": "Agregar stock",
+      "PRODUCT_CODE": "Código",
+      "PRODUCT_NAME": "Producto",
+      "CURRENT_STOCK": "Stock actual",
+      "QUANTITY_TO_ADD": "Cantidad a agregar",
+      "INVALID_QUANTITY": "Ingresa una cantidad válida mayor a 0",
+      "TO_ADD": "A agregar",
+      "NEW_TOTAL": "Nuevo total",
+      "SUBMIT": "Agregar stock",
+      "ERROR_MESSAGE": "No se pudo agregar el stock"
+    },
+    "APPLY_DISCOUNT": {
+      "TITLE": "Aplicar descuento",
+      "DISCOUNT_TYPE": "Tipo de descuento",
+      "DISCOUNT_TYPE_OPTIONS": {
+        "PERCENTAGE": "Porcentaje",
+        "FIXED_AMOUNT": "Monto fijo"
+      },
+      "DISCOUNT_VALUE": "Valor del descuento",
+      "START_DATE": "Fecha de inicio",
+      "END_DATE": "Fecha de fin",
+      "IS_ACTIVE": "Descuento activo",
+      "IS_ACTIVE_HELP": "Activa o desactiva el descuento sin eliminarlo.",
+      "STATUS": "Estado del descuento",
+      "ORIGINAL_PRICE": "Precio original",
+      "FINAL_PRICE": "Precio final",
+      "APPLY_BUTTON": "Aplicar",
+      "CANCEL_BUTTON": "Cancelar",
+      "REMOVE_BUTTON": "Quitar descuento"
     }
   },
   "MEDICAL_HISTORY": {

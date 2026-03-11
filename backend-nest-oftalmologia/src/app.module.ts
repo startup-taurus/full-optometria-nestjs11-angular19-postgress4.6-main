@@ -57,6 +57,7 @@ import { Supplier } from './modules/suppliers/entities/supplier.entity';
 import { Product } from './modules/products/entities/product.entity';
 import { InventoryTransfer } from './modules/products/entities/inventory-transfer.entity';
 import { StockMovement } from './modules/products/entities/stock-movement.entity';
+import { ProductDiscount } from './modules/products/entities/product-discount.entity';
 import { Shift } from './modules/shift-management/entities/shift.entity';
 import { ShiftStatus } from './modules/shift-management/entities/shift-status.entity';
 import { ClinicalFormConfig } from './modules/clinical-form-config/entities/clinical-form-config.entity';
@@ -97,6 +98,7 @@ import { Feedback } from './modules/feedback/entities/feedback.entity';
           Product,
           InventoryTransfer,
           StockMovement,
+          ProductDiscount,
           Shift,
           ShiftStatus,
           ClinicalFormConfig,

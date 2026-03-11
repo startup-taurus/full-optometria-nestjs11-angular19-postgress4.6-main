@@ -53,8 +53,14 @@ import { FilterInventoryComponent } from '../filters/filter-inventory/filter-inv
 import { ViewInventoryComponent } from '../forms/view-inventory/view-inventory.component'
 import { CreateEditInventoryComponent } from '../forms/create-edit-inventory/create-edit-inventory.component'
 import { TransferStockInventoryComponent } from '../forms/transfer-stock-inventory/transfer-stock-inventory.component'
+import { AddStockInventoryComponent } from '../forms/add-stock-inventory/add-stock-inventory.component'
+import { ApplyDiscountInventoryComponent } from '../forms/apply-discount-inventory/apply-discount-inventory.component'
 import Swal from 'sweetalert2'
-import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } from '@core/helpers/ui/ui.constants'
+import {
+  SWAL_DELETE_CONFIRM_CONFIG,
+  SWAL_SUCCESS_CONFIG,
+  SWAL_ERROR_CONFIG,
+} from '@core/helpers/ui/ui.constants'
 
 @Component({
   selector: 'table-inventory',
@@ -95,6 +101,8 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   public descriptionTemplate?: TemplateRef<HTMLElement>
   @ViewChild('viewsTemplate', { static: true })
   public viewsTemplate?: TemplateRef<HTMLElement>
+  @ViewChild('discountTemplate', { static: true })
+  public discountTemplate?: TemplateRef<HTMLElement>
   @ViewChild('actionsTemplate', { static: true })
   public actionsTemplate?: TemplateRef<HTMLElement>
   @ViewChild('sideFilterPanel', { static: false })
@@ -246,6 +254,13 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           sortable: false,
         },
         {
+          name: 'INVENTORY.TABLE.DISCOUNT',
+          prop: 'hasActiveDiscount',
+          cellTemplate: this.discountTemplate ?? undefined,
+          width: 150,
+          sortable: false,
+        },
+        {
           name: 'INVENTORY.TABLE.QUANTITY',
           prop: 'quantity',
           cellTemplate: this.quantityTemplate ?? undefined,
@@ -275,7 +290,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         {
           name: 'INVENTORY.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
-          width: 280,
+          width: 205,
           sortable: false,
         },
       ],
@@ -432,6 +447,50 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  public openAddStockModal(product: Product): void {
+    const modalRef = this._bsModalService.openModal({
+      component: AddStockInventoryComponent,
+      options: {
+        size: 'md',
+        backdrop: 'static',
+        centered: true,
+      },
+      data: {
+        selectedRow: product,
+      },
+    })
+
+    if (modalRef) {
+      modalRef.closed.subscribe((result: string) => {
+        if (result === 'stock-added') {
+          this.reloadDatatable(this.filter)
+        }
+      })
+    }
+  }
+
+  public openApplyDiscountModal(product: Product): void {
+    const modalRef = this._bsModalService.openModal({
+      component: ApplyDiscountInventoryComponent,
+      options: {
+        size: 'lg',
+        backdrop: 'static',
+        centered: true,
+      },
+      data: {
+        selectedRow: product,
+      },
+    })
+
+    if (modalRef) {
+      modalRef.closed.subscribe((result: string) => {
+        if (result === 'discount-applied' || result === 'discount-removed') {
+          this.reloadDatatable(this.filter)
+        }
+      })
+    }
+  }
+
   public showTransferHistory(product: Product): void {
     this._productService
       .getTransferHistory({ productId: product.id, direction: 'all' })
@@ -501,21 +560,31 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     return this.branchNameMap.get(branchId) || branchId
   }
 
-  private buildTransferHistoryHtml(history: any[], currentProduct: Product): string {
+  private buildTransferHistoryHtml(
+    history: any[],
+    currentProduct: Product
+  ): string {
     const cards = history.slice(0, 25).map((item: any) => {
       const isSent = item.sourceProductId === currentProduct.id
       const movementLabel = isSent ? 'Enviado' : 'Recibido'
       const movementColor = isSent ? '#dc3545' : '#198754'
       const sourceBranch = this.getBranchName(item.sourceBranchId)
       const targetBranch = this.getBranchName(item.targetBranchId)
-      const productName = item.sourceProduct?.name || item.targetProduct?.name || currentProduct.name || '-'
+      const productName =
+        item.sourceProduct?.name ||
+        item.targetProduct?.name ||
+        currentProduct.name ||
+        '-'
       const productCode = item.sourceCode || currentProduct.code || '-'
       const quantity = item.quantity ?? '-'
       const sourceBalanceAfter = item.sourceBalanceAfterTransfer ?? '-'
       const targetBalanceAfter = item.targetBalanceAfterTransfer ?? '-'
       const transferNote = item.note || 'Sin nota'
       const sentBy = item.createdByUser
-        ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() || item.createdByUser.username || item.createdByUser.email || '-'
+        ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
+          item.createdByUser.username ||
+          item.createdByUser.email ||
+          '-'
         : '-'
       const date = item.createdAt
         ? new Date(item.createdAt).toLocaleString('es-EC')
@@ -645,12 +714,16 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
             this.reloadDatatable(this.filter)
           },
           error: (err) => {
-            let errorMessage = 'No se pudo eliminar el producto. Por favor, intenta nuevamente.'
-            
+            let errorMessage =
+              'No se pudo eliminar el producto. Por favor, intenta nuevamente.'
+
             if (err?.error?.message) {
               const backendMessage = err.error.message
-              
-              if (typeof backendMessage === 'object' && (backendMessage.es || backendMessage.en)) {
+
+              if (
+                typeof backendMessage === 'object' &&
+                (backendMessage.es || backendMessage.en)
+              ) {
                 errorMessage = backendMessage.es || backendMessage.en
               } else if (typeof backendMessage === 'string') {
                 errorMessage = backendMessage

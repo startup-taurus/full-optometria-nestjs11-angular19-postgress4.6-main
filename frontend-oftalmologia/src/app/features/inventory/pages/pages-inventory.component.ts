@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
 import { TableInventoryComponent } from '../components/tables/table-inventory.component'
-import { BranchSelectorComponent } from '@/app/shared/components/branch-selector/branch-selector.component'
 import { PageTitleComponent } from '../../../shared/components/layouts/page-title/page-title.component'
 import { TranslateModule } from '@ngx-translate/core'
 
@@ -9,7 +8,6 @@ import { TranslateModule } from '@ngx-translate/core'
   standalone: true,
   imports: [
     TableInventoryComponent,
-    BranchSelectorComponent,
     PageTitleComponent,
     TranslateModule,
   ],

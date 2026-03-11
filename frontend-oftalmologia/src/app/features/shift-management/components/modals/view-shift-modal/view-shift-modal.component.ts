@@ -4,6 +4,7 @@ import { TranslateModule } from '@ngx-translate/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Shift } from '../../../../../core/interfaces/api/shift.interface'
 import { environment } from '../../../../../../environments/environment'
+import { formatAppointmentDateTime } from '@core/helpers/date-time/appointment-date-time.helper'
 
 @Component({
   selector: 'app-view-shift-modal',
@@ -25,25 +26,12 @@ export class ViewShiftModalComponent {
 
   getFormattedAppointmentDate(): string {
     if (!this.selectedShift) return ''
-    const date = new Date(this.selectedShift.appointmentDate)
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    return formatAppointmentDateTime(this.selectedShift.appointmentDate)
   }
 
   getFormattedDate(date: string | Date | undefined): string {
     if (!date) return 'N/A'
-    return new Date(date).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    return formatAppointmentDateTime(date)
   }
 
   getPatientProfileImage(): string {

@@ -96,18 +96,25 @@
           <div class="col-md-6 mb-2">
             <strong>{{ 'INVENTORY.TABLE.CATEGORY' | translate }}:</strong>
             <p class="mb-0">
-              {{ product.category?.name || ('COMMON.NOT_SPECIFIED' | translate) }}
+              {{
+                product.category?.name || ('COMMON.NOT_SPECIFIED' | translate)
+              }}
             </p>
           </div>
           <div class="col-md-6 mb-2">
             <strong>{{ 'INVENTORY.TABLE.SUBCATEGORY' | translate }}:</strong>
             <p class="mb-0">
-              {{ product.subcategory?.name || ('COMMON.NOT_SPECIFIED' | translate) }}
+              {{
+                product.subcategory?.name ||
+                  ('COMMON.NOT_SPECIFIED' | translate)
+              }}
             </p>
           </div>
           <div class="col-md-6 mb-2">
             <strong>{{ 'INVENTORY.TABLE.UNIT_PRICE' | translate }}:</strong>
-            <p class="mb-0">{{ product.unitPrice | currency: 'USD' : 'symbol' : '1.2-2' }}</p>
+            <p class="mb-0">
+              {{ product.unitPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
+            </p>
           </div>
           <div class="col-md-6 mb-2">
             <strong>{{ 'INVENTORY.TABLE.QUANTITY' | translate }}:</strong>
@@ -125,6 +132,96 @@
       </div>
     </div>
 
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="card-title text-primary mb-3">
+          <i class="ti ti-tag-off me-2"></i>
+          {{ 'INVENTORY.DETAILS.DISCOUNT_INFO' | translate }}
+        </h6>
+        <div
+          *ngIf="
+            product?.hasActiveDiscount && product?.discount;
+            else noActiveDiscount
+          "
+        >
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <strong
+                >{{
+                  'INVENTORY.APPLY_DISCOUNT.DISCOUNT_TYPE' | translate
+                }}:</strong
+              >
+              <p class="mb-0">
+                <span
+                  class="badge"
+                  [class.bg-primary]="product?.discount?.type === 'PERCENTAGE'"
+                  [class.bg-info]="product?.discount?.type === 'FIXED_AMOUNT'"
+                >
+                  {{
+                    product?.discount?.type === 'PERCENTAGE'
+                      ? ('INVENTORY.APPLY_DISCOUNT.DISCOUNT_TYPE_OPTIONS.PERCENTAGE'
+                        | translate)
+                      : ('INVENTORY.APPLY_DISCOUNT.DISCOUNT_TYPE_OPTIONS.FIXED_AMOUNT'
+                        | translate)
+                  }}
+                </span>
+              </p>
+            </div>
+            <div class="col-md-6 mb-2">
+              <strong
+                >{{
+                  'INVENTORY.APPLY_DISCOUNT.DISCOUNT_VALUE' | translate
+                }}:</strong
+              >
+              <p class="mb-0 fw-bold text-danger">
+                -{{ product?.discount?.value
+                }}{{ product?.discount?.type === 'PERCENTAGE' ? '%' : ' USD' }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-2">
+              <strong>{{ 'INVENTORY.TABLE.UNIT_PRICE' | translate }}:</strong>
+              <p class="mb-0">
+                <span class="text-muted text-decoration-line-through me-2">
+                  {{
+                    product?.unitPrice | currency: 'USD' : 'symbol' : '1.2-2'
+                  }}
+                </span>
+                <span class="fw-bold text-danger">
+                  {{
+                    product?.discount?.finalPrice
+                      | currency: 'USD' : 'symbol' : '1.2-2'
+                  }}
+                </span>
+              </p>
+            </div>
+            <div class="col-md-6 mb-2" *ngIf="product?.discount?.startDate">
+              <strong
+                >{{
+                  'INVENTORY.APPLY_DISCOUNT.START_DATE' | translate
+                }}:</strong
+              >
+              <p class="mb-0">
+                {{ product?.discount?.startDate | date: 'dd/MM/yyyy' : 'UTC' }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-2" *ngIf="product?.discount?.endDate">
+              <strong
+                >{{ 'INVENTORY.APPLY_DISCOUNT.END_DATE' | translate }}:</strong
+              >
+              <p class="mb-0">
+                {{ product?.discount?.endDate | date: 'dd/MM/yyyy' : 'UTC' }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noActiveDiscount>
+          <p class="text-muted mb-0">
+            <i class="ti ti-info-circle me-1"></i>Sin descuento activo
+          </p>
+        </ng-template>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-body">
         <h6 class="card-title text-primary mb-3">
@@ -134,11 +231,18 @@
         <div class="row">
           <div class="col-md-6 mb-2">
             <strong>{{ 'COMMON.CREATED_AT' | translate }}:</strong>
-            <p class="mb-0">{{ product.createdAt | date: 'yyyy/MM/dd HH:mm' }}</p>
+            <p class="mb-0">
+              {{ product.createdAt | date: 'yyyy/MM/dd HH:mm' }}
+            </p>
           </div>
-          <div class="col-md-6 mb-2" *ngIf="product.updatedAt !== product.createdAt">
+          <div
+            class="col-md-6 mb-2"
+            *ngIf="product.updatedAt !== product.createdAt"
+          >
             <strong>{{ 'COMMON.UPDATED_AT' | translate }}:</strong>
-            <p class="mb-0">{{ product.updatedAt | date: 'yyyy/MM/dd HH:mm' }}</p>
+            <p class="mb-0">
+              {{ product.updatedAt | date: 'yyyy/MM/dd HH:mm' }}
+            </p>
           </div>
         </div>
       </div>
@@ -189,7 +293,10 @@
     <div class="modal-image-info">
       <h5>{{ product?.name }}</h5>
       <p class="text-muted mb-0">{{ product?.code }}</p>
-      <p class="text-muted mb-0" *ngIf="product?.images && product.images.length > 1">
+      <p
+        class="text-muted mb-0"
+        *ngIf="product?.images && product.images.length > 1"
+      >
         {{ selectedImageIndex + 1 }} / {{ product.images.length }}
       </p>
     </div>

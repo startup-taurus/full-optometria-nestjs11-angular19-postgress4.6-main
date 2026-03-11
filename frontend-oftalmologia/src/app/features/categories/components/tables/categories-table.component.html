@@ -58,7 +58,7 @@
         class="category-item border-bottom"
       >
         <div
-          class="d-flex align-items-center p-3 category-header"
+          class="d-flex align-items-center p-3 category-header category-row"
           [class.expanded]="expandedCategories.has(category.id)"
           [class.clickable]="
             getSubcategoriesForCategory(category.id).length > 0
@@ -67,7 +67,6 @@
         >
           <div
             class="expand-indicator me-2 d-flex align-items-center justify-content-center"
-            style="width: 24px; height: 24px"
             *ngIf="getSubcategoriesForCategory(category.id).length > 0"
           >
             <i
@@ -79,16 +78,15 @@
           <div
             class="placeholder-btn me-2"
             *ngIf="getSubcategoriesForCategory(category.id).length === 0"
-            style="width: 24px"
           ></div>
 
-          <div class="flex-grow-1 d-flex align-items-center">
+          <div class="category-main d-flex align-items-center">
             <div class="category-icon me-3">
               <i class="ti ti-folder category-icon-color fs-5"></i>
             </div>
             <div class="category-info">
-              <h6 class="mb-1 fw-semibold">{{ category.name }}</h6>
-              <small class="text-muted" *ngIf="category.description">{{
+              <h6 class="mb-1 fw-semibold category-title">{{ category.name }}</h6>
+              <small class="text-muted category-description" *ngIf="category.description">{{
                 category.description
               }}</small>
             </div>
@@ -122,28 +120,25 @@
           >
             <button
               type="button"
-              class="btn btn-sm btn-outline-success rounded-circle"
+              class="btn btn-sm btn-outline-success rounded-circle action-circle-btn"
               (click)="onCreateSubcategory(category.id)"
               [title]="'CATEGORIES.ADD_SUBCATEGORY' | translate"
-              style="width: 32px; height: 32px"
             >
               <i class="ti ti-plus"></i>
             </button>
             <button
               type="button"
-              class="btn btn-sm btn-outline-primary rounded-circle"
+              class="btn btn-sm btn-outline-primary rounded-circle action-circle-btn"
               (click)="onEditCategory(category)"
               [title]="'COMMON.EDIT' | translate"
-              style="width: 32px; height: 32px"
             >
               <i class="ti ti-edit"></i>
             </button>
             <button
               type="button"
-              class="btn btn-sm btn-outline-danger rounded-circle"
+              class="btn btn-sm btn-outline-danger rounded-circle action-circle-btn"
               (click)="onDeleteCategory(category)"
               [title]="'COMMON.DELETE' | translate"
-              style="width: 32px; height: 32px"
             >
               <i class="ti ti-trash"></i>
             </button>
@@ -160,50 +155,50 @@
               *ngFor="
                 let subcategory of getSubcategoriesForCategory(category.id)
               "
-              class="subcategory-item d-flex align-items-center p-2"
+              class="subcategory-item subcategory-row"
             >
               <div class="subcategory-icon me-3">
                 <i class="ti ti-file-text text-secondary fs-5"></i>
               </div>
               <div class="subcategory-info flex-grow-1">
-                <h6 class="mb-0 fw-semibold fs-3">{{ subcategory.name }}</h6>
-                <small class="text-muted" *ngIf="subcategory.description">{{
+                <h6 class="mb-0 fw-semibold subcategory-title">{{ subcategory.name }}</h6>
+                <small class="text-muted subcategory-description" *ngIf="subcategory.description">{{
                   subcategory.description
                 }}</small>
               </div>
-              <div class="subcategory-status me-3">
-                <span
-                  class="badge"
-                  [class.bg-light-success]="subcategory.isActive"
-                  [class.bg-light-danger]="!subcategory.isActive"
-                  [class.text-success]="subcategory.isActive"
-                  [class.text-danger]="!subcategory.isActive"
-                >
-                  {{
-                    (subcategory.isActive ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE')
-                      | translate
-                  }}
-                </span>
-              </div>
-              <div class="subcategory-actions d-flex gap-1">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-primary rounded-circle"
-                  (click)="onEditSubcategory(subcategory)"
-                  [title]="'COMMON.EDIT' | translate"
-                  style="width: 32px; height: 32px"
-                >
-                  <i class="ti ti-edit"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger rounded-circle"
-                  (click)="onDeleteSubcategory(subcategory)"
-                  [title]="'COMMON.DELETE' | translate"
-                  style="width: 32px; height: 32px"
-                >
-                  <i class="ti ti-trash"></i>
-                </button>
+              <div class="subcategory-meta">
+                <div class="subcategory-status">
+                  <span
+                    class="badge"
+                    [class.bg-light-success]="subcategory.isActive"
+                    [class.bg-light-danger]="!subcategory.isActive"
+                    [class.text-success]="subcategory.isActive"
+                    [class.text-danger]="!subcategory.isActive"
+                  >
+                    {{
+                      (subcategory.isActive ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE')
+                        | translate
+                    }}
+                  </span>
+                </div>
+                <div class="subcategory-actions d-flex gap-1">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary rounded-circle action-circle-btn"
+                    (click)="onEditSubcategory(subcategory)"
+                    [title]="'COMMON.EDIT' | translate"
+                  >
+                    <i class="ti ti-edit"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger rounded-circle action-circle-btn"
+                    (click)="onDeleteSubcategory(subcategory)"
+                    [title]="'COMMON.DELETE' | translate"
+                  >
+                    <i class="ti ti-trash"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

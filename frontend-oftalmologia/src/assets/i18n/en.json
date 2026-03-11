@@ -723,7 +723,7 @@
     "RELOAD_TABLE": "Reload Table",
     "RELOAD": "Reload",
     "RESULTS": "Results",
-    "NGX_DATATABLE_EMPTY_MESSAGE": "No data found. If you applied filters, try adjusting them or broaden your search criteria.",
+    "NGX_DATATABLE_EMPTY_MESSAGE": "No data found.",
     "YES": "Yes",
     "NO": "No",
     "NO_ITEMS_FOUND": "No items found",
@@ -778,7 +778,12 @@
     "INVALID_TIME_CLOSED_DAY": "The branch is closed on {{day}}",
     "INVALID_INTERVAL": "Minutes must be in 15-minute intervals (e.g.: 00, 15, 30, 45)",
     "REQUIRED_FIELD": "{{field}} is required",
-    "MIN_VALUE_1": "The minimum allowed value is 1"
+    "MIN_VALUE_1": "The minimum allowed value is 1",
+    "DISCOUNT_VALUE_MAX": "Percentage discount cannot be greater than 100",
+    "DISCOUNT_VALUE_MIN": "Discount must be greater than 0",
+    "END_DATE_AFTER_START": "End date must be after start date",
+    "FIXED_AMOUNT_EXCEEDS_PRICE": "The fixed discount amount cannot be greater than or equal to the product base price",
+    "START_DATE_IN_PAST": "Start date cannot be before today's date"
   },
   "SWEET_ALERT":{
     "ARE_YOU_SURE": "Are you sure?",
@@ -820,7 +825,9 @@
       "EDIT_PRODUCT": "Edit Product",
       "DEACTIVATE_PRODUCT": "Deactivate Product",
       "ACTIVATE": "Activate Product",
-      "DELETE": "Delete Product"
+      "DELETE": "Delete Product",
+      "TRANSFER_HISTORY": "Transfer history",
+      "APPLY_DISCOUNT": "Apply discount"
     },
     "DETAILS": {
       "GENERAL_INFO": "General Information",
@@ -828,7 +835,8 @@
       "STOCK_INFO": "Stock Information",
       "SUPPLIER_INFO": "Supplier Information",
       "DEFAULT_SUPPLIER": "Default Supplier",
-      "IMAGE_INFO": "Image Information"
+      "IMAGE_INFO": "Image Information",
+      "DISCOUNT_INFO": "Active Discount"
     },
     "FORM": {
       "CREATE": "Create Product",
@@ -855,6 +863,7 @@
       "SUBCATEGORY": "Subcategory",
       "BRAND": "Brand",
       "UNIT_PRICE": "Unit Price",
+      "DISCOUNT": "Discount",
       "QUANTITY": "Quantity",
       "VIEWS": "Views",
       "SUPPLIER": "Supplier",
@@ -914,6 +923,37 @@
       "INSUFFICIENT_STOCK_TITLE": "Insufficient stock",
       "INSUFFICIENT_STOCK_TEXT": "The quantity to transfer ({{quantity}}) exceeds available stock ({{stock}})",
       "ERROR_MESSAGE": "Could not complete the stock transfer"
+    },
+    "ADD_STOCK": {
+      "TITLE": "Add stock",
+      "PRODUCT_CODE": "Code",
+      "PRODUCT_NAME": "Product",
+      "CURRENT_STOCK": "Current stock",
+      "QUANTITY_TO_ADD": "Quantity to add",
+      "INVALID_QUANTITY": "Enter a valid quantity greater than 0",
+      "TO_ADD": "To add",
+      "NEW_TOTAL": "New total",
+      "SUBMIT": "Add stock",
+      "ERROR_MESSAGE": "Could not add stock"
+    },
+    "APPLY_DISCOUNT": {
+      "TITLE": "Apply discount",
+      "DISCOUNT_TYPE": "Discount type",
+      "DISCOUNT_TYPE_OPTIONS": {
+        "PERCENTAGE": "Percentage",
+        "FIXED_AMOUNT": "Fixed amount"
+      },
+      "DISCOUNT_VALUE": "Discount value",
+      "START_DATE": "Start date",
+      "END_DATE": "End date",
+      "IS_ACTIVE": "Discount active",
+      "IS_ACTIVE_HELP": "Enable or disable the discount without removing it.",
+      "STATUS": "Discount status",
+      "ORIGINAL_PRICE": "Original price",
+      "FINAL_PRICE": "Final price",
+      "APPLY_BUTTON": "Apply",
+      "CANCEL_BUTTON": "Cancel",
+      "REMOVE_BUTTON": "Remove discount"
     }
   },
   "MEDICAL_HISTORY": {

@@ -10,7 +10,9 @@
       <div class="container-fluid px-4 px-lg-5">
         <div class="d-flex justify-content-between align-items-center py-3">
           <div>
-            <h1 class="mb-0"><i class="bi bi-eyeglasses me-2"></i>Catálogo de Productos</h1>
+            <h1 class="mb-0">
+              <i class="bi bi-eyeglasses me-2"></i>Catálogo de Productos
+            </h1>
             <p class="text-white-50 mb-0">
               Encuentra los mejores productos para el cuidado visual
             </p>
@@ -70,7 +72,10 @@
           </div>
 
           @if (isFiltersDrawerOpen) {
-            <div class="filters-backdrop d-lg-none" (click)="closeFiltersDrawer()"></div>
+            <div
+              class="filters-backdrop d-lg-none"
+              (click)="closeFiltersDrawer()"
+            ></div>
           }
 
           <aside
@@ -86,7 +91,9 @@
                   </h5>
                 </div>
                 <div class="card-body">
-                  <div class="d-flex d-lg-none justify-content-between align-items-center mb-3">
+                  <div
+                    class="d-flex d-lg-none justify-content-between align-items-center mb-3"
+                  >
                     <h5 class="mb-0 fw-bold">Filtros</h5>
                     <button
                       type="button"
@@ -111,6 +118,81 @@
                     />
                   </div>
 
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">
+                      <i class="bi bi-award me-2 text-warning"></i>
+                      Marca
+                    </label>
+                    <select
+                      class="form-select"
+                      [(ngModel)]="selectedBrand"
+                      (change)="onBrandChange()"
+                    >
+                      <option value="">Todas las marcas</option>
+                      @for (brand of filters().brands; track brand) {
+                        <option [value]="brand">{{ brand }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">
+                      <i class="bi bi-tags me-2 text-info"></i>
+                      Categoría
+                    </label>
+                    <select
+                      class="form-select"
+                      [(ngModel)]="selectedCategoryId"
+                      (change)="onCategoryChange()"
+                    >
+                      <option value="">Todas las categorías</option>
+                      @for (
+                        category of filters().categories;
+                        track category.id
+                      ) {
+                        <option [value]="category.id">
+                          {{ category.name }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+
+                  @if (filters().branches?.length > 1) {
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">
+                        <i class="bi bi-geo-alt me-2 text-primary"></i>
+                        Sucursal
+                      </label>
+                      <select
+                        class="form-select"
+                        [(ngModel)]="selectedBranchId"
+                        (change)="onFilterChange()"
+                      >
+                        <option value="">Todas las sucursales</option>
+                        @for (branch of filters().branches; track branch.id) {
+                          <option [value]="branch.id">{{ branch.name }}</option>
+                        }
+                      </select>
+                    </div>
+                  }
+
+                  <div class="mb-3">
+                    <label
+                      class="form-label fw-bold d-flex align-items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        class="form-check-input mt-0"
+                        [(ngModel)]="showOnlyAvailable"
+                        (change)="onAvailabilityChange()"
+                      />
+                      <span>
+                        <i class="bi bi-box-seam me-2 text-success"></i>
+                        Solo disponibles
+                      </span>
+                    </label>
+                  </div>
+
                   <!-- <div class="mb-3">
                 <label class="form-label fw-bold">
                   <i class="bi bi-file-text me-2 text-info"></i>
@@ -130,12 +212,16 @@
                       <i class="bi bi-cash me-2 text-success"></i>
                       Rango de precio
                     </label>
+                    <small class="text-muted d-block mb-2">
+                      Si ingresas los valores al revés, el sistema los ajusta.
+                    </small>
                     <div class="row g-2">
                       <div class="col-6">
                         <input
                           type="number"
                           class="form-control form-control-sm"
-                          placeholder="Mínimo"
+                          placeholder="Desde"
+                          min="0"
                           [(ngModel)]="minPrice"
                         />
                       </div>
@@ -143,7 +229,8 @@
                         <input
                           type="number"
                           class="form-control form-control-sm"
-                          placeholder="Máximo"
+                          placeholder="Hasta"
+                          min="0"
                           [(ngModel)]="maxPrice"
                         />
                       </div>
@@ -200,6 +287,99 @@
               </div>
             </div>
 
+            @if (selectedCategoryName) {
+              <div class="mb-3">
+                <span
+                  class="badge text-bg-light border d-inline-flex align-items-center gap-2"
+                >
+                  Categoría: {{ selectedCategoryName }}
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-link text-decoration-none p-0"
+                    (click)="clearCategoryFilter()"
+                    aria-label="Quitar filtro de categoría"
+                  >
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </span>
+              </div>
+            }
+
+            @if (
+              selectedBrand ||
+              showOnlyAvailable ||
+              hasPriceFilter ||
+              selectedBranchId
+            ) {
+              <div class="mb-3 d-flex flex-wrap gap-2">
+                @if (selectedBrand) {
+                  <span
+                    class="badge text-bg-light border d-inline-flex align-items-center gap-2"
+                  >
+                    Marca: {{ selectedBrand }}
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-link text-decoration-none p-0"
+                      (click)="clearBrandFilter()"
+                      aria-label="Quitar filtro de marca"
+                    >
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </span>
+                }
+
+                @if (selectedBranchId) {
+                  <span
+                    class="badge text-bg-light border d-inline-flex align-items-center gap-2"
+                  >
+                    <i class="bi bi-geo-alt"></i>
+                    Sucursal: {{ selectedBranchName }}
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-link text-decoration-none p-0"
+                      (click)="clearBranchFilter()"
+                      aria-label="Quitar filtro de sucursal"
+                    >
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </span>
+                }
+
+                @if (showOnlyAvailable) {
+                  <span
+                    class="badge text-bg-light border d-inline-flex align-items-center gap-2"
+                  >
+                    Solo disponibles
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-link text-decoration-none p-0"
+                      (click)="clearAvailabilityFilter()"
+                      aria-label="Quitar filtro de disponibilidad"
+                    >
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </span>
+                }
+
+                @if (hasPriceFilter) {
+                  <span
+                    class="badge text-bg-light border d-inline-flex align-items-center gap-2"
+                  >
+                    Precio:
+                    {{ minPrice ?? 0 }} - {{ maxPrice ?? 'sin tope' }}
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-link text-decoration-none p-0"
+                      (click)="clearPriceFilter()"
+                      aria-label="Quitar filtro de precio"
+                    >
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </span>
+                }
+              </div>
+            }
+
             @if (loading()) {
               <div class="text-center py-5">
                 <div class="spinner-border text-primary" role="status">
@@ -215,7 +395,10 @@
                 @for (product of products(); track product.id; let i = $index) {
                   <div class="col" [attr.data-index]="i">
                     <div class="product-card">
-                      <div class="product-image-container" (click)="openProductModal(product)">
+                      <div
+                        class="product-image-container"
+                        (click)="openProductModal(product)"
+                      >
                         <img
                           [src]="getImageUrl(product)"
                           [alt]="product.name"
@@ -229,9 +412,14 @@
                           </span>
                         }
 
-                        @if (!isOutOfStock(product) && product.quantity > 0 && product.quantity <= 5) {
+                        @if (
+                          !isOutOfStock(product) &&
+                          product.quantity > 0 &&
+                          product.quantity <= 5
+                        ) {
                           <span class="badge-stock badge-low">
-                            <i class="bi bi-fire"></i> Últimas {{ product.quantity }}
+                            <i class="bi bi-fire"></i> Últimas
+                            {{ product.quantity }}
                           </span>
                         }
 
@@ -245,7 +433,10 @@
                           <div class="overlay-actions">
                             <button
                               class="btn btn-outline-light btn-sm"
-                              (click)="openProductModal(product); $event.stopPropagation()"
+                              (click)="
+                                openProductModal(product);
+                                $event.stopPropagation()
+                              "
                             >
                               <i class="bi bi-info-circle me-1"></i>
                               Vista rápida
@@ -305,14 +496,55 @@
                               {{ product.category.name }}
                             </span>
                           }
+
+                          @if (product.branchName) {
+                            <span class="meta-item">
+                              <iconify-icon
+                                icon="mdi:map-marker-outline"
+                                width="16"
+                                height="16"
+                                class="text-primary"
+                              ></iconify-icon>
+                              {{ product.branchName }}
+                            </span>
+                          }
                         </div>
 
                         <div class="product-footer">
                           <div class="product-price">
-                            {{
-                              product.unitPrice
-                                | currency: 'USD' : 'symbol' : '1.2-2'
-                            }}
+                            @if (
+                              product.hasActiveDiscount && product.discount
+                            ) {
+                              <div class="d-flex flex-column align-items-start">
+                                <span class="badge text-bg-danger mb-1">
+                                  -{{ product.discount.value
+                                  }}{{
+                                    product.discount.type === 'PERCENTAGE'
+                                      ? '%'
+                                      : ''
+                                  }}
+                                </span>
+                                <span
+                                  class="text-muted text-decoration-line-through small"
+                                >
+                                  {{
+                                    product.unitPrice
+                                      | currency: 'USD' : 'symbol' : '1.2-2'
+                                  }}
+                                </span>
+                                <span class="text-danger fw-bold">
+                                  {{
+                                    product.discount.finalPrice
+                                      | currency: 'USD' : 'symbol' : '1.2-2'
+                                  }}
+                                </span>
+                              </div>
+                            } @else {
+                              {{
+                                product.unitPrice
+                                  | currency: 'USD' : 'symbol' : '1.2-2'
+                              }}
+                            }
                           </div>
 
                           <div class="product-footer-actions">
@@ -450,7 +682,10 @@
                   <div class="col-lg-5">
                     <div class="product-image-zone">
                       <img
-                        [src]="selectedProductImageUrl || getImageUrl(selectedProduct)"
+                        [src]="
+                          selectedProductImageUrl ||
+                          getImageUrl(selectedProduct)
+                        "
                         [alt]="selectedProduct.name"
                         class="product-main-image"
                         (click)="openImageModal(selectedProduct)"
@@ -468,8 +703,12 @@
                       <button
                         type="button"
                         class="thumb-btn"
-                        *ngFor="let galleryImage of getProductGallery(selectedProduct)"
-                        [class.active]="galleryImage === selectedProductImageUrl"
+                        *ngFor="
+                          let galleryImage of getProductGallery(selectedProduct)
+                        "
+                        [class.active]="
+                          galleryImage === selectedProductImageUrl
+                        "
                         (click)="selectProductImage(galleryImage)"
                       >
                         <img [src]="galleryImage" alt="Imagen del producto" />
@@ -503,7 +742,10 @@
                         <div class="info-row">
                           <span class="info-label">SUCURSAL</span>
                           <span class="info-value">
-                            {{ selectedProduct.branch?.name || selectedProduct.branchName }}
+                            {{
+                              selectedProduct.branch?.name ||
+                                selectedProduct.branchName
+                            }}
                           </span>
                           @if (selectedProduct.branch?.address) {
                             <span class="info-address">
@@ -554,12 +796,32 @@
             <div class="modal-footer">
               <div class="price-section">
                 <span class="price-label">PRECIO</span>
-                <span class="price-value">
-                  {{
-                    selectedProduct?.unitPrice
-                      | currency: 'USD' : 'symbol' : '1.2-2'
-                  }}
-                </span>
+                @if (
+                  selectedProduct?.hasActiveDiscount &&
+                  selectedProduct?.discount
+                ) {
+                  <div class="d-flex flex-column align-items-end">
+                    <span class="text-muted text-decoration-line-through small">
+                      {{
+                        selectedProduct?.unitPrice
+                          | currency: 'USD' : 'symbol' : '1.2-2'
+                      }}
+                    </span>
+                    <span class="price-value text-danger">
+                      {{
+                        selectedProduct?.discount?.finalPrice
+                          | currency: 'USD' : 'symbol' : '1.2-2'
+                      }}
+                    </span>
+                  </div>
+                } @else {
+                  <span class="price-value">
+                    {{
+                      selectedProduct?.unitPrice
+                        | currency: 'USD' : 'symbol' : '1.2-2'
+                    }}
+                  </span>
+                }
               </div>
 
               <div class="actions-section">

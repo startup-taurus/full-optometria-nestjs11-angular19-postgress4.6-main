@@ -43,6 +43,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       case HttpStatus.NOT_FOUND:
         messageKey = 'ERROR.NOT_FOUND';
         break;
+      case HttpStatus.CONFLICT:
+        messageKey = 'ERROR.VALIDATION';
+        break;
       default:
         messageKey = 'ERROR.INTERNAL';
     }

@@ -66,6 +66,29 @@
   opacity: 0.6;
 }
 
+.no-caret::after {
+  display: none !important;
+}
+
+.actions-icon-grid {
+  min-width: 0 !important;
+
+  .grid-2col {
+    grid-template-columns: repeat(2, 1fr);
+    display: grid;
+  }
+}
+
+.action-icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
   .table-responsive {
     font-size: 0.875rem;

@@ -30,6 +30,7 @@ import {
   QueryShiftDto,
 } from '../../../../core/interfaces/api/shift.interface'
 import { environment } from '../../../../../environments/environment'
+import { formatAppointmentDateTime } from '@core/helpers/date-time/appointment-date-time.helper'
 import Swal from 'sweetalert2'
 import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } from '@core/helpers/ui/ui.constants'
 
@@ -292,11 +293,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
   }
 
   public formatAppointmentDate(date: string | Date): string {
-    return new Date(date).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
+    return formatAppointmentDateTime(date)
   }
 
   public onViewShift(shift: Shift): void {

@@ -540,7 +540,10 @@ export class ShiftsService {
     if (existingShift) {
       throw new ConflictException({
         messageKey: 'ERROR.VALIDATION',
-        message: 'Patient already has an appointment on this date',
+        message: {
+          es: 'El paciente ya tiene una cita agendada para este dia.',
+          en: 'The patient already has an appointment scheduled for this day.',
+        },
       });
     }
   }

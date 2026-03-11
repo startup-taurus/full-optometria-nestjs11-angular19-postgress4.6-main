@@ -37,6 +37,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
         case HttpStatus.NOT_FOUND:
           messageKey = 'ERROR.NOT_FOUND';
           break;
+        case HttpStatus.CONFLICT:
+          messageKey = 'ERROR.VALIDATION';
+          break;
         default:
           messageKey = 'ERROR.INTERNAL';
       }
@@ -56,13 +59,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       const friendlyError = `${messageObj.es} / ${messageObj.en}`;
 
+      // Para conflicto o not_found también pasamos el mensaje localizado del throw
+      const dataError =
+        status === HttpStatus.BAD_REQUEST
+          ? friendlyError
+          : (extracted.errorMessage ?? friendlyError);
+
       return response.status(status).json({
         statusCode: status,
         status: 'error',
         message: messageObj,
         data: {
-          error: status === HttpStatus.BAD_REQUEST ? friendlyError : extracted.errorMessage,
-          details: status === HttpStatus.BAD_REQUEST ? null : extracted.errorDetails,
+          error: dataError,
+          details: extracted.errorDetails,
+          localizedMessage: extracted.localizedMessage,
           timestamp: new Date().toISOString(),
         },
       });
@@ -105,16 +115,32 @@ export class AllExceptionsFilter implements ExceptionFilter {
   private extractErrorMessageAndDetails(exceptionResponse: unknown): {
     errorMessage: string | null;
     errorDetails: string[] | null;
+    localizedMessage: { es: string; en: string } | null;
   } {
     if (!exceptionResponse || typeof exceptionResponse !== 'object') {
-      return {
-        errorMessage: null,
-        errorDetails: null,
-      };
+      return { errorMessage: null, errorDetails: null, localizedMessage: null };
     }
 
     const response = exceptionResponse as Record<string, unknown>;
     const message = response.message;
+
+    // Objeto con claves de idioma { es, en } — caso del ConflictException de turnos
+    if (
+      message &&
+      typeof message === 'object' &&
+      !Array.isArray(message) &&
+      ('es' in (message as object) || 'en' in (message as object))
+    ) {
+      const msg = message as Record<string, string>;
+      const localizedMessage = { es: msg['es'] || '', en: msg['en'] || '' };
+      // Enviamos ambos idiomas separados por " / " para que el frontend elija
+      const combined = [msg['es'], msg['en']].filter(Boolean).join(' / ');
+      return {
+        errorMessage: combined || null,
+        errorDetails: null,
+        localizedMessage,
+      };
+    }
 
     if (Array.isArray(message)) {
       const details = message
@@ -126,6 +152,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return {
         errorMessage: details[0] || null,
         errorDetails: details.length ? details : null,
+        localizedMessage: null,
       };
     }
 
@@ -133,12 +160,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return {
         errorMessage: message,
         errorDetails: null,
+        localizedMessage: null,
       };
     }
 
-    return {
-      errorMessage: null,
-      errorDetails: null,
-    };
+    return { errorMessage: null, errorDetails: null, localizedMessage: null };
   }
 }

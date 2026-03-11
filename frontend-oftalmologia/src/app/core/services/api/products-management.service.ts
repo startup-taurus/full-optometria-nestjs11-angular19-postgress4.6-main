@@ -57,6 +57,14 @@ export interface ProductFilter {
   limit?: number
 }
 
+export interface ApplyDiscountPayload {
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT'
+  discountValue: number
+  startDate?: string | null
+  endDate?: string | null
+  isActive?: boolean
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -187,6 +195,17 @@ export class ProductsManagementService {
         throw error
       })
     )
+  }
+
+  applyDiscount(
+    productId: string,
+    payload: ApplyDiscountPayload
+  ): Observable<any> {
+    return this.http.post<any>(`${this.productsUrl}/${productId}/apply-discount`, payload)
+  }
+
+  removeDiscount(productId: string): Observable<any> {
+    return this.http.delete<any>(`${this.productsUrl}/${productId}/remove-discount`)
   }
 
   private buildParams(filter: ProductFilter): { [key: string]: string } {
