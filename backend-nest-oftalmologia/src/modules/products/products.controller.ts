@@ -23,6 +23,8 @@ import { QueryProductDto } from './dtos/query-product.dto';
 import { PublicQueryProductDto } from './dtos/public-query-product.dto';
 import { TransferProductStockDto } from './dtos/transfer-product-stock.dto';
 import { QueryProductTransferHistoryDto } from './dtos/query-product-transfer-history.dto';
+import { QueryProductStockHistoryDto } from './dtos/query-product-stock-history.dto';
+import { QueryProductHistoryDto } from './dtos/query-product-history.dto';
 import { BranchContext } from '../../common/decorators/branch-context.decorator';
 import { CreateApplyDiscountDto } from './dtos/create-apply-discount.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -98,6 +100,26 @@ export class ProductsController {
     return this.productsService.getTransferHistory(queryDto, branchId, companyId);
   }
 
+  @Get('stock/history')
+  @UseGuards(AuthGuard('jwt'))
+  async getStockHistory(
+    @Query(ValidationPipe) queryDto: QueryProductStockHistoryDto,
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null
+  ) {
+    return this.productsService.getStockHistory(queryDto, branchId, companyId);
+  }
+
+  @Get('audit/history')
+  @UseGuards(AuthGuard('jwt'))
+  async getProductHistory(
+    @Query(ValidationPipe) queryDto: QueryProductHistoryDto,
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null
+  ) {
+    return this.productsService.getProductHistory(queryDto, branchId, companyId);
+  }
+
   @Get('discounts/active')
   @UseGuards(AuthGuard('jwt'))
   async getActiveDiscounts(@BranchContext() branchId: string) {
@@ -120,13 +142,15 @@ export class ProductsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateProductDto: UpdateProductDto,
     @BranchContext() branchId: string,
-    @CompanyId() companyId: string | null
+    @CompanyId() companyId: string | null,
+    @CurrentUser() user: any
   ) {
     return this.productsService.update(
       id,
       updateProductDto,
       branchId,
-      companyId
+      companyId,
+      user?.id
     );
   }
 
@@ -135,9 +159,10 @@ export class ProductsController {
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @BranchContext() branchId: string,
-    @CompanyId() companyId: string | null
+    @CompanyId() companyId: string | null,
+    @CurrentUser() user: any
   ) {
-    return this.productsService.remove(id, branchId, companyId);
+    return this.productsService.remove(id, branchId, companyId, user?.id);
   }
 
   @Post(':id/upload-image')
@@ -204,18 +229,21 @@ export class ProductsController {
     @Param('id', ParseUUIDPipe) productId: string,
     @Body(ValidationPipe) dto: CreateApplyDiscountDto,
     @BranchContext() branchId: string,
-    @CompanyId() companyId: string | null
+    @CompanyId() companyId: string | null,
+    @CurrentUser() user: any
   ) {
-    return this.productsService.applyDiscount(productId, branchId, companyId, dto);
+    return this.productsService.applyDiscount(productId, branchId, companyId, dto, user?.id);
   }
 
   @Delete(':id/remove-discount')
   @UseGuards(AuthGuard('jwt'))
   async removeDiscount(
     @Param('id', ParseUUIDPipe) productId: string,
-    @BranchContext() branchId: string
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null,
+    @CurrentUser() user: any
   ) {
-    return this.productsService.removeDiscount(productId, branchId);
+    return this.productsService.removeDiscount(productId, branchId, companyId, user?.id);
   }
 
 }

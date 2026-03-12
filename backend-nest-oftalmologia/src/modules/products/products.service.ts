@@ -23,8 +23,17 @@ import { QueryProductDto } from './dtos/query-product.dto';
 import { PublicQueryProductDto } from './dtos/public-query-product.dto';
 import { TransferProductStockDto } from './dtos/transfer-product-stock.dto';
 import { QueryProductTransferHistoryDto } from './dtos/query-product-transfer-history.dto';
-import { ProductDiscount, DiscountType } from './entities/product-discount.entity';
+import { QueryProductStockHistoryDto } from './dtos/query-product-stock-history.dto';
+import {
+  ProductDiscount,
+  DiscountType,
+} from './entities/product-discount.entity';
+import {
+  ProductAuditLog,
+  ProductAuditEventType,
+} from './entities/product-audit-log.entity';
 import { CreateApplyDiscountDto } from './dtos/create-apply-discount.dto';
+import { QueryProductHistoryDto } from './dtos/query-product-history.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 import {
@@ -57,13 +66,81 @@ export class ProductsService {
     private laboratoryOrderRepository: Repository<LaboratoryOrder>,
     @InjectRepository(Company)
     private companyRepository: Repository<Company>,
-     @InjectRepository(InventoryTransfer)
-     private inventoryTransferRepository: Repository<InventoryTransfer>,
-     @InjectRepository(ProductDiscount)
-     private productDiscountRepository: Repository<ProductDiscount>,
-     @InjectRepository(Branch)
-     private branchRepository: Repository<Branch>
+    @InjectRepository(InventoryTransfer)
+    private inventoryTransferRepository: Repository<InventoryTransfer>,
+    @InjectRepository(StockMovement)
+    private stockMovementRepository: Repository<StockMovement>,
+    @InjectRepository(ProductDiscount)
+    private productDiscountRepository: Repository<ProductDiscount>,
+    @InjectRepository(Branch)
+    private branchRepository: Repository<Branch>,
+    @InjectRepository(ProductAuditLog)
+    private productAuditLogRepository: Repository<ProductAuditLog>,
   ) {}
+
+  private async registerStockMovement(
+    payload: {
+      companyId: string | null;
+      branchId: string;
+      productId: string;
+      movementType: string;
+      quantity: number;
+      balanceAfter: number;
+      referenceType: string;
+      referenceId: string;
+      note?: string | null;
+      createdByUserId?: string;
+    },
+    manager?: any,
+  ) {
+    const normalizedQuantity = Number.isFinite(Number(payload.quantity))
+      ? Math.max(0, Number(payload.quantity))
+      : 0;
+
+    const normalizedBalanceAfter = Number.isFinite(Number(payload.balanceAfter))
+      ? Number(payload.balanceAfter)
+      : 0;
+
+    const repository = manager
+      ? manager.getRepository(StockMovement)
+      : this.stockMovementRepository;
+
+    const stockMovement = repository.create({
+      companyId: payload.companyId,
+      branchId: payload.branchId,
+      productId: payload.productId,
+      movementType: payload.movementType,
+      quantity: normalizedQuantity,
+      balanceAfter: normalizedBalanceAfter,
+      referenceType: payload.referenceType,
+      referenceId: payload.referenceId,
+      note: payload.note ?? null,
+      createdByUserId: payload.createdByUserId,
+    });
+
+    await repository.save(stockMovement);
+  }
+
+  private async registerProductEvent(payload: {
+    companyId: string | null;
+    branchId: string;
+    productId: string;
+    eventType: string;
+    changedFields?: Record<string, any> | null;
+    metadata?: Record<string, any> | null;
+    createdByUserId?: string;
+  }): Promise<void> {
+    const auditLog = this.productAuditLogRepository.create({
+      companyId: payload.companyId,
+      branchId: payload.branchId,
+      productId: payload.productId,
+      eventType: payload.eventType,
+      changedFields: payload.changedFields ?? null,
+      metadata: payload.metadata ?? null,
+      createdByUserId: payload.createdByUserId,
+    });
+    await this.productAuditLogRepository.save(auditLog);
+  }
 
   private normalizeFilterKey(value?: string): string {
     return (value || '')
@@ -75,9 +152,12 @@ export class ProductsService {
   }
 
   private groupCategoriesForPublicFilters(
-    categories: Array<{ id: string; name: string }>
+    categories: Array<{ id: string; name: string }>,
   ) {
-    const groupedMap = new Map<string, { id: string; name: string; ids: string[] }>();
+    const groupedMap = new Map<
+      string,
+      { id: string; name: string; ids: string[] }
+    >();
     const categoryIdMap = new Map<string, string>();
 
     for (const category of categories) {
@@ -103,7 +183,7 @@ export class ProductsService {
     }
 
     const groupedCategories = Array.from(groupedMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }),
     );
 
     return { groupedCategories, categoryIdMap };
@@ -111,7 +191,7 @@ export class ProductsService {
 
   private groupSubcategoriesForPublicFilters(
     subcategories: Array<{ id: string; name: string; categoryId: string }>,
-    categoryIdMap: Map<string, string>
+    categoryIdMap: Map<string, string>,
   ) {
     const groupedMap = new Map<
       string,
@@ -119,7 +199,9 @@ export class ProductsService {
     >();
 
     for (const subcategory of subcategories) {
-      const representativeCategoryId = categoryIdMap.get(subcategory.categoryId);
+      const representativeCategoryId = categoryIdMap.get(
+        subcategory.categoryId,
+      );
       if (!representativeCategoryId) continue;
 
       const normalizedName = this.normalizeFilterKey(subcategory.name);
@@ -144,7 +226,7 @@ export class ProductsService {
     }
 
     return Array.from(groupedMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }),
     );
   }
 
@@ -161,7 +243,7 @@ export class ProductsService {
     }
 
     return Array.from(groupedMap.values()).sort((a, b) =>
-      a.localeCompare(b, 'es', { sensitivity: 'base' })
+      a.localeCompare(b, 'es', { sensitivity: 'base' }),
     );
   }
 
@@ -169,7 +251,7 @@ export class ProductsService {
     createProductDto: CreateProductDto,
     branchId: string,
     companyId: string | null,
-    userId?: string
+    userId?: string,
   ) {
     const whereCondition: any = {
       code: createProductDto.code,
@@ -205,6 +287,34 @@ export class ProductsService {
 
     const savedProduct = await this.productRepository.save(product);
 
+    await this.registerStockMovement({
+      companyId,
+      branchId,
+      productId: savedProduct.id,
+      movementType: 'STOCK_INICIAL',
+      quantity: Number(savedProduct.quantity) || 0,
+      balanceAfter: Number(savedProduct.quantity) || 0,
+      referenceType: 'PRODUCT_CREATION',
+      referenceId: savedProduct.id,
+      note: null,
+      createdByUserId: userId,
+    });
+
+    await this.registerProductEvent({
+      companyId,
+      branchId,
+      productId: savedProduct.id,
+      eventType: ProductAuditEventType.CREATED,
+      metadata: {
+        name: savedProduct.name,
+        code: savedProduct.code,
+        brand: savedProduct.brand,
+        unitPrice: Number(savedProduct.unitPrice),
+        quantity: Number(savedProduct.quantity) || 0,
+      },
+      createdByUserId: userId,
+    });
+
     return {
       statusCode: 201,
       success: true,
@@ -219,7 +329,7 @@ export class ProductsService {
   async findAll(
     queryDto: QueryProductDto,
     branchId: string,
-    companyId: string | null
+    companyId: string | null,
   ) {
     const { skip, take } = PaginationUtil.getSkipAndTake(queryDto);
     const queryBuilder = this.productRepository
@@ -298,7 +408,9 @@ export class ProductsService {
       const discounts = await this.productDiscountRepository.find({
         where: products.map((p) => ({ productId: p.id, branchId: p.branchId })),
       });
-      discounts.forEach((d) => discountMap.set(`${d.productId}:${d.branchId}`, d));
+      discounts.forEach((d) =>
+        discountMap.set(`${d.productId}:${d.branchId}`, d),
+      );
     }
 
     const productsWithImages = await Promise.all(
@@ -316,8 +428,12 @@ export class ProductsService {
           },
         });
 
-        const discount = discountMap.get(`${product.id}:${product.branchId}`) || null;
-        const { finalPrice } = this.calculateFinalPrice(Number(product.unitPrice), discount);
+        const discount =
+          discountMap.get(`${product.id}:${product.branchId}`) || null;
+        const { finalPrice } = this.calculateFinalPrice(
+          Number(product.unitPrice),
+          discount,
+        );
         const discountActive = !!discount && this.isDiscountActive(discount);
 
         return {
@@ -342,13 +458,13 @@ export class ProductsService {
               }
             : {}),
         };
-      })
+      }),
     );
 
     const paginationResult = PaginationUtil.paginate(
       productsWithImages,
       totalCount,
-      queryDto
+      queryDto,
     );
 
     return {
@@ -402,8 +518,14 @@ export class ProductsService {
       },
     });
 
-    const discount = await this.findActiveDiscount(product.id, product.branchId);
-    const { finalPrice } = this.calculateFinalPrice(Number(product.unitPrice), discount);
+    const discount = await this.findActiveDiscount(
+      product.id,
+      product.branchId,
+    );
+    const { finalPrice } = this.calculateFinalPrice(
+      Number(product.unitPrice),
+      discount,
+    );
     const discountActive = !!discount && this.isDiscountActive(discount);
 
     return {
@@ -442,7 +564,8 @@ export class ProductsService {
     id: string,
     updateProductDto: UpdateProductDto,
     branchId: string,
-    companyId: string | null
+    companyId: string | null,
+    userId?: string,
   ) {
     const whereCondition: any = { id, branchId };
     if (companyId) {
@@ -486,13 +609,74 @@ export class ProductsService {
 
     await this.validateRelatedEntities(updateProductDto, branchId);
 
+    const TRACKED_FIELDS = [
+      'name',
+      'description',
+      'brand',
+      'code',
+      'unitPrice',
+      'quantity',
+      'categoryId',
+      'subcategoryId',
+      'defaultSupplierId',
+      'isActive',
+    ] as const;
+
+    const previousQuantity = Number(product.quantity);
+
     const {
       companyId: _,
       branchId: __,
       ...safeUpdateData
     } = updateProductDto as any;
+
+    const changedFields: Record<string, { from: any; to: any }> = {};
+    for (const field of TRACKED_FIELDS) {
+      const newVal = (safeUpdateData as any)[field];
+      if (newVal !== undefined) {
+        const oldVal = (product as any)[field];
+        if (String(oldVal) !== String(newVal)) {
+          changedFields[field] = { from: oldVal, to: newVal };
+        }
+      }
+    }
+
     Object.assign(product, safeUpdateData);
+
+    const nextQuantity = Number(product.quantity);
     const updatedProduct = await this.productRepository.save(product);
+
+    if (nextQuantity !== previousQuantity) {
+      const quantityDelta = Math.abs(nextQuantity - previousQuantity);
+      const movementType =
+        nextQuantity > previousQuantity
+          ? 'INGRESO_AJUSTE_MANUAL'
+          : 'SALIDA_AJUSTE_MANUAL';
+
+      await this.registerStockMovement({
+        companyId,
+        branchId,
+        productId: updatedProduct.id,
+        movementType,
+        quantity: quantityDelta,
+        balanceAfter: nextQuantity,
+        referenceType: 'PRODUCT_UPDATE',
+        referenceId: updatedProduct.id,
+        note: `Ajuste manual de stock: ${previousQuantity} -> ${nextQuantity}`,
+        createdByUserId: userId,
+      });
+    }
+
+    if (Object.keys(changedFields).length > 0) {
+      await this.registerProductEvent({
+        companyId,
+        branchId,
+        productId: updatedProduct.id,
+        eventType: ProductAuditEventType.UPDATED,
+        changedFields,
+        createdByUserId: userId,
+      });
+    }
 
     return {
       statusCode: 200,
@@ -505,7 +689,12 @@ export class ProductsService {
     };
   }
 
-  async remove(id: string, branchId: string, companyId: string | null) {
+  async remove(
+    id: string,
+    branchId: string,
+    companyId: string | null,
+    userId?: string,
+  ) {
     const whereCondition: any = { id, branchId };
     if (companyId) {
       whereCondition.companyId = companyId;
@@ -531,7 +720,7 @@ export class ProductsService {
       .where('order.branchId = :branchId', { branchId })
       .andWhere(
         '(order.productId = :productId OR :productId = ANY(order.productIds))',
-        { productId: id }
+        { productId: id },
       )
       .getCount();
 
@@ -554,7 +743,39 @@ export class ProductsService {
       });
     }
 
-    await this.productRepository.remove(product);
+    const previousQuantity = Number(product.quantity);
+
+    await this.registerStockMovement({
+      companyId,
+      branchId,
+      productId: product.id,
+      movementType: 'SALIDA_ELIMINACION',
+      quantity: previousQuantity,
+      balanceAfter: 0,
+      referenceType: 'PRODUCT_DELETE',
+      referenceId: product.id,
+      note: 'Salida por eliminación lógica de producto',
+      createdByUserId: userId,
+    });
+
+    await this.registerProductEvent({
+      companyId,
+      branchId,
+      productId: product.id,
+      eventType: ProductAuditEventType.DEACTIVATED,
+      metadata: {
+        name: product.name,
+        code: product.code,
+        quantityAtDeletion: previousQuantity,
+      },
+      createdByUserId: userId,
+    });
+
+    product.quantity = 0;
+    product.isActive = false;
+    product.code = `${product.code}__DELETED__${Date.now()}`;
+
+    await this.productRepository.save(product);
 
     return {
       statusCode: 200,
@@ -568,7 +789,7 @@ export class ProductsService {
 
   private async validateRelatedEntities(
     dto: CreateProductDto | UpdateProductDto,
-    branchId: string
+    branchId: string,
   ) {
     if (dto.categoryId) {
       const category = await this.categoryRepository.findOne({
@@ -689,12 +910,12 @@ export class ProductsService {
       .leftJoinAndSelect('product.branch', 'branch')
       .leftJoinAndSelect('product.createdByUser', 'user')
       .where('product.isActive = :isActive', { isActive: true })
-      .andWhere('product.companyId = :companyId', { companyId })
+      .andWhere('product.companyId = :companyId', { companyId });
 
     if (queryDto.search) {
       queryBuilder.andWhere(
         '(product.name ILIKE :search OR product.description ILIKE :search OR product.brand ILIKE :search)',
-        { search: `%${queryDto.search}%` }
+        { search: `%${queryDto.search}%` },
       );
     }
 
@@ -708,7 +929,7 @@ export class ProductsService {
       new Set([
         ...(queryDto.categoryIds || []),
         ...(queryDto.categoryId ? [queryDto.categoryId] : []),
-      ])
+      ]),
     );
 
     if (selectedCategoryIds.length > 0) {
@@ -781,10 +1002,13 @@ export class ProductsService {
           },
         });
 
-        const discount = await this.findActiveDiscount(product.id, product.branchId);
+        const discount = await this.findActiveDiscount(
+          product.id,
+          product.branchId,
+        );
         const { finalPrice } = this.calculateFinalPrice(
           Number(product.unitPrice),
-          discount
+          discount,
         );
 
         return {
@@ -835,7 +1059,7 @@ export class ProductsService {
               }
             : {}),
         };
-      })
+      }),
     );
 
     return {
@@ -889,10 +1113,13 @@ export class ProductsService {
       },
     });
 
-    const discount = await this.findActiveDiscount(product.id, product.branchId);
+    const discount = await this.findActiveDiscount(
+      product.id,
+      product.branchId,
+    );
     const { finalPrice } = this.calculateFinalPrice(
       Number(product.unitPrice),
-      discount
+      discount,
     );
 
     return {
@@ -1016,7 +1243,7 @@ export class ProductsService {
 
     const brandRows = await brandQueryBuilder.getRawMany<{ brand: string }>();
     const brands = this.groupBrandsForPublicFilters(
-      brandRows.map((row) => row.brand)
+      brandRows.map((row) => row.brand),
     );
 
     const branchQueryBuilder = this.branchRepository
@@ -1024,7 +1251,9 @@ export class ProductsService {
       .where('branch.isActive = :isActive', { isActive: true });
 
     if (companyId) {
-      branchQueryBuilder.andWhere('branch.companyId = :companyId', { companyId });
+      branchQueryBuilder.andWhere('branch.companyId = :companyId', {
+        companyId,
+      });
     }
 
     const branches = await branchQueryBuilder
@@ -1036,7 +1265,7 @@ export class ProductsService {
       this.groupCategoriesForPublicFilters(categories);
     const groupedSubcategories = this.groupSubcategoriesForPublicFilters(
       subcategories,
-      categoryIdMap
+      categoryIdMap,
     );
 
     return {
@@ -1108,7 +1337,7 @@ export class ProductsService {
     transferDto: TransferProductStockDto,
     sourceBranchId: string,
     companyId: string | null,
-    userId?: string
+    userId?: string,
   ) {
     const quantity = Number(transferDto.quantity);
     if (!Number.isInteger(quantity) || quantity <= 0) {
@@ -1214,18 +1443,19 @@ export class ProductsService {
       let destinationCreated = false;
 
       if (!destinationProduct) {
-        const destinationCategory = await this.resolveOrCreateDestinationCategory(
-          manager,
-          sourceProduct,
-          transferDto.destinationBranchId
-        );
+        const destinationCategory =
+          await this.resolveOrCreateDestinationCategory(
+            manager,
+            sourceProduct,
+            transferDto.destinationBranchId,
+          );
 
         const destinationSubcategory =
           await this.resolveOrCreateDestinationSubcategory(
             manager,
             sourceProduct,
             destinationCategory,
-            transferDto.destinationBranchId
+            transferDto.destinationBranchId,
           );
 
         destinationProduct = manager.create(Product, {
@@ -1249,7 +1479,10 @@ export class ProductsService {
       sourceProduct.quantity -= quantity;
       destinationProduct.quantity += quantity;
 
-      const savedDestinationProduct = await manager.save(Product, destinationProduct);
+      const savedDestinationProduct = await manager.save(
+        Product,
+        destinationProduct,
+      );
       const savedSourceProduct = await manager.save(Product, sourceProduct);
 
       const transfer = manager.create(InventoryTransfer, {
@@ -1317,9 +1550,8 @@ export class ProductsService {
   async getTransferHistory(
     queryDto: QueryProductTransferHistoryDto,
     branchId: string,
-    companyId: string | null
+    companyId: string | null,
   ) {
-
     const queryBuilder = this.inventoryTransferRepository
       .createQueryBuilder('transfer')
       .leftJoinAndSelect('transfer.sourceProduct', 'sourceProduct')
@@ -1337,13 +1569,17 @@ export class ProductsService {
 
     if (hasBranchId) {
       if (direction === 'sent') {
-        queryBuilder.andWhere('transfer.sourceBranchId = :branchId', { branchId });
+        queryBuilder.andWhere('transfer.sourceBranchId = :branchId', {
+          branchId,
+        });
       } else if (direction === 'received') {
-        queryBuilder.andWhere('transfer.targetBranchId = :branchId', { branchId });
+        queryBuilder.andWhere('transfer.targetBranchId = :branchId', {
+          branchId,
+        });
       } else {
         queryBuilder.andWhere(
           '(transfer.sourceBranchId = :branchId OR transfer.targetBranchId = :branchId)',
-          { branchId }
+          { branchId },
         );
       }
     }
@@ -1351,7 +1587,7 @@ export class ProductsService {
     if (queryDto.productId) {
       queryBuilder.andWhere(
         '(transfer.sourceProductId = :productId OR transfer.targetProductId = :productId)',
-        { productId: queryDto.productId }
+        { productId: queryDto.productId },
       );
     }
 
@@ -1368,7 +1604,7 @@ export class ProductsService {
       ...new Set(
         history
           .map((transfer) => transfer.createdByUserId)
-          .filter((id): id is string => !!id)
+          .filter((id): id is string => !!id),
       ),
     ];
 
@@ -1406,10 +1642,10 @@ export class ProductsService {
     return history.map((transfer) => {
       const transferMovements = movementsByTransferId.get(transfer.id) || [];
       const sourceMovement = transferMovements.find(
-        (movement) => movement.movementType === 'SALIDA_TRANSFERENCIA'
+        (movement) => movement.movementType === 'SALIDA_TRANSFERENCIA',
       );
       const targetMovement = transferMovements.find(
-        (movement) => movement.movementType === 'INGRESO_TRANSFERENCIA'
+        (movement) => movement.movementType === 'INGRESO_TRANSFERENCIA',
       );
       const transferUser =
         transfer.createdByUser ||
@@ -1426,10 +1662,74 @@ export class ProductsService {
     });
   }
 
+  async getStockHistory(
+    queryDto: QueryProductStockHistoryDto,
+    branchId: string,
+    companyId: string | null,
+  ) {
+    const movementRepository = this.dataSource.getRepository(StockMovement);
+    const queryBuilder = movementRepository
+      .createQueryBuilder('movement')
+      .where('movement.branchId = :branchId', { branchId });
+
+    if (companyId) {
+      queryBuilder.andWhere('movement.companyId = :companyId', { companyId });
+    }
+
+    if (queryDto.productId) {
+      queryBuilder.andWhere('movement.productId = :productId', {
+        productId: queryDto.productId,
+      });
+    }
+
+    const movements = await queryBuilder
+      .orderBy('movement.createdAt', 'DESC')
+      .limit(100)
+      .getMany();
+
+    if (!movements.length) {
+      return [];
+    }
+
+    const userIds = [
+      ...new Set(
+        movements
+          .map((movement) => movement.createdByUserId)
+          .filter((id): id is string => !!id),
+      ),
+    ];
+
+    const usersById = new Map<string, User>();
+    if (userIds.length) {
+      const userRepository = this.dataSource.getRepository(User);
+      const users = await userRepository.find({ where: { id: In(userIds) } });
+      users.forEach((user) => usersById.set(user.id, user));
+    }
+
+    return movements.map((movement) => {
+      const user = movement.createdByUserId
+        ? usersById.get(movement.createdByUserId)
+        : undefined;
+
+      return {
+        ...movement,
+        createdByUser: user
+          ? {
+              id: user.id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              username: user.username,
+              email: user.email,
+            }
+          : null,
+      };
+    });
+  }
+
   private async resolveOrCreateDestinationCategory(
     manager: any,
     sourceProduct: Product,
-    destinationBranchId: string
+    destinationBranchId: string,
   ): Promise<Category> {
     const sourceCategory = await manager.findOne(Category, {
       where: { id: sourceProduct.categoryId },
@@ -1477,7 +1777,7 @@ export class ProductsService {
     manager: any,
     sourceProduct: Product,
     destinationCategory: Category,
-    destinationBranchId: string
+    destinationBranchId: string,
   ): Promise<Subcategory> {
     const sourceSubcategory = await manager.findOne(Subcategory, {
       where: { id: sourceProduct.subcategoryId },
@@ -1527,7 +1827,7 @@ export class ProductsService {
     productId: string,
     file: Express.Multer.File,
     branchId: string,
-    isCover: boolean = true
+    isCover: boolean = true,
   ) {
     const product = await this.productRepository.findOne({
       where: { id: productId, branchId },
@@ -1610,7 +1910,7 @@ export class ProductsService {
         process.cwd(),
         'uploads',
         'product',
-        'product_image'
+        'product_image',
       );
 
       if (!fs.existsSync(uploadDir)) {
@@ -1644,9 +1944,7 @@ export class ProductsService {
             if (fs.existsSync(oldFilePath)) {
               fs.unlinkSync(oldFilePath);
             }
-          } catch (error) {
- 
-          }
+          } catch (error) {}
 
           await this.fileRepository.remove(oldFile);
         }
@@ -1703,7 +2001,7 @@ export class ProductsService {
   private async optimizeAndSaveImage(
     buffer: Buffer,
     filePath: string,
-    mimeType: string
+    mimeType: string,
   ): Promise<void> {
     try {
       let sharpInstance = sharp(buffer);
@@ -1729,7 +2027,6 @@ export class ProductsService {
           .toFile(filePath);
       }
     } catch (error) {
-
       fs.writeFileSync(filePath, buffer);
     }
   }
@@ -1785,7 +2082,7 @@ export class ProductsService {
   async deleteProductImage(
     productId: string,
     imageId: string,
-    branchId: string
+    branchId: string,
   ) {
     const product = await this.productRepository.findOne({
       where: { id: productId, branchId },
@@ -1868,7 +2165,7 @@ export class ProductsService {
 
   private calculateFinalPrice(
     unitPrice: number,
-    discount: ProductDiscount | null
+    discount: ProductDiscount | null,
   ): { finalPrice: number; hasDiscount: boolean } {
     if (!discount || !this.isDiscountActive(discount)) {
       return { finalPrice: unitPrice, hasDiscount: false };
@@ -1889,7 +2186,7 @@ export class ProductsService {
 
   private async findActiveDiscount(
     productId: string,
-    branchId: string
+    branchId: string,
   ): Promise<ProductDiscount | null> {
     return this.productDiscountRepository.findOne({
       where: {
@@ -1903,7 +2200,8 @@ export class ProductsService {
     productId: string,
     branchId: string,
     companyId: string | null,
-    dto: CreateApplyDiscountDto
+    dto: CreateApplyDiscountDto,
+    userId?: string,
   ) {
     const product = await this.productRepository.findOne({
       where: { id: productId, branchId },
@@ -1920,7 +2218,11 @@ export class ProductsService {
       });
     }
 
-    if (dto.startDate && dto.endDate && new Date(dto.endDate) <= new Date(dto.startDate)) {
+    if (
+      dto.startDate &&
+      dto.endDate &&
+      new Date(dto.endDate) <= new Date(dto.startDate)
+    ) {
       throw new BadRequestException({
         statusCode: 400,
         success: false,
@@ -1955,6 +2257,23 @@ export class ProductsService {
 
     await this.productDiscountRepository.save(discount);
 
+    await this.registerProductEvent({
+      companyId,
+      branchId,
+      productId,
+      eventType: ProductAuditEventType.DISCOUNT_APPLIED,
+      metadata: {
+        discountType: dto.discountType,
+        discountValue: Number(dto.discountValue),
+        isActive: dto.isActive ?? true,
+        startDate: dto.startDate ?? null,
+        endDate: dto.endDate ?? null,
+        productName: product.name,
+        productCode: product.code,
+      },
+      createdByUserId: userId,
+    });
+
     return {
       statusCode: 201,
       success: true,
@@ -1966,7 +2285,12 @@ export class ProductsService {
     };
   }
 
-  async removeDiscount(productId: string, branchId: string) {
+  async removeDiscount(
+    productId: string,
+    branchId: string,
+    companyId?: string | null,
+    userId?: string,
+  ) {
     const discount = await this.findActiveDiscount(productId, branchId);
 
     if (!discount) {
@@ -1983,6 +2307,18 @@ export class ProductsService {
     discount.isActive = false;
     await this.productDiscountRepository.save(discount);
 
+    await this.registerProductEvent({
+      companyId: companyId ?? null,
+      branchId,
+      productId,
+      eventType: ProductAuditEventType.DISCOUNT_REMOVED,
+      metadata: {
+        discountType: discount.discountType,
+        discountValue: Number(discount.discountValue),
+      },
+      createdByUserId: userId,
+    });
+
     return {
       statusCode: 200,
       success: true,
@@ -1991,6 +2327,116 @@ export class ProductsService {
         en: 'Discount removed successfully',
       },
     };
+  }
+
+  async getProductHistory(
+    queryDto: QueryProductHistoryDto,
+    branchId: string,
+    companyId: string | null,
+  ) {
+    const queryBuilder = this.productAuditLogRepository
+      .createQueryBuilder('audit')
+      .where('audit.branchId = :branchId', { branchId });
+
+    if (companyId) {
+      queryBuilder.andWhere('audit.companyId = :companyId', { companyId });
+    }
+
+    if (queryDto.productId) {
+      queryBuilder.andWhere('audit.productId = :productId', {
+        productId: queryDto.productId,
+      });
+    }
+
+    const logs = await queryBuilder
+      .orderBy('audit.createdAt', 'DESC')
+      .limit(200)
+      .getMany();
+
+    const hasRealCreated = logs.some((l) => l.eventType === 'CREATED');
+    const needsSyntheticCreated = !hasRealCreated && !!queryDto.productId;
+
+    let syntheticCreated: Record<string, any> | null = null;
+    if (needsSyntheticCreated) {
+      const product = await this.productRepository.findOne({
+        where: { id: queryDto.productId, branchId },
+        relations: ['createdByUser'],
+      });
+
+      if (product) {
+        syntheticCreated = {
+          id: null,
+          productId: product.id,
+          branchId: product.branchId,
+          companyId: product.companyId,
+          eventType: 'CREATED',
+          changedFields: null,
+          metadata: {
+            name: product.name,
+            code: product.code,
+            brand: product.brand,
+            unitPrice: Number(product.unitPrice),
+            quantity: Number(product.quantity),
+            _synthetic: true,
+          },
+          createdByUserId: product.createdByUserId,
+          createdAt: product.createdAt,
+          createdByUser: product.createdByUser
+            ? {
+                id: product.createdByUser.id,
+                firstName: (product.createdByUser as any).firstName,
+                lastName: (product.createdByUser as any).lastName,
+                username: (product.createdByUser as any).username,
+                email: (product.createdByUser as any).email,
+              }
+            : null,
+        };
+      }
+    }
+
+    if (!logs.length && syntheticCreated) {
+      return { statusCode: 200, success: true, data: [syntheticCreated] };
+    }
+
+    if (!logs.length) {
+      return { statusCode: 200, success: true, data: [] };
+    }
+
+    const userIds = [
+      ...new Set(
+        logs.map((l) => l.createdByUserId).filter((id): id is string => !!id),
+      ),
+    ];
+
+    const usersById = new Map<string, User>();
+    if (userIds.length) {
+      const userRepository = this.dataSource.getRepository(User);
+      const users = await userRepository.find({ where: { id: In(userIds) } });
+      users.forEach((u) => usersById.set(u.id, u));
+    }
+
+    const mapped = logs.map((log) => {
+      const user = log.createdByUserId
+        ? usersById.get(log.createdByUserId)
+        : undefined;
+      return {
+        ...log,
+        createdByUser: user
+          ? {
+              id: user.id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              username: user.username,
+              email: user.email,
+            }
+          : null,
+      };
+    });
+
+    // Agregar el evento CREATED sintético al final (es el más antiguo)
+    const data = syntheticCreated ? [...mapped, syntheticCreated] : mapped;
+
+    return { statusCode: 200, success: true, data };
   }
 
   async getActiveDiscounts(branchId: string) {
@@ -2011,5 +2457,3 @@ export class ProductsService {
     };
   }
 }
-
-

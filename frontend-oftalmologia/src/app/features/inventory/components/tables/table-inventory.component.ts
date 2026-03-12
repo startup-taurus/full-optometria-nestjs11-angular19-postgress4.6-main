@@ -528,6 +528,43 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       })
   }
 
+  public showStockHistory(product: Product): void {
+    this._productService
+      .getProductHistory({ productId: product.id })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          const responseData = response?.data as any
+          const history = this.extractTransferHistory(responseData)
+
+          if (!history.length) {
+            Swal.fire({
+              title: 'Sin historial',
+              text: 'No hay eventos registrados para este producto.',
+              icon: 'info',
+            })
+            return
+          }
+
+          const html = this.buildProductAuditHtml(history)
+
+          Swal.fire({
+            title: `Historial de producto: ${product.name}`,
+            html,
+            width: 1100,
+            confirmButtonText: 'Cerrar',
+          })
+        },
+        error: () => {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo cargar el historial del producto.',
+            icon: 'error',
+          })
+        },
+      })
+  }
+
   private extractTransferHistory(payload: any): any[] {
     if (Array.isArray(payload)) {
       return payload
@@ -612,6 +649,137 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     })
 
     return `<div style="max-height:68vh;overflow:auto;padding:2px 2px 0 2px;background:#f8fafc;border-radius:10px;">${cards.join('')}</div>`
+  }
+
+  private buildStockHistoryHtml(history: any[]): string {
+    const movementTypeLabel: Record<string, string> = {
+      STOCK_INICIAL: 'Stock inicial',
+      INGRESO_AJUSTE_MANUAL: 'Ingreso por ajuste',
+      SALIDA_AJUSTE_MANUAL: 'Salida por ajuste',
+      SALIDA_ELIMINACION: 'Salida por eliminación',
+      INGRESO_TRANSFERENCIA: 'Ingreso por transferencia',
+      SALIDA_TRANSFERENCIA: 'Salida por transferencia',
+    }
+
+    const rows = history
+      .slice(0, 100)
+      .map((item: any) => {
+        const movementType = movementTypeLabel[item.movementType] || item.movementType || '-'
+        const quantity = item.quantity ?? 0
+        const balanceAfter = item.balanceAfter ?? '-'
+        const user = item.createdByUser
+          ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
+            item.createdByUser.username ||
+            item.createdByUser.email ||
+            '-'
+          : '-'
+        const date = item.createdAt
+          ? new Date(item.createdAt).toLocaleString('es-EC')
+          : '-'
+        const note = item.note || '-'
+
+        return `
+          <tr>
+            <td style="padding:8px;border-bottom:1px solid #eef2f7;white-space:nowrap;">${date}</td>
+            <td style="padding:8px;border-bottom:1px solid #eef2f7;">${movementType}</td>
+            <td style="padding:8px;border-bottom:1px solid #eef2f7;text-align:right;">${quantity}</td>
+            <td style="padding:8px;border-bottom:1px solid #eef2f7;text-align:right;">${balanceAfter}</td>
+            <td style="padding:8px;border-bottom:1px solid #eef2f7;">${user}</td>
+            <td style="padding:8px;border-bottom:1px solid #eef2f7;">${note}</td>
+          </tr>
+        `
+      })
+      .join('')
+
+    return `
+      <div style="max-height:68vh;overflow:auto;border:1px solid #e5e7eb;border-radius:10px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:left;background:#fff;">
+          <thead>
+            <tr style="background:#f8fafc;color:#0f172a;">
+              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Fecha</th>
+              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Tipo</th>
+              <th style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:right;">Cantidad</th>
+              <th style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:right;">Saldo</th>
+              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Usuario</th>
+              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Nota</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+    `
+  }
+
+  private buildProductAuditHtml(history: any[]): string {
+    const eventConfig: Record<string, { label: string; color: string; bg: string }> = {
+      CREATED:          { label: 'Creación',           color: '#166534', bg: '#dcfce7' },
+      UPDATED:          { label: 'Actualización',      color: '#1e40af', bg: '#dbeafe' },
+      DISCOUNT_APPLIED: { label: 'Descuento aplicado', color: '#92400e', bg: '#fef3c7' },
+      DISCOUNT_REMOVED: { label: 'Descuento eliminado',color: '#7c3aed', bg: '#ede9fe' },
+      DEACTIVATED:      { label: 'Eliminado',          color: '#991b1b', bg: '#fee2e2' },
+    }
+
+    const fieldLabels: Record<string, string> = {
+      name: 'Nombre', description: 'Descripción', brand: 'Marca',
+      code: 'Código', unitPrice: 'Precio', quantity: 'Cantidad',
+      categoryId: 'Categoría', subcategoryId: 'Subcategoría',
+      defaultSupplierId: 'Proveedor', isActive: 'Activo',
+    }
+
+    const renderChangedFields = (changedFields: Record<string, { from: any; to: any }> | null): string => {
+      if (!changedFields || !Object.keys(changedFields).length) return ''
+      const lines = Object.entries(changedFields).map(([key, val]) => {
+        const label = fieldLabels[key] || key
+        return `<div style="margin:2px 0;"><strong>${label}:</strong> <span style="color:#6b7280;text-decoration:line-through;">${val.from}</span> → <span style="color:#111827;font-weight:600;">${val.to}</span></div>`
+      })
+      return `<div style="margin-top:6px;font-size:12px;">${lines.join('')}</div>`
+    }
+
+    const renderMetadata = (eventType: string, metadata: Record<string, any> | null): string => {
+      if (!metadata) return ''
+      if (eventType === 'CREATED') {
+        const syntheticNote = metadata['_synthetic']
+          ? `<div style="margin-top:4px;font-size:11px;color:#6b7280;font-style:italic;">⚠ Este evento fue reconstruido desde la fecha de creación del producto (anterior al sistema de auditoría)</div>`
+          : ''
+        return `<div style="margin-top:6px;font-size:12px;color:#374151;">Código: <strong>${metadata['code'] || '-'}</strong> · Precio: <strong>$${metadata['unitPrice'] ?? '-'}</strong> · Stock inicial: <strong>${metadata['quantity'] ?? 0}</strong></div>${syntheticNote}`
+      }
+      if (eventType === 'DISCOUNT_APPLIED' || eventType === 'DISCOUNT_REMOVED') {
+        const type = metadata['discountType'] === 'PERCENTAGE' ? '%' : '$'
+        const val = metadata['discountValue'] ?? '-'
+        const start = metadata['startDate'] ? new Date(metadata['startDate']).toLocaleDateString('es-EC') : '-'
+        const end = metadata['endDate'] ? new Date(metadata['endDate']).toLocaleDateString('es-EC') : '-'
+        return `<div style="margin-top:6px;font-size:12px;color:#374151;">Tipo: <strong>${metadata['discountType'] || '-'}</strong> · Valor: <strong>${val}${type}</strong> · Vigencia: ${start} – ${end}</div>`
+      }
+      if (eventType === 'DEACTIVATED') {
+        return `<div style="margin-top:6px;font-size:12px;color:#374151;">Stock al eliminar: <strong>${metadata['quantityAtDeletion'] ?? 0}</strong></div>`
+      }
+      return ''
+    }
+
+    const cards = history.slice(0, 200).map((item: any) => {
+      const cfg = eventConfig[item.eventType] || { label: item.eventType, color: '#374151', bg: '#f3f4f6' }
+      const user = item.createdByUser
+        ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
+          item.createdByUser.username || item.createdByUser.email || '-'
+        : '-'
+      const date = item.createdAt ? new Date(item.createdAt).toLocaleString('es-EC') : '-'
+      const changedHtml = renderChangedFields(item.changedFields)
+      const metaHtml = renderMetadata(item.eventType, item.metadata)
+
+      return `
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;margin-bottom:8px;background:#fff;text-align:left;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+            <span style="display:inline-block;padding:3px 10px;border-radius:999px;background:${cfg.bg};color:${cfg.color};font-weight:700;font-size:11px;">${cfg.label}</span>
+            <span style="color:#6b7280;font-size:12px;">👤 ${user} &nbsp;·&nbsp; 🕐 ${date}</span>
+          </div>
+          ${changedHtml}${metaHtml}
+        </div>
+      `
+    })
+
+    return `<div style="max-height:70vh;overflow:auto;padding:4px;background:#f8fafc;border-radius:10px;">${cards.join('')}</div>`
   }
 
   public toggleProductStatus(product: Product): void {

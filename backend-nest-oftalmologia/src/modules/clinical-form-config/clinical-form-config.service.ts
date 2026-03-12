@@ -279,14 +279,14 @@ export class ClinicalFormConfigService {
             visible: true,
             fields: {
               occupation: true,
-              weight: true,
-              height: true,
-              allergies: true,
-              currentMedications: true,
-              chiefComplaint: true,
+              lastVisualExamDate: true,
+              visionProblems: true,
+              generalHealth: true,
+              otherHealthProblems: true,
+              segmentAnterior: true,
             },
           },
-          step2_previousLensometry: {
+          step2_previousRx: {
             visible: true,
             fields: {
               previousRxOd: true,
@@ -295,7 +295,7 @@ export class ClinicalFormConfigService {
               previousAddOi: true,
             },
           },
-          step2_visualAcuityNoRx: {
+          step2_visualAcuity: {
             visible: true,
             fields: {
               visualAcuityOdVl: true,
@@ -304,62 +304,59 @@ export class ClinicalFormConfigService {
               visualAcuityOiVp: true,
             },
           },
-          step2_keratometry: {
+          step2_motorTest: {
             visible: true,
             fields: {
-              keratometryOd: true,
-              keratometryOi: true,
+              exophoria: true,
+              endophoria: true,
+              exotropia: true,
+              endotropia: true,
+              hyperphoria: true,
+              hypotropia: true,
+              alternating: true,
             },
           },
-          step2_retinoscopy: {
+          step2_finalRx: {
             visible: true,
             fields: {
-              retinoscopySphere: true,
-              retinoscopyCylinder: true,
-              retinoscopyAxis: true,
+              finalRxOdSphere: true,
+              finalRxOdCylinder: true,
+              finalRxOdAxis: true,
+              finalRxOdAdd: true,
+              finalRxOdAvVl: true,
+              finalRxOdAvVp: true,
+              finalRxOiSphere: true,
+              finalRxOiCylinder: true,
+              finalRxOiAxis: true,
+              finalRxOiAdd: true,
+              finalRxOiAvVl: true,
+              finalRxOiAvVp: true,
             },
           },
-          step2_subjectiveRefraction: {
+          step2_lensTypes: {
             visible: true,
             fields: {
-              subjectiveRxOdSphere: true,
-              subjectiveRxOdCylinder: true,
-              subjectiveRxOdAxis: true,
-              subjectiveRxOdAdd: true,
-              subjectiveRxOiSphere: true,
-              subjectiveRxOiCylinder: true,
-              subjectiveRxOiAxis: true,
-              subjectiveRxOiAdd: true,
+              lensTypes: true,
             },
           },
-          step2_visualAcuityWithRx: {
+          step2_additionalTreatments: {
             visible: true,
             fields: {
-              correctedAvOdVl: true,
-              correctedAvOdVp: true,
-              correctedAvOiVl: true,
-              correctedAvOiVp: true,
+              additionalTreatments: true,
             },
           },
-          step2_motorTests: {
+          step2_professionalName: {
             visible: true,
             fields: {
-              coverTest: true,
-              ductions: true,
-              versions: true,
-              npc: true,
-              npa: true,
-              fusionalVergences: true,
-              stereopsis: true,
+              professionalName: true,
             },
           },
           step3_pupillaryReflexes: {
             visible: true,
             fields: {
-              directReflexOd: true,
-              directReflexOi: true,
-              consensualReflexOd: true,
-              consensualReflexOi: true,
+              photomotor: true,
+              consensual: true,
+              accommodative: true,
             },
           },
           step3_ophthalmoscopy: {
@@ -372,28 +369,25 @@ export class ClinicalFormConfigService {
           step3_refractiveTests: {
             visible: true,
             fields: {
-              retinoscopy: true,
-              autorefraction: true,
               keratometry: true,
+              autorefract: true,
+              refraction: true,
+              subjective: true,
             },
           },
           step3_otherExams: {
             visible: true,
             fields: {
-              biomicroscopy: true,
-              tonometry: true,
-              gonioscopy: true,
-              pachymetry: true,
+              stereopsis: true,
+              worthTest: true,
+              otherNotes: true,
             },
           },
           step3_diagnosisAndDisposition: {
             visible: true,
             fields: {
               diagnosis: true,
-              treatment: true,
-              recommendations: true,
-              followUp: true,
-              referral: true,
+              disposition: true,
             },
           },
         },

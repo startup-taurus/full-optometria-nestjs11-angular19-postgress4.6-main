@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core'
-import { Observable, BehaviorSubject, of } from 'rxjs'
-import { tap, catchError, map, switchMap } from 'rxjs/operators'
+import { Observable, of } from 'rxjs'
+import { catchError, map, switchMap, distinctUntilChanged } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
 import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
@@ -18,43 +18,65 @@ export class FieldVisibilityService {
   private store = inject(Store<AppState>)
   private configService = inject(ClinicalFormConfigService)
 
-  private configCache$ = new BehaviorSubject<FieldsConfig | null>(null)
-  private currentBranchId: string | null = null
+  private readonly configCacheByBranch = new Map<string, FieldsConfig>()
 
-  constructor() {
-    this.subscribeTobranchChanges()
-  }
+  private mergeFieldsConfigWithDefaults(
+    remoteConfig?: FieldsConfig | null
+  ): FieldsConfig {
+    if (!remoteConfig?.sections) {
+      return DEFAULT_CLINICAL_FORM_STRUCTURE
+    }
 
-  private subscribeTobranchChanges(): void {
-    this.store.select(selectSelectedBranchId).subscribe({
-      next: (branchId) => {
-        if (branchId !== this.currentBranchId) {
-          this.currentBranchId = branchId
-          this.configCache$.next(null)
+    const mergedSections: FieldsConfig['sections'] = {}
+
+    Object.entries(DEFAULT_CLINICAL_FORM_STRUCTURE.sections).forEach(
+      ([sectionKey, defaultSection]) => {
+        const remoteSection = remoteConfig.sections[sectionKey]
+        mergedSections[sectionKey] = {
+          visible: remoteSection?.visible ?? defaultSection.visible,
+          fields: {
+            ...defaultSection.fields,
+            ...(remoteSection?.fields ?? {}),
+          },
         }
-      },
+      }
+    )
+
+    Object.entries(remoteConfig.sections).forEach(([sectionKey, remoteSection]) => {
+      if (!mergedSections[sectionKey]) {
+        mergedSections[sectionKey] = remoteSection
+      }
     })
+
+    return {
+      sections: mergedSections,
+    }
   }
 
   getFieldsConfig(): Observable<FieldsConfig> {
-    const cachedConfig = this.configCache$.value
-    if (cachedConfig) {
-      return of(cachedConfig)
-    }
+    return this.store.select(selectSelectedBranchId).pipe(
+      distinctUntilChanged(),
+      switchMap((branchId) => {
+        const cacheKey = branchId ?? '__no_branch__'
+        const cachedConfig = this.configCacheByBranch.get(cacheKey)
 
-    return this.configService.getConfig().pipe(
-      map((config: ClinicalFormConfig | null) => {
-        if (config && config.fieldsConfig) {
-          this.configCache$.next(config.fieldsConfig)
-          return config.fieldsConfig
-        } else {
-          this.configCache$.next(DEFAULT_CLINICAL_FORM_STRUCTURE)
-          return DEFAULT_CLINICAL_FORM_STRUCTURE
+        if (cachedConfig) {
+          return of(cachedConfig)
         }
-      }),
-      catchError((error) => {
-        this.configCache$.next(DEFAULT_CLINICAL_FORM_STRUCTURE)
-        return of(DEFAULT_CLINICAL_FORM_STRUCTURE)
+
+        return this.configService.getConfig().pipe(
+          map((config: ClinicalFormConfig | null) => {
+            const normalizedConfig = this.mergeFieldsConfigWithDefaults(
+              config?.fieldsConfig
+            )
+            this.configCacheByBranch.set(cacheKey, normalizedConfig)
+            return normalizedConfig
+          }),
+          catchError(() => {
+            this.configCacheByBranch.set(cacheKey, DEFAULT_CLINICAL_FORM_STRUCTURE)
+            return of(DEFAULT_CLINICAL_FORM_STRUCTURE)
+          })
+        )
       })
     )
   }
@@ -81,7 +103,7 @@ export class FieldVisibilityService {
   }
 
   clearCache(): void {
-    this.configCache$.next(null)
+    this.configCacheByBranch.clear()
   }
 
   getSectionsByStep(step: number): string[] {

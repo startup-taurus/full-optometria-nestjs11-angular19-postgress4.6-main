@@ -165,6 +165,36 @@ export class ProductService {
     })
   }
 
+  public getStockHistory(params?: {
+    productId?: string
+  }): Observable<ApiResponse<any[]>> {
+    const endpoint = `${this.API_URL}/stock/history`
+    let httpParams = new HttpParams()
+
+    if (params?.productId) {
+      httpParams = httpParams.set('productId', params.productId)
+    }
+
+    return this._httpClient.get<ApiResponse<any[]>>(endpoint, {
+      params: httpParams,
+    })
+  }
+
+  public getProductHistory(params?: {
+    productId?: string
+  }): Observable<ApiResponse<any[]>> {
+    const endpoint = `${this.API_URL}/audit/history`
+    let httpParams = new HttpParams()
+
+    if (params?.productId) {
+      httpParams = httpParams.set('productId', params.productId)
+    }
+
+    return this._httpClient.get<ApiResponse<any[]>>(endpoint, {
+      params: httpParams,
+    })
+  }
+
   private showNotification(
     message: ApiMessage,
     title: string = 'INVENTORY.TITLE'

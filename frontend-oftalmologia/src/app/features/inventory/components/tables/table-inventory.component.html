@@ -228,6 +228,16 @@
                       </button>
                       <button
                         class="btn btn-sm btn-outline-secondary action-icon-btn"
+                        (click)="showStockHistory(row)"
+                        [ngbTooltip]="
+                          'INVENTORY.ACTIONS.STOCK_HISTORY' | translate
+                        "
+                        container="body"
+                      >
+                        <i class="ti ti-chart-bar"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-secondary action-icon-btn"
                         (click)="openApplyDiscountModal(row)"
                         [ngbTooltip]="
                           'INVENTORY.ACTIONS.APPLY_DISCOUNT' | translate

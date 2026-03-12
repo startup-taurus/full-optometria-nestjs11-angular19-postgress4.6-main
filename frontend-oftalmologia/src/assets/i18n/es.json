@@ -843,6 +843,7 @@
       "ACTIVATE": "Activar Producto",
       "DELETE": "Eliminar Producto",
       "TRANSFER_HISTORY": "Historial de transferencias",
+      "STOCK_HISTORY": "Historial de stock",
       "APPLY_DISCOUNT": "Aplicar descuento"
       
     },

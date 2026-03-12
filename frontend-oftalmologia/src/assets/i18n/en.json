@@ -827,6 +827,7 @@
       "ACTIVATE": "Activate Product",
       "DELETE": "Delete Product",
       "TRANSFER_HISTORY": "Transfer history",
+      "STOCK_HISTORY": "Stock history",
       "APPLY_DISCOUNT": "Apply discount"
     },
     "DETAILS": {
