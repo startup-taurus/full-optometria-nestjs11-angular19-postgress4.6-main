@@ -72,6 +72,7 @@
 
 .actions-icon-grid {
   min-width: 0 !important;
+  background-color: var(--bs-body-bg) !important;
 
   .grid-2col {
     grid-template-columns: repeat(2, 1fr);

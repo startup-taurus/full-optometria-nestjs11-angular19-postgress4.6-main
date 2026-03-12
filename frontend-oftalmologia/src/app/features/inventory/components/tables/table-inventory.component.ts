@@ -514,8 +514,12 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           Swal.fire({
             title: 'Historial de transferencias',
             html,
-            width: 980,
+            width: 'min(980px, 95vw)',
             confirmButtonText: 'Cerrar',
+            customClass: {
+              popup: 'inventory-history-popup',
+              htmlContainer: 'inventory-history-html-container',
+            },
           })
         },
         error: () => {
@@ -551,8 +555,12 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           Swal.fire({
             title: `Historial de producto: ${product.name}`,
             html,
-            width: 1100,
+            width: 'min(1100px, 95vw)',
             confirmButtonText: 'Cerrar',
+            customClass: {
+              popup: 'inventory-history-popup',
+              htmlContainer: 'inventory-history-html-container',
+            },
           })
         },
         error: () => {
@@ -604,7 +612,9 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     const cards = history.slice(0, 25).map((item: any) => {
       const isSent = item.sourceProductId === currentProduct.id
       const movementLabel = isSent ? 'Enviado' : 'Recibido'
-      const movementColor = isSent ? '#dc3545' : '#198754'
+      const movementClass = isSent
+        ? 'transfer-badge transfer-badge--sent'
+        : 'transfer-badge transfer-badge--received'
       const sourceBranch = this.getBranchName(item.sourceBranchId)
       const targetBranch = this.getBranchName(item.targetBranchId)
       const productName =
@@ -628,43 +638,51 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         : '-'
 
       return `
-        <div style="border:1px solid #e9ecef;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#ffffff;box-shadow:0 1px 2px rgba(16,24,40,0.06);text-align:left;">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-            <span style="display:inline-block;padding:4px 10px;border-radius:999px;background:${movementColor};color:#fff;font-weight:700;font-size:12px;">${movementLabel}</span>
-            <span style="color:#667085;font-size:12px;">${date}</span>
+        <article class="inventory-history-card">
+          <div class="inventory-history-card__header">
+            <span class="${movementClass}">${movementLabel}</span>
+            <span class="inventory-history-card__date">${this.escapeHtml(date)}</span>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;font-size:13px;color:#1f2937;">
-            <div><strong>Desde:</strong> ${sourceBranch}</div>
-            <div><strong>Hacia:</strong> ${targetBranch}</div>
-            <div><strong>Código:</strong> ${productCode}</div>
-            <div><strong>Producto:</strong> ${productName}</div>
-            <div><strong>Cantidad:</strong> ${quantity}</div>
-            <div><strong>Enviado por:</strong> ${sentBy}</div>
-            <div><strong>Stock origen después:</strong> ${sourceBalanceAfter}</div>
-            <div><strong>Stock destino después:</strong> ${targetBalanceAfter}</div>
-            <div style="grid-column:1 / -1;"><strong>Nota:</strong> ${transferNote}</div>
+          <div class="inventory-history-grid">
+            <div><strong>Desde:</strong> ${this.escapeHtml(sourceBranch)}</div>
+            <div><strong>Hacia:</strong> ${this.escapeHtml(targetBranch)}</div>
+            <div><strong>Código:</strong> ${this.escapeHtml(productCode)}</div>
+            <div><strong>Producto:</strong> ${this.escapeHtml(productName)}</div>
+            <div><strong>Cantidad:</strong> ${this.escapeHtml(quantity)}</div>
+            <div><strong>Enviado por:</strong> ${this.escapeHtml(sentBy)}</div>
+            <div><strong>Stock origen después:</strong> ${this.escapeHtml(sourceBalanceAfter)}</div>
+            <div><strong>Stock destino después:</strong> ${this.escapeHtml(targetBalanceAfter)}</div>
+            <div class="inventory-history-grid__full"><strong>Nota:</strong> ${this.escapeHtml(transferNote)}</div>
           </div>
-        </div>
+        </article>
       `
     })
 
-    return `<div style="max-height:68vh;overflow:auto;padding:2px 2px 0 2px;background:#f8fafc;border-radius:10px;">${cards.join('')}</div>`
+    return `<section class="inventory-history-shell transfer-history-shell">${cards.join('')}</section>`
   }
 
   private buildStockHistoryHtml(history: any[]): string {
-    const movementTypeLabel: Record<string, string> = {
-      STOCK_INICIAL: 'Stock inicial',
-      INGRESO_AJUSTE_MANUAL: 'Ingreso por ajuste',
-      SALIDA_AJUSTE_MANUAL: 'Salida por ajuste',
-      SALIDA_ELIMINACION: 'Salida por eliminación',
-      INGRESO_TRANSFERENCIA: 'Ingreso por transferencia',
-      SALIDA_TRANSFERENCIA: 'Salida por transferencia',
+    const movementConfig: Record<string, { label: string; tone: string }> = {
+      STOCK_INICIAL: { label: 'Stock inicial', tone: 'secondary' },
+      INGRESO_AJUSTE_MANUAL: { label: 'Ingreso por ajuste', tone: 'success' },
+      SALIDA_AJUSTE_MANUAL: { label: 'Salida por ajuste', tone: 'danger' },
+      SALIDA_ELIMINACION: { label: 'Salida por eliminación', tone: 'danger' },
+      INGRESO_TRANSFERENCIA: { label: 'Ingreso por transferencia', tone: 'primary' },
+      SALIDA_TRANSFERENCIA: { label: 'Salida por transferencia', tone: 'warning' },
     }
 
-    const rows = history
+    const isIngreso = (type: string) =>
+      type === 'STOCK_INICIAL' ||
+      type === 'INGRESO_AJUSTE_MANUAL' ||
+      type === 'INGRESO_TRANSFERENCIA'
+
+    const cards = history
       .slice(0, 100)
       .map((item: any) => {
-        const movementType = movementTypeLabel[item.movementType] || item.movementType || '-'
+        const cfg = movementConfig[item.movementType] ?? {
+          label: item.movementType || '-',
+          tone: 'secondary',
+        }
         const quantity = item.quantity ?? 0
         const balanceAfter = item.balanceAfter ?? '-'
         const user = item.createdByUser
@@ -676,49 +694,37 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         const date = item.createdAt
           ? new Date(item.createdAt).toLocaleString('es-EC')
           : '-'
-        const note = item.note || '-'
+        const note = item.note || 'Sin nota'
+        const qtyClass = isIngreso(item.movementType) ? 'stock-qty stock-qty--in' : 'stock-qty stock-qty--out'
+        const qtyPrefix = isIngreso(item.movementType) ? '+' : '-'
 
         return `
-          <tr>
-            <td style="padding:8px;border-bottom:1px solid #eef2f7;white-space:nowrap;">${date}</td>
-            <td style="padding:8px;border-bottom:1px solid #eef2f7;">${movementType}</td>
-            <td style="padding:8px;border-bottom:1px solid #eef2f7;text-align:right;">${quantity}</td>
-            <td style="padding:8px;border-bottom:1px solid #eef2f7;text-align:right;">${balanceAfter}</td>
-            <td style="padding:8px;border-bottom:1px solid #eef2f7;">${user}</td>
-            <td style="padding:8px;border-bottom:1px solid #eef2f7;">${note}</td>
-          </tr>
+          <article class="inventory-history-card">
+            <div class="inventory-history-card__header">
+              <span class="audit-event-badge audit-event-badge--${cfg.tone}">${this.escapeHtml(cfg.label)}</span>
+              <span class="inventory-history-card__date">${this.escapeHtml(date)}</span>
+            </div>
+            <div class="inventory-history-grid">
+              <div><strong>Cantidad:</strong> <span class="${qtyClass}">${qtyPrefix}${this.escapeHtml(quantity)}</span></div>
+              <div><strong>Saldo tras mov.:</strong> ${this.escapeHtml(balanceAfter)}</div>
+              <div><strong>Realizado por:</strong> ${this.escapeHtml(user)}</div>
+              <div class="inventory-history-grid__full"><strong>Nota:</strong> ${this.escapeHtml(note)}</div>
+            </div>
+          </article>
         `
       })
       .join('')
 
-    return `
-      <div style="max-height:68vh;overflow:auto;border:1px solid #e5e7eb;border-radius:10px;">
-        <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:left;background:#fff;">
-          <thead>
-            <tr style="background:#f8fafc;color:#0f172a;">
-              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Fecha</th>
-              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Tipo</th>
-              <th style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:right;">Cantidad</th>
-              <th style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:right;">Saldo</th>
-              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Usuario</th>
-              <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Nota</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-      </div>
-    `
+    return `<section class="inventory-history-shell stock-history-shell">${cards}</section>`
   }
 
   private buildProductAuditHtml(history: any[]): string {
-    const eventConfig: Record<string, { label: string; color: string; bg: string }> = {
-      CREATED:          { label: 'Creación',           color: '#166534', bg: '#dcfce7' },
-      UPDATED:          { label: 'Actualización',      color: '#1e40af', bg: '#dbeafe' },
-      DISCOUNT_APPLIED: { label: 'Descuento aplicado', color: '#92400e', bg: '#fef3c7' },
-      DISCOUNT_REMOVED: { label: 'Descuento eliminado',color: '#7c3aed', bg: '#ede9fe' },
-      DEACTIVATED:      { label: 'Eliminado',          color: '#991b1b', bg: '#fee2e2' },
+    const eventConfig: Record<string, { label: string; tone: string }> = {
+      CREATED: { label: 'Creación', tone: 'success' },
+      UPDATED: { label: 'Actualización', tone: 'primary' },
+      DISCOUNT_APPLIED: { label: 'Descuento aplicado', tone: 'warning' },
+      DISCOUNT_REMOVED: { label: 'Descuento eliminado', tone: 'info' },
+      DEACTIVATED: { label: 'Eliminado', tone: 'danger' },
     }
 
     const fieldLabels: Record<string, string> = {
@@ -732,34 +738,37 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       if (!changedFields || !Object.keys(changedFields).length) return ''
       const lines = Object.entries(changedFields).map(([key, val]) => {
         const label = fieldLabels[key] || key
-        return `<div style="margin:2px 0;"><strong>${label}:</strong> <span style="color:#6b7280;text-decoration:line-through;">${val.from}</span> → <span style="color:#111827;font-weight:600;">${val.to}</span></div>`
+        return `<div><strong>${this.escapeHtml(label)}:</strong> <span class="history-value--old">${this.escapeHtml(val.from)}</span> → <span class="history-value--new">${this.escapeHtml(val.to)}</span></div>`
       })
-      return `<div style="margin-top:6px;font-size:12px;">${lines.join('')}</div>`
+      return `<div class="history-changes">${lines.join('')}</div>`
     }
 
     const renderMetadata = (eventType: string, metadata: Record<string, any> | null): string => {
       if (!metadata) return ''
       if (eventType === 'CREATED') {
         const syntheticNote = metadata['_synthetic']
-          ? `<div style="margin-top:4px;font-size:11px;color:#6b7280;font-style:italic;">⚠ Este evento fue reconstruido desde la fecha de creación del producto (anterior al sistema de auditoría)</div>`
+          ? `<div class="history-meta history-meta--note">⚠ Este evento fue reconstruido desde la fecha de creación del producto (anterior al sistema de auditoría)</div>`
           : ''
-        return `<div style="margin-top:6px;font-size:12px;color:#374151;">Código: <strong>${metadata['code'] || '-'}</strong> · Precio: <strong>$${metadata['unitPrice'] ?? '-'}</strong> · Stock inicial: <strong>${metadata['quantity'] ?? 0}</strong></div>${syntheticNote}`
+        return `<div class="history-meta">Código: <strong>${this.escapeHtml(metadata['code'] || '-')}</strong> · Precio: <strong>$${this.escapeHtml(metadata['unitPrice'] ?? '-')}</strong> · Stock inicial: <strong>${this.escapeHtml(metadata['quantity'] ?? 0)}</strong></div>${syntheticNote}`
       }
       if (eventType === 'DISCOUNT_APPLIED' || eventType === 'DISCOUNT_REMOVED') {
         const type = metadata['discountType'] === 'PERCENTAGE' ? '%' : '$'
         const val = metadata['discountValue'] ?? '-'
         const start = metadata['startDate'] ? new Date(metadata['startDate']).toLocaleDateString('es-EC') : '-'
         const end = metadata['endDate'] ? new Date(metadata['endDate']).toLocaleDateString('es-EC') : '-'
-        return `<div style="margin-top:6px;font-size:12px;color:#374151;">Tipo: <strong>${metadata['discountType'] || '-'}</strong> · Valor: <strong>${val}${type}</strong> · Vigencia: ${start} – ${end}</div>`
+        return `<div class="history-meta">Tipo: <strong>${this.escapeHtml(metadata['discountType'] || '-')}</strong> · Valor: <strong>${this.escapeHtml(val)}${this.escapeHtml(type)}</strong> · Vigencia: ${this.escapeHtml(start)} – ${this.escapeHtml(end)}</div>`
       }
       if (eventType === 'DEACTIVATED') {
-        return `<div style="margin-top:6px;font-size:12px;color:#374151;">Stock al eliminar: <strong>${metadata['quantityAtDeletion'] ?? 0}</strong></div>`
+        return `<div class="history-meta">Stock al eliminar: <strong>${this.escapeHtml(metadata['quantityAtDeletion'] ?? 0)}</strong></div>`
       }
       return ''
     }
 
     const cards = history.slice(0, 200).map((item: any) => {
-      const cfg = eventConfig[item.eventType] || { label: item.eventType, color: '#374151', bg: '#f3f4f6' }
+      const cfg = eventConfig[item.eventType] || {
+        label: item.eventType,
+        tone: 'secondary',
+      }
       const user = item.createdByUser
         ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
           item.createdByUser.username || item.createdByUser.email || '-'
@@ -769,17 +778,26 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       const metaHtml = renderMetadata(item.eventType, item.metadata)
 
       return `
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;margin-bottom:8px;background:#fff;text-align:left;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-            <span style="display:inline-block;padding:3px 10px;border-radius:999px;background:${cfg.bg};color:${cfg.color};font-weight:700;font-size:11px;">${cfg.label}</span>
-            <span style="color:#6b7280;font-size:12px;">👤 ${user} &nbsp;·&nbsp; 🕐 ${date}</span>
+        <article class="inventory-history-card audit-history-card">
+          <div class="inventory-history-card__header">
+            <span class="audit-event-badge audit-event-badge--${cfg.tone}">${this.escapeHtml(cfg.label)}</span>
+            <span class="inventory-history-card__date">👤 ${this.escapeHtml(user)} &nbsp;·&nbsp; 🕐 ${this.escapeHtml(date)}</span>
           </div>
           ${changedHtml}${metaHtml}
-        </div>
+        </article>
       `
     })
 
-    return `<div style="max-height:70vh;overflow:auto;padding:4px;background:#f8fafc;border-radius:10px;">${cards.join('')}</div>`
+    return `<section class="inventory-history-shell audit-history-shell">${cards.join('')}</section>`
+  }
+
+  private escapeHtml(value: unknown): string {
+    return String(value ?? '-')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
   }
 
   public toggleProductStatus(product: Product): void {
