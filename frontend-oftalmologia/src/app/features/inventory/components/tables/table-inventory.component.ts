@@ -28,7 +28,6 @@ import {
 } from '@core/services/api/products-management.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
 import { CompanyLogoService } from '@core/services/ui/company-logo.service'
-import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
@@ -65,6 +64,7 @@ import {
   SWAL_SUCCESS_CONFIG,
   SWAL_ERROR_CONFIG,
 } from '@core/helpers/ui/ui.constants'
+import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
 
 @Component({
   selector: 'table-inventory',
@@ -168,7 +168,12 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       return
     }
 
-    const branch = this.branchList.find((b) => b.id === branchId)
+    const branchFromSelector = this.branchList.find((b) => b.id === branchId)
+    const branchFromDetail = await firstValueFrom(
+      this._branchService.getBranchById(branchId)
+    )
+    const branch = branchFromDetail || branchFromSelector
+
     if (!branch) {
       Swal.fire({
         title: 'Sucursal no encontrada',
@@ -193,6 +198,14 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
 
     try {
       const logoUrl = this._companyLogoService.getCachedLogoUrl() ?? undefined
+      const phoneFromProducts = products.find(
+        (product) => product.branchId === branchId
+      )?.branch?.phone
+      const branchPhone =
+        branchFromDetail?.phone ||
+        branchFromSelector?.phone ||
+        phoneFromProducts ||
+        undefined
 
       const pdfProducts = products.map((product) => ({
         name: product.name,
@@ -200,18 +213,25 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         description: product.description ?? undefined,
         unitPrice: parseFloat(String(product.unitPrice)),
         imageUrl: (() => {
-          const cover = product.images?.find((img) => img.isCover) ?? product.images?.[0]
+          const cover =
+            product.images?.find((img) => img.isCover) ?? product.images?.[0]
           return cover?.path
             ? `${environment.fileBaseUrl}/${cover.path}`
             : undefined
         })(),
+        imageUrls:
+          product.images?.map(
+            (image) => `${environment.fileBaseUrl}/${image.path}`
+          ) ?? [],
         discount:
           product.hasActiveDiscount && product.discount
             ? {
                 type: product.discount.type,
                 value: product.discount.value,
                 finalPrice: parseFloat(String(product.discount.finalPrice)),
-                originalPrice: parseFloat(String(product.discount.originalPrice)),
+                originalPrice: parseFloat(
+                  String(product.discount.originalPrice)
+                ),
               }
             : undefined,
       }))
@@ -225,7 +245,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           branch: {
             id: branch.id,
             name: branch.name,
-            phone: branch.phone,
+            phone: branchPhone,
             address: branch.address,
           },
           products: pdfProducts,
@@ -779,8 +799,14 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       INGRESO_AJUSTE_MANUAL: { label: 'Ingreso por ajuste', tone: 'success' },
       SALIDA_AJUSTE_MANUAL: { label: 'Salida por ajuste', tone: 'danger' },
       SALIDA_ELIMINACION: { label: 'Salida por eliminación', tone: 'danger' },
-      INGRESO_TRANSFERENCIA: { label: 'Ingreso por transferencia', tone: 'primary' },
-      SALIDA_TRANSFERENCIA: { label: 'Salida por transferencia', tone: 'warning' },
+      INGRESO_TRANSFERENCIA: {
+        label: 'Ingreso por transferencia',
+        tone: 'primary',
+      },
+      SALIDA_TRANSFERENCIA: {
+        label: 'Salida por transferencia',
+        tone: 'warning',
+      },
     }
 
     const isIngreso = (type: string) =>
@@ -807,7 +833,9 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           ? new Date(item.createdAt).toLocaleString('es-EC')
           : '-'
         const note = item.note || 'Sin nota'
-        const qtyClass = isIngreso(item.movementType) ? 'stock-qty stock-qty--in' : 'stock-qty stock-qty--out'
+        const qtyClass = isIngreso(item.movementType)
+          ? 'stock-qty stock-qty--in'
+          : 'stock-qty stock-qty--out'
         const qtyPrefix = isIngreso(item.movementType) ? '+' : '-'
 
         return `
@@ -840,13 +868,21 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     }
 
     const fieldLabels: Record<string, string> = {
-      name: 'Nombre', description: 'Descripción', brand: 'Marca',
-      code: 'Código', unitPrice: 'Precio', quantity: 'Cantidad',
-      categoryId: 'Categoría', subcategoryId: 'Subcategoría',
-      defaultSupplierId: 'Proveedor', isActive: 'Activo',
+      name: 'Nombre',
+      description: 'Descripción',
+      brand: 'Marca',
+      code: 'Código',
+      unitPrice: 'Precio',
+      quantity: 'Cantidad',
+      categoryId: 'Categoría',
+      subcategoryId: 'Subcategoría',
+      defaultSupplierId: 'Proveedor',
+      isActive: 'Activo',
     }
 
-    const renderChangedFields = (changedFields: Record<string, { from: any; to: any }> | null): string => {
+    const renderChangedFields = (
+      changedFields: Record<string, { from: any; to: any }> | null
+    ): string => {
       if (!changedFields || !Object.keys(changedFields).length) return ''
       const lines = Object.entries(changedFields).map(([key, val]) => {
         const label = fieldLabels[key] || key
@@ -855,7 +891,10 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       return `<div class="history-changes">${lines.join('')}</div>`
     }
 
-    const renderMetadata = (eventType: string, metadata: Record<string, any> | null): string => {
+    const renderMetadata = (
+      eventType: string,
+      metadata: Record<string, any> | null
+    ): string => {
       if (!metadata) return ''
       if (eventType === 'CREATED') {
         const syntheticNote = metadata['_synthetic']
@@ -863,11 +902,18 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           : ''
         return `<div class="history-meta">Código: <strong>${this.escapeHtml(metadata['code'] || '-')}</strong> · Precio: <strong>$${this.escapeHtml(metadata['unitPrice'] ?? '-')}</strong> · Stock inicial: <strong>${this.escapeHtml(metadata['quantity'] ?? 0)}</strong></div>${syntheticNote}`
       }
-      if (eventType === 'DISCOUNT_APPLIED' || eventType === 'DISCOUNT_REMOVED') {
+      if (
+        eventType === 'DISCOUNT_APPLIED' ||
+        eventType === 'DISCOUNT_REMOVED'
+      ) {
         const type = metadata['discountType'] === 'PERCENTAGE' ? '%' : '$'
         const val = metadata['discountValue'] ?? '-'
-        const start = metadata['startDate'] ? new Date(metadata['startDate']).toLocaleDateString('es-EC') : '-'
-        const end = metadata['endDate'] ? new Date(metadata['endDate']).toLocaleDateString('es-EC') : '-'
+        const start = metadata['startDate']
+          ? new Date(metadata['startDate']).toLocaleDateString('es-EC')
+          : '-'
+        const end = metadata['endDate']
+          ? new Date(metadata['endDate']).toLocaleDateString('es-EC')
+          : '-'
         return `<div class="history-meta">Tipo: <strong>${this.escapeHtml(metadata['discountType'] || '-')}</strong> · Valor: <strong>${this.escapeHtml(val)}${this.escapeHtml(type)}</strong> · Vigencia: ${this.escapeHtml(start)} – ${this.escapeHtml(end)}</div>`
       }
       if (eventType === 'DEACTIVATED') {
@@ -883,9 +929,13 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       }
       const user = item.createdByUser
         ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
-          item.createdByUser.username || item.createdByUser.email || '-'
+          item.createdByUser.username ||
+          item.createdByUser.email ||
+          '-'
         : '-'
-      const date = item.createdAt ? new Date(item.createdAt).toLocaleString('es-EC') : '-'
+      const date = item.createdAt
+        ? new Date(item.createdAt).toLocaleString('es-EC')
+        : '-'
       const changedHtml = renderChangedFields(item.changedFields)
       const metaHtml = renderMetadata(item.eventType, item.metadata)
 

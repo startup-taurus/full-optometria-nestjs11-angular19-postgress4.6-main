@@ -19,6 +19,7 @@ export interface PublicCatalogPdfProduct {
   description?: string
   unitPrice: number
   imageUrl?: string
+  imageUrls?: string[]
   discount?: PublicCatalogPdfProductDiscount
 }
 

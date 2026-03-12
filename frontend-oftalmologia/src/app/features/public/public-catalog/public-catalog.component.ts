@@ -13,11 +13,10 @@ import {
 } from '@core/interfaces/api/public-product.interface'
 import { PublicCatalogPdfProduct } from '@core/interfaces/ui/public-catalog-pdf.interface'
 import { CartService } from '@core/services/ui/cart.service'
-import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
 import { DefaultZgamesComponent } from '../default-zgames/default-zgames.component'
-import { CatalogPdfExportComponent } from '../../../shared/components/catalog-pdf-export/catalog-pdf-export.component'
 import Swal from 'sweetalert2'
 import { firstValueFrom } from 'rxjs'
+import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
 
 interface WhatsAppBranchTarget {
   branchName: string
@@ -28,13 +27,7 @@ interface WhatsAppBranchTarget {
 @Component({
   selector: 'app-public-catalog',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-    DefaultZgamesComponent,
-    CatalogPdfExportComponent,
-  ],
+  imports: [CommonModule, FormsModule, RouterModule, DefaultZgamesComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './public-catalog.component.html',
   styleUrls: ['./public-catalog.component.scss'],
@@ -647,14 +640,31 @@ export class PublicCatalogComponent implements OnInit {
         return
       }
 
-      const branch = this.resolveBranchInfoForPdf(this.selectedBranchId, products)
-      const pdfProducts: PublicCatalogPdfProduct[] = products.map((product) => ({
-        name: product.name,
-        brand: product.brand,
-        description: product.description,
-        unitPrice: this.resolveFinalProductPrice(product),
-        imageUrl: this.getImageUrl(product),
-      }))
+      const branch = this.resolveBranchInfoForPdf(
+        this.selectedBranchId,
+        products
+      )
+      const pdfProducts: PublicCatalogPdfProduct[] = products.map(
+        (product) => ({
+          name: product.name,
+          brand: product.brand,
+          description: product.description,
+          unitPrice: this.resolveFinalProductPrice(product),
+          imageUrl: this.getImageUrl(product),
+          imageUrls: product.images?.map((image) =>
+            this.catalogService.getImageUrl(image.path)
+          ),
+          discount:
+            product.hasActiveDiscount && product.discount
+              ? {
+                  type: product.discount.type,
+                  value: product.discount.value,
+                  finalPrice: product.discount.finalPrice,
+                  originalPrice: product.discount.originalPrice,
+                }
+              : undefined,
+        })
+      )
 
       await this.publicCatalogPdfService.downloadCatalog(
         {
