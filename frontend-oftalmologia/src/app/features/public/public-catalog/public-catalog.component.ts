@@ -11,14 +11,30 @@ import {
   PublicProductFilters,
   PublicProductQuery,
 } from '@core/interfaces/api/public-product.interface'
+import { PublicCatalogPdfProduct } from '@core/interfaces/ui/public-catalog-pdf.interface'
 import { CartService } from '@core/services/ui/cart.service'
+import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
 import { DefaultZgamesComponent } from '../default-zgames/default-zgames.component'
+import { CatalogPdfExportComponent } from '../../../shared/components/catalog-pdf-export/catalog-pdf-export.component'
 import Swal from 'sweetalert2'
+import { firstValueFrom } from 'rxjs'
+
+interface WhatsAppBranchTarget {
+  branchName: string
+  phone: string
+  link: string
+}
 
 @Component({
   selector: 'app-public-catalog',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, DefaultZgamesComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    DefaultZgamesComponent,
+    CatalogPdfExportComponent,
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './public-catalog.component.html',
   styleUrls: ['./public-catalog.component.scss'],
@@ -29,6 +45,7 @@ export class PublicCatalogComponent implements OnInit {
   private readonly route = inject(ActivatedRoute)
   private readonly authService = inject(AuthenticationService)
   private readonly cartService = inject(CartService)
+  private readonly publicCatalogPdfService = inject(PublicCatalogPdfService)
 
   companyName = signal<string>('')
   isValidCompany = signal<boolean>(false)
@@ -58,6 +75,7 @@ export class PublicCatalogComponent implements OnInit {
   selectedProductImageUrl = ''
   selectedProductQuantity = 1
   isCartOpen = false
+  generatingCatalogPdf = false
 
   searchName = ''
   searchDescription = ''
@@ -527,7 +545,7 @@ export class PublicCatalogComponent implements OnInit {
       return
     }
 
-    const links: string[] = []
+    const targets: WhatsAppBranchTarget[] = []
     const missingPhones: string[] = []
 
     for (const group of groups) {
@@ -545,13 +563,17 @@ export class PublicCatalogComponent implements OnInit {
       )
 
       if (link) {
-        links.push(link)
+        targets.push({
+          branchName: group.branchName,
+          phone: branchPhone,
+          link,
+        })
       } else {
         missingPhones.push(group.branchName)
       }
     }
 
-    if (!links.length) {
+    if (!targets.length) {
       this.showToast(
         'warning',
         'No se pudo generar WhatsApp',
@@ -560,11 +582,11 @@ export class PublicCatalogComponent implements OnInit {
       return
     }
 
-    links.forEach((link, index) => {
-      setTimeout(() => {
-        window.open(link, '_blank', 'noopener,noreferrer')
-      }, index * 180)
-    })
+    if (targets.length === 1) {
+      window.open(targets[0].link, '_blank', 'noopener,noreferrer')
+    } else {
+      await this.showWhatsAppBranchSelector(targets)
+    }
 
     if (missingPhones.length) {
       this.showToast(
@@ -578,8 +600,92 @@ export class PublicCatalogComponent implements OnInit {
     this.showToast(
       'success',
       'WhatsApp abierto',
-      'Se abrió el resumen de tu carrito.'
+      targets.length === 1
+        ? 'Se abrió el resumen de tu carrito.'
+        : 'Selecciona la sucursal desde la lista y abre cada chat manualmente.'
     )
+  }
+
+  async exportBranchCatalogPdf(): Promise<void> {
+    if (this.generatingCatalogPdf) {
+      return
+    }
+
+    if (!this.selectedBranchId) {
+      this.showToast(
+        'warning',
+        'Selecciona una sucursal',
+        'Para generar el catálogo PDF debes filtrar por una sucursal.'
+      )
+      return
+    }
+
+    const companyName = this.companyName()
+    if (!companyName) {
+      this.showToast(
+        'error',
+        'Empresa inválida',
+        'No fue posible identificar la empresa del catálogo.'
+      )
+      return
+    }
+
+    this.generatingCatalogPdf = true
+
+    try {
+      const products = await this.loadProductsForBranchPdf(
+        this.selectedBranchId,
+        companyName
+      )
+
+      if (!products.length) {
+        this.showToast(
+          'info',
+          'Sin productos para exportar',
+          'La sucursal seleccionada no tiene productos activos.'
+        )
+        return
+      }
+
+      const branch = this.resolveBranchInfoForPdf(this.selectedBranchId, products)
+      const pdfProducts: PublicCatalogPdfProduct[] = products.map((product) => ({
+        name: product.name,
+        brand: product.brand,
+        description: product.description,
+        unitPrice: this.resolveFinalProductPrice(product),
+        imageUrl: this.getImageUrl(product),
+      }))
+
+      await this.publicCatalogPdfService.downloadCatalog(
+        {
+          title: 'Catálogo de Productos',
+          generatedAt: new Date(),
+          branch: {
+            id: this.selectedBranchId,
+            name: branch.name,
+            phone: branch.phone,
+            address: branch.address,
+            companyName,
+          },
+          products: pdfProducts,
+        },
+        this.buildCatalogFilename(branch.name)
+      )
+
+      this.showToast(
+        'success',
+        'Catálogo generado',
+        'La descarga del PDF comenzó correctamente.'
+      )
+    } catch {
+      this.showToast(
+        'error',
+        'No se pudo generar el PDF',
+        'Intenta nuevamente en unos segundos.'
+      )
+    } finally {
+      this.generatingCatalogPdf = false
+    }
   }
 
   async shareProduct(
@@ -827,6 +933,116 @@ export class PublicCatalogComponent implements OnInit {
     }
 
     return ''
+  }
+
+  private async showWhatsAppBranchSelector(
+    targets: WhatsAppBranchTarget[]
+  ): Promise<void> {
+    const linksHtml = targets
+      .map(
+        (target) =>
+          `<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="${target.link}" target="_blank" rel="noopener noreferrer"><span>${this.escapeHtml(
+            target.branchName
+          )}</span><small class="text-muted">${this.escapeHtml(
+            target.phone
+          )}</small></a>`
+      )
+      .join('')
+
+    await Swal.fire({
+      title: 'Sucursales para WhatsApp',
+      html: `<p class="mb-2">Tu carrito tiene productos de <strong>${targets.length} sucursales diferentes</strong>. Cada sucursal maneja su propio inventario y atención al cliente, por eso debes contactarlas por separado.</p><p class="text-muted small mb-3">Hazlo clic en la sucursal que quieras consultar para abrir su WhatsApp.</p><div class="list-group text-start">${linksHtml}</div>`,
+      icon: 'info',
+      confirmButtonText: 'Listo',
+      focusConfirm: false,
+    })
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+  }
+
+  private async loadProductsForBranchPdf(
+    branchId: string,
+    companyName: string
+  ): Promise<PublicProduct[]> {
+    const allProducts: PublicProduct[] = []
+    const limit = 60
+    let currentPage = 1
+    let totalPages = 1
+
+    do {
+      const response = await firstValueFrom(
+        this.catalogService.getProducts({
+          companyName,
+          branchId,
+          page: currentPage,
+          limit,
+          sortBy: 'newest',
+        })
+      )
+
+      if (response.items?.length) {
+        allProducts.push(...response.items)
+      }
+
+      totalPages = Math.max(response.totalPages || 1, 1)
+      currentPage += 1
+    } while (currentPage <= totalPages)
+
+    return allProducts
+  }
+
+  private resolveBranchInfoForPdf(
+    branchId: string,
+    products: PublicProduct[]
+  ): { name: string; phone: string; address: string } {
+    const branchFromFilters = this.filters().branches.find(
+      (branch) => branch.id === branchId
+    )
+    const branchFromProducts = products.find((product) => {
+      const currentBranchId = product.branch?.id || 'sin-sucursal'
+      return currentBranchId === branchId
+    })?.branch
+
+    return {
+      name:
+        branchFromProducts?.name ||
+        branchFromFilters?.name ||
+        this.selectedBranchName ||
+        'Sucursal',
+      phone:
+        branchFromProducts?.phone ||
+        branchFromFilters?.phone ||
+        'No disponible',
+      address: branchFromProducts?.address || '',
+    }
+  }
+
+  private resolveFinalProductPrice(product: PublicProduct): number {
+    const discountPrice = product.discount?.finalPrice
+    if (product.hasActiveDiscount && discountPrice !== undefined) {
+      return Number(discountPrice)
+    }
+
+    return Number(product.unitPrice)
+  }
+
+  private buildCatalogFilename(branchName: string): string {
+    const normalizedBranchName = branchName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+
+    const date = new Date().toISOString().slice(0, 10)
+    return `catalogo_${normalizedBranchName || 'sucursal'}_${date}.pdf`
   }
 
   private showToast(

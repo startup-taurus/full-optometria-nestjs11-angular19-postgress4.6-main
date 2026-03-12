@@ -8,6 +8,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core'
+import { environment } from '@environment/environment'
 import { BUTTON_ACTIONS } from '@core/helpers/ui/constants'
 import { DEFAULT_NGX_DATATABLE_PAGINATION } from '@core/helpers/ui/ngx-datatable.constant'
 import { FORMAT_FOR_DATES } from '@core/helpers/ui/ui.constants'
@@ -26,6 +27,8 @@ import {
   ProductWithRelations,
 } from '@core/services/api/products-management.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
+import { CompanyLogoService } from '@core/services/ui/company-logo.service'
+import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
@@ -35,6 +38,7 @@ import { TranslateModule } from '@ngx-translate/core'
 import {
   BehaviorSubject,
   catchError,
+  firstValueFrom,
   map,
   Observable,
   of,
@@ -111,10 +115,13 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   public config$ = new BehaviorSubject<Partial<NgxDatatableConfig>>({})
   public data$: Observable<Product[]> = of([])
 
+  public isPdfLoading = false
+
   private filter: object = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
   private isInitialLoad = true
   private branchNameMap = new Map<string, string>()
+  private branchList: Branch[] = []
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _productService = inject(ProductService)
@@ -122,6 +129,8 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   private _productsManagementService = inject(ProductsManagementService)
   private _bsModalService = inject(BootstrapModalService)
   private _store = inject(Store<AppState>)
+  private _catalogPdfService = inject(PublicCatalogPdfService)
+  private _companyLogoService = inject(CompanyLogoService)
 
   ngOnInit(): void {
     this.initializeSubscriptions()
@@ -134,10 +143,113 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       .getAllBranchesForSelector()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((branches: Branch[]) => {
+        this.branchList = branches
         this.branchNameMap = new Map(
           branches.map((branch) => [branch.id, branch.name])
         )
       })
+  }
+
+  public async downloadInventoryPdf(): Promise<void> {
+    if (this.isPdfLoading) {
+      return
+    }
+
+    const branchId = await firstValueFrom(
+      this._store.select(selectSelectedBranchId)
+    )
+
+    if (!branchId) {
+      Swal.fire({
+        title: 'Selecciona una sucursal',
+        text: 'Debes tener una sucursal activa para generar el catálogo PDF.',
+        icon: 'warning',
+      })
+      return
+    }
+
+    const branch = this.branchList.find((b) => b.id === branchId)
+    if (!branch) {
+      Swal.fire({
+        title: 'Sucursal no encontrada',
+        text: 'No fue posible obtener la información de la sucursal.',
+        icon: 'error',
+      })
+      return
+    }
+
+    const products = await firstValueFrom(this.data$)
+
+    if (!products.length) {
+      Swal.fire({
+        title: 'Sin productos',
+        text: 'No hay productos cargados en el inventario para exportar.',
+        icon: 'info',
+      })
+      return
+    }
+
+    this.isPdfLoading = true
+
+    try {
+      const logoUrl = this._companyLogoService.getCachedLogoUrl() ?? undefined
+
+      const pdfProducts = products.map((product) => ({
+        name: product.name,
+        brand: product.brand ?? undefined,
+        description: product.description ?? undefined,
+        unitPrice: parseFloat(String(product.unitPrice)),
+        imageUrl: (() => {
+          const cover = product.images?.find((img) => img.isCover) ?? product.images?.[0]
+          return cover?.path
+            ? `${environment.fileBaseUrl}/${cover.path}`
+            : undefined
+        })(),
+        discount:
+          product.hasActiveDiscount && product.discount
+            ? {
+                type: product.discount.type,
+                value: product.discount.value,
+                finalPrice: parseFloat(String(product.discount.finalPrice)),
+                originalPrice: parseFloat(String(product.discount.originalPrice)),
+              }
+            : undefined,
+      }))
+
+      const filename = `inventario-${branch.name.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`
+
+      await this._catalogPdfService.downloadCatalog(
+        {
+          title: 'Inventario de Productos',
+          generatedAt: new Date(),
+          branch: {
+            id: branch.id,
+            name: branch.name,
+            phone: branch.phone,
+            address: branch.address,
+          },
+          products: pdfProducts,
+          logoUrl,
+        },
+        filename
+      )
+
+      Swal.fire({
+        title: 'PDF generado',
+        text: 'El inventario fue exportado correctamente.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false,
+      })
+    } catch {
+      Swal.fire({
+        title: 'Error al generar PDF',
+        text: 'Intenta nuevamente en unos segundos.',
+        icon: 'error',
+      })
+    } finally {
+      this.isPdfLoading = false
+    }
   }
 
   ngOnDestroy(): void {

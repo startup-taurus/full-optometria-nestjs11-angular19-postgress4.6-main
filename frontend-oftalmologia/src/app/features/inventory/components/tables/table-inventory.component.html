@@ -31,6 +31,17 @@
               </button>
 
               <button
+                class="btn btn-outline-danger btn-sm"
+                type="button"
+                placement="top"
+                ngbTooltip="Exportar inventario PDF"
+                [disabled]="isPdfLoading"
+                (click)="downloadInventoryPdf()"
+              >
+                <i class="ti" [class.ti-file-type-pdf]="!isPdfLoading" [class.ti-loader-2]="isPdfLoading"></i>
+              </button>
+
+              <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
                 placement="top"
