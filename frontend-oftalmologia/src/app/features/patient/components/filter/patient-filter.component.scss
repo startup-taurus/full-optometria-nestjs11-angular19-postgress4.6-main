@@ -1,18 +1,1 @@
-.patient-filter {
-  padding: 0;
 
-  .form-label {
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--bs-body-color);
-  }
-
-  .form-control,
-  ::ng-deep .ng-select {
-    font-size: 0.875rem;
-  }
-
-  ::ng-deep .ng-select .ng-select-container {
-    min-height: 38px;
-  }
-}

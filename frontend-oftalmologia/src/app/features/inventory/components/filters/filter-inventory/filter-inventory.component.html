@@ -1,4 +1,4 @@
-<div class="inventory-filter">
+<div class="inventory-filter filter-form-unified filter-form-v2">
   <form [formGroup]="inventoryFilterForm!" (ngSubmit)="onSubmit()">
     <div class="row g-3">
       <div class="col-12">
@@ -78,13 +78,13 @@
           [clearable]="true"
           [searchable]="true"
           [placeholder]="'INVENTORY.FILTER.CATEGORY_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option
             *ngFor="let category of categories$ | async"
             [value]="category.id"
           >
-            <span class="text-dark fw-medium">{{ category.name }}</span>
+            <span class="fw-medium">{{ category.name }}</span>
           </ng-option>
         </ng-select>
       </div>
@@ -101,13 +101,13 @@
           [clearable]="true"
           [searchable]="true"
           [placeholder]="'INVENTORY.FILTER.SUBCATEGORY_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option
             *ngFor="let subcategory of subcategories$ | async"
             [value]="subcategory.id"
           >
-            <span class="text-dark fw-medium">{{ subcategory.name }}</span>
+            <span class="fw-medium">{{ subcategory.name }}</span>
           </ng-option>
         </ng-select>
       </div>
@@ -124,13 +124,13 @@
           [clearable]="true"
           [searchable]="true"
           [placeholder]="'INVENTORY.FILTER.SUPPLIER_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option
             *ngFor="let supplier of suppliers$ | async"
             [value]="supplier.id"
           >
-            <span class="text-dark fw-medium">{{ supplier.name }}</span>
+            <span class="fw-medium">{{ supplier.name }}</span>
           </ng-option>
         </ng-select>
       </div>
@@ -146,13 +146,13 @@
           bindValue="value"
           [clearable]="true"
           [placeholder]="'INVENTORY.FILTER.STATUS_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option
             *ngFor="let option of statusOptions$ | async"
             [value]="option.value"
           >
-            <span class="text-dark fw-medium">{{ option.label }}</span>
+            <span class="fw-medium">{{ option.label }}</span>
           </ng-option>
         </ng-select>
       </div>

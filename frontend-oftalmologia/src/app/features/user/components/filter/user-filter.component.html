@@ -1,4 +1,4 @@
-<div class="user-filter">
+<div class="user-filter filter-form-unified filter-form-v2">
   <form [formGroup]="userFilterForm!" (ngSubmit)="onSubmit()">
     <div class="row g-3">
       <div class="col-12">
@@ -97,10 +97,10 @@
           [clearable]="true"
           [searchable]="true"
           [placeholder]="'USER.FILTER.ROLE_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option *ngFor="let role of roles$ | async" [value]="role.value">
-            <span class="text-dark fw-medium">{{ role.label }}</span>
+            <span class="fw-medium">{{ role.label }}</span>
           </ng-option>
         </ng-select>
       </div>
@@ -116,13 +116,13 @@
           bindValue="value"
           [clearable]="true"
           [placeholder]="'USER.FILTER.IS_ACTIVE_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option
             *ngFor="let option of active$ | async"
             [value]="option.value"
           >
-            <span class="text-dark fw-medium">{{ option.label }}</span>
+            <span class="fw-medium">{{ option.label }}</span>
           </ng-option>
         </ng-select>
       </div>
@@ -138,13 +138,13 @@
           bindValue="value"
           [clearable]="true"
           [placeholder]="'USER.FILTER.IS_LOCKED_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option
             *ngFor="let option of blocked$ | async"
             [value]="option.value"
           >
-            <span class="text-dark fw-medium">{{ option.label }}</span>
+            <span class="fw-medium">{{ option.label }}</span>
           </ng-option>
         </ng-select>
       </div>
