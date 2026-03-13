@@ -90,6 +90,16 @@ export class ProductsController {
     return this.productsService.findAll(queryDto, branchId, companyId);
   }
 
+  @Get('by-code/:code')
+  @UseGuards(AuthGuard('jwt'))
+  async findOneByCode(
+    @Param('code') code: string,
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null,
+  ) {
+    return this.productsService.findOneByCode(code, branchId, companyId);
+  }
+
   @Get('transfers/history')
   @UseGuards(AuthGuard('jwt'))
   async getTransferHistory(

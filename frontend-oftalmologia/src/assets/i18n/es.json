@@ -954,6 +954,19 @@
       "SUBMIT": "Agregar stock",
       "ERROR_MESSAGE": "No se pudo agregar el stock"
     },
+    "QUICK_STOCK": {
+      "TITLE": "Ingreso por código",
+      "DESCRIPTION": "Busca un producto por código para agregar stock o crearlo si no existe.",
+      "CODE_PLACEHOLDER": "Escribe o escanea el código del producto",
+      "CODE_REQUIRED": "El código es obligatorio",
+      "START_SCAN": "Escanear con cámara",
+      "STOP_SCAN": "Detener escaneo",
+      "SEARCHING": "Buscando producto...",
+      "NOT_FOUND": "No se encontró un producto con ese código en la sucursal activa.",
+      "ADD_STOCK": "Agregar stock",
+      "CREATE_WITH_CODE": "Crear producto con este código",
+      "CAMERA_ERROR": "No se pudo iniciar la cámara. Puedes continuar escribiendo el código manualmente."
+    },
     "APPLY_DISCOUNT": {
       "TITLE": "Aplicar descuento",
       "DISCOUNT_TYPE": "Tipo de descuento",

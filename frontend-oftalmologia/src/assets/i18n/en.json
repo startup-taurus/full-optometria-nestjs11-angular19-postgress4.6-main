@@ -937,6 +937,19 @@
       "SUBMIT": "Add stock",
       "ERROR_MESSAGE": "Could not add stock"
     },
+    "QUICK_STOCK": {
+      "TITLE": "Stock by code",
+      "DESCRIPTION": "Find a product by code to add stock or create it if it doesn't exist.",
+      "CODE_PLACEHOLDER": "Type or scan the product code",
+      "CODE_REQUIRED": "Code is required",
+      "START_SCAN": "Scan with camera",
+      "STOP_SCAN": "Stop scan",
+      "SEARCHING": "Searching product...",
+      "NOT_FOUND": "No product found with that code in the active branch.",
+      "ADD_STOCK": "Add stock",
+      "CREATE_WITH_CODE": "Create product with this code",
+      "CAMERA_ERROR": "Camera could not be started. You can continue by typing the code manually."
+    },
     "APPLY_DISCOUNT": {
       "TITLE": "Apply discount",
       "DISCOUNT_TYPE": "Discount type",

@@ -58,6 +58,10 @@ import { CreateEditInventoryComponent } from '../forms/create-edit-inventory/cre
 import { TransferStockInventoryComponent } from '../forms/transfer-stock-inventory/transfer-stock-inventory.component'
 import { AddStockInventoryComponent } from '../forms/add-stock-inventory/add-stock-inventory.component'
 import { ApplyDiscountInventoryComponent } from '../forms/apply-discount-inventory/apply-discount-inventory.component'
+import {
+  QuickStockSearchInventoryComponent,
+  QuickStockSearchResult,
+} from '../forms/quick-stock-search-inventory/quick-stock-search-inventory.component'
 import Swal from 'sweetalert2'
 import {
   SWAL_DELETE_CONFIRM_CONFIG,
@@ -65,6 +69,10 @@ import {
   SWAL_ERROR_CONFIG,
 } from '@core/helpers/ui/ui.constants'
 import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
+
+interface InventoryUpsertModalData extends ModalWithAction<Product> {
+  initialCode?: string
+}
 
 @Component({
   selector: 'table-inventory',
@@ -453,9 +461,43 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     this.data$ = this.loadProductsObservable()
   }
 
-  public openModal(buttonAction: ButtonAction, product?: Product): void {
+  public openQuickStockSearchModal(): void {
+    const modalRef = this._bsModalService.openModal({
+      component: QuickStockSearchInventoryComponent,
+      options: {
+        size: 'lg',
+        backdrop: 'static',
+        centered: true,
+      },
+    })
+
+    if (!modalRef) {
+      return
+    }
+
+    modalRef.closed.subscribe((result: QuickStockSearchResult) => {
+      if (!result) {
+        return
+      }
+
+      if (result.action === 'stock' && result.product) {
+        this.openAddStockModal(result.product)
+        return
+      }
+
+      if (result.action === 'create' && result.code) {
+        this.openModal(BUTTON_ACTIONS.ADD, undefined, result.code)
+      }
+    })
+  }
+
+  public openModal(
+    buttonAction: ButtonAction,
+    product?: Product,
+    initialCode?: string
+  ): void {
     if (buttonAction === BUTTON_ACTIONS.ADD) {
-      const modalConfig: BootstrapModalConfig<ModalWithAction<Product>> = {
+      const modalConfig: BootstrapModalConfig<InventoryUpsertModalData> = {
         component: CreateEditInventoryComponent,
         options: {
           size: 'xl',
@@ -465,6 +507,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         },
         data: {
           buttonAction: BUTTON_ACTIONS.ADD,
+          initialCode,
         },
       }
 

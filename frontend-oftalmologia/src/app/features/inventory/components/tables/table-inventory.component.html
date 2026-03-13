@@ -31,6 +31,16 @@
               </button>
 
               <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'INVENTORY.QUICK_STOCK.TITLE' | translate"
+                (click)="openQuickStockSearchModal()"
+              >
+                <i class="ti ti-barcode"></i>
+              </button>
+
+              <button
                 class="btn btn-outline-danger btn-sm"
                 type="button"
                 placement="top"

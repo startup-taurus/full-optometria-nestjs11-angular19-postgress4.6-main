@@ -92,6 +92,18 @@ export class ProductService {
     )
   }
 
+  public findProductByCode(code: string): Observable<Product> {
+    const normalizedCode = (code || '').trim()
+    const endpoint = `${this.API_URL}/by-code/${encodeURIComponent(normalizedCode)}`
+
+    return this._httpClient.get<any>(endpoint).pipe(
+      map((response) => {
+        const product = response?.data?.data?.data || response?.data?.data || response?.data
+        return product as Product
+      })
+    )
+  }
+
   public deleteProduct(id: string): Observable<ApiResponse<Product>> {
     const endpoint = `${this.API_URL}/delete/${id}`
     return this._httpClient

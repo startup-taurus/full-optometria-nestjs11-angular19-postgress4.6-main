@@ -560,6 +560,98 @@ export class ProductsService {
     };
   }
 
+  async findOneByCode(code: string, branchId: string, companyId: string | null) {
+    const normalizedCode = (code || '').trim();
+
+    if (!normalizedCode) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'El código es requerido',
+          en: 'Code is required',
+        },
+      });
+    }
+
+    const queryBuilder = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.subcategory', 'subcategory')
+      .leftJoinAndSelect('product.defaultSupplier', 'supplier')
+      .leftJoinAndSelect('product.createdByUser', 'createdByUser')
+      .where('product.branchId = :branchId', { branchId })
+      .andWhere('LOWER(TRIM(product.code)) = LOWER(TRIM(:code))', {
+        code: normalizedCode,
+      });
+
+    CompanyFilterUtil.applyCompanyFilter(queryBuilder, 'product', companyId);
+
+    const product = await queryBuilder.getOne();
+
+    if (!product) {
+      throw new NotFoundException({
+        statusCode: 404,
+        success: false,
+        message: {
+          es: 'No se encontró un producto con ese código en la sucursal activa',
+          en: 'No product found with that code in the active branch',
+        },
+      });
+    }
+
+    const images = await this.fileRepository.find({
+      where: {
+        entityType: 'product',
+        entityId: product.id,
+        fileCategory: 'product_image',
+        isActive: true,
+      },
+      order: {
+        isCover: 'DESC',
+        createdAt: 'ASC',
+      },
+    });
+
+    const discount = await this.findActiveDiscount(product.id, product.branchId);
+    const { finalPrice } = this.calculateFinalPrice(
+      Number(product.unitPrice),
+      discount,
+    );
+    const discountActive = !!discount && this.isDiscountActive(discount);
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: {
+        es: 'Producto obtenido exitosamente',
+        en: 'Product retrieved successfully',
+      },
+      data: {
+        ...product,
+        images: images.map((img) => ({
+          id: img.id,
+          path: img.path,
+          isCover: img.isCover,
+        })),
+        hasActiveDiscount: discountActive,
+        ...(discountActive
+          ? {
+              discount: {
+                type: discount!.discountType,
+                value: Number(discount!.discountValue),
+                finalPrice: Number(finalPrice.toFixed(2)),
+                originalPrice: Number(product.unitPrice),
+                startDate: discount!.startDate,
+                endDate: discount!.endDate,
+                isActive: discount!.isActive,
+              },
+            }
+          : {}),
+      },
+    };
+  }
+
   async update(
     id: string,
     updateProductDto: UpdateProductDto,
