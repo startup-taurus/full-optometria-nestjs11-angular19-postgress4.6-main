@@ -41,23 +41,37 @@
     </div>
 
     <div class="d-flex gap-2 mb-3">
+      <input
+        #fileScannerInput
+        type="file"
+        class="d-none"
+        accept="image/*"
+        capture="environment"
+        (change)="onScanFileSelected($event)"
+      />
+
       <button
         type="button"
         class="btn btn-outline-secondary"
-        (click)="toggleScanner()"
+        (click)="toggleScanner(fileScannerInput)"
+        [disabled]="isScannerInitializing || isFileScanning || isProcessingDecodedResult"
       >
         <i class="ti" [class.ti-camera]="!isScannerRunning" [class.ti-camera-off]="isScannerRunning"></i>
         {{
-          (isScannerRunning
+          ((isScannerRunning || isScannerInitializing)
             ? 'INVENTORY.QUICK_STOCK.STOP_SCAN'
             : 'INVENTORY.QUICK_STOCK.START_SCAN') | translate
         }}
       </button>
     </div>
 
+    <small class="text-muted d-block mb-3">
+      {{ 'INVENTORY.QUICK_STOCK.SCAN_HELP' | translate }}
+    </small>
+
     <div
       class="camera-box mb-3"
-      *ngIf="isScannerRunning"
+      [class.d-none]="!isScannerRunning && !isScannerInitializing"
       [id]="readerElementId"
     ></div>
 
@@ -68,6 +82,11 @@
     <div class="d-flex align-items-center gap-2 mb-3" *ngIf="isSearching">
       <span class="spinner-border spinner-border-sm"></span>
       <span>{{ 'INVENTORY.QUICK_STOCK.SEARCHING' | translate }}</span>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 mb-3" *ngIf="isFileScanning">
+      <span class="spinner-border spinner-border-sm"></span>
+      <span>{{ 'INVENTORY.QUICK_STOCK.PROCESSING_IMAGE' | translate }}</span>
     </div>
 
     <div class="alert alert-success" *ngIf="productFound">

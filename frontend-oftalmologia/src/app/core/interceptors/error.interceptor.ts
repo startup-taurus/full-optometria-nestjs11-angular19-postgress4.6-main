@@ -32,6 +32,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         const errorMessage = this.extractErrorMessage(error)
+        const shouldNotify = !this.isExpectedQuickStockNotFound(req, error)
 
         if (
           error.status === RESPONSE_CODES.UNAUTHORIZED ||
@@ -43,18 +44,35 @@ export class ErrorInterceptor implements HttpInterceptor {
           this.router.navigate(['/auth/account-deactivation'])
         }
 
-        this._notificationService.showNotification({
-          type: 'error',
-          title: 'Error',
-          message: errorMessage,
-        })
+        if (shouldNotify) {
+          this._notificationService.showNotification({
+            type: 'error',
+            title: 'Error',
+            message: errorMessage,
+          })
+        }
 
         const errorMessageTranslated =
           this._notificationService.getMessageTest(errorMessage)
 
-        return throwError(() => new Error(errorMessageTranslated))
+        const propagatedError = {
+          ...error,
+          status: error.status,
+          statusCode: error.status,
+          translatedMessage: errorMessageTranslated,
+          originalError: error,
+        }
+
+        return throwError(() => propagatedError)
       })
     )
+  }
+
+  private isExpectedQuickStockNotFound(
+    req: HttpRequest<any>,
+    error: HttpErrorResponse
+  ): boolean {
+    return req.url.includes('/products/by-code/') && error.status === 404
   }
 
   private extractErrorMessage(error: HttpErrorResponse): string {

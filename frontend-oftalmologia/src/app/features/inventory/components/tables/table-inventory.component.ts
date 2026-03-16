@@ -34,6 +34,7 @@ import { AppState } from '@core/states'
 import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
+import { TranslateService } from '@ngx-translate/core'
 import {
   BehaviorSubject,
   catchError,
@@ -136,6 +137,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   private _branchService = inject(BranchService)
   private _productsManagementService = inject(ProductsManagementService)
   private _bsModalService = inject(BootstrapModalService)
+  private _translateService = inject(TranslateService)
   private _store = inject(Store<AppState>)
   private _catalogPdfService = inject(PublicCatalogPdfService)
   private _companyLogoService = inject(CompanyLogoService)
@@ -481,13 +483,47 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       }
 
       if (result.action === 'stock' && result.product) {
+        this.showQuickStockFlowToast('stock', result)
         this.openAddStockModal(result.product)
         return
       }
 
       if (result.action === 'create' && result.code) {
+        this.showQuickStockFlowToast('create', result)
         this.openModal(BUTTON_ACTIONS.ADD, undefined, result.code)
       }
+    })
+  }
+
+  private showQuickStockFlowToast(
+    flow: 'stock' | 'create',
+    result: QuickStockSearchResult
+  ): void {
+    const titleKey =
+      flow === 'stock'
+        ? 'INVENTORY.QUICK_STOCK.FLOW_PRODUCT_FOUND_TITLE'
+        : 'INVENTORY.QUICK_STOCK.FLOW_PRODUCT_NOT_FOUND_TITLE'
+
+    const textKey =
+      flow === 'stock'
+        ? 'INVENTORY.QUICK_STOCK.FLOW_PRODUCT_FOUND_TEXT'
+        : 'INVENTORY.QUICK_STOCK.FLOW_PRODUCT_NOT_FOUND_TEXT'
+
+    const title = this._translateService.instant(titleKey)
+    const text = this._translateService.instant(textKey, {
+      code: result.code,
+      product: result.product?.name || '',
+    })
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: flow === 'stock' ? 'success' : 'info',
+      title,
+      text,
+      timer: 2800,
+      timerProgressBar: true,
+      showConfirmButton: false,
     })
   }
 
