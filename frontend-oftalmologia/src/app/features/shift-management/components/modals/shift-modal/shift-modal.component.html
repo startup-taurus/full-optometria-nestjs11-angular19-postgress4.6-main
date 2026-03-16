@@ -16,7 +16,11 @@
 </div>
 
 <div class="modal-body">
-  <form [formGroup]="shiftForm" (ngSubmit)="onSubmit()" class="modal-form">
+  <form
+    [formGroup]="shiftForm"
+    (ngSubmit)="onSubmit()"
+    class="modal-form modal-form-theme"
+  >
     <div class="row" *ngIf="!editMode">
       <div class="col-md-12">
         <div class="form-group mb-3">

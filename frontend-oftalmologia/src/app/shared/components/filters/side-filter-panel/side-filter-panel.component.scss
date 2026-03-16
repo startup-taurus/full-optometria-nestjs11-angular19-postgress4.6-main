@@ -178,11 +178,22 @@
         .accordion,
         .accordion-item,
         .accordion-body,
-        .form-control,
-        .form-select,
-        .ng-select .ng-select-container,
         .input-group-text {
           background-color: var(--bs-body-bg);
+        }
+
+        .filter-form-v2 {
+          .form-control,
+          .form-select,
+          input.form-control,
+          textarea,
+          select {
+            background-color: var(--bs-secondary-bg) !important;
+          }
+
+          .ng-select.filter-select-v2 .ng-select-container {
+            background-color: var(--bs-secondary-bg) !important;
+          }
         }
 
         .form-label {
