@@ -1279,6 +1279,16 @@
   }
 }
 
+[data-bs-theme='dark'] {
+  .common-ngx-datatable .datatable-body .datatable-body-row {
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      background-color: transparent !important;
+    }
+  }
+}
+
 .common-badge {
   &.badge-sm {
     padding: 0.25rem 0.5rem;

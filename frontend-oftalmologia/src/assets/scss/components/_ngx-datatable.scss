@@ -36,7 +36,7 @@
     .datatable-body-row {
       &.active,
       &.active .datatable-row-group {
-        background-color: var(--bs-primary-bg-subtle) !important;
+        background-color: transparent !important;
         color: var(--bs-body-color) !important;
         border-left: 4px solid var(--bs-primary) !important;
         transition: background-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
@@ -47,13 +47,13 @@
 
       &.active:hover,
       &.active:hover .datatable-row-group {
-        background-color: var(--bs-primary-bg-subtle) !important;
+        background-color: transparent !important;
         color: var(--bs-body-color) !important;
       }
 
       &.active:focus,
       &.active:focus .datatable-row-group {
-        background-color: var(--bs-primary-bg-subtle) !important;
+        background-color: transparent !important;
         color: var(--bs-body-color) !important;
       }
     }
@@ -120,11 +120,11 @@
     }
 
     &.active .datatable-row-group {
-      background-color: rgba(var(--bs-primary-rgb), 0.16) !important;
+      background-color: transparent !important;
     }
 
     &.active:hover .datatable-row-group {
-      background-color: rgba(var(--bs-primary-rgb), 0.18) !important;
+      background-color: transparent !important;
     }
   }
 
