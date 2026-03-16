@@ -30,9 +30,17 @@ import { DEFAULT_GLOBAL_TOASTR_CONFIG } from '@core/helpers/ui/ui.constants'
 import { permissionsInitializerFactory } from '@core/initializers/permissions.initializer'
 import { branchReduxInitializerFactory } from '@core/initializers/branch-redux.initializer'
 import { localStorageSyncReducer } from '@core/states/layout/layout-reducers'
+import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
+}
+
+export function tooltipInitializerFactory(tooltipConfig: NgbTooltipConfig) {
+  return () => {
+    tooltipConfig.container = 'body'
+    tooltipConfig.tooltipClass = 'table-tooltip'
+  }
 }
 
 export const appConfig: ApplicationConfig = {
@@ -62,6 +70,12 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: branchReduxInitializerFactory,
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: tooltipInitializerFactory,
+      deps: [NgbTooltipConfig],
       multi: true,
     },
     AUTH_TOKEN_INTERCEPTOR_PROVIDERS,

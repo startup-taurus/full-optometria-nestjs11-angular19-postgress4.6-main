@@ -1170,6 +1170,10 @@
 .filter-clear-btn {
   position: relative;
 
+  i.ti-filter-off {
+    font-size: 1rem;
+  }
+
   .filter-crossed {
     position: relative;
     display: inline-block;
@@ -1190,6 +1194,19 @@
   &:hover .filter-crossed::after {
     background-color: #fff;
   }
+}
+
+[data-bs-theme='dark'] .filter-clear-btn.btn-outline-danger {
+  color: #ffb3be !important;
+  border-color: rgba(255, 128, 146, 0.7) !important;
+  background-color: rgba(220, 53, 69, 0.12) !important;
+}
+
+[data-bs-theme='dark'] .filter-clear-btn.btn-outline-danger:hover,
+[data-bs-theme='dark'] .filter-clear-btn.btn-outline-danger:focus {
+  color: #fff !important;
+  border-color: #ff6f86 !important;
+  background-color: rgba(220, 53, 69, 0.3) !important;
 }
 
 .common-ngx-datatable {
@@ -1719,6 +1736,12 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     max-width: 220px;
   }
+}
+
+.tooltip.table-tooltip {
+  --bs-tooltip-bg: #2c3347;
+  --bs-tooltip-color: #f1f3f6;
+  --bs-tooltip-opacity: 1;
 }
 
 // Flechas del tooltip por dirección (no sobreescribir los cuatro lados)
@@ -2794,8 +2817,8 @@ i.text-primary {
 // ============================================================
 .side-filter-panel .filter-form-v2 {
   --filter-v2-dropdown-bg: #ffffff;
-  --filter-v2-field-bg: var(--bs-secondary-bg);
-  --filter-v2-field-border: transparent;
+  --filter-v2-field-bg: var(--bs-secondary-bg, #f8f9fa);
+  --filter-v2-field-border: var(--bs-border-color);
   --filter-v2-field-hover-border: color-mix(
     in srgb,
     var(--bs-border-color) 70%,
@@ -2811,7 +2834,7 @@ i.text-primary {
     border-radius: 0.5rem !important;
     background-color: var(--filter-v2-field-bg) !important;
     color: var(--bs-body-color) !important;
-    box-shadow: none !important;
+    box-shadow: inset 0 0 0 1px var(--filter-v2-field-border) !important;
     min-height: 40px !important;
   }
 
@@ -2848,7 +2871,7 @@ i.text-primary {
       border-radius: 0.75rem !important;
       background-color: var(--filter-v2-field-bg) !important;
       color: var(--bs-body-color) !important;
-      box-shadow: none !important;
+      box-shadow: inset 0 0 0 1px var(--filter-v2-field-border) !important;
       overflow: hidden;
     }
 
@@ -2882,6 +2905,27 @@ i.text-primary {
     .ng-placeholder {
       color: var(--bs-secondary-color) !important;
       opacity: 1 !important;
+    }
+
+    .ng-clear-wrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      margin-right: 0.25rem;
+    }
+
+    .ng-clear-wrapper .ng-clear {
+      color: var(--bs-secondary-color) !important;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1;
+      opacity: 1 !important;
+      transition: color 0.15s ease;
+    }
+
+    .ng-clear-wrapper:hover .ng-clear {
+      color: var(--bs-danger) !important;
     }
 
     .ng-arrow-wrapper {
@@ -2930,6 +2974,16 @@ i.text-primary {
       .ng-option {
         background-color: var(--filter-v2-dropdown-bg) !important;
       }
+
+      .ng-option {
+        color: var(--bs-body-color) !important;
+      }
+
+      .ng-option.ng-option-marked,
+      .ng-option:hover {
+        background-color: var(--filter-v2-field-bg) !important;
+        color: var(--bs-emphasis-color) !important;
+      }
     }
   }
 
@@ -2948,12 +3002,8 @@ i.text-primary {
 
 [data-bs-theme='dark'] .side-filter-panel .filter-form-v2 {
   --filter-v2-dropdown-bg: #1f2430;
-  --filter-v2-field-bg: color-mix(
-    in srgb,
-    var(--bs-secondary-bg) 85%,
-    var(--bs-body-bg) 15%
-  );
-  --filter-v2-field-border: transparent;
+  --filter-v2-field-bg: var(--bs-secondary-bg, #1e1f27);
+  --filter-v2-field-border: var(--bs-border-color);
   --filter-v2-field-hover-border: color-mix(
     in srgb,
     var(--bs-border-color) 75%,
@@ -2976,5 +3026,9 @@ i.text-primary {
     background-color: var(--filter-v2-field-bg) !important;
     color: var(--bs-body-color) !important;
     box-shadow: none !important;
+  }
+
+  .ng-select.filter-select-v2 .ng-clear-wrapper .ng-clear {
+    color: #f3f5f8 !important;
   }
 }
