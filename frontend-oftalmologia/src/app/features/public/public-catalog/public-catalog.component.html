@@ -68,8 +68,8 @@
         </div>
       }
 
-      <div class="catalog-content container-fluid px-4 px-lg-5 py-4">
-        <div class="row">
+      <div class="catalog-content container-fluid px-3 px-lg-4 py-4">
+        <div class="row catalog-shell g-4">
           <div class="col-12 d-lg-none mb-3">
             <button
               class="btn btn-filters-toggle w-100"
@@ -95,16 +95,13 @@
           }
 
           <aside
-            class="filters-sidebar col-lg-3 col-xl-3 mb-4"
+            class="filters-sidebar col-lg-3 col-xl-3"
             [class.mobile-open]="isFiltersDrawerOpen"
           >
             <div class="filters-panel">
-              <div class="filters-card card shadow-sm">
+              <div class="filters-card card">
                 <div class="card-header d-none d-lg-block">
-                  <h5 class="mb-0">
-                    <i class="bi bi-funnel-fill me-2"></i>
-                    Filtros
-                  </h5>
+                  <h5 class="mb-0">Filtros</h5>
                 </div>
                 <div class="card-body">
                   <div
@@ -120,94 +117,70 @@
                     </button>
                   </div>
 
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">
-                      <i class="bi bi-search me-2 text-primary"></i>
-                      Buscar por nombre
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Nombre del producto..."
-                      [(ngModel)]="searchName"
-                      (keyup.enter)="onSearch()"
-                    />
+                  <div class="filter-section">
+                    <h6 class="filter-section-title">Buscar</h6>
+                    <div>
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Buscar producto..."
+                        [(ngModel)]="searchName"
+                        (keyup.enter)="onSearch()"
+                      />
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">
-                      <i class="bi bi-award me-2 text-warning"></i>
-                      Marca
-                    </label>
-                    <select
-                      class="form-select"
-                      [(ngModel)]="selectedBrand"
-                      (change)="onBrandChange()"
-                    >
-                      <option value="">Todas las marcas</option>
-                      @for (brand of filters().brands; track brand) {
-                        <option [value]="brand">{{ brand }}</option>
-                      }
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">
-                      <i class="bi bi-tags me-2 text-info"></i>
-                      Categoría
-                    </label>
-                    <select
-                      class="form-select"
-                      [(ngModel)]="selectedCategoryId"
-                      (change)="onCategoryChange()"
-                    >
-                      <option value="">Todas las categorías</option>
-                      @for (
-                        category of filters().categories;
-                        track category.id
-                      ) {
-                        <option [value]="category.id">
-                          {{ category.name }}
-                        </option>
-                      }
-                    </select>
-                  </div>
-
-                  @if (filters().branches?.length > 1) {
-                    <div class="mb-3">
-                      <label class="form-label fw-bold">
-                        <i class="bi bi-geo-alt me-2 text-primary"></i>
-                        Sucursal
-                      </label>
+                  <div class="filter-section">
+                    <h6 class="filter-section-title">Categoría</h6>
+                    <div>
                       <select
                         class="form-select"
-                        [(ngModel)]="selectedBranchId"
-                        (change)="onFilterChange()"
+                        [(ngModel)]="selectedCategoryId"
                       >
-                        <option value="">Todas las sucursales</option>
-                        @for (branch of filters().branches; track branch.id) {
-                          <option [value]="branch.id">{{ branch.name }}</option>
+                        <option value="">Todas las categorías</option>
+                        @for (
+                          category of filters().categories;
+                          track category.id
+                        ) {
+                          <option [value]="category.id">
+                            {{ category.name }}
+                          </option>
                         }
                       </select>
                     </div>
-                  }
-
-                  <div class="mb-3">
-                    <label
-                      class="form-label fw-bold d-flex align-items-center gap-2"
-                    >
-                      <input
-                        type="checkbox"
-                        class="form-check-input mt-0"
-                        [(ngModel)]="showOnlyAvailable"
-                        (change)="onAvailabilityChange()"
-                      />
-                      <span>
-                        <i class="bi bi-box-seam me-2 text-success"></i>
-                        Solo disponibles
-                      </span>
-                    </label>
                   </div>
+
+                  <div class="filter-section">
+                    <h6 class="filter-section-title">Marca</h6>
+                    <div>
+                      <select
+                        class="form-select"
+                        [(ngModel)]="selectedBrand"
+                      >
+                        <option value="">Todas las marcas</option>
+                        @for (brand of filters().brands; track brand) {
+                          <option [value]="brand">{{ brand }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+
+                  @if (filters().branches?.length > 1) {
+                    <div class="filter-section">
+                      <h6 class="filter-section-title">Sucursal</h6>
+                      <div>
+                        <select
+                          class="form-select"
+                          [(ngModel)]="selectedBranchId"
+                        >
+                          <option value="">Todas las sucursales</option>
+                          @for (branch of filters().branches; track branch.id) {
+                            <option [value]="branch.id">{{ branch.name }}</option>
+                          }
+                        </select>
+                      </div>
+                    </div>
+                  }
 
                   <!-- <div class="mb-3">
                 <label class="form-label fw-bold">
@@ -223,15 +196,12 @@
                 />
               </div> -->
 
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">
-                      <i class="bi bi-cash me-2 text-success"></i>
-                      Rango de precio
-                    </label>
+                  <div class="filter-section">
+                    <h6 class="filter-section-title">Precio</h6>
                     <small class="text-muted d-block mb-2">
                       Si ingresas los valores al revés, el sistema los ajusta.
                     </small>
-                    <div class="row g-2">
+                    <div class="row g-2 mb-2">
                       <div class="col-6">
                         <input
                           type="number"
@@ -253,47 +223,44 @@
                     </div>
                   </div>
 
-                  <button
-                    class="btn btn-primary w-100 mb-2"
-                    (click)="onSearch()"
-                  >
-                    <i class="bi bi-funnel-fill me-2"></i>
-                    Filtrar
-                  </button>
+                  <div class="filter-actions">
+                    <button
+                      class="btn btn-primary w-100"
+                      (click)="onSearch()"
+                    >
+                      Aplicar filtros
+                    </button>
 
-                  <button
-                    class="btn btn-outline-secondary w-100"
-                    (click)="clearFilters()"
-                  >
-                    <i class="bi bi-x-circle me-2"></i>
-                    Limpiar filtros
-                  </button>
+                    <button
+                      class="btn btn-outline-secondary w-100"
+                      (click)="clearFilters()"
+                    >
+                      Limpiar filtros
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </aside>
 
           <main class="col-lg-9 col-xl-9">
-            <div
-              class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2"
-            >
-              <div>
-                <span class="text-muted">
+            <div class="catalog-toolbar mb-3">
+              <div class="toolbar-results">
+                <span class="toolbar-count">
                   {{ totalCount() }} producto{{
                     totalCount() !== 1 ? 's' : ''
                   }}
                   encontrado{{ totalCount() !== 1 ? 's' : '' }}
                 </span>
               </div>
-              <div class="d-flex align-items-center gap-2">
-                <label class="mb-0 text-muted d-none d-sm-inline"
-                  >Ordenar por:</label
-                >
+              <div class="toolbar-right">
+                <label class="mb-0 text-muted d-none d-sm-inline">
+                  Ordenar por:
+                </label>
                 <select
-                  class="form-select form-select-sm"
+                  class="form-select form-select-sm toolbar-sort-select"
                   [(ngModel)]="sortBy"
                   (change)="onFilterChange()"
-                  style="width: auto; min-width: 150px"
                 >
                   <option value="newest">Más recientes</option>
                   <option value="views">Más vistos</option>
@@ -323,7 +290,6 @@
 
             @if (
               selectedBrand ||
-              showOnlyAvailable ||
               hasPriceFilter ||
               selectedBranchId
             ) {
@@ -355,22 +321,6 @@
                       class="btn btn-sm btn-link text-decoration-none p-0"
                       (click)="clearBranchFilter()"
                       aria-label="Quitar filtro de sucursal"
-                    >
-                      <i class="bi bi-x-lg"></i>
-                    </button>
-                  </span>
-                }
-
-                @if (showOnlyAvailable) {
-                  <span
-                    class="badge text-bg-light border d-inline-flex align-items-center gap-2"
-                  >
-                    Solo disponibles
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-link text-decoration-none p-0"
-                      (click)="clearAvailabilityFilter()"
-                      aria-label="Quitar filtro de disponibilidad"
                     >
                       <i class="bi bi-x-lg"></i>
                     </button>
@@ -415,6 +365,10 @@
                         class="product-image-container"
                         (click)="openProductModal(product)"
                       >
+                        @if (product.category) {
+                          <span class="product-chip">{{ product.category.name }}</span>
+                        }
+
                         <img
                           [src]="getImageUrl(product)"
                           [alt]="product.name"
@@ -428,63 +382,12 @@
                           </span>
                         }
 
-                        @if (
-                          !isOutOfStock(product) &&
-                          product.quantity > 0 &&
-                          product.quantity <= 5
-                        ) {
-                          <span class="badge-stock badge-low">
-                            <i class="bi bi-fire"></i> Últimas
-                            {{ product.quantity }}
-                          </span>
-                        }
-
                         @if (product.views > 100) {
                           <span class="badge-views">
-                            <i class="bi bi-eye-fill"></i> {{ product.views }}
+                            <i class="bi bi-star-fill"></i>
+                            {{ product.views }}
                           </span>
                         }
-
-                        <div class="product-overlay">
-                          <div class="overlay-actions">
-                            <button
-                              class="btn btn-outline-light btn-sm"
-                              (click)="
-                                openProductModal(product);
-                                $event.stopPropagation()
-                              "
-                            >
-                              <i class="bi bi-info-circle me-1"></i>
-                              Vista rápida
-                            </button>
-
-                            <button
-                              type="button"
-                              class="btn btn-outline-light btn-sm"
-                              (click)="shareProduct(product, $event)"
-                            >
-                              <i class="bi bi-share-fill me-1"></i>
-                              Compartir
-                            </button>
-
-                            @if (canShowWhatsAppButton(product)) {
-                              <a
-                                [href]="getWhatsAppLink(product)"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="btn btn-whatsapp btn-sm"
-                                (click)="$event.stopPropagation()"
-                              >
-                                <iconify-icon
-                                  icon="mdi:whatsapp"
-                                  width="20"
-                                  height="20"
-                                ></iconify-icon>
-                                WhatsApp
-                              </a>
-                            }
-                          </div>
-                        </div>
                       </div>
 
                       <div class="product-info">
@@ -585,6 +488,25 @@
                             </div>
                           </div>
 
+                          <div class="product-links-row">
+                            @if (canShowWhatsAppButton(product)) {
+                              <a
+                                [href]="getWhatsAppLink(product)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn-link-action whatsapp"
+                                (click)="$event.stopPropagation()"
+                              >
+                                <iconify-icon
+                                  icon="mdi:whatsapp"
+                                  width="16"
+                                  height="16"
+                                ></iconify-icon>
+                                WhatsApp
+                              </a>
+                            }
+                          </div>
+
                           <div class="product-actions-row">
                             <button
                               type="button"
@@ -601,7 +523,7 @@
                               (click)="openProductModal(product)"
                             >
                               <i class="bi bi-eye-fill me-1"></i>
-                              Vista rápida
+                              Ver más detalles
                             </button>
                           </div>
                         </div>
@@ -719,6 +641,17 @@
                 <div class="row g-4">
                   <div class="col-lg-5">
                     <div class="product-image-zone">
+                      @if (getProductGallery(selectedProduct).length > 1) {
+                        <button
+                          type="button"
+                          class="gallery-nav-btn prev"
+                          (click)="previousProductImage(); $event.stopPropagation()"
+                          aria-label="Imagen anterior"
+                        >
+                          <span aria-hidden="true">‹</span>
+                        </button>
+                      }
+
                       <img
                         [src]="
                           selectedProductImageUrl ||
@@ -736,6 +669,17 @@
                         ></iconify-icon>
                         <span>Click para ver completa</span>
                       </div>
+
+                      @if (getProductGallery(selectedProduct).length > 1) {
+                        <button
+                          type="button"
+                          class="gallery-nav-btn next"
+                          (click)="nextProductImage(); $event.stopPropagation()"
+                          aria-label="Imagen siguiente"
+                        >
+                          <span aria-hidden="true">›</span>
+                        </button>
+                      }
                     </div>
                     <div class="product-gallery-thumbs mt-2">
                       <button
@@ -863,14 +807,6 @@
               </div>
 
               <div class="actions-section">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  (click)="closeProductModal()"
-                >
-                  Cerrar
-                </button>
-
                 @if (selectedProduct) {
                   <div class="modal-cart-tools">
                     <div class="quantity-control">
@@ -891,19 +827,11 @@
                         addToCart(selectedProduct, selectedProductQuantity)
                       "
                     >
-                      <i class="bi bi-cart-plus-fill"></i>
-                      Agregar al carrito
+                      <i class="bi bi-plus-lg"></i>
+                      Agregar
                     </button>
                   </div>
 
-                  <button
-                    type="button"
-                    class="btn btn-secondary-custom"
-                    (click)="shareProduct(selectedProduct)"
-                  >
-                    <i class="bi bi-share-fill"></i>
-                    Compartir
-                  </button>
                 }
 
                 @if (
@@ -920,7 +848,7 @@
                       width="24"
                       height="24"
                     ></iconify-icon>
-                    Chatear por WhatsApp
+                    WhatsApp
                   </a>
                 } @else if (selectedProduct && isOutOfStock(selectedProduct)) {
                   <button
@@ -976,11 +904,53 @@
               height="24"
             ></iconify-icon>
           </button>
+
+          @if (selectedProduct && getProductGallery(selectedProduct).length > 1) {
+            <button
+              type="button"
+              class="image-modal-nav prev"
+              (click)="previousProductImage(); $event.stopPropagation()"
+              aria-label="Imagen anterior"
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+          }
+
           <img
             [src]="selectedImageUrl"
             [alt]="selectedProductName"
             class="modal-full-image"
           />
+
+          @if (selectedProduct && getProductGallery(selectedProduct).length > 1) {
+            <button
+              type="button"
+              class="image-modal-nav next"
+              (click)="nextProductImage(); $event.stopPropagation()"
+              aria-label="Imagen siguiente"
+            >
+              <span aria-hidden="true">›</span>
+            </button>
+          }
+
+          @if (selectedProduct && getProductGallery(selectedProduct).length > 1) {
+            <div class="image-modal-thumbs">
+              @for (
+                galleryImage of getProductGallery(selectedProduct);
+                track galleryImage
+              ) {
+                <button
+                  type="button"
+                  class="thumb-btn"
+                  [class.active]="galleryImage === selectedProductImageUrl"
+                  (click)="selectProductImage(galleryImage)"
+                >
+                  <img [src]="galleryImage" alt="Imagen miniatura" />
+                </button>
+              }
+            </div>
+          }
+
           <div class="modal-image-info">
             <h5>{{ selectedProductName }}</h5>
             <p class="text-muted mb-0">{{ selectedProductCode }}</p>

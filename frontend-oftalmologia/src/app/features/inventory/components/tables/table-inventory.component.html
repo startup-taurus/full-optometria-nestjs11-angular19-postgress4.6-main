@@ -13,7 +13,7 @@
                 *ngIf="hasActiveFilters()"
                 class="btn btn-outline-danger btn-sm filter-clear-btn"
                 type="button"
-                placement="top"
+                placement="left"
                 [ngbTooltip]="'WORDS.RESET' | translate"
                 (click)="clearAllFilters()"
               >
@@ -23,7 +23,7 @@
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
-                placement="top"
+                placement="left"
                 [ngbTooltip]="'SUPPLIERS.ACTIONS.REFRESH' | translate"
                 (click)="reloadDatatable()"
               >
@@ -33,7 +33,7 @@
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
-                placement="top"
+                placement="left"
                 [ngbTooltip]="'INVENTORY.QUICK_STOCK.TITLE' | translate"
                 (click)="openQuickStockSearchModal()"
               >
@@ -43,7 +43,7 @@
               <button
                 class="btn btn-outline-danger btn-sm"
                 type="button"
-                placement="top"
+                placement="left"
                 ngbTooltip="Exportar inventario PDF"
                 [disabled]="isPdfLoading"
                 (click)="downloadInventoryPdf()"
@@ -54,7 +54,7 @@
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
-                placement="top"
+                placement="left"
                 [ngbTooltip]="'INVENTORY.ACTIONS.CREATE' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >

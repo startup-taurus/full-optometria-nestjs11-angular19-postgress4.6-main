@@ -278,7 +278,6 @@ export class PublicCatalogComponent implements OnInit {
     }
 
     if (this.selectedBrand) query.brand = this.selectedBrand
-    query.inStock = this.showOnlyAvailable
     if (this.minPrice !== undefined) query.minPrice = this.minPrice
     if (this.maxPrice !== undefined) query.maxPrice = this.maxPrice
     if (this.sortBy) query.sortBy = this.sortBy
@@ -575,6 +574,8 @@ export class PublicCatalogComponent implements OnInit {
       return
     }
 
+    this.closeCart()
+
     if (targets.length === 1) {
       window.open(targets[0].link, '_blank', 'noopener,noreferrer')
     } else {
@@ -789,6 +790,39 @@ export class PublicCatalogComponent implements OnInit {
 
   selectProductImage(url: string): void {
     this.selectedProductImageUrl = url
+    if (this.showImageModal) {
+      this.selectedImageUrl = url
+    }
+  }
+
+  nextProductImage(): void {
+    const product = this.selectedProduct
+    if (!product) return
+
+    const gallery = this.getProductGallery(product)
+    if (gallery.length <= 1) return
+
+    const currentIndex = Math.max(
+      0,
+      gallery.findIndex((img) => img === this.selectedProductImageUrl)
+    )
+    const nextIndex = (currentIndex + 1) % gallery.length
+    this.selectProductImage(gallery[nextIndex])
+  }
+
+  previousProductImage(): void {
+    const product = this.selectedProduct
+    if (!product) return
+
+    const gallery = this.getProductGallery(product)
+    if (gallery.length <= 1) return
+
+    const currentIndex = Math.max(
+      0,
+      gallery.findIndex((img) => img === this.selectedProductImageUrl)
+    )
+    const previousIndex = (currentIndex - 1 + gallery.length) % gallery.length
+    this.selectProductImage(gallery[previousIndex])
   }
 
   closeImageModal(): void {
