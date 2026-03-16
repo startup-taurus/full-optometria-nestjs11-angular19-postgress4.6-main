@@ -91,6 +91,14 @@ html[data-bs-theme='dark'] {
   min-height: $topbar-height;
   transition: none;
   border-radius: 0 30px 30px 0;
+
+  > .topbar-link h5,
+  > .topbar-link h6,
+  > .topbar-link span,
+  > .topbar-link .ti-chevron-down {
+    color: #fff !important;
+    opacity: 1 !important;
+  }
 }
 
 // Topbar Search

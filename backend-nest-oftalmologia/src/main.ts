@@ -14,6 +14,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const corsOrigin = configService.get<string>('CORS_ORIGIN') || '*';
+  const staticCorsOrigin =
+    corsOrigin === '*' || corsOrigin.includes(',') ? '*' : corsOrigin;
   app.enableCors({
     origin: corsOrigin === '*' ? true : corsOrigin.split(','),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -31,7 +33,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
     setHeaders: (res) => {
-      res.set('Access-Control-Allow-Origin', corsOrigin === '*' ? '*' : corsOrigin);
+      res.set('Access-Control-Allow-Origin', staticCorsOrigin);
       res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
       res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.set('Cross-Origin-Resource-Policy', 'cross-origin');

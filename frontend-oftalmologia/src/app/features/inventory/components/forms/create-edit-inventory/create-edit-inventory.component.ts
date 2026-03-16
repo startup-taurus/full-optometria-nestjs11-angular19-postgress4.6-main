@@ -25,6 +25,10 @@ import { NgSelectModule } from '@ng-select/ng-select'
 import { TranslateModule } from '@ngx-translate/core'
 import { Observable, of, map, Subject, takeUntil, forkJoin } from 'rxjs'
 
+interface InventoryUpsertModalData extends ModalWithAction<Product> {
+  initialCode?: string
+}
+
 interface ProductImagePreview {
   id?: string
   path?: string
@@ -48,6 +52,7 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
   public isLoading = false
   public product?: Product
   public buttonAction?: ButtonAction
+  public initialCode = ''
 
   public categories$: Observable<Category[]> = of([])
   public subcategories$: Observable<Subcategory[]> = of([])
@@ -67,7 +72,7 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
   private _subcategoryService = inject(SubcategoryService)
   private _supplierService = inject(SupplierService)
   private _bsModalService = inject(
-    BootstrapModalService<ModalWithAction<Product>>
+    BootstrapModalService<InventoryUpsertModalData>
   )
 
   ngOnInit(): void {
@@ -87,10 +92,11 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
     this._bsModalService
       .getDataIssued()
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: ModalWithAction<Product>) => {
+      .subscribe((data: InventoryUpsertModalData) => {
         if (data) {
           this.buttonAction = data.buttonAction
           this.product = data.selectedRow
+          this.initialCode = data.initialCode || ''
           this.isEdit = this.buttonAction === BUTTON_ACTIONS.EDIT
 
           if (this.form) {
@@ -121,7 +127,7 @@ export class CreateEditInventoryComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.form = this._fb.group({
       code: [
-        { value: this.product?.code || '', disabled: false },
+        { value: this.product?.code || this.initialCode || '', disabled: false },
         [Validators.required, Validators.maxLength(50)],
       ],
       name: [

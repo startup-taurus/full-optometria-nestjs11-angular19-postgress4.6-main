@@ -1,4 +1,4 @@
-<div class="patient-filter">
+<div class="patient-filter filter-form filter-form-unified">
   <form [formGroup]="patientFilterForm!" (ngSubmit)="onSubmit()">
     <div class="row g-3">
       <div class="col-12">
@@ -100,13 +100,13 @@
           bindValue="value"
           [clearable]="true"
           [placeholder]="'PATIENT.FILTER.IS_ACTIVE_PLACEHOLDER' | translate"
-          class="text-dark"
+          class="filter-select-v2"
         >
           <ng-option
             *ngFor="let option of active$ | async"
             [value]="option.value"
           >
-            <span class="text-dark fw-medium">{{ option.label }}</span>
+            <span class="fw-medium">{{ option.label }}</span>
           </ng-option>
         </ng-select>
       </div>

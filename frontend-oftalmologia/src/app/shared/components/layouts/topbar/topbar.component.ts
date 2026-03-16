@@ -34,7 +34,6 @@ import { ToastrNotificationService } from '@core/services/ui/notification.servic
 
 import type { LayoutState } from '@core/states/layout/layout-reducers'
 import { changetheme } from '@core/states/layout/layout-action'
-import { getLayoutColor } from '@core/states/layout/layout-selector'
 import { UserActions } from '@core/states/auth/auth.actions'
 
 import { LogoComponent } from '../logo/logo.component'
@@ -163,14 +162,11 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   }
 
   changeTheme(): void {
-    const currentTheme =
-      document.documentElement.getAttribute('data-bs-theme') || 'light'
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light'
+    const newTheme = this.color === 'dark' ? 'light' : 'dark'
 
+    this.color = newTheme
     this.store.dispatch(changetheme({ color: newTheme }))
-    this.store.select(getLayoutColor).subscribe((theme) => {
-      document.documentElement.setAttribute('data-bs-theme', theme)
-    })
+    document.documentElement.setAttribute('data-bs-theme', newTheme)
   }
 
   changeLanguage(language: string): void {

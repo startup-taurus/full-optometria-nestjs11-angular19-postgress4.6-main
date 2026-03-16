@@ -366,6 +366,61 @@
   }
 }
 
+.modal-form-theme {
+  .form-label {
+    color: var(--modal-text-primary) !important;
+  }
+
+  .form-control,
+  .form-select,
+  textarea.form-control {
+    background-color: var(--modal-surface-3) !important;
+    border: 1px solid var(--modal-border-color) !important;
+    color: var(--modal-text-primary) !important;
+    box-shadow: inset 0 0 0 1px var(--modal-border-color) !important;
+    transition: all 0.2s ease-in-out;
+
+    &:hover:not(:focus) {
+      border-color: var(--modal-border-hover) !important;
+      box-shadow: inset 0 0 0 1px var(--modal-border-hover) !important;
+    }
+
+    &:focus {
+      background-color: var(--modal-surface-3) !important;
+      border-color: var(--bs-primary) !important;
+      color: var(--modal-text-primary) !important;
+      box-shadow:
+        inset 0 0 0 1px var(--bs-primary),
+        0 0 0 0.25rem var(--modal-focus-ring) !important;
+    }
+
+    &::placeholder {
+      color: var(--modal-text-placeholder) !important;
+      opacity: 1;
+    }
+  }
+
+  .ng-select .ng-select-container {
+    background-color: var(--modal-surface-3) !important;
+    border: 1px solid var(--modal-border-color) !important;
+    color: var(--modal-text-primary) !important;
+    box-shadow: inset 0 0 0 1px var(--modal-border-color) !important;
+
+    &:hover {
+      border-color: var(--modal-border-hover) !important;
+      box-shadow: inset 0 0 0 1px var(--modal-border-hover) !important;
+    }
+  }
+
+  .ng-select.ng-select-focused .ng-select-container,
+  .ng-select.ng-select-opened .ng-select-container {
+    border-color: var(--bs-primary) !important;
+    box-shadow:
+      inset 0 0 0 1px var(--bs-primary),
+      0 0 0 0.25rem var(--modal-focus-ring) !important;
+  }
+}
+
 // =============================================================================
 // MODAL FOOTER STYLES
 // =============================================================================

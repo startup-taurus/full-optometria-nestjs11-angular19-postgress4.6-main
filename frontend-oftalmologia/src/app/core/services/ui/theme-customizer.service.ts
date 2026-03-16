@@ -13,6 +13,45 @@ export interface ThemeColor {
 })
 export class ThemeCustomizerService {
   private readonly STORAGE_KEY = 'app-theme-color'
+  private readonly THEME_OVERRIDE_KEYS: string[] = [
+    '--app-primary',
+    '--app-primary-rgb',
+    '--bs-primary',
+    '--bs-primary-rgb',
+    '--bs-primary-50',
+    '--bs-primary-100',
+    '--bs-primary-200',
+    '--bs-primary-300',
+    '--bs-primary-400',
+    '--bs-primary-500',
+    '--bs-primary-600',
+    '--bs-primary-700',
+    '--bs-primary-800',
+    '--bs-primary-900',
+    '--bs-primary-text-emphasis',
+    '--bs-primary-bg-subtle',
+    '--bs-primary-border-subtle',
+    '--bs-secondary',
+    '--bs-secondary-rgb',
+    '--bs-btn-bg',
+    '--bs-btn-border-color',
+    '--bs-btn-hover-bg',
+    '--bs-btn-hover-border-color',
+    '--bs-btn-active-bg',
+    '--bs-btn-active-border-color',
+    '--bs-btn-disabled-bg',
+    '--bs-btn-disabled-border-color',
+    '--bs-link-color',
+    '--bs-link-hover-color',
+    '--osen-topbar-bg',
+    '--osen-topbar-item-color',
+    '--osen-topbar-item-hover-color',
+    '--osen-topbar-search-bg',
+    '--osen-topbar-user-bg',
+    '--osen-topbar-user-border',
+    '--osen-menu-item-active-bg',
+    '--osen-menu-item-active-color',
+  ]
 
   public readonly availableColors: ThemeColor[] = [
     {
@@ -135,6 +174,14 @@ export class ThemeCustomizerService {
     this.applyThemeColor(this.availableColors[0], false)
   }
 
+  public applySavedColorForInternalContext(): void {
+    this.loadSavedColor()
+  }
+
+  public resetToBaseTheme(): void {
+    this.applyThemeColor(this.availableColors[0], false)
+  }
+
   public applyThemeColor(color: ThemeColor, save: boolean = true): void {
     const root = document.documentElement
 
@@ -170,11 +217,6 @@ export class ThemeCustomizerService {
 
     root.style.setProperty('--bs-secondary', this.availableColors[2].hex)
     root.style.setProperty('--bs-secondary-rgb', this.availableColors[2].rgb)
-
-    root.style.setProperty('--bs-body-color', '#4c4c5c')
-    root.style.setProperty('--bs-body-bg', '#fafdff')
-    root.style.setProperty('--bs-border-color', '#ced4da')
-    root.style.setProperty('--bs-border-color-translucent', '#ced4da')
 
     root.style.setProperty('--bs-btn-bg', color.hex)
     root.style.setProperty('--bs-btn-border-color', color.hex)

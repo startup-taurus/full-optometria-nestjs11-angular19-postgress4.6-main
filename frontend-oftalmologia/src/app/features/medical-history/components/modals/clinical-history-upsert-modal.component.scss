@@ -1,7 +1,7 @@
 .user-option {
   .user-name {
     font-weight: 500;
-    color: #495057;
+    color: var(--bs-body-color);
   }
 }
 
@@ -10,29 +10,29 @@
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 
   .card-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-bottom: 1px solid #dee2e6;
+    background: var(--bs-tertiary-bg);
+    border-bottom: 1px solid var(--bs-border-color);
 
     h6 {
       font-weight: 600;
-      color: #495057;
+      color: var(--bs-body-color);
     }
   }
 }
 
 .form-label {
   font-weight: 500;
-  color: #495057;
+  color: var(--bs-body-color);
   margin-bottom: 0.5rem;
 }
 
 .form-control {
-  border: 1px solid #ced4da;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.375rem;
 
   &:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
   }
 }
 
@@ -72,8 +72,8 @@
 
 /* Multi-step Progress Indicator */
 .modal-progress {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  background-color: var(--bs-tertiary-bg);
+  border-bottom: 1px solid var(--bs-border-color);
 
   .step-circle {
     width: 40px;
@@ -84,21 +84,21 @@
     justify-content: center;
     font-weight: 600;
     font-size: 14px;
-    border: 2px solid #6c757d;
-    background-color: #ffffff;
-    color: #6c757d;
+    border: 2px solid var(--bs-secondary-color);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-secondary-color);
     transition: all 0.3s ease;
 
     &.current {
-      border-color: #007bff;
-      background-color: #007bff;
+      border-color: var(--bs-primary);
+      background-color: var(--bs-primary);
       color: #ffffff;
       transform: scale(1.1);
     }
 
     &.completed {
-      border-color: #28a745;
-      background-color: #28a745;
+      border-color: var(--bs-success);
+      background-color: var(--bs-success);
       color: #ffffff;
 
       &:before {
@@ -111,7 +111,7 @@
   .step-label {
     font-size: 14px;
     font-weight: 500;
-    color: #495057;
+    color: var(--bs-body-color);
     white-space: nowrap;
 
     .current ~ & {
@@ -127,7 +127,7 @@
   .step-divider {
     flex: 1;
     height: 2px;
-    background-color: #dee2e6;
+    background-color: var(--bs-border-color);
     margin: 0 1rem;
     position: relative;
     top: 20px;
@@ -165,8 +165,8 @@
 .form-control,
 .form-select {
   &:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
   }
 }
 
@@ -194,27 +194,27 @@
 :host ::ng-deep {
   ng-select {
     &.ng-select-focused .ng-select-container {
-      border-color: #80bdff;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      border-color: var(--bs-primary);
+      box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
     }
 
     .ng-select-container {
-      border-color: #ced4da;
+      border-color: var(--bs-border-color);
     }
 
     .ng-placeholder {
-      color: #6c757d;
+      color: var(--bs-secondary-color);
     }
 
     .ng-option {
       &.ng-option-selected {
-        background-color: #007bff;
+        background-color: var(--bs-primary);
         color: #ffffff;
       }
 
       &.ng-option-highlighted {
-        background-color: rgba(0, 123, 255, 0.1);
-        color: #495057;
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        color: var(--bs-body-color);
       }
     }
   }

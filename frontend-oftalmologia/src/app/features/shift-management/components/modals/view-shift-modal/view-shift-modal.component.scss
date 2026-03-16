@@ -1,25 +1,25 @@
 .modal-header {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--bs-border-color);
   padding: 1rem 1.5rem;
 
   .modal-title {
     font-weight: 600;
-    color: #495057;
+    color: var(--bs-emphasis-color);
     font-size: 1.25rem;
   }
 
   .btn-close {
     border: none;
     background: none;
-    color: #6c757d;
+    color: var(--bs-secondary-color);
     font-size: 1.2rem;
     padding: 0.5rem;
     border-radius: 4px;
     transition: all 0.2s ease;
 
     &:hover {
-      color: #495057;
-      background-color: #f8f9fa;
+      color: var(--bs-body-color);
+      background-color: var(--bs-tertiary-bg);
     }
   }
 }
@@ -29,7 +29,7 @@
 
   .card {
     border-radius: 8px;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--bs-border-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: none;
     .card-body {
@@ -38,30 +38,30 @@
       .card-title {
         font-size: 1rem;
         font-weight: 600;
-        color: #495057;
+        color: var(--bs-body-color);
         margin-bottom: 1rem;
-        border-bottom: 1px solid #f8f9fa;
+        border-bottom: 1px solid var(--bs-border-color);
         padding-bottom: 0.5rem;
       }
 
       h5 {
-        color: #495057;
+        color: var(--bs-body-color);
         font-weight: 600;
         margin-bottom: 0.5rem;
       }
 
       .text-muted {
-        color: #6c757d !important;
+        color: var(--bs-secondary-color) !important;
 
         strong {
-          color: #495057;
+          color: var(--bs-body-color);
           font-weight: 500;
         }
       }
 
       .fw-medium {
         font-weight: 500;
-        color: #495057;
+        color: var(--bs-body-color);
       }
 
       .badge {
@@ -72,7 +72,7 @@
       }
 
       .rounded-circle {
-        border: 2px solid #e9ecef !important;
+        border: 2px solid var(--bs-border-color) !important;
         object-fit: cover;
       }
 
@@ -85,7 +85,7 @@
 }
 
 .modal-footer {
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid var(--bs-border-color);
   padding: 1rem 1.5rem;
   display: flex;
   justify-content: flex-end;

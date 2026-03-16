@@ -2,7 +2,7 @@
   <div class="row g-4">
     <div class="col-12">
       <div class="card common-datatable-card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom">
+        <div class="card-header border-bottom">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 text-primary">
               <i class="ti ti-package me-2"></i>
@@ -13,7 +13,7 @@
                 *ngIf="hasActiveFilters()"
                 class="btn btn-outline-danger btn-sm filter-clear-btn"
                 type="button"
-                placement="top"
+                placement="left"
                 [ngbTooltip]="'WORDS.RESET' | translate"
                 (click)="clearAllFilters()"
               >
@@ -23,7 +23,7 @@
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
-                placement="top"
+                placement="left"
                 [ngbTooltip]="'SUPPLIERS.ACTIONS.REFRESH' | translate"
                 (click)="reloadDatatable()"
               >
@@ -33,7 +33,28 @@
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
-                placement="top"
+                placement="left"
+                [ngbTooltip]="'INVENTORY.QUICK_STOCK.TITLE' | translate"
+                (click)="openQuickStockSearchModal()"
+              >
+                <i class="ti ti-barcode"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-danger btn-sm"
+                type="button"
+                placement="left"
+                ngbTooltip="Exportar inventario PDF"
+                [disabled]="isPdfLoading"
+                (click)="downloadInventoryPdf()"
+              >
+                <i class="ti" [class.ti-file-type-pdf]="!isPdfLoading" [class.ti-loader-2]="isPdfLoading"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="left"
                 [ngbTooltip]="'INVENTORY.ACTIONS.CREATE' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
@@ -195,7 +216,7 @@
                   ngbDropdown
                   container="body"
                   placement="bottom-end auto"
-                  [autoClose]="'inside'"
+                  [autoClose]="true"
                 >
                   <button
                     type="button"
@@ -206,7 +227,7 @@
                   >
                     <i class="ti ti-dots-vertical"></i>
                   </button>
-                  <div ngbDropdownMenu class="actions-icon-grid p-2">
+                  <div ngbDropdownMenu class="dropdown-menu actions-icon-grid p-2">
                     <div class="d-grid grid-2col gap-1">
                       <button
                         class="btn btn-sm btn-outline-secondary action-icon-btn"
@@ -225,6 +246,16 @@
                         container="body"
                       >
                         <i class="ti ti-history"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-secondary action-icon-btn"
+                        (click)="showStockHistory(row)"
+                        [ngbTooltip]="
+                          'INVENTORY.ACTIONS.STOCK_HISTORY' | translate
+                        "
+                        container="body"
+                      >
+                        <i class="ti ti-chart-bar"></i>
                       </button>
                       <button
                         class="btn btn-sm btn-outline-secondary action-icon-btn"

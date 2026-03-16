@@ -28,6 +28,40 @@
   <div class="theme-customizer-panel__body">
     <div class="customizer-section">
       <h6 class="customizer-section__title">
+        <i class="ti ti-sun-moon me-2"></i>
+        Apariencia
+      </h6>
+      <p class="customizer-section__description text-muted small mb-3">
+        Alterna entre modo claro y oscuro en el sistema interno.
+      </p>
+
+      <div class="mode-selector">
+        <button
+          type="button"
+          class="mode-selector__item"
+          [class.mode-selector__item--active]="isModeSelected('light')"
+          (click)="changeMode('light')"
+        >
+          <i class="ti ti-sun fs-20"></i>
+          <span>Claro</span>
+        </button>
+
+        <button
+          type="button"
+          class="mode-selector__item"
+          [class.mode-selector__item--active]="isModeSelected('dark')"
+          (click)="changeMode('dark')"
+        >
+          <i class="ti ti-moon fs-20"></i>
+          <span>Oscuro</span>
+        </button>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="customizer-section">
+      <h6 class="customizer-section__title">
         <i class="ti ti-color-swatch me-2"></i>
         {{ 'THEME_CUSTOMIZER.PRIMARY_COLOR' | translate }}
       </h6>

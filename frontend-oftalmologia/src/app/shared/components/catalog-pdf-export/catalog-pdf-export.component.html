@@ -1,0 +1,17 @@
+<div class="d-flex justify-content-end mb-3">
+  <button
+    type="button"
+    class="btn btn-outline-dark"
+    [disabled]="disabled || loading"
+    (click)="onExport()"
+  >
+    <span class="d-inline-flex align-items-center gap-2">
+      <i class="bi bi-file-earmark-pdf"></i>
+      @if (loading) {
+        Generando catálogo...
+      } @else {
+        Generar catálogo PDF
+      }
+    </span>
+  </button>
+</div>

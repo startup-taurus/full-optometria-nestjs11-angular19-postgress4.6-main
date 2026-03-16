@@ -7,7 +7,7 @@ export const currentYear = new Date().getFullYear()
 export const credits = {
   year: new Date().getFullYear(),
   name: 'Oftalmología',
-  company: 'ZGames',
+  company: 'LatamSoft',
 }
 
 export const TIMEOUTS = {

@@ -1,25 +1,25 @@
 .modal-header {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--bs-border-color);
   padding: 1rem 1.5rem;
 
   .modal-title {
     font-weight: 600;
-    color: #495057;
+    color: var(--bs-emphasis-color);
     font-size: 1.25rem;
   }
 
   .btn-close {
     border: none;
     background: none;
-    color: #6c757d;
+    color: var(--bs-secondary-color);
     font-size: 1.2rem;
     padding: 0.5rem;
     border-radius: 4px;
     transition: all 0.2s ease;
 
     &:hover {
-      color: #495057;
-      background-color: #f8f9fa;
+      color: var(--bs-body-color);
+      background-color: var(--bs-tertiary-bg);
     }
   }
 }
@@ -30,7 +30,7 @@
   .modal-form {
     .form-label {
       font-weight: 500;
-      color: #495057;
+      color: var(--bs-body-color);
       margin-bottom: 0.5rem;
 
       .text-danger {
@@ -40,7 +40,7 @@
 
     .form-control {
       border-radius: 6px;
-      border: 1px solid #ced4da;
+      border: 1px solid var(--bs-border-color);
       padding: 0.5rem 0.75rem;
       transition: all 0.2s ease;
 
@@ -67,7 +67,7 @@
       .ng-select-container {
         border-radius: 6px;
         min-height: 38px;
-        border: 1px solid #ced4da;
+        border: 1px solid var(--bs-border-color);
         transition: all 0.2s ease;
 
         &.ng-select-focused {
@@ -88,12 +88,12 @@
         padding: 8px 12px;
 
         &.ng-option-highlighted {
-          background-color: #f8f9fa;
-          color: #495057;
+          background-color: var(--bs-tertiary-bg);
+          color: var(--bs-body-color);
         }
 
         &.ng-option-selected {
-          background-color: #007bff;
+          background-color: var(--bs-primary);
           color: white;
         }
       }
@@ -110,24 +110,24 @@
   .selected-patient-info {
     .card {
       border-radius: 8px;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--bs-border-color);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
       .card-header {
         border-radius: 8px 8px 0 0;
         padding: 0.75rem 1rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        border-bottom: 1px solid var(--bs-border-color);
 
         &.bg-light-info {
-          background-color: #e3f2fd;
-          border-color: #2196f3;
-          color: #1976d2;
+          background-color: var(--bs-info-bg-subtle);
+          border-color: var(--bs-info);
+          color: var(--bs-info-text-emphasis);
         }
 
         &.bg-light-secondary {
-          background-color: #f8f9fa;
-          border-color: #6c757d;
-          color: #495057;
+          background-color: var(--bs-secondary-bg);
+          border-color: var(--bs-secondary);
+          color: var(--bs-body-color);
         }
 
         .card-title {
@@ -141,13 +141,13 @@
         padding: 1rem;
 
         .patient-avatar img {
-          border: 2px solid #e9ecef;
+          border: 2px solid var(--bs-border-color);
           object-fit: cover;
         }
 
         .patient-details {
           h6 {
-            color: #495057;
+            color: var(--bs-body-color);
             font-weight: 600;
             margin-bottom: 0.5rem;
           }
@@ -155,7 +155,7 @@
           p {
             font-size: 0.875rem;
             margin: 0.25rem 0;
-            color: #6c757d;
+            color: var(--bs-secondary-color);
           }
         }
       }
@@ -168,7 +168,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(var(--bs-body-bg-rgb, 255, 255, 255), 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -178,7 +178,7 @@
 }
 
 .modal-footer {
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid var(--bs-border-color);
   padding: 1rem 1.5rem;
   display: flex;
   justify-content: flex-end;

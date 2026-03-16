@@ -2,19 +2,19 @@
   padding: 1rem;
 
   .card {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--bs-border-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e0e0e0;
+    background-color: var(--bs-tertiary-bg);
+    border-bottom: 1px solid var(--bs-border-color);
     padding: 0.75rem 1rem;
 
     h6 {
       font-size: 0.95rem;
       font-weight: 600;
-      color: #495057;
+      color: var(--bs-body-color);
     }
   }
 
@@ -185,7 +185,7 @@
               width: 100%;
               text-align: center;
               padding: 0.5rem;
-              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+              background: linear-gradient(135deg, var(--bs-tertiary-bg) 0%, var(--bs-secondary-bg) 100%);
               border-radius: 0.25rem;
               margin-bottom: 0.5rem;
               border-left: 3px solid currentColor;
@@ -214,7 +214,7 @@
                     font-size: 0.75rem;
                     margin-bottom: 0.2rem;
                     font-weight: 600;
-                    color: #495057;
+                    color: var(--bs-body-color);
                   }
 
                   .form-control {

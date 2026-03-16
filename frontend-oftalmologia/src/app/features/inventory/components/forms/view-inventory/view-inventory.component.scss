@@ -1,7 +1,7 @@
 .modal-header {
   .modal-title {
     font-weight: 600;
-    color: #333;
+    color: var(--bs-emphasis-color);
   }
 
   .btn-close {
@@ -19,9 +19,9 @@
       justify-content: center;
       align-items: center;
       padding: 1rem;
-      background-color: #f8f9fa;
+      background-color: var(--bs-secondary-bg);
       border-radius: 8px;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--bs-border-color);
       cursor: pointer;
       transition: all 0.3s ease;
       overflow: hidden;
@@ -79,19 +79,19 @@
 
       .detail-label {
         font-weight: 600;
-        color: #495057;
+        color: var(--bs-body-color);
         display: block;
         margin-bottom: 0.25rem;
         font-size: 0.875rem;
       }
 
       .detail-value {
-        color: #333;
+        color: var(--bs-body-color);
         font-size: 1rem;
         padding: 0.5rem 0.75rem;
-        background-color: #f8f9fa;
+        background-color: var(--bs-secondary-bg);
         border-radius: 0.375rem;
-        border: 1px solid #dee2e6;
+        border: 1px solid var(--bs-border-color);
         min-height: 40px;
         display: flex;
         align-items: center;
@@ -154,7 +154,7 @@
     position: relative;
     max-width: 90vw;
     max-height: 90vh;
-    background: white;
+    background: var(--bs-body-bg);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -231,13 +231,13 @@
 
     .modal-image-info {
       padding: 1rem 1.5rem;
-      background-color: #f8f9fa;
-      border-top: 1px solid #dee2e6;
+      background-color: var(--bs-tertiary-bg);
+      border-top: 1px solid var(--bs-border-color);
       text-align: center;
 
       h5 {
         margin-bottom: 0.5rem;
-        color: #333;
+        color: var(--bs-emphasis-color);
         font-weight: 600;
       }
 

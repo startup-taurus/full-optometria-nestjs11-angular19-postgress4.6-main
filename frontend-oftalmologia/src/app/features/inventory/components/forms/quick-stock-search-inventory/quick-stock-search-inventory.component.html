@@ -1,0 +1,135 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ 'INVENTORY.QUICK_STOCK.TITLE' | translate }}</h5>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="searchProduct()">
+  <div class="modal-body">
+    <p class="text-muted mb-3">
+      {{ 'INVENTORY.QUICK_STOCK.DESCRIPTION' | translate }}
+    </p>
+
+    <div class="mb-3">
+      <label class="form-label">{{ 'INVENTORY.TABLE.CODE' | translate }}</label>
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="code"
+          [placeholder]="'INVENTORY.QUICK_STOCK.CODE_PLACEHOLDER' | translate"
+          [class.is-invalid]="form.get('code')?.invalid && form.get('code')?.touched"
+        />
+        <button
+          class="btn btn-outline-primary"
+          type="submit"
+          [disabled]="isSearching"
+        >
+          <i class="ti ti-search"></i>
+        </button>
+      </div>
+      <div
+        class="invalid-feedback d-block"
+        *ngIf="form.get('code')?.invalid && form.get('code')?.touched"
+      >
+        {{ 'INVENTORY.QUICK_STOCK.CODE_REQUIRED' | translate }}
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-3">
+      <input
+        #fileScannerInput
+        type="file"
+        class="d-none"
+        accept="image/*"
+        capture="environment"
+        (change)="onScanFileSelected($event)"
+      />
+
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="toggleScanner(fileScannerInput)"
+        [disabled]="isScannerInitializing || isFileScanning || isProcessingDecodedResult"
+      >
+        <i class="ti" [class.ti-camera]="!isScannerRunning" [class.ti-camera-off]="isScannerRunning"></i>
+        {{
+          ((isScannerRunning || isScannerInitializing)
+            ? 'INVENTORY.QUICK_STOCK.STOP_SCAN'
+            : 'INVENTORY.QUICK_STOCK.START_SCAN') | translate
+        }}
+      </button>
+    </div>
+
+    <small class="text-muted d-block mb-3">
+      {{ 'INVENTORY.QUICK_STOCK.SCAN_HELP' | translate }}
+    </small>
+
+    <div
+      class="camera-box mb-3"
+      [class.d-none]="!isScannerRunning && !isScannerInitializing"
+      [id]="readerElementId"
+    ></div>
+
+    <div class="alert alert-warning" *ngIf="cameraErrorMessage">
+      {{ cameraErrorMessage | translate }}
+    </div>
+
+    <div class="d-flex align-items-center gap-2 mb-3" *ngIf="isSearching">
+      <span class="spinner-border spinner-border-sm"></span>
+      <span>{{ 'INVENTORY.QUICK_STOCK.SEARCHING' | translate }}</span>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 mb-3" *ngIf="isFileScanning">
+      <span class="spinner-border spinner-border-sm"></span>
+      <span>{{ 'INVENTORY.QUICK_STOCK.PROCESSING_IMAGE' | translate }}</span>
+    </div>
+
+    <div class="alert alert-success" *ngIf="productFound">
+      <div>
+        <strong>{{ 'INVENTORY.TABLE.CODE' | translate }}:</strong> {{ productFound.code }}
+      </div>
+      <div>
+        <strong>{{ 'INVENTORY.TABLE.NAME' | translate }}:</strong> {{ productFound.name }}
+      </div>
+      <div>
+        <strong>{{ 'INVENTORY.ADD_STOCK.CURRENT_STOCK' | translate }}:</strong>
+        {{ productFound.quantity ?? 0 }}
+      </div>
+    </div>
+
+    <div class="alert alert-info" *ngIf="hasSearched && !productFound">
+      {{ searchErrorMessage | translate }}
+    </div>
+  </div>
+
+  <div class="modal-footer d-flex justify-content-between">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+
+    <div class="d-flex gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="createProductWithCode()"
+        [disabled]="!(hasSearched && !productFound)"
+      >
+        {{ 'INVENTORY.QUICK_STOCK.CREATE_WITH_CODE' | translate }}
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="useFoundProduct()"
+        [disabled]="!productFound"
+      >
+        {{ 'INVENTORY.QUICK_STOCK.ADD_STOCK' | translate }}
+      </button>
+    </div>
+  </div>
+</form>

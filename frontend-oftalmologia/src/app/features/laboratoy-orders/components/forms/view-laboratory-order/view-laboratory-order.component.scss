@@ -9,12 +9,12 @@
 }
 
 :host ::ng-deep .modal-header {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--bs-border-color);
   padding: 1rem 1.5rem;
 
   h4 {
     font-weight: 600;
-    color: #495057;
+    color: var(--bs-body-color);
     font-size: 1.25rem;
     line-height: 1.4;
     margin: 0;
@@ -54,25 +54,25 @@
 }
 
 .info-card {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.5rem;
-  background-color: #ffffff;
+  background-color: var(--bs-body-bg);
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 
   .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
+    background-color: var(--bs-tertiary-bg);
+    border-bottom: 1px solid var(--bs-border-color);
     padding: 1rem 1.25rem;
 
     h6 {
-      color: #495057;
+      color: var(--bs-body-color);
       margin: 0;
       font-weight: 600;
       font-size: 1rem;
       line-height: 1.4;
 
       i {
-        color: #007bff;
+        color: var(--bs-primary);
         margin-right: 0.5rem;
       }
     }
@@ -88,7 +88,7 @@
   line-height: 1.5;
 
   strong {
-    color: #495057;
+    color: var(--bs-body-color);
     font-weight: 600;
     display: inline-block;
     min-width: 160px;
@@ -96,13 +96,13 @@
   }
 
   span {
-    color: #6c757d;
+    color: var(--bs-secondary-color);
     font-size: 0.9rem;
   }
 }
 
 .section-title {
-  color: #007bff;
+  color: var(--bs-primary);
   font-weight: 600;
   margin-bottom: 1rem;
   font-size: 1.1rem;

@@ -3,6 +3,7 @@ import {
   HostListener,
   inject,
   ViewChild,
+  OnDestroy,
   type OnInit,
 } from '@angular/core'
 import {
@@ -30,6 +31,8 @@ import {
 import { CompanyLogoService } from '@core/services/ui/company-logo.service'
 import { selectUser } from '@core/states/auth/auth.selectors'
 import { take } from 'rxjs/operators'
+import { ThemeCustomizerService } from '@core/services/ui/theme-customizer.service'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-root',
@@ -38,7 +41,7 @@ import { take } from 'rxjs/operators'
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   private titleService = inject(TitleService)
   private companyLogoService = inject(CompanyLogoService)
   private ngbModal = inject(NgbModal)
@@ -48,6 +51,8 @@ export class AppComponent implements OnInit {
 
   private router = inject(Router)
   private sessionTimeoutService = inject(SessionTimeoutService)
+  private themeCustomizerService = inject(ThemeCustomizerService)
+  private routerEventsSubscription: Subscription | null = null
 
   constructor(
     private translate: TranslateService,
@@ -64,6 +69,17 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleService.init()
+    this.syncThemeWithRoute(this.router.url)
+
+    this.routerEventsSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.syncThemeWithRoute(event.urlAfterRedirects)
+      }
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.routerEventsSubscription?.unsubscribe()
   }
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -147,5 +163,18 @@ export class AppComponent implements OnInit {
     })
 
     setTimeout(() => hideSplash(), 2500)
+  }
+
+  private syncThemeWithRoute(url: string): void {
+    if (this.isInternalRoute(url)) {
+      this.themeCustomizerService.applySavedColorForInternalContext()
+      return
+    }
+
+    this.themeCustomizerService.resetToBaseTheme()
+  }
+
+  private isInternalRoute(url: string): boolean {
+    return !/^\/(catalog|auth)(\/|$)/.test(url)
   }
 }

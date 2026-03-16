@@ -1,1 +1,19 @@
+.camera-btn {
+	width: 2rem;
+	height: 2rem;
+	min-width: 2rem;
+	min-height: 2rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+@media (max-width: 576px) {
+	.camera-btn {
+		width: 1.75rem;
+		height: 1.75rem;
+		min-width: 1.75rem;
+		min-height: 1.75rem;
+	}
+}
 

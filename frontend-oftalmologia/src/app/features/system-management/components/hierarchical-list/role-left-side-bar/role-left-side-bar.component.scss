@@ -30,7 +30,8 @@
         border-radius: 12px;
         padding-left: 2.75rem;
         border: 1px solid var(--bs-border-color);
-        background: white;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
 
         &:focus {
           box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
@@ -58,9 +59,9 @@
     margin: 0 1rem 0.75rem 1rem;
     padding: 0 !important;
     border-radius: 12px;
-    background: white;
+    background: var(--bs-body-bg);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--bs-border-color);
     transition: all 0.2s ease;
     overflow: hidden;
 
@@ -113,8 +114,8 @@
 
   .disabled-role {
     opacity: 0.65;
-    background: #f8f9fa !important;
-    border-color: #e0e0e0 !important;
+    background: var(--bs-secondary-bg) !important;
+    border-color: var(--bs-border-color) !important;
 
     .chat-users {
       .flex-grow-1 {

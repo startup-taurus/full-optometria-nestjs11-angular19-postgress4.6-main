@@ -13,6 +13,8 @@ import { Company } from '../companies/entities/company.entity';
 import { Branch } from '../branches/entities/branch.entity';
 import { InventoryTransfer } from './entities/inventory-transfer.entity';
 import { ProductDiscount } from './entities/product-discount.entity';
+import { StockMovement } from './entities/stock-movement.entity';
+import { ProductAuditLog } from './entities/product-audit-log.entity';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { ProductDiscount } from './entities/product-discount.entity';
       Branch,
       InventoryTransfer,
       ProductDiscount,
+      StockMovement,
+      ProductAuditLog,
     ]),
     MulterModule.register({
       limits: {
