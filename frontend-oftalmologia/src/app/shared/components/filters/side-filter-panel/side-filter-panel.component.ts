@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common'
 import {
+  AfterViewInit,
   Component,
   ComponentRef,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
@@ -39,7 +41,9 @@ export interface FilterPanelConfig {
   templateUrl: './side-filter-panel.component.html',
   styleUrls: ['./side-filter-panel.component.scss'],
 })
-export class SideFilterPanelComponent implements OnInit, OnDestroy {
+export class SideFilterPanelComponent
+  implements OnInit, OnDestroy, AfterViewInit
+{
   @Input() config: FilterPanelConfig = {
     title: 'WORDS.FILTER',
     showBadge: true,
@@ -63,14 +67,30 @@ export class SideFilterPanelComponent implements OnInit, OnDestroy {
   @ViewChild('filterContainer', { read: ViewContainerRef })
   filterContainer!: ViewContainerRef
 
+  @ViewChild('toggleButton') toggleButton?: ElementRef<HTMLButtonElement>
+
   private componentRef: ComponentRef<any> | null = null
   private destroy$ = new Subject<void>()
   private focusedElementBeforeOpen: HTMLElement | null = null
   private _filterCommunicationService = inject(FilterCommunicationService)
+  private readonly viewportPadding = 12
+  private dragOffsetX = 0
+  private dragOffsetY = 0
+  private startDragX = 0
+  private startDragY = 0
+
+  public isDragging = false
+  public dragMoved = false
+  public toggleX = 0
+  public toggleY = 0
 
   ngOnInit(): void {
     this.mergeDefaultConfig()
     this.subscribeToFilterCommunication()
+  }
+
+  ngAfterViewInit(): void {
+    this.setInitialTogglePosition()
   }
 
   ngOnDestroy(): void {
@@ -113,6 +133,67 @@ export class SideFilterPanelComponent implements OnInit, OnDestroy {
       event.preventDefault()
       this.closePanel()
     }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.clampTogglePosition()
+  }
+
+  @HostListener('document:pointermove', ['$event'])
+  onPointerMove(event: PointerEvent): void {
+    if (!this.isDragging) return
+
+    const nextX = event.clientX - this.dragOffsetX
+    const nextY = event.clientY - this.dragOffsetY
+    this.toggleX = nextX
+    this.toggleY = nextY
+
+    const distanceX = Math.abs(event.clientX - this.startDragX)
+    const distanceY = Math.abs(event.clientY - this.startDragY)
+    if (distanceX > 3 || distanceY > 3) {
+      this.dragMoved = true
+    }
+
+    this.clampTogglePosition()
+    event.preventDefault()
+  }
+
+  @HostListener('document:pointerup')
+  @HostListener('document:pointercancel')
+  onPointerUp(): void {
+    if (!this.isDragging) return
+
+    this.isDragging = false
+  }
+
+  public onTogglePointerDown(event: PointerEvent): void {
+    if (event.button !== 0 && event.pointerType === 'mouse') {
+      return
+    }
+
+    const target = event.currentTarget as HTMLElement | null
+    target?.setPointerCapture?.(event.pointerId)
+
+    this.isDragging = true
+    this.dragMoved = false
+    this.startDragX = event.clientX
+    this.startDragY = event.clientY
+    this.dragOffsetX = event.clientX - this.toggleX
+    this.dragOffsetY = event.clientY - this.toggleY
+
+    event.preventDefault()
+  }
+
+  public onToggleButtonClick(event: MouseEvent): void {
+    if (this.dragMoved) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.dragMoved = false
+      return
+    }
+
+    this.togglePanel()
   }
 
   public togglePanel(): void {
@@ -262,6 +343,42 @@ export class SideFilterPanelComponent implements OnInit, OnDestroy {
       [this.config.position as string]: this.isOpen
         ? '0'
         : `-${this.config.width}`,
+    }
+  }
+
+  public get toggleStyles(): Record<string, string> {
+    return {
+      left: `${this.toggleX}px`,
+      top: `${this.toggleY}px`,
+    }
+  }
+
+  private setInitialTogglePosition(): void {
+    const { width, height } = this.getToggleSize()
+
+    this.toggleX = window.innerWidth - width - 32
+    this.toggleY = (window.innerHeight - height) / 2
+
+    this.clampTogglePosition()
+  }
+
+  private clampTogglePosition(): void {
+    const { width, height } = this.getToggleSize()
+
+    const minX = this.viewportPadding
+    const minY = this.viewportPadding
+    const maxX = Math.max(minX, window.innerWidth - width - this.viewportPadding)
+    const maxY = Math.max(minY, window.innerHeight - height - this.viewportPadding)
+
+    this.toggleX = Math.min(Math.max(this.toggleX, minX), maxX)
+    this.toggleY = Math.min(Math.max(this.toggleY, minY), maxY)
+  }
+
+  private getToggleSize(): { width: number; height: number } {
+    const button = this.toggleButton?.nativeElement
+    return {
+      width: button?.offsetWidth || 60,
+      height: button?.offsetHeight || 60,
     }
   }
 }

@@ -959,28 +959,38 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       isActive: 'Activo',
     }
 
-    const renderChangedFields = (
+    const renderChangedFieldRows = (
       changedFields: Record<string, { from: any; to: any }> | null
     ): string => {
       if (!changedFields || !Object.keys(changedFields).length) return ''
-      const lines = Object.entries(changedFields).map(([key, val]) => {
-        const label = fieldLabels[key] || key
-        return `<div><strong>${this.escapeHtml(label)}:</strong> <span class="history-value--old">${this.escapeHtml(val.from)}</span> → <span class="history-value--new">${this.escapeHtml(val.to)}</span></div>`
-      })
-      return `<div class="history-changes">${lines.join('')}</div>`
+
+      return Object.entries(changedFields)
+        .map(([key, val]) => {
+          const label = fieldLabels[key] || key
+          return `<div class="inventory-history-grid__full audit-history-row"><strong>${this.escapeHtml(label)}:</strong> <span class="history-value--old">${this.escapeHtml(val.from)}</span> → <span class="history-value--new">${this.escapeHtml(val.to)}</span></div>`
+        })
+        .join('')
     }
 
-    const renderMetadata = (
+    const renderMetadataRows = (
       eventType: string,
       metadata: Record<string, any> | null
     ): string => {
       if (!metadata) return ''
+
       if (eventType === 'CREATED') {
         const syntheticNote = metadata['_synthetic']
-          ? `<div class="history-meta history-meta--note">⚠ Este evento fue reconstruido desde la fecha de creación del producto (anterior al sistema de auditoría)</div>`
+          ? `<div class="inventory-history-grid__full audit-history-row history-meta--note">⚠ Este evento fue reconstruido desde la fecha de creación del producto (anterior al sistema de auditoría)</div>`
           : ''
-        return `<div class="history-meta">Código: <strong>${this.escapeHtml(metadata['code'] || '-')}</strong> · Precio: <strong>$${this.escapeHtml(metadata['unitPrice'] ?? '-')}</strong> · Stock inicial: <strong>${this.escapeHtml(metadata['quantity'] ?? 0)}</strong></div>${syntheticNote}`
+
+        return `
+          <div class="inventory-history-grid__full audit-history-row">Código: <strong>${this.escapeHtml(metadata['code'] || '-')}</strong></div>
+          <div class="inventory-history-grid__full audit-history-row">Precio: <strong>$${this.escapeHtml(metadata['unitPrice'] ?? '-')}</strong></div>
+          <div class="inventory-history-grid__full audit-history-row">Stock inicial: <strong>${this.escapeHtml(metadata['quantity'] ?? 0)}</strong></div>
+          ${syntheticNote}
+        `
       }
+
       if (
         eventType === 'DISCOUNT_APPLIED' ||
         eventType === 'DISCOUNT_REMOVED'
@@ -993,11 +1003,18 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         const end = metadata['endDate']
           ? new Date(metadata['endDate']).toLocaleDateString('es-EC')
           : '-'
-        return `<div class="history-meta">Tipo: <strong>${this.escapeHtml(metadata['discountType'] || '-')}</strong> · Valor: <strong>${this.escapeHtml(val)}${this.escapeHtml(type)}</strong> · Vigencia: ${this.escapeHtml(start)} – ${this.escapeHtml(end)}</div>`
+
+        return `
+          <div class="inventory-history-grid__full audit-history-row">Tipo descuento: <strong>${this.escapeHtml(metadata['discountType'] || '-')}</strong></div>
+          <div class="inventory-history-grid__full audit-history-row">Valor descuento: <strong>${this.escapeHtml(val)}${this.escapeHtml(type)}</strong></div>
+          <div class="inventory-history-grid__full audit-history-row">Vigencia: <strong>${this.escapeHtml(start)} – ${this.escapeHtml(end)}</strong></div>
+        `
       }
+
       if (eventType === 'DEACTIVATED') {
-        return `<div class="history-meta">Stock al eliminar: <strong>${this.escapeHtml(metadata['quantityAtDeletion'] ?? 0)}</strong></div>`
+        return `<div class="inventory-history-grid__full audit-history-row">Stock al eliminar: <strong>${this.escapeHtml(metadata['quantityAtDeletion'] ?? 0)}</strong></div>`
       }
+
       return ''
     }
 
@@ -1015,16 +1032,20 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       const date = item.createdAt
         ? new Date(item.createdAt).toLocaleString('es-EC')
         : '-'
-      const changedHtml = renderChangedFields(item.changedFields)
-      const metaHtml = renderMetadata(item.eventType, item.metadata)
+      const changedRowsHtml = renderChangedFieldRows(item.changedFields)
+      const metaRowsHtml = renderMetadataRows(item.eventType, item.metadata)
 
       return `
         <article class="inventory-history-card audit-history-card">
           <div class="inventory-history-card__header">
             <span class="audit-event-badge audit-event-badge--${cfg.tone}">${this.escapeHtml(cfg.label)}</span>
-            <span class="inventory-history-card__date">👤 ${this.escapeHtml(user)} &nbsp;·&nbsp; 🕐 ${this.escapeHtml(date)}</span>
+            <span class="inventory-history-card__date">🕐 ${this.escapeHtml(date)}</span>
           </div>
-          ${changedHtml}${metaHtml}
+          <div class="inventory-history-grid audit-history-grid">
+            <div class="inventory-history-grid__full audit-history-row"><strong>Usuario:</strong> ${this.escapeHtml(user)}</div>
+            ${changedRowsHtml || '<div class="inventory-history-grid__full audit-history-row">Sin cambios de campos registrados</div>'}
+            ${metaRowsHtml}
+          </div>
         </article>
       `
     })
