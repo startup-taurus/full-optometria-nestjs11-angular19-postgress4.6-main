@@ -74,6 +74,13 @@ export const MENU_ITEMS: MenuItemType[] = [
     requiredPermissions: [PERMISSION_IDS.FEEDBACK],
   },
   {
+    key: 'NOTIFICATIONS',
+    label: 'NOTIFICATIONS',
+    icon: 'ti-bell-ringing',
+    url: '/notifications',
+    requiredPermissions: [PERMISSION_IDS.WHATSAPP_MODULE],
+  },
+  {
     key: 'FEEDBACK_ADMIN',
     label: 'FEEDBACK_ADMIN',
     icon: 'ti-message-2-cog',

@@ -96,6 +96,7 @@
     "CLINICAL_MANAGEMENT": "Gestión Clínica",
     "COMPANIES": "Compañias",
     "PATIENTS": "Pacientes",
+    "NOTIFICATIONS": "Notificaciones WhatsApp",
     "FEEDBACK_USER": "Feedback",
     "FEEDBACK_ADMIN": "Feedback General"
   },
@@ -110,6 +111,7 @@
   },
   "PROFILE": {
     "TITLE": "Perfil",
+    "USERNAME": "Nombre de usuario",
     "MY_PROFILE": {
       "TITLE": "Mi perfil",
       "PERSONAL_INFORMATION": "Información personal",
@@ -166,12 +168,64 @@
         "TIP_4": "Evita palabras comunes o información personal"
       }
     },
+    "WHATSAPP": {
+      "TITLE": "WhatsApp",
+      "DESCRIPTION": "Conecta tu sesión de WhatsApp para enviar recordatorios de pacientes.",
+      "OPEN_MODULE": "Abrir módulo de notificaciones",
+      "SCAN_QR": "Escanea el código QR con tu WhatsApp"
+    },
     "ERRORS": {
       "CURRENTPASSWORD_REQUIRED": "La contraseña actual es requerida",
       "NEWPASSWORD_REQUIRED": "La nueva contraseña es requerida",
       "CONFIRMPASSWORD_REQUIRED": "La confirmación de contraseña es requerida",
       "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 6 caracteres",
       "PASSWORD_MISMATCH": "Las contraseñas no coinciden"
+    }
+  },
+  "NOTIFICATIONS": {
+    "TITLE": "Notificaciones WhatsApp",
+    "SESSION": {
+      "TITLE": "Sesión de WhatsApp",
+      "INIT": "Iniciar sesión QR",
+      "REFRESH_QR": "Actualizar QR",
+      "MARK_CONNECTED": "Marcar conectado",
+      "LOGOUT": "Cerrar sesión",
+      "QR_LABEL": "Código QR",
+      "CONNECTED_PHONE": "Teléfono conectado",
+      "STATUS_DISCONNECTED": "Desconectado",
+      "STATUS_QR_READY": "QR listo",
+      "STATUS_CONNECTED": "Conectado",
+      "INIT_SUCCESS": "Sesión iniciada correctamente",
+      "QR_REFRESHED": "QR actualizado",
+      "CONNECTED": "Sesión marcada como conectada",
+      "LOGOUT_SUCCESS": "Sesión cerrada",
+      "SETUP_REQUIRED": "Debes conectar WhatsApp antes de enviar recordatorios. Configura la sesión en tu perfil.",
+      "SETUP_IN_PROFILE": "Configurar en Perfil"
+    },
+    "RULE": {
+      "TITLE": "Reglas de recordatorio",
+      "RENEWAL_AFTER_DAYS": "Renovar después de (días)",
+      "NOTIFY_BEFORE_DAYS": "Avisar antes de (días)",
+      "QUIET_HOURS_START": "Inicio horario silencioso",
+      "QUIET_HOURS_END": "Fin horario silencioso",
+      "ACTIVE": "Regla activa",
+      "SAVE": "Guardar reglas",
+      "UPDATED": "Reglas actualizadas"
+    },
+    "ELIGIBLE": {
+      "TITLE": "Pacientes elegibles para renovación",
+      "SEARCH": "Buscar paciente",
+      "REFRESH": "Actualizar",
+      "PATIENT": "Paciente",
+      "DOCUMENT": "Documento",
+      "PHONE": "Teléfono",
+      "DAYS": "Días",
+      "DUE_SOON": "Por cumplirse",
+      "DUE_SOON_YES": "Sí",
+      "DUE_SOON_NO": "No",
+      "EMPTY": "No hay pacientes elegibles",
+      "MESSAGE_TEMPLATE": "Plantilla de mensaje",
+      "SEND_MANUAL": "Enviar recordatorio manual"
     }
   },
   "USER": {

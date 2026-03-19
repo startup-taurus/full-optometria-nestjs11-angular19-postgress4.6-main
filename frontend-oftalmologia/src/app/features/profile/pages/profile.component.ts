@@ -4,6 +4,7 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import { TranslatePipe } from '@ngx-translate/core'
 import { ProfileDetailsComponent } from '../components/profile-details/profile-details.component'
 import { SecuritySettingsComponent } from '../components/security/security-settings.component'
+import { WhatsAppSessionComponent } from '../components/whatsapp-session/whatsapp-session.component'
 
 
 @Component({
@@ -16,6 +17,7 @@ import { SecuritySettingsComponent } from '../components/security/security-setti
     TranslatePipe,
     ProfileDetailsComponent,
     SecuritySettingsComponent,
+    WhatsAppSessionComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],

@@ -94,4 +94,11 @@ export const VIEWS_ROUTES: Route[] = [
     loadChildren: () =>
       import('./feedback/feedback.route').then((mod) => mod.FEEDBACK_ROUTES),
   },
+  {
+    path: 'notifications',
+    loadChildren: () =>
+      import('./notifications/notifications.route').then(
+        (mod) => mod.NOTIFICATIONS_ROUTES
+      ),
+  },
 ]

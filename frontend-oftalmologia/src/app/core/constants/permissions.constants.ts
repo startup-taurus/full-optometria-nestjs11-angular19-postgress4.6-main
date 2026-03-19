@@ -46,6 +46,9 @@ export const PERMISSION_IDS = {
 
   //feedback
   FEEDBACK: '7ec21b5c-03fa-415c-b6de-59fea2dd2cea',
+
+  //notificaciones whatsapp
+  WHATSAPP_MODULE: '772ddd04-70cf-4d3c-b4a3-c30b18bf8505',
 } as const
 
 // Mapeo de nombres de permisos a IDs para compatibilidad hacia atrás
@@ -59,6 +62,7 @@ export const PERMISSION_NAME_TO_ID_MAP: { [key: string]: string } = {
   CALENDAR: PERMISSION_IDS.CALENDAR,
   BRANCH_SELECTOR: PERMISSION_IDS.BRANCH_SELECTOR,
   FEEDBACK: PERMISSION_IDS.FEEDBACK,
+  WHATSAPP_MODULE: PERMISSION_IDS.WHATSAPP_MODULE,
 }
 
 // Mapeo de módulos a IDs de permisos
@@ -79,6 +83,7 @@ export const MODULE_NAME_TO_PERMISSION_MAP: { [key: string]: string } = {
   COMPANIES: PERMISSION_IDS.COMPANIES,
   PATIENTS: PERMISSION_IDS.PATIENTS,
   FEEDBACK: PERMISSION_IDS.FEEDBACK,
+  NOTIFICATIONS: PERMISSION_IDS.WHATSAPP_MODULE,
 }
 
 // Alias más legibles para templates
@@ -98,6 +103,7 @@ export const PERMISSIONS = {
   branchSelector: PERMISSION_IDS.BRANCH_SELECTOR,
   patients: PERMISSION_IDS.PATIENTS,
   feedback: PERMISSION_IDS.FEEDBACK,
+  whatsappModule: PERMISSION_IDS.WHATSAPP_MODULE,
 } as const
 
 export type PermissionId = (typeof PERMISSION_IDS)[keyof typeof PERMISSION_IDS]

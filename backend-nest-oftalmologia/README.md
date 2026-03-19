@@ -50,6 +50,11 @@ API_PREFIX=v1/api
 
 # Password Configuration
 BCRYPT_SALT_ROUNDS=10
+
+# WhatsApp WebJS auth data path (opcional)
+# Por defecto en Windows: %LOCALAPPDATA%/zofta-whatsapp-auth
+# Si deseas forzar una ruta específica (recomendado en Docker/servidor), define:
+WHATSAPP_AUTH_BASE_PATH=C:/zofta-whatsapp-auth
 ```
 
 ### Instalación y Configuración
