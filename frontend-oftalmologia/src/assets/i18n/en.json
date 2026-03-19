@@ -97,7 +97,8 @@
     "MEDICAL_HISTORY_CONFIGURATION": "Medical Configuration",
     "CLINICAL_MANAGEMENT": "Clinical Management",
     "COMPANIES": "Companies",
-    "PATIENTS": "Patients"
+    "PATIENTS": "Patients",
+    "NOTIFICATIONS": "WhatsApp Notifications"
   },
   "TOPBAR": {
     "SEARCH": "Search something...",
@@ -110,6 +111,7 @@
   },
   "PROFILE": {
     "TITLE": "Profile",
+    "USERNAME": "Username",
     "MY_PROFILE": {
       "TITLE": "My Profile",
       "PERSONAL_INFORMATION": "Personal Information",
@@ -165,6 +167,58 @@
         "TIP_3": "Add numbers and special characters",
         "TIP_4": "Avoid common words or personal information"
       }
+    },
+    "WHATSAPP": {
+      "TITLE": "WhatsApp",
+      "DESCRIPTION": "Connect your WhatsApp session to send patient reminders.",
+      "OPEN_MODULE": "Open notifications module",
+      "SCAN_QR": "Scan the QR code with your WhatsApp"
+    }
+  },
+  "NOTIFICATIONS": {
+    "TITLE": "WhatsApp Notifications",
+    "SESSION": {
+      "TITLE": "WhatsApp Session",
+      "INIT": "Start QR session",
+      "REFRESH_QR": "Refresh QR",
+      "MARK_CONNECTED": "Mark connected",
+      "LOGOUT": "Logout",
+      "QR_LABEL": "QR code",
+      "CONNECTED_PHONE": "Connected phone",
+      "STATUS_DISCONNECTED": "Disconnected",
+      "STATUS_QR_READY": "QR ready",
+      "STATUS_CONNECTED": "Connected",
+      "INIT_SUCCESS": "Session initialized",
+      "QR_REFRESHED": "QR refreshed",
+      "CONNECTED": "Session marked as connected",
+      "LOGOUT_SUCCESS": "Session closed",
+      "SETUP_REQUIRED": "You must connect WhatsApp before sending reminders. Set up the session in your profile.",
+      "SETUP_IN_PROFILE": "Setup in Profile"
+    },
+    "RULE": {
+      "TITLE": "Reminder rules",
+      "RENEWAL_AFTER_DAYS": "Renew after (days)",
+      "NOTIFY_BEFORE_DAYS": "Notify before (days)",
+      "QUIET_HOURS_START": "Quiet hours start",
+      "QUIET_HOURS_END": "Quiet hours end",
+      "ACTIVE": "Rule active",
+      "SAVE": "Save rules",
+      "UPDATED": "Rules updated"
+    },
+    "ELIGIBLE": {
+      "TITLE": "Renewal eligible patients",
+      "SEARCH": "Search patient",
+      "REFRESH": "Refresh",
+      "PATIENT": "Patient",
+      "DOCUMENT": "Document",
+      "PHONE": "Phone",
+      "DAYS": "Days",
+      "DUE_SOON": "Due soon",
+      "DUE_SOON_YES": "Yes",
+      "DUE_SOON_NO": "No",
+      "EMPTY": "No eligible patients",
+      "MESSAGE_TEMPLATE": "Message template",
+      "SEND_MANUAL": "Send manual reminder"
     }
   },
   "USER": {

@@ -1,20 +1,31 @@
 .side-filter-toggle {
   position: fixed;
-  bottom: 50%;
+  top: 50%;
   right: 2rem;
-  transform: translateY(50%);
+  transform: translateY(-50%);
   z-index: 1040;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease;
   animation: floatBounce 3s ease-in-out infinite;
+  cursor: grab;
 
   &:hover {
-    transform: translateY(50%) scale(1.1);
+    transform: translateY(-50%) scale(1.08);
     animation: none;
   }
 
   &--open {
-    transform: translateY(50%) scale(0.9);
+    transform: translateY(-50%) scale(0.95);
     animation: none;
+  }
+
+  &--dragging {
+    animation: none;
+    cursor: grabbing;
+    transform: none !important;
+
+    &:hover {
+      transform: none !important;
+    }
   }
 
   .btn {
@@ -24,6 +35,9 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
     background-color: var(--bs-primary);
+    cursor: inherit;
+    touch-action: none;
+    user-select: none;
 
     &:hover {
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
@@ -297,16 +311,14 @@
   }
 
   .side-filter-toggle {
-    bottom: 50%;
     right: 1rem;
-    transform: translateY(50%);
 
     &:hover {
-      transform: translateY(50%) scale(1.1);
+      transform: scale(1.08);
     }
 
     &--open {
-      transform: translateY(50%) scale(0.9);
+      transform: scale(0.95);
     }
   }
 }
@@ -314,10 +326,10 @@
 @keyframes floatBounce {
   0%,
   100% {
-    transform: translateY(50%);
+    transform: translateY(-50%);
   }
   50% {
-    transform: translateY(calc(50% - 8px));
+    transform: translateY(calc(-50% - 8px));
   }
 }
 

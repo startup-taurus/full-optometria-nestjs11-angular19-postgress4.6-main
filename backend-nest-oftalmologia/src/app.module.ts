@@ -7,6 +7,7 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 
 // Configuration
 import { validate } from './config/env.validation';
@@ -40,6 +41,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PatientsModule } from './modules/patients/patients.module';
 import { CompanyQuotaModule } from './modules/company-quota/company-quota.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+
 
 // Entities
 import { User } from './modules/users/entities/user.entity';
@@ -66,6 +69,12 @@ import { ClinicalHistory } from './modules/clinical-histories/entities/clinical-
 import { LaboratoryOrder } from './modules/laboratory-orders/entities/laboratory-order.entity';
 import { Patient } from './modules/patients/entities/patient.entity';
 import { Feedback } from './modules/feedback/entities/feedback.entity';
+import { WhatsAppSession } from './modules/notifications/entities/whatsapp-session.entity';
+import { ReminderRule } from './modules/notifications/entities/reminder-rule.entity';
+import { Campaign } from './modules/notifications/entities/campaign.entity';
+import { MessageDispatchLog } from './modules/notifications/entities/message-dispatch-log.entity';
+import { PatientContactPreference } from './modules/notifications/entities/patient-contact-preference.entity';
+
 
 @Module({
   imports: [
@@ -73,6 +82,7 @@ import { Feedback } from './modules/feedback/entities/feedback.entity';
       isGlobal: true,
       validate,
     }),
+    ScheduleModule.forRoot(),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -108,6 +118,11 @@ import { Feedback } from './modules/feedback/entities/feedback.entity';
           LaboratoryOrder,
           Patient,
           Feedback,
+          WhatsAppSession,
+          ReminderRule,
+          Campaign,
+          MessageDispatchLog,
+          PatientContactPreference,
         ],
         synchronize: false,
         dropSchema: false,
@@ -136,6 +151,7 @@ import { Feedback } from './modules/feedback/entities/feedback.entity';
     PatientsModule,
     CompanyQuotaModule,
     FeedbackModule,
+    NotificationsModule,
   ],
   providers: [
     {

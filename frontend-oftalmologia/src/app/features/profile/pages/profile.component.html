@@ -41,6 +41,20 @@
             </a>
             <ng-template ngbNavContent> <security-settings /> </ng-template>
           </ng-container>
+          <ng-container ngbNavItem>
+            <a
+              id="v-pills-whatsapp-tab"
+              ngbNavLink
+              role="tab"
+              aria-controls="v-pills-whatsapp"
+              aria-selected="false"
+            >
+              <i class="ti ti-brand-whatsapp fs-18 me-1"></i> {{'PROFILE.WHATSAPP.TITLE' | translate}}
+            </a>
+            <ng-template ngbNavContent>
+              <profile-whatsapp-session></profile-whatsapp-session>
+            </ng-template>
+          </ng-container>
         </div>
       </div>
 

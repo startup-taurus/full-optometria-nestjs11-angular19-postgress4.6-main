@@ -319,6 +319,16 @@
   border-left: 4px solid rgba(var(--bs-success-rgb), 0.5);
 }
 
+.audit-history-grid {
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+}
+
+.audit-history-row {
+  display: block;
+  padding: 0.45rem 0.15rem 0.45rem 0;
+}
+
 .inventory-history-card__header {
   display: flex;
   justify-content: space-between;

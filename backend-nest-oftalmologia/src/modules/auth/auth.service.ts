@@ -68,13 +68,6 @@ export class AuthService {
       });
     }
 
-    if (user.isLocked) {
-      this.logger.warn(`Locked user login attempt: ${identifier}`);
-      throw new UnauthorizedException({
-        messageKey: 'ERROR.UNAUTHORIZED',
-      });
-    }
-
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
       this.logger.warn(`Invalid password for user: ${identifier}`);
@@ -92,6 +85,15 @@ export class AuthService {
       throw new UnauthorizedException({
         messageKey: 'ERROR.INVALID_CREDENTIALS',
       });
+    }
+
+    if (user.isLocked) {
+      this.logger.warn(`Auto unlocking user after valid credentials: ${identifier}`);
+      await this.userRepository.update(user.id, {
+        isLocked: false,
+        failedLoginAttempts: 0,
+      });
+      user.isLocked = false;
     }
 
     await this.userRepository.update(user.id, {

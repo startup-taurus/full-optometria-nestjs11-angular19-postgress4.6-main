@@ -1,8 +1,15 @@
-<div class="side-filter-toggle" [class.side-filter-toggle--open]="isOpen">
+<div
+  class="side-filter-toggle"
+  [class.side-filter-toggle--open]="isOpen"
+  [class.side-filter-toggle--dragging]="isDragging"
+  [ngStyle]="toggleStyles"
+>
   <button
+    #toggleButton
     type="button"
     class="btn btn-primary btn-lg rounded-circle shadow-lg position-relative"
-    (click)="togglePanel()"
+    (pointerdown)="onTogglePointerDown($event)"
+    (click)="onToggleButtonClick($event)"
     [attr.aria-label]="config.title | translate"
     [attr.aria-expanded]="isOpen"
     [attr.aria-controls]="'side-filter-panel-' + config.position"
