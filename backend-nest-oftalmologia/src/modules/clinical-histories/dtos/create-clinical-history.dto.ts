@@ -69,11 +69,31 @@ export class CreateClinicalHistoryDto {
 
   @IsOptional()
   @IsString()
+  previousOdVl?: string;
+
+  @IsOptional()
+  @IsString()
+  previousOdVp?: string;
+
+  @IsOptional()
+  @IsString()
   previousRxOi?: string;
 
   @IsOptional()
   @IsString()
   previousAddOi?: string;
+
+  @IsOptional()
+  @IsString()
+  previousOiVl?: string;
+
+  @IsOptional()
+  @IsString()
+  previousOiVp?: string;
+
+  @IsOptional()
+  @IsString()
+  previousAo?: string;
 
   // Agudeza visual sin RX
   @IsOptional()

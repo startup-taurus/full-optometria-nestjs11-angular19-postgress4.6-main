@@ -129,6 +129,11 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
       mid: [null],
       distVp: [null],
       engraving: [null],
+      frameLargerDiameter: [null],
+      frameHorizontal: [null],
+      frameVertical: [null],
+      frameBridge: [null],
+      observations: [null],
     })
 
     this.stepForms[4] = this._fb.group({
@@ -138,11 +143,6 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
       frameBrand: [null],
       frameModel: [null],
       frameData: [null],
-      frameLargerDiameter: [null],
-      frameHorizontal: [null],
-      frameVertical: [null],
-      frameBridge: [null],
-      observations: [null],
     })
 
     this.mainForm = this._fb.group({
@@ -241,6 +241,11 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
       mid: order.mid,
       distVp: order.distVp,
       engraving: order.engraving,
+      frameLargerDiameter: order.frameLargerDiameter,
+      frameHorizontal: order.frameHorizontal,
+      frameVertical: order.frameVertical,
+      frameBridge: order.frameBridge,
+      observations: order.observations,
     })
 
     this.stepForms[4].patchValue({
@@ -255,11 +260,6 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
       frameBrand: order.frameBrand,
       frameModel: order.frameModel,
       frameData: order.frameData,
-      frameLargerDiameter: order.frameLargerDiameter,
-      frameHorizontal: order.frameHorizontal,
-      frameVertical: order.frameVertical,
-      frameBridge: order.frameBridge,
-      observations: order.observations,
     })
   }
 

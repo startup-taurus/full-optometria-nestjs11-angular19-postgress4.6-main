@@ -1,5 +1,5 @@
 <div class="row" [formGroup]="formGroup">
-  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_previousRx')">
+  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step2_previousRx')">
     <div class="card">
       <div class="card-header">
         <h5 class="mb-0">
@@ -11,73 +11,201 @@
         <h6 class="text-primary mb-3">
           {{ 'MEDICAL_HISTORY.FORM.PREVIOUS_RX_LENSOMETRY' | translate }}
         </h6>
-        <div class="row">
-          <div
-            class="col-md-6 mb-3"
-            *ngIf="shouldShowField('step2_previousRx', 'previousRxOd')"
-          >
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="previousRxOd"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.PREVIOUS_RX_OD' | translate
-              "
-            />
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-primary mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousRxOd')"
+                  >
+                    <label class="form-label small">RX ANTERIOR</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousRxOd"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.PREVIOUS_RX_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousAddOd')"
+                  >
+                    <label class="form-label small">ADD</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousAddOd"
+                      placeholder="ADD"
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousOdVl')"
+                  >
+                    <label class="form-label small">VL</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousOdVl"
+                      placeholder="VL"
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousOdVp')"
+                  >
+                    <label class="form-label small">VP</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousOdVp"
+                      placeholder="VP"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div
-            class="col-md-6 mb-3"
-            *ngIf="shouldShowField('step2_previousRx', 'previousAddOd')"
-          >
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.RIGHT_EYE_ADD' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="previousAddOd"
-              [placeholder]="'MEDICAL_HISTORY.FIELDS.RIGHT_EYE_ADD' | translate"
-            />
+
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-success mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousRxOi')"
+                  >
+                    <label class="form-label small">RX ANTERIOR</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousRxOi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.PREVIOUS_RX_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousAddOi')"
+                  >
+                    <label class="form-label small">ADD</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousAddOi"
+                      placeholder="ADD"
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousOiVl')"
+                  >
+                    <label class="form-label small">VL</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousOiVl"
+                      placeholder="VL"
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    *ngIf="shouldShowField('step2_previousRx', 'previousOiVp')"
+                  >
+                    <label class="form-label small">VP</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="previousOiVp"
+                      placeholder="VP"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+
           <div
-            class="col-md-6 mb-3"
-            *ngIf="shouldShowField('step2_previousRx', 'previousRxOi')"
+            class="col-12"
+            *ngIf="shouldShowField('step2_previousRx', 'previousAo')"
           >
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="previousRxOi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.PREVIOUS_RX_OI' | translate
-              "
-            />
+            <div class="row g-2">
+              <div class="col-md-3">
+                <label class="form-label small">AO</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="previousAo"
+                  placeholder="AO"
+                />
+              </div>
+            </div>
           </div>
-          <div
-            class="col-md-6 mb-3"
-            *ngIf="shouldShowField('step2_previousRx', 'previousAddOi')"
-          >
+        </div>
+
+        <hr class="my-4" *ngIf="shouldShowField('step1_personalData', 'segmentAnterior')" />
+
+        <div
+          class="row"
+          *ngIf="shouldShowField('step1_personalData', 'segmentAnterior')"
+        >
+          <div class="col-12">
             <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.LEFT_EYE_ADD' | translate
+              'MEDICAL_HISTORY.FIELDS.ANTERIOR_SEGMENT' | translate
             }}</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="previousAddOi"
-              [placeholder]="'MEDICAL_HISTORY.FIELDS.LEFT_EYE_ADD' | translate"
-            />
+            <div class="mb-2">
+              @for (option of ['OD', 'OI', 'A.O.']; track option) {
+                <div class="form-check form-check-inline">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    [value]="option"
+                    formControlName="segmentAnterior"
+                    [id]="'segment_step2_' + option"
+                  />
+                  <label
+                    class="form-check-label"
+                    [for]="'segment_step2_' + option"
+                  >
+                    {{ option }}
+                  </label>
+                </div>
+              }
+            </div>
+            @if (formGroup.get('segmentAnterior')?.value) {
+              <input
+                type="text"
+                class="form-control mt-2"
+                formControlName="segmentAnteriorOther"
+                [placeholder]="
+                  'MEDICAL_HISTORY.PLACEHOLDERS.SPECIFY_OTHER' | translate
+                "
+              />
+            }
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_visualAcuity')">
+  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step2_visualAcuity')">
     <div class="card">
       <div class="card-header">
         <h6 class="mb-0">
@@ -87,62 +215,83 @@
         </h6>
       </div>
       <div class="card-body">
-        <div class="row">
-          <div
-            class="col-md-3 mb-3"
-            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVl')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }} VL</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="visualAcuityOdVl"
-              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OD_VL' | translate"
-            />
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-primary mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-6"
+                    *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVl')"
+                  >
+                    <label class="form-label">VL</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="visualAcuityOdVl"
+                      [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OD_VL' | translate"
+                    />
+                  </div>
+                  <div
+                    class="col-md-6"
+                    *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVp')"
+                  >
+                    <label class="form-label">VP</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="visualAcuityOdVp"
+                      [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OD_VP' | translate"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div
-            class="col-md-3 mb-3"
-            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVp')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }} VP</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="visualAcuityOdVp"
-              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OD_VP' | translate"
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVl')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }} VL</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="visualAcuityOiVl"
-              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OI_VL' | translate"
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVp')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }} VP</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="visualAcuityOiVp"
-              [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OI_VP' | translate"
-            />
+
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-success mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-6"
+                    *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVl')"
+                  >
+                    <label class="form-label">VL</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="visualAcuityOiVl"
+                      [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OI_VL' | translate"
+                    />
+                  </div>
+                  <div
+                    class="col-md-6"
+                    *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVp')"
+                  >
+                    <label class="form-label">VP</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="visualAcuityOiVp"
+                      [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OI_VP' | translate"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -252,7 +401,7 @@
     </div>
   </div>
 
-  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_motorTest')">
+  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step2_motorTest')">
     <div class="card">
       <div class="card-header">
         <h6 class="mb-0">
@@ -759,179 +908,193 @@
         </h6>
       </div>
       <div class="card-body">
-        <div class="row">
-          <div class="col-md-6 mb-4">
-            <h6 class="text-info mb-3">
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
-            </h6>
-            <div class="row">
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdSphere')"
-              >
-                <label class="form-label small">{{
-                  'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
-                }}</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOdSphere"
-                  [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
-                />
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-primary mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+                </label>
               </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdCylinder')"
-              >
-                <label class="form-label small">{{
-                  'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
-                }}</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOdCylinder"
-                  [placeholder]="
-                    'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
-                  "
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAxis')"
-              >
-                <label class="form-label small">{{
-                  'MEDICAL_HISTORY.FIELDS.AXIS' | translate
-                }}</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOdAxis"
-                  [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAdd')"
-              >
-                <label class="form-label small">ADD OD</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOdAdd"
-                  placeholder="ADD OD"
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVl')"
-              >
-                <label class="form-label small">AV VL</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="correctedAvOdVl"
-                  placeholder="AV VL"
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVp')"
-              >
-                <label class="form-label small">AV VP</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="correctedAvOdVp"
-                  placeholder="AV VP"
-                />
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdSphere')"
+                  >
+                    <label class="form-label small">{{
+                      'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOdSphere"
+                      [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdCylinder')"
+                  >
+                    <label class="form-label small">{{
+                      'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOdCylinder"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAxis')"
+                  >
+                    <label class="form-label small">{{
+                      'MEDICAL_HISTORY.FIELDS.AXIS' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOdAxis"
+                      [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAdd')"
+                  >
+                    <label class="form-label small">ADD OD</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOdAdd"
+                      placeholder="ADD OD"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVl')"
+                  >
+                    <label class="form-label small">AV VL</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="correctedAvOdVl"
+                      placeholder="AV VL"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVp')"
+                  >
+                    <label class="form-label small">AV VP</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="correctedAvOdVp"
+                      placeholder="AV VP"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="col-md-6 mb-4">
-            <h6 class="text-info mb-3">
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
-            </h6>
-            <div class="row">
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiSphere')"
-              >
-                <label class="form-label small">{{
-                  'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
-                }}</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOiSphere"
-                  [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
-                />
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-success mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+                </label>
               </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiCylinder')"
-              >
-                <label class="form-label small">{{
-                  'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
-                }}</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOiCylinder"
-                  [placeholder]="
-                    'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
-                  "
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAxis')"
-              >
-                <label class="form-label small">{{
-                  'MEDICAL_HISTORY.FIELDS.AXIS' | translate
-                }}</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOiAxis"
-                  [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAdd')"
-              >
-                <label class="form-label small">ADD OI</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="finalRxOiAdd"
-                  placeholder="ADD OI"
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVl')"
-              >
-                <label class="form-label small">AV VL</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="correctedAvOiVl"
-                  placeholder="AV VL"
-                />
-              </div>
-              <div
-                class="col-6 mb-2"
-                *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVp')"
-              >
-                <label class="form-label small">AV VP</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="correctedAvOiVp"
-                  placeholder="AV VP"
-                />
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiSphere')"
+                  >
+                    <label class="form-label small">{{
+                      'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOiSphere"
+                      [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiCylinder')"
+                  >
+                    <label class="form-label small">{{
+                      'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOiCylinder"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAxis')"
+                  >
+                    <label class="form-label small">{{
+                      'MEDICAL_HISTORY.FIELDS.AXIS' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOiAxis"
+                      [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAdd')"
+                  >
+                    <label class="form-label small">ADD OI</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="finalRxOiAdd"
+                      placeholder="ADD OI"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVl')"
+                  >
+                    <label class="form-label small">AV VL</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="correctedAvOiVl"
+                      placeholder="AV VL"
+                    />
+                  </div>
+                  <div
+                    class="col-md-2"
+                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVp')"
+                  >
+                    <label class="form-label small">AV VP</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="correctedAvOiVp"
+                      placeholder="AV VP"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

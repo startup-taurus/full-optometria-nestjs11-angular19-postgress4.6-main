@@ -17,8 +17,13 @@ export interface ClinicalHistoryFormData {
 
   previousRxOd: string
   previousAddOd: string
+  previousOdVl: string
+  previousOdVp: string
   previousRxOi: string
   previousAddOi: string
+  previousOiVl: string
+  previousOiVp: string
+  previousAo: string
   visualAcuityOdVl: string
   visualAcuityOdVp: string
   visualAcuityOiVl: string
@@ -93,8 +98,13 @@ export class ClinicalHistoryFormService {
 
       previousRxOd: [''],
       previousAddOd: [''],
+      previousOdVl: [''],
+      previousOdVp: [''],
       previousRxOi: [''],
       previousAddOi: [''],
+      previousOiVl: [''],
+      previousOiVp: [''],
+      previousAo: [''],
 
       visualAcuityOdVl: [''],
       visualAcuityOdVp: [''],
@@ -351,8 +361,13 @@ export class ClinicalHistoryFormService {
 
       previousRxOd: data.previousRxOd,
       previousAddOd: data.previousAddOd,
+      previousOdVl: data.previousOdVl,
+      previousOdVp: data.previousOdVp,
       previousRxOi: data.previousRxOi,
       previousAddOi: data.previousAddOi,
+      previousOiVl: data.previousOiVl,
+      previousOiVp: data.previousOiVp,
+      previousAo: data.previousAo,
 
       visualAcuityOdVl: data.visualAcuityOdVl,
       visualAcuityOdVp: data.visualAcuityOdVp,
@@ -425,8 +440,13 @@ export class ClinicalHistoryFormService {
 
       previousRxOd: formValue.previousRxOd || undefined,
       previousAddOd: formValue.previousAddOd || undefined,
+      previousOdVl: formValue.previousOdVl || undefined,
+      previousOdVp: formValue.previousOdVp || undefined,
       previousRxOi: formValue.previousRxOi || undefined,
       previousAddOi: formValue.previousAddOi || undefined,
+      previousOiVl: formValue.previousOiVl || undefined,
+      previousOiVp: formValue.previousOiVp || undefined,
+      previousAo: formValue.previousAo || undefined,
 
       visualAcuityOdVl: formValue.visualAcuityOdVl || undefined,
       visualAcuityOdVp: formValue.visualAcuityOdVp || undefined,

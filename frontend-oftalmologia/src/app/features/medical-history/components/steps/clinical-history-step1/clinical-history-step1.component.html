@@ -220,37 +220,6 @@
             ></textarea>
           </div>
 
-          <div class="col-md-6 mb-3" *ngIf="shouldShowField('segmentAnterior')">
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.ANTERIOR_SEGMENT' | translate
-            }}</label>
-            <div class="mb-2">
-              @for (option of ['OD', 'OI', 'A.O.']; track option) {
-                <div class="form-check form-check-inline">
-                  <input
-                    type="radio"
-                    class="form-check-input"
-                    [value]="option"
-                    formControlName="segmentAnterior"
-                    [id]="'segment_' + option"
-                  />
-                  <label class="form-check-label" [for]="'segment_' + option">
-                    {{ option }}
-                  </label>
-                </div>
-              }
-            </div>
-            @if (formGroup.get('segmentAnterior')?.value) {
-              <input
-                type="text"
-                class="form-control mt-2"
-                formControlName="segmentAnteriorOther"
-                [placeholder]="
-                  'MEDICAL_HISTORY.PLACEHOLDERS.SPECIFY_OTHER' | translate
-                "
-              />
-            }
-          </div>
         </div>
       </div>
     </div>

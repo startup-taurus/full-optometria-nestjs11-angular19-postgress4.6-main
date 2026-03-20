@@ -113,8 +113,6 @@ export class LaboratoryOrderPdfService {
         { text: '', margin: [0, 10, 0, 10] },
         this.buildProductSection(data),
         { text: '', margin: [0, 10, 0, 10] },
-        this.buildDesignParametersSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
         this.buildFrameDataSection(data),
         { text: '', margin: [0, 15, 0, 0] },
         this.buildSignatureSection(),
@@ -597,22 +595,22 @@ export class LaboratoryOrderPdfService {
             body: [
               [
                 {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.LARGER_DIAMETER')}:`,
-                  bold: true,
-                },
-                { text: order.frameLargerDiameter || '-' },
-                {
                   text: `${this._translateService.instant('PDF.LABORATORY_ORDER.HORIZONTAL')}:`,
                   bold: true,
                 },
                 { text: order.frameHorizontal || '-' },
-              ],
-              [
                 {
                   text: `${this._translateService.instant('PDF.LABORATORY_ORDER.VERTICAL')}:`,
                   bold: true,
                 },
                 { text: order.frameVertical || '-' },
+              ],
+              [
+                {
+                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.LARGER_DIAMETER')}:`,
+                  bold: true,
+                },
+                { text: order.frameLargerDiameter || '-' },
                 {
                   text: `${this._translateService.instant('PDF.LABORATORY_ORDER.BRIDGE')}:`,
                   bold: true,

@@ -50,8 +50,13 @@ export const DEFAULT_CLINICAL_FORM_STRUCTURE: FieldsConfig = {
       fields: {
         previousRxOd: true,
         previousAddOd: true,
+        previousOdVl: true,
+        previousOdVp: true,
         previousRxOi: true,
         previousAddOi: true,
+        previousOiVl: true,
+        previousOiVp: true,
+        previousAo: true,
       },
     },
     step2_visualAcuity: {
@@ -181,8 +186,13 @@ export const CLINICAL_FORM_LABELS = {
 
     previousRxOd: 'RX anterior OD',
     previousAddOd: 'ADD OD',
+    previousOdVl: 'VL OD',
+    previousOdVp: 'VP OD',
     previousRxOi: 'RX anterior OI',
     previousAddOi: 'ADD OI',
+    previousOiVl: 'VL OI',
+    previousOiVp: 'VP OI',
+    previousAo: 'AO',
 
     visualAcuityOdVl: 'OD VL',
     visualAcuityOdVp: 'OD VP',

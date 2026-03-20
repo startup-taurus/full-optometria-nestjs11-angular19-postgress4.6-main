@@ -66,11 +66,26 @@ export class ClinicalHistory {
   @Column({ name: 'previous_add_od', nullable: true })
   previousAddOd: string;
 
+  @Column({ name: 'previous_od_vl', nullable: true })
+  previousOdVl: string;
+
+  @Column({ name: 'previous_od_vp', nullable: true })
+  previousOdVp: string;
+
   @Column({ name: 'previous_rx_oi', nullable: true })
   previousRxOi: string;
 
   @Column({ name: 'previous_add_oi', nullable: true })
   previousAddOi: string;
+
+  @Column({ name: 'previous_oi_vl', nullable: true })
+  previousOiVl: string;
+
+  @Column({ name: 'previous_oi_vp', nullable: true })
+  previousOiVp: string;
+
+  @Column({ name: 'previous_ao', nullable: true })
+  previousAo: string;
 
   @Column({ name: 'visual_acuity_od_vl', nullable: true })
   visualAcuityOdVl: string;
