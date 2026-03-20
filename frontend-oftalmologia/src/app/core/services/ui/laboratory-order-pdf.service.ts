@@ -113,6 +113,8 @@ export class LaboratoryOrderPdfService {
         { text: '', margin: [0, 10, 0, 10] },
         this.buildProductSection(data),
         { text: '', margin: [0, 10, 0, 10] },
+        this.buildDesignParametersSection(data),
+        { text: '', margin: [0, 10, 0, 10] },
         this.buildFrameDataSection(data),
         { text: '', margin: [0, 15, 0, 0] },
         this.buildSignatureSection(),
@@ -433,22 +435,13 @@ export class LaboratoryOrderPdfService {
         },
         {
           table: {
-            widths: [
-              '12.5%',
-              '12.5%',
-              '12.5%',
-              '12.5%',
-              '12.5%',
-              '12.5%',
-              '12.5%',
-              '12.5%',
-            ],
+            widths: ['25%', '25%', '25%', '25%'],
             headerRows: 1,
             body: [
               [
                 {
                   text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.D_VERTEX'
+                    'PDF.LABORATORY_ORDER.HORIZONTAL'
                   ),
                   bold: true,
                   alignment: 'center',
@@ -456,7 +449,7 @@ export class LaboratoryOrderPdfService {
                 },
                 {
                   text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.PANTOS'
+                    'PDF.LABORATORY_ORDER.VERTICAL'
                   ),
                   bold: true,
                   alignment: 'center',
@@ -464,7 +457,7 @@ export class LaboratoryOrderPdfService {
                 },
                 {
                   text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.PANORA'
+                    'PDF.LABORATORY_ORDER.LARGER_DIAMETER'
                   ),
                   bold: true,
                   alignment: 'center',
@@ -472,39 +465,7 @@ export class LaboratoryOrderPdfService {
                 },
                 {
                   text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.FRAME_FIT'
-                  ),
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#E3F2FD',
-                },
-                {
-                  text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.PROFILE'
-                  ),
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#E3F2FD',
-                },
-                {
-                  text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.MID'
-                  ),
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#E3F2FD',
-                },
-                {
-                  text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.DIST_VP'
-                  ),
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#E3F2FD',
-                },
-                {
-                  text: this._translateService.instant(
-                    'PDF.LABORATORY_ORDER.ENGRAVING'
+                    'PDF.LABORATORY_ORDER.BRIDGE'
                   ),
                   bold: true,
                   alignment: 'center',
@@ -512,14 +473,10 @@ export class LaboratoryOrderPdfService {
                 },
               ],
               [
-                { text: order.dVertex || '-', alignment: 'center' },
-                { text: order.pantos || '-', alignment: 'center' },
-                { text: order.panora || '-', alignment: 'center' },
-                { text: order.frameFit || '-', alignment: 'center' },
-                { text: order.profile || '-', alignment: 'center' },
-                { text: order.mid || '-', alignment: 'center' },
-                { text: order.distVp || '-', alignment: 'center' },
-                { text: order.engraving || '-', alignment: 'center' },
+                { text: order.frameHorizontal || '-', alignment: 'center' },
+                { text: order.frameVertical || '-', alignment: 'center' },
+                { text: order.frameLargerDiameter || '-', alignment: 'center' },
+                { text: order.frameBridge || '-', alignment: 'center' },
               ],
             ],
           },
@@ -529,6 +486,22 @@ export class LaboratoryOrderPdfService {
             hLineColor: () => '#CCCCCC',
             vLineColor: () => '#CCCCCC',
           },
+        },
+        { text: '', margin: [0, 5, 0, 5] },
+        {
+          table: {
+            widths: ['*'],
+            body: [
+              [
+                {
+                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.OBSERVATIONS')}:`,
+                  bold: true,
+                },
+              ],
+              [{ text: order.observations || '-' }],
+            ],
+          },
+          layout: 'lightHorizontalLines',
         },
       ],
     }
@@ -584,55 +557,6 @@ export class LaboratoryOrderPdfService {
                 },
                 { text: order.frameData || '-' },
               ],
-            ],
-          },
-          layout: 'lightHorizontalLines',
-        },
-        { text: '', margin: [0, 5, 0, 5] },
-        {
-          table: {
-            widths: ['25%', '25%', '25%', '25%'],
-            body: [
-              [
-                {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.HORIZONTAL')}:`,
-                  bold: true,
-                },
-                { text: order.frameHorizontal || '-' },
-                {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.VERTICAL')}:`,
-                  bold: true,
-                },
-                { text: order.frameVertical || '-' },
-              ],
-              [
-                {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.LARGER_DIAMETER')}:`,
-                  bold: true,
-                },
-                { text: order.frameLargerDiameter || '-' },
-                {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.BRIDGE')}:`,
-                  bold: true,
-                },
-                { text: order.frameBridge || '-' },
-              ],
-            ],
-          },
-          layout: 'lightHorizontalLines',
-        },
-        { text: '', margin: [0, 5, 0, 5] },
-        {
-          table: {
-            widths: ['*'],
-            body: [
-              [
-                {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.OBSERVATIONS')}:`,
-                  bold: true,
-                },
-              ],
-              [{ text: order.observations || '-' }],
             ],
           },
           layout: 'lightHorizontalLines',

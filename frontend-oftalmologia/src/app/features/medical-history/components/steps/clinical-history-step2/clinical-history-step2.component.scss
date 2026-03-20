@@ -219,6 +219,35 @@ input {
     margin-bottom: 0.75rem;
   }
 
+  .card-body {
+    .row.g-2.align-items-center {
+      .col-auto {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 0.5rem;
+
+        label {
+          margin-bottom: 0;
+          font-size: 0.95rem;
+        }
+      }
+
+      .col {
+        width: 100%;
+      }
+
+      .col-md-2,
+      .col-md-3,
+      .col-md-4,
+      .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 0.25rem;
+      }
+    }
+  }
+
   .form-label {
     font-size: 0.85rem;
     margin-bottom: 0.35rem;
@@ -301,6 +330,53 @@ input {
     font-size: 0.8rem;
     margin-bottom: 0.3rem;
     font-weight: 600;
+  }
+
+  .card-body {
+    .row.g-2.align-items-center {
+      .col-auto {
+        width: 100%;
+        text-align: center;
+        padding: 0.5rem;
+        background: linear-gradient(135deg, var(--bs-tertiary-bg) 0%, var(--bs-secondary-bg) 100%);
+        border-left: 3px solid currentColor;
+        border-radius: 0.25rem;
+        margin-bottom: 0.5rem;
+
+        label {
+          margin: 0;
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+      }
+
+      .col {
+        width: 100%;
+        padding: 0;
+      }
+
+      .col-md-2,
+      .col-md-3,
+      .col-md-4,
+      .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 0.25rem;
+
+        .form-label {
+          font-size: 0.75rem;
+          margin-bottom: 0.2rem;
+          font-weight: 600;
+          color: var(--bs-body-color);
+        }
+
+        .form-control {
+          font-size: 0.8rem;
+          padding: 0.35rem 0.4rem;
+          height: auto;
+        }
+      }
+    }
   }
 
   .form-control,
