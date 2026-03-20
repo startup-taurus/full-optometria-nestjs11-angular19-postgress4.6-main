@@ -264,6 +264,24 @@
               </div>
               <div class="col-md-6">
                 <div class="data-field">
+                  <strong>VL OD:</strong>
+                  <span>{{
+                    clinicalHistory.previousOdVl ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="data-field">
+                  <strong>VP OD:</strong>
+                  <span>{{
+                    clinicalHistory.previousOdVp ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="data-field">
                   <strong
                     >{{
                       'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate
@@ -284,6 +302,33 @@
                   >
                   <span>{{
                     clinicalHistory.previousAddOi ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="data-field">
+                  <strong>VL OI:</strong>
+                  <span>{{
+                    clinicalHistory.previousOiVl ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="data-field">
+                  <strong>VP OI:</strong>
+                  <span>{{
+                    clinicalHistory.previousOiVp ||
+                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="data-field">
+                  <strong>AO:</strong>
+                  <span>{{
+                    clinicalHistory.previousAo ||
                       ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
                   }}</span>
                 </div>

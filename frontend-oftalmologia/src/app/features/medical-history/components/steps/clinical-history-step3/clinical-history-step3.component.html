@@ -1,6 +1,6 @@
 <div class="row" [formGroup]="formGroup">
   <div
-    class="col-lg-6 mb-4"
+    class="col-lg-12 mb-4"
     *ngIf="shouldShowSection('step3_pupillaryReflexes')"
   >
     <div class="card">
@@ -11,133 +11,144 @@
         </h6>
       </div>
       <div class="card-body" formGroupName="pupillaryReflexes">
-        <div class="row">
-          <div
-            class="col-md-6 mb-3"
-            formGroupName="photomotor"
-            *ngIf="shouldShowField('step3_pupillaryReflexes', 'photomotor')"
-          >
-            <label class="form-label"
-              >{{
-                'MEDICAL_HISTORY.PUPILLARY_REFLEXES.PHOTOMOTOR' | translate
-              }}
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="od"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.PHOTOMOTOR_OD' | translate
-              "
-            />
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-primary mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-4"
+                    formGroupName="photomotor"
+                    *ngIf="shouldShowField('step3_pupillaryReflexes', 'photomotor')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.PUPILLARY_REFLEXES.PHOTOMOTOR' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.PHOTOMOTOR_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-4"
+                    formGroupName="consensual"
+                    *ngIf="shouldShowField('step3_pupillaryReflexes', 'consensual')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.PUPILLARY_REFLEXES.CONSENSUAL' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.CONSENSUAL_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-4"
+                    formGroupName="accommodative"
+                    *ngIf="shouldShowField('step3_pupillaryReflexes', 'accommodative')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.PUPILLARY_REFLEXES.ACCOMMODATIVE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.ACCOMMODATIVE_OD' | translate
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div
-            class="col-md-6 mb-3"
-            formGroupName="photomotor"
-            *ngIf="shouldShowField('step3_pupillaryReflexes', 'photomotor')"
-          >
-            <label class="form-label"
-              >{{
-                'MEDICAL_HISTORY.PUPILLARY_REFLEXES.PHOTOMOTOR' | translate
-              }}
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="oi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.PHOTOMOTOR_OI' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-6 mb-3"
-            formGroupName="consensual"
-            *ngIf="shouldShowField('step3_pupillaryReflexes', 'consensual')"
-          >
-            <label class="form-label"
-              >{{
-                'MEDICAL_HISTORY.PUPILLARY_REFLEXES.CONSENSUAL' | translate
-              }}
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="od"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.CONSENSUAL_OD' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-6 mb-3"
-            formGroupName="consensual"
-            *ngIf="shouldShowField('step3_pupillaryReflexes', 'consensual')"
-          >
-            <label class="form-label"
-              >{{
-                'MEDICAL_HISTORY.PUPILLARY_REFLEXES.CONSENSUAL' | translate
-              }}
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="oi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.CONSENSUAL_OI' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-6 mb-3"
-            formGroupName="accommodative"
-            *ngIf="shouldShowField('step3_pupillaryReflexes', 'accommodative')"
-          >
-            <label class="form-label"
-              >{{
-                'MEDICAL_HISTORY.PUPILLARY_REFLEXES.ACCOMMODATIVE' | translate
-              }}
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="od"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.ACCOMMODATIVE_OD' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-6 mb-3"
-            formGroupName="accommodative"
-            *ngIf="shouldShowField('step3_pupillaryReflexes', 'accommodative')"
-          >
-            <label class="form-label"
-              >{{
-                'MEDICAL_HISTORY.PUPILLARY_REFLEXES.ACCOMMODATIVE' | translate
-              }}
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="oi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.ACCOMMODATIVE_OI' | translate
-              "
-            />
+
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-success mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-4"
+                    formGroupName="photomotor"
+                    *ngIf="shouldShowField('step3_pupillaryReflexes', 'photomotor')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.PUPILLARY_REFLEXES.PHOTOMOTOR' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.PHOTOMOTOR_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-4"
+                    formGroupName="consensual"
+                    *ngIf="shouldShowField('step3_pupillaryReflexes', 'consensual')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.PUPILLARY_REFLEXES.CONSENSUAL' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.CONSENSUAL_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-4"
+                    formGroupName="accommodative"
+                    *ngIf="shouldShowField('step3_pupillaryReflexes', 'accommodative')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.PUPILLARY_REFLEXES.ACCOMMODATIVE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.ACCOMMODATIVE_OI' | translate
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step3_ophthalmoscopy')">
+  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step3_ophthalmoscopy')">
     <div class="card">
       <div class="card-header">
         <h6 class="mb-0">
@@ -198,150 +209,171 @@
         </h6>
       </div>
       <div class="card-body" formGroupName="refractiveTests">
-        <div class="row">
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="keratometry"
-            *ngIf="shouldShowField('step3_refractiveTests', 'keratometry')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.KERATOMETRY' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="od"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.KERATOMETRY_OD' | translate
-              "
-            />
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-primary mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-3"
+                    formGroupName="keratometry"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'keratometry')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.KERATOMETRY' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.KERATOMETRY_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="autorefract"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'autorefract')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.AUTOREFRACT' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.AUTOREFRACT_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="refraction"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'refraction')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.REFRACTION' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.REFRACTION_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="subjective"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'subjective')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.SUBJECTIVE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.SUBJECTIVE_OD' | translate
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="keratometry"
-            *ngIf="shouldShowField('step3_refractiveTests', 'keratometry')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.KERATOMETRY' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="oi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.KERATOMETRY_OI' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="autorefract"
-            *ngIf="shouldShowField('step3_refractiveTests', 'autorefract')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.AUTOREFRACT' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="od"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.AUTOREFRACT_OD' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="autorefract"
-            *ngIf="shouldShowField('step3_refractiveTests', 'autorefract')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.AUTOREFRACT' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="oi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.AUTOREFRACT_OI' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="refraction"
-            *ngIf="shouldShowField('step3_refractiveTests', 'refraction')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.REFRACTION' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="od"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.REFRACTION_OD' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="refraction"
-            *ngIf="shouldShowField('step3_refractiveTests', 'refraction')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.REFRACTION' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="oi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.REFRACTION_OI' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="subjective"
-            *ngIf="shouldShowField('step3_refractiveTests', 'subjective')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.SUBJECTIVE' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="od"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.SUBJECTIVE_OD' | translate
-              "
-            />
-          </div>
-          <div
-            class="col-md-3 mb-3"
-            formGroupName="subjective"
-            *ngIf="shouldShowField('step3_refractiveTests', 'subjective')"
-          >
-            <label class="form-label"
-              >{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.SUBJECTIVE' | translate }}
-              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              formControlName="oi"
-              [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.SUBJECTIVE_OI' | translate
-              "
-            />
+
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-success mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-3"
+                    formGroupName="keratometry"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'keratometry')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.KERATOMETRY' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.KERATOMETRY_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="autorefract"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'autorefract')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.AUTOREFRACT' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.AUTOREFRACT_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="refraction"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'refraction')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.REFRACTION' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.REFRACTION_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="subjective"
+                    *ngIf="shouldShowField('step3_refractiveTests', 'subjective')"
+                  >
+                    <label class="form-label">{{
+                      'MEDICAL_HISTORY.REFRACTIVE_TESTS.SUBJECTIVE' | translate
+                    }}</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.SUBJECTIVE_OI' | translate
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

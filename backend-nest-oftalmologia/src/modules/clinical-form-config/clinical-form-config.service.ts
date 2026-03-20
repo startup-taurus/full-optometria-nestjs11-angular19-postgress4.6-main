@@ -291,8 +291,13 @@ export class ClinicalFormConfigService {
             fields: {
               previousRxOd: true,
               previousAddOd: true,
+              previousOdVl: true,
+              previousOdVp: true,
               previousRxOi: true,
               previousAddOi: true,
+              previousOiVl: true,
+              previousOiVp: true,
+              previousAo: true,
             },
           },
           step2_visualAcuity: {

@@ -17,8 +17,13 @@ export interface ClinicalHistory {
 
   previousRxOd?: string
   previousAddOd?: string
+  previousOdVl?: string
+  previousOdVp?: string
   previousRxOi?: string
   previousAddOi?: string
+  previousOiVl?: string
+  previousOiVp?: string
+  previousAo?: string
 
   visualAcuityOdVl?: string
   visualAcuityOdVp?: string
@@ -96,8 +101,13 @@ export interface CreateClinicalHistoryDto {
 
   previousRxOd?: string
   previousAddOd?: string
+  previousOdVl?: string
+  previousOdVp?: string
   previousRxOi?: string
   previousAddOi?: string
+  previousOiVl?: string
+  previousOiVp?: string
+  previousAo?: string
 
   visualAcuityOdVl?: string
   visualAcuityOdVp?: string

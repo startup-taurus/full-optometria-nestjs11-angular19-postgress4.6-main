@@ -15,98 +15,65 @@
       <div class="row g-3" [formGroup]="formGroup">
         <div class="col-md-3">
           <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.D_VERTEX' | translate
+            'LABORATORY_ORDERS.LABELS.HORIZONTAL' | translate
           }}</label>
           <input
             type="text"
             class="form-control"
-            formControlName="dVertex"
+            formControlName="frameHorizontal"
             placeholder="mm"
           />
         </div>
 
         <div class="col-md-3">
           <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.PANTOS' | translate
+            'LABORATORY_ORDERS.LABELS.VERTICAL' | translate
           }}</label>
           <input
             type="text"
             class="form-control"
-            formControlName="pantos"
-            placeholder=""
-          />
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.PANORA' | translate
-          }}</label>
-          <input
-            type="text"
-            class="form-control"
-            formControlName="panora"
-            placeholder=""
-          />
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.FRAME_FIT' | translate
-          }}</label>
-          <input
-            type="text"
-            class="form-control"
-            formControlName="frameFit"
-            placeholder=""
-          />
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.PROFILE' | translate
-          }}</label>
-          <input
-            type="text"
-            class="form-control"
-            formControlName="profile"
-            placeholder=""
-          />
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.MID' | translate
-          }}</label>
-          <input
-            type="text"
-            class="form-control"
-            formControlName="mid"
-            placeholder=""
-          />
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.DIST_VP' | translate
-          }}</label>
-          <input
-            type="text"
-            class="form-control"
-            formControlName="distVp"
+            formControlName="frameVertical"
             placeholder="mm"
           />
         </div>
 
         <div class="col-md-3">
           <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.ENGRAVING' | translate
+            'LABORATORY_ORDERS.LABELS.LARGER_DIAMETER' | translate
           }}</label>
           <input
             type="text"
             class="form-control"
-            formControlName="engraving"
-            placeholder=""
+            formControlName="frameLargerDiameter"
+            placeholder="mm"
           />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.LABELS.BRIDGE' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="frameBridge"
+            placeholder="mm"
+          />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">{{
+            'LABORATORY_ORDERS.LABELS.OBSERVATIONS' | translate
+          }}</label>
+          <textarea
+            class="form-control"
+            formControlName="observations"
+            rows="3"
+            [placeholder]="
+              'LABORATORY_ORDERS.PLACEHOLDERS.ADDITIONAL_OBSERVATIONS'
+                | translate
+            "
+          ></textarea>
         </div>
       </div>
     </div>
