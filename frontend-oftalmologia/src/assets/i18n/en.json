@@ -172,11 +172,21 @@
       "TITLE": "WhatsApp",
       "DESCRIPTION": "Connect your WhatsApp session to send patient reminders.",
       "OPEN_MODULE": "Open notifications module",
-      "SCAN_QR": "Scan the QR code with your WhatsApp"
+      "SCAN_QR": "Scan the QR code with your WhatsApp",
+      "SYNCING_STATUS": "Checking WhatsApp status...",
+      "STATUS_UPDATED_AT": "Status updated: {{time}}",
+      "QR_AUTO_REFRESH": "It refreshes automatically every 30 seconds.",
+      "QR_LAST_UPDATED": "Last update: {{time}}",
+      "QR_STALE_HINT": "The QR may be about to expire. Wait for automatic refresh or press \"Refresh QR\".",
+      "INVALID_QR_REGENERATING": "An invalid QR was detected. Regenerating automatically...",
+      "GENERATE_QR_NOW": "Generate QR now",
+      "REFRESH_QR": "Refresh QR",
+      "REFRESHING_QR": "Refreshing..."
     }
   },
   "NOTIFICATIONS": {
     "TITLE": "WhatsApp Notifications",
+    "DESCRIPTION": "Set rules, select patients, and send reminders in a clear and fast workflow.",
     "SESSION": {
       "TITLE": "WhatsApp Session",
       "INIT": "Start QR session",
@@ -193,7 +203,9 @@
       "CONNECTED": "Session marked as connected",
       "LOGOUT_SUCCESS": "Session closed",
       "SETUP_REQUIRED": "You must connect WhatsApp before sending reminders. Set up the session in your profile.",
-      "SETUP_IN_PROFILE": "Setup in Profile"
+      "SETUP_IN_PROFILE": "Setup in Profile",
+      "SYNCING_STATUS": "Checking connection status...",
+      "LAST_CHECK": "Last check: {{time}}"
     },
     "RULE": {
       "TITLE": "Reminder rules",
@@ -203,7 +215,11 @@
       "QUIET_HOURS_END": "Quiet hours end",
       "ACTIVE": "Rule active",
       "SAVE": "Save rules",
-      "UPDATED": "Rules updated"
+      "UPDATED": "Rules updated",
+      "TOOLTIP_GENERAL": "Define when to notify and which hours should block automatic sends.",
+      "TOOLTIP_RENEWAL_AFTER": "Number of days after last delivery or checkup to consider renewal.",
+      "TOOLTIP_NOTIFY_BEFORE": "How many days in advance reminders are sent before the estimated date.",
+      "TOOLTIP_QUIET_HOURS": "No automatic messages are sent during this time range."
     },
     "ELIGIBLE": {
       "TITLE": "Renewal eligible patients",
@@ -218,7 +234,31 @@
       "DUE_SOON_NO": "No",
       "EMPTY": "No eligible patients",
       "MESSAGE_TEMPLATE": "Message template",
-      "SEND_MANUAL": "Send manual reminder"
+      "SEND_MANUAL": "Send manual reminder",
+      "SELECT_REQUIRED": "Select at least one patient",
+      "SEND_RESULT": "Sent: {{sent}}, failed: {{failed}}"
+    },
+    "TEMPLATE": {
+      "OPEN_EDITOR": "Create / edit template",
+      "HELP": "Use the editor to insert variables without typing braces manually.",
+      "MODAL_TITLE": "WhatsApp template editor",
+      "MODAL_DESCRIPTION": "Insert variables with one click. They are replaced with patient data when sending.",
+      "LABEL": "Template",
+      "RESET_DEFAULT": "Reset to default",
+      "PREVIEW": "Preview",
+      "PREVIEW_PATIENT": "Patient",
+      "APPLY": "Use template",
+      "DEFAULT_MESSAGE": "Hi {{nombres}} {{apellidos}}, this is a reminder that your lens renewal is coming soon. Schedule your appointment whenever you like.",
+      "TOOLTIP_MODAL": "Create a reusable message. Variables are replaced automatically on send.",
+      "TOOLTIP_INSERT": "Insert this variable at the current cursor position.",
+      "TOOLTIP_MESSAGE_TEMPLATE": "This text is sent to all selected patients.",
+      "VARIABLES": {
+        "NOMBRE": "Full name",
+        "NOMBRES": "First names",
+        "APELLIDOS": "Last names",
+        "CEDULA": "ID number",
+        "TELEFONO": "Phone"
+      }
     }
   },
   "USER": {

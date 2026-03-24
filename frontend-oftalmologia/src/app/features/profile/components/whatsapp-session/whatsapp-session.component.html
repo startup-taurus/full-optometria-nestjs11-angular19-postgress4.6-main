@@ -1,6 +1,9 @@
-<div class="card shadow-sm rounded">
+<div class="card whatsapp-profile-card border-0 shadow-sm rounded-4 overflow-hidden">
   <div class="card-body">
-    <h5 class="fw-semibold mb-3">{{ 'PROFILE.WHATSAPP.TITLE' | translate }}</h5>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <h5 class="fw-semibold mb-0">{{ 'PROFILE.WHATSAPP.TITLE' | translate }}</h5>
+      <span class="session-dot" [ngClass]="session?.status === 'connected' ? 'is-connected' : 'is-offline'"></span>
+    </div>
 
     <p class="text-muted mb-3">{{ 'PROFILE.WHATSAPP.DESCRIPTION' | translate }}</p>
 
@@ -10,37 +13,47 @@
     </div>
 
     <div class="mb-3" *ngIf="session">
-      <span class="badge text-bg-secondary" *ngIf="session.status === 'disconnected'">
+      <span class="badge rounded-pill px-3 py-2" [ngClass]="statusBadgeClass" *ngIf="session.status === 'disconnected'">
         {{ 'NOTIFICATIONS.SESSION.STATUS_DISCONNECTED' | translate }}
       </span>
-      <span class="badge text-bg-warning" *ngIf="session.status === 'qr_ready'">
+      <span class="badge rounded-pill px-3 py-2" [ngClass]="statusBadgeClass" *ngIf="session.status === 'qr_ready'">
         {{ 'NOTIFICATIONS.SESSION.STATUS_QR_READY' | translate }}
       </span>
-      <span class="badge text-bg-success" *ngIf="session.status === 'connected'">
+      <span class="badge rounded-pill px-3 py-2" [ngClass]="statusBadgeClass" *ngIf="session.status === 'connected'">
         {{ 'NOTIFICATIONS.SESSION.STATUS_CONNECTED' | translate }}
       </span>
+
+      <div class="mt-2 small d-flex align-items-center gap-2">
+        <span class="text-muted" *ngIf="syncingSession">
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          {{ 'PROFILE.WHATSAPP.SYNCING_STATUS' | translate }}
+        </span>
+        <span class="text-muted" *ngIf="!syncingSession && lastSessionSyncAt">
+          {{ 'PROFILE.WHATSAPP.STATUS_UPDATED_AT' | translate:{ time: (lastSessionSyncAt | date:'shortTime') } }}
+        </span>
+      </div>
     </div>
 
     <div class="mb-3" *ngIf="session?.qrCode && hasValidImageQr">
       <label class="form-label">{{ 'NOTIFICATIONS.SESSION.QR_LABEL' | translate }}</label>
       <img [src]="session?.qrCode || ''"
-           alt="QR"
-           class="img-fluid border rounded p-2"
+           [alt]="'NOTIFICATIONS.SESSION.QR_LABEL' | translate"
+           class="img-fluid border rounded-3 p-2 qr-preview"
            (load)="onQrLoad()"
            (error)="onQrError($event)" />
       <small class="text-muted d-block mt-2">{{ 'PROFILE.WHATSAPP.SCAN_QR' | translate }}</small>
-      <small class="text-muted d-block">Se actualiza automáticamente cada 30 segundos.</small>
+      <small class="text-muted d-block">{{ 'PROFILE.WHATSAPP.QR_AUTO_REFRESH' | translate }}</small>
       <small class="d-block" [ngClass]="isQrLikelyStale ? 'text-warning' : 'text-muted'" *ngIf="session?.updatedAt">
-        Última actualización: {{ session?.updatedAt | date:'shortTime' }}
+        {{ 'PROFILE.WHATSAPP.QR_LAST_UPDATED' | translate:{ time: (session?.updatedAt | date:'shortTime') } }}
       </small>
       <small class="text-warning d-block" *ngIf="isQrLikelyStale">
-        El QR puede estar por vencer, espera la actualización automática o pulsa "Refrescar QR".
+        {{ 'PROFILE.WHATSAPP.QR_STALE_HINT' | translate }}
       </small>
     </div>
 
     <div class="mb-3" *ngIf="session?.status === 'qr_ready' && session?.qrCode && !hasValidImageQr">
       <div class="alert alert-warning mb-0" role="alert">
-        Se detectó un QR inválido. Regenerando automáticamente...
+        {{ 'PROFILE.WHATSAPP.INVALID_QR_REGENERATING' | translate }}
       </div>
     </div>
 
@@ -51,7 +64,7 @@
         [disabled]="loading"
         *ngIf="session?.status === 'disconnected' && !session?.qrCode"
       >
-        Generar QR ahora
+        {{ 'PROFILE.WHATSAPP.GENERATE_QR_NOW' | translate }}
       </button>
       <button
         class="btn btn-outline-secondary"
@@ -59,7 +72,7 @@
         [disabled]="loading || refreshingQr"
         *ngIf="session?.status === 'qr_ready'"
       >
-        {{ refreshingQr ? 'Actualizando...' : 'Refrescar QR' }}
+        {{ refreshingQr ? ('PROFILE.WHATSAPP.REFRESHING_QR' | translate) : ('PROFILE.WHATSAPP.REFRESH_QR' | translate) }}
       </button>
       <button class="btn btn-outline-danger" (click)="logout()" [disabled]="loading" *ngIf="canShowLogoutAction">
         {{ 'NOTIFICATIONS.SESSION.LOGOUT' | translate }}

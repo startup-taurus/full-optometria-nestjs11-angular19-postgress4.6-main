@@ -34,7 +34,7 @@ export class NotificationsService {
   private readonly qrTtlMs = 60000;
   private readonly sessionNormalizationTimeoutMs = 2500;
   private readonly runtimeStartTimeoutMs = 90000;
-  private readonly refreshWaitTimeoutMs = 3000;
+  private readonly refreshWaitTimeoutMs = 5000;
 
   constructor(
     @InjectRepository(WhatsAppSession)
@@ -300,6 +300,10 @@ export class NotificationsService {
           'Hola {{nombre}}, te recordamos renovar tus lentes en nuestra sucursal.',
         {
           nombre: `${patient.firstName} ${patient.lastName}`.trim(),
+          nombres: patient.firstName?.trim() || '',
+          apellidos: patient.lastName?.trim() || '',
+          cedula: patient.documentNumber || '',
+          telefono: phone,
         },
       );
 

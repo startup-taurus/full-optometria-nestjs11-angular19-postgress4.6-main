@@ -1,11 +1,29 @@
 <page-title title="{{ 'NOTIFICATIONS.TITLE' | translate }}" />
 
-<div class="container-fluid">
+<div class="container-fluid notifications-whatsapp-page">
+  <div class="hero-banner rounded-4 shadow-sm mb-3 p-3 p-md-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <h5 class="mb-1">{{ 'NOTIFICATIONS.TITLE' | translate }}</h5>
+        <p class="mb-0 text-muted">{{ 'NOTIFICATIONS.DESCRIPTION' | translate }}</p>
+      </div>
+      <div class="d-flex align-items-center gap-2 status-pill" *ngIf="session">
+        <span class="session-dot" [ngClass]="session?.status === 'connected' ? 'is-connected' : 'is-offline'"></span>
+        <span *ngIf="session.status === 'connected'">{{ 'NOTIFICATIONS.SESSION.STATUS_CONNECTED' | translate }}</span>
+        <span *ngIf="session.status === 'qr_ready'">{{ 'NOTIFICATIONS.SESSION.STATUS_QR_READY' | translate }}</span>
+        <span *ngIf="session.status === 'disconnected'">{{ 'NOTIFICATIONS.SESSION.STATUS_DISCONNECTED' | translate }}</span>
+      </div>
+    </div>
+  </div>
+
   <div class="row g-3">
     <div class="col-12 col-xl-5">
-      <div class="card">
+      <div class="card border-0 shadow-sm rounded-4 card-hover">
         <div class="card-body">
-          <h5 class="mb-3">{{ 'NOTIFICATIONS.SESSION.TITLE' | translate }}</h5>
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <h5 class="mb-0">{{ 'NOTIFICATIONS.SESSION.TITLE' | translate }}</h5>
+            <span class="session-dot" [ngClass]="session?.status === 'connected' ? 'is-connected' : 'is-offline'"></span>
+          </div>
 
           <div class="mb-3" *ngIf="currentUser$ | async as user">
             <label class="form-label text-muted">{{ 'PROFILE.USERNAME' | translate }}</label>
@@ -13,14 +31,24 @@
           </div>
 
           <div class="d-flex align-items-center gap-2 mb-3" *ngIf="session">
-            <span class="badge text-bg-secondary" *ngIf="session.status === 'disconnected'">
+            <span class="badge rounded-pill px-3 py-2 text-bg-secondary" *ngIf="session.status === 'disconnected'">
               {{ 'NOTIFICATIONS.SESSION.STATUS_DISCONNECTED' | translate }}
             </span>
-            <span class="badge text-bg-warning" *ngIf="session.status === 'qr_ready'">
+            <span class="badge rounded-pill px-3 py-2 text-bg-warning" *ngIf="session.status === 'qr_ready'">
               {{ 'NOTIFICATIONS.SESSION.STATUS_QR_READY' | translate }}
             </span>
-            <span class="badge text-bg-success" *ngIf="session.status === 'connected'">
+            <span class="badge rounded-pill px-3 py-2 text-bg-success" *ngIf="session.status === 'connected'">
               {{ 'NOTIFICATIONS.SESSION.STATUS_CONNECTED' | translate }}
+            </span>
+          </div>
+
+          <div class="small mb-3" *ngIf="session">
+            <span class="text-muted" *ngIf="syncingSession">
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              {{ 'NOTIFICATIONS.SESSION.SYNCING_STATUS' | translate }}
+            </span>
+            <span class="text-muted" *ngIf="!syncingSession && lastSessionSyncAt">
+              {{ 'NOTIFICATIONS.SESSION.LAST_CHECK' | translate:{ time: (lastSessionSyncAt | date:'shortTime') } }}
             </span>
           </div>
 
@@ -28,7 +56,7 @@
             <small>{{ 'NOTIFICATIONS.SESSION.SETUP_REQUIRED' | translate }}</small>
           </div>
 
-          <div class="d-flex flex-wrap gap-2">
+          <div class="d-flex flex-wrap gap-2 session-actions">
             <button class="btn btn-outline-danger" (click)="logoutSession()" [disabled]="loadingSession" *ngIf="canShowLogoutAction">
               {{ 'NOTIFICATIONS.SESSION.LOGOUT' | translate }}
             </button>
@@ -39,25 +67,63 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card border-0 shadow-sm rounded-4 card-hover">
         <div class="card-body" *ngIf="reminderRule">
-          <h5 class="mb-3">{{ 'NOTIFICATIONS.RULE.TITLE' | translate }}</h5>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <h5 class="mb-0">{{ 'NOTIFICATIONS.RULE.TITLE' | translate }}</h5>
+            <button
+              type="button"
+              class="btn btn-link p-0 text-muted tooltip-trigger"
+              [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_GENERAL' | translate"
+              container="body"
+            >
+              <i class="ri-information-line"></i>
+            </button>
+          </div>
 
-          <div class="row g-2">
+          <div class="row g-2 reminder-grid">
             <div class="col-6">
-              <label class="form-label">{{ 'NOTIFICATIONS.RULE.RENEWAL_AFTER_DAYS' | translate }}</label>
+              <label class="form-label d-flex align-items-center gap-1">
+                <span>{{ 'NOTIFICATIONS.RULE.RENEWAL_AFTER_DAYS' | translate }}</span>
+                <i
+                  class="ri-question-line text-muted"
+                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_RENEWAL_AFTER' | translate"
+                  container="body"
+                ></i>
+              </label>
               <input class="form-control" type="number" [(ngModel)]="reminderRule.renewalAfterDays" />
             </div>
             <div class="col-6">
-              <label class="form-label">{{ 'NOTIFICATIONS.RULE.NOTIFY_BEFORE_DAYS' | translate }}</label>
+              <label class="form-label d-flex align-items-center gap-1">
+                <span>{{ 'NOTIFICATIONS.RULE.NOTIFY_BEFORE_DAYS' | translate }}</span>
+                <i
+                  class="ri-question-line text-muted"
+                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_NOTIFY_BEFORE' | translate"
+                  container="body"
+                ></i>
+              </label>
               <input class="form-control" type="number" [(ngModel)]="reminderRule.renewalNotifyBeforeDays" />
             </div>
             <div class="col-6">
-              <label class="form-label">{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_START' | translate }}</label>
+              <label class="form-label d-flex align-items-center gap-1">
+                <span>{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_START' | translate }}</span>
+                <i
+                  class="ri-question-line text-muted"
+                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS' | translate"
+                  container="body"
+                ></i>
+              </label>
               <input class="form-control" type="time" [(ngModel)]="reminderRule.quietHoursStart" />
             </div>
             <div class="col-6">
-              <label class="form-label">{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_END' | translate }}</label>
+              <label class="form-label d-flex align-items-center gap-1">
+                <span>{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_END' | translate }}</span>
+                <i
+                  class="ri-question-line text-muted"
+                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS' | translate"
+                  container="body"
+                ></i>
+              </label>
               <input class="form-control" type="time" [(ngModel)]="reminderRule.quietHoursEnd" />
             </div>
             <div class="col-12 form-check mt-2 ms-2">
@@ -81,9 +147,9 @@
     </div>
 
     <div class="col-12 col-xl-7">
-      <div class="card">
+      <div class="card border-0 shadow-sm rounded-4 card-hover">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+          <div class="d-flex justify-content-between align-items-center gap-2 mb-3 flex-wrap">
             <h5 class="mb-0">{{ 'NOTIFICATIONS.ELIGIBLE.TITLE' | translate }}</h5>
             <div class="d-flex gap-2">
               <input
@@ -98,7 +164,7 @@
           </div>
 
           <div class="table-responsive">
-            <table class="table table-sm align-middle">
+            <table class="table table-sm align-middle patient-table">
               <thead>
                 <tr>
                   <th></th>
@@ -138,8 +204,23 @@
           </div>
 
           <div class="mb-2">
-            <label class="form-label">{{ 'NOTIFICATIONS.ELIGIBLE.MESSAGE_TEMPLATE' | translate }}</label>
-            <textarea class="form-control" rows="3" [(ngModel)]="manualMessageTemplate"></textarea>
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+              <label class="form-label mb-0 d-flex align-items-center gap-1">
+                <span>{{ 'NOTIFICATIONS.ELIGIBLE.MESSAGE_TEMPLATE' | translate }}</span>
+                <i
+                  class="ri-question-line text-muted"
+                  [ngbTooltip]="'NOTIFICATIONS.TEMPLATE.TOOLTIP_MESSAGE_TEMPLATE' | translate"
+                  container="body"
+                ></i>
+              </label>
+              <button class="btn btn-outline-primary btn-sm" (click)="openTemplateModal()">
+                {{ 'NOTIFICATIONS.TEMPLATE.OPEN_EDITOR' | translate }}
+              </button>
+            </div>
+            <textarea class="form-control" rows="4" [(ngModel)]="manualMessageTemplate"></textarea>
+            <small class="text-muted d-block mt-2">
+              {{ 'NOTIFICATIONS.TEMPLATE.HELP' | translate }}
+            </small>
           </div>
 
           <button class="btn btn-success" (click)="sendManual()" [disabled]="sendingManual || session?.status !== 'connected'">
@@ -150,3 +231,66 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade show template-modal" tabindex="-1" [style.display]="isTemplateModalOpen ? 'block' : 'none'" [attr.aria-hidden]="!isTemplateModalOpen" *ngIf="isTemplateModalOpen">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 modal-enter">
+      <div class="modal-header">
+        <h5 class="modal-title d-flex align-items-center gap-2">
+          <span>{{ 'NOTIFICATIONS.TEMPLATE.MODAL_TITLE' | translate }}</span>
+          <i
+            class="ri-information-line text-muted"
+            [ngbTooltip]="'NOTIFICATIONS.TEMPLATE.TOOLTIP_MODAL' | translate"
+            container="body"
+          ></i>
+        </h5>
+        <button type="button" class="btn-close ms-auto" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="closeTemplateModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted mb-3">
+          {{ 'NOTIFICATIONS.TEMPLATE.MODAL_DESCRIPTION' | translate }}
+        </p>
+
+        <div class="d-flex flex-wrap gap-2 mb-3 template-variable-list">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm variable-chip"
+            *ngFor="let variable of templateVariables"
+            (click)="insertVariable(variable.key)"
+            [ngbTooltip]="'NOTIFICATIONS.TEMPLATE.TOOLTIP_INSERT' | translate"
+            container="body"
+          >
+            {{ variable.labelKey | translate }}
+          </button>
+        </div>
+
+        <label class="form-label fw-semibold">{{ 'NOTIFICATIONS.TEMPLATE.LABEL' | translate }}</label>
+        <textarea
+          #templateTextarea
+          class="form-control mb-3"
+          rows="5"
+          [(ngModel)]="templateDraft"
+        ></textarea>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="resetTemplateDraft()">
+            {{ 'NOTIFICATIONS.TEMPLATE.RESET_DEFAULT' | translate }}
+          </button>
+        </div>
+
+        <div class="border rounded p-3 bg-body-tertiary">
+          <label class="form-label fw-semibold mb-2">{{ 'NOTIFICATIONS.TEMPLATE.PREVIEW' | translate }}</label>
+          <p class="mb-0" style="white-space: pre-wrap">{{ templatePreview }}</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeTemplateModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="applyTemplateDraft()">{{ 'NOTIFICATIONS.TEMPLATE.APPLY' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="isTemplateModalOpen"></div>
