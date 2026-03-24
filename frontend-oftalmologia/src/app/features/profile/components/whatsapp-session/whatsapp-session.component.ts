@@ -16,6 +16,7 @@ import { User } from '@core/interfaces/api/user.interface'
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
   templateUrl: './whatsapp-session.component.html',
+  styleUrl: './whatsapp-session.component.scss',
 })
 export class WhatsAppSessionComponent implements OnInit, OnDestroy {
   private readonly notificationsService = inject(NotificationsService)
@@ -28,29 +29,54 @@ export class WhatsAppSessionComponent implements OnInit, OnDestroy {
   currentUser$ = this.store.select(selectUser)
   private readonly qrRefreshMs = 30000
   private readonly postRefreshReloadMs = 2500
+  private readonly sessionSyncMs = 30000
   private readonly maxSilentRefreshErrors = 3
   private silentRefreshErrors = 0
   private qrRefreshTimer: ReturnType<typeof setInterval> | null = null
   private postRefreshReloadTimer: ReturnType<typeof setTimeout> | null = null
+  private sessionSyncTimer: ReturnType<typeof setInterval> | null = null
+  syncingSession = false
+  lastSessionSyncAt: Date | null = null
 
   ngOnInit(): void {
     this.loadSession()
+    this.startAutoSessionSync()
   }
 
   ngOnDestroy(): void {
     this.stopAutoQrRefresh()
     this.stopPostRefreshReload()
+    this.stopAutoSessionSync()
   }
 
-  loadSession(): void {
-    this.loading = true
+  loadSession(silent = false): void {
+    if (this.loading || this.syncingSession || this.refreshingQr) {
+      return
+    }
+
+    if (silent) {
+      this.syncingSession = true
+    } else {
+      this.loading = true
+    }
+
     this.notificationsService
       .getWhatsAppSession()
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          if (silent) {
+            this.syncingSession = false
+            return
+          }
+
+          this.loading = false
+        })
+      )
       .subscribe({
         next: (response) => {
           this.session = response.data
           this.silentRefreshErrors = 0
+          this.lastSessionSyncAt = new Date()
           this.syncQrRefreshLifecycle()
         },
         error: (err) => {
@@ -200,7 +226,7 @@ export class WhatsAppSessionComponent implements OnInit, OnDestroy {
   private schedulePostRefreshReload(): void {
     this.stopPostRefreshReload()
     this.postRefreshReloadTimer = setTimeout(() => {
-      this.loadSession()
+      this.loadSession(true)
     }, this.postRefreshReloadMs)
   }
 
@@ -211,6 +237,25 @@ export class WhatsAppSessionComponent implements OnInit, OnDestroy {
 
     clearTimeout(this.postRefreshReloadTimer)
     this.postRefreshReloadTimer = null
+  }
+
+  private startAutoSessionSync(): void {
+    if (this.sessionSyncTimer) {
+      return
+    }
+
+    this.sessionSyncTimer = setInterval(() => {
+      this.loadSession(true)
+    }, this.sessionSyncMs)
+  }
+
+  private stopAutoSessionSync(): void {
+    if (!this.sessionSyncTimer) {
+      return
+    }
+
+    clearInterval(this.sessionSyncTimer)
+    this.sessionSyncTimer = null
   }
 
   get canShowLogoutAction(): boolean {
@@ -237,5 +282,21 @@ export class WhatsAppSessionComponent implements OnInit, OnDestroy {
     }
 
     return Date.now() - updatedTime > 45000
+  }
+
+  get statusBadgeClass(): string {
+    if (!this.session) {
+      return 'text-bg-secondary'
+    }
+
+    if (this.session.status === 'connected') {
+      return 'text-bg-success'
+    }
+
+    if (this.session.status === 'qr_ready') {
+      return 'text-bg-warning'
+    }
+
+    return 'text-bg-secondary'
   }
 }

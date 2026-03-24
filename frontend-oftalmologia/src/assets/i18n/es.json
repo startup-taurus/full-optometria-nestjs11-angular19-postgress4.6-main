@@ -172,7 +172,16 @@
       "TITLE": "WhatsApp",
       "DESCRIPTION": "Conecta tu sesión de WhatsApp para enviar recordatorios de pacientes.",
       "OPEN_MODULE": "Abrir módulo de notificaciones",
-      "SCAN_QR": "Escanea el código QR con tu WhatsApp"
+      "SCAN_QR": "Escanea el código QR con tu WhatsApp",
+      "SYNCING_STATUS": "Verificando estado de WhatsApp...",
+      "STATUS_UPDATED_AT": "Estado actualizado: {{time}}",
+      "QR_AUTO_REFRESH": "Se actualiza automáticamente cada 30 segundos.",
+      "QR_LAST_UPDATED": "Última actualización: {{time}}",
+      "QR_STALE_HINT": "El QR puede estar por vencer, espera la actualización automática o pulsa \"Refrescar QR\".",
+      "INVALID_QR_REGENERATING": "Se detectó un QR inválido. Regenerando automáticamente...",
+      "GENERATE_QR_NOW": "Generar QR ahora",
+      "REFRESH_QR": "Refrescar QR",
+      "REFRESHING_QR": "Actualizando..."
     },
     "ERRORS": {
       "CURRENTPASSWORD_REQUIRED": "La contraseña actual es requerida",
@@ -184,6 +193,7 @@
   },
   "NOTIFICATIONS": {
     "TITLE": "Notificaciones WhatsApp",
+    "DESCRIPTION": "Configura reglas, selecciona pacientes y envía recordatorios de forma clara y rápida.",
     "SESSION": {
       "TITLE": "Sesión de WhatsApp",
       "INIT": "Iniciar sesión QR",
@@ -200,7 +210,9 @@
       "CONNECTED": "Sesión marcada como conectada",
       "LOGOUT_SUCCESS": "Sesión cerrada",
       "SETUP_REQUIRED": "Debes conectar WhatsApp antes de enviar recordatorios. Configura la sesión en tu perfil.",
-      "SETUP_IN_PROFILE": "Configurar en Perfil"
+      "SETUP_IN_PROFILE": "Configurar en Perfil",
+      "SYNCING_STATUS": "Verificando estado de conexión...",
+      "LAST_CHECK": "Última verificación: {{time}}"
     },
     "RULE": {
       "TITLE": "Reglas de recordatorio",
@@ -210,7 +222,11 @@
       "QUIET_HOURS_END": "Fin horario silencioso",
       "ACTIVE": "Regla activa",
       "SAVE": "Guardar reglas",
-      "UPDATED": "Reglas actualizadas"
+      "UPDATED": "Reglas actualizadas",
+      "TOOLTIP_GENERAL": "Define cuándo notificar y en qué horario evitar envíos para no molestar al paciente.",
+      "TOOLTIP_RENEWAL_AFTER": "Cantidad de días después de la última entrega o control para considerar la renovación.",
+      "TOOLTIP_NOTIFY_BEFORE": "Días de anticipación para enviar recordatorio antes de la fecha estimada.",
+      "TOOLTIP_QUIET_HOURS": "Durante este rango horario no se envían mensajes automáticos."
     },
     "ELIGIBLE": {
       "TITLE": "Pacientes elegibles para renovación",
@@ -225,7 +241,31 @@
       "DUE_SOON_NO": "No",
       "EMPTY": "No hay pacientes elegibles",
       "MESSAGE_TEMPLATE": "Plantilla de mensaje",
-      "SEND_MANUAL": "Enviar recordatorio manual"
+      "SEND_MANUAL": "Enviar recordatorio manual",
+      "SELECT_REQUIRED": "Selecciona al menos un paciente",
+      "SEND_RESULT": "Enviados: {{sent}}, fallidos: {{failed}}"
+    },
+    "TEMPLATE": {
+      "OPEN_EDITOR": "Crear / editar plantilla",
+      "HELP": "Usa el editor para insertar variables sin escribir llaves manualmente.",
+      "MODAL_TITLE": "Editor de plantilla WhatsApp",
+      "MODAL_DESCRIPTION": "Inserta variables con un clic. Se reemplazan por datos del paciente al enviar.",
+      "LABEL": "Plantilla",
+      "RESET_DEFAULT": "Restablecer predeterminada",
+      "PREVIEW": "Vista previa",
+      "PREVIEW_PATIENT": "Paciente",
+      "APPLY": "Usar plantilla",
+      "DEFAULT_MESSAGE": "Hola {{nombres}} {{apellidos}}, te recordamos que tu renovación de lentes está próxima. Agenda tu cita cuando gustes.",
+      "TOOLTIP_MODAL": "Crea un mensaje reusable. Las variables se reemplazan automáticamente al enviar.",
+      "TOOLTIP_INSERT": "Inserta esta variable en la posición actual del texto.",
+      "TOOLTIP_MESSAGE_TEMPLATE": "Este texto se envía a todos los pacientes seleccionados.",
+      "VARIABLES": {
+        "NOMBRE": "Nombre completo",
+        "NOMBRES": "Nombres",
+        "APELLIDOS": "Apellidos",
+        "CEDULA": "Cédula",
+        "TELEFONO": "Teléfono"
+      }
     }
   },
   "USER": {

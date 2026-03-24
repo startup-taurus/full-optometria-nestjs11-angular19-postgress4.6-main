@@ -61,9 +61,18 @@ export class NotificationsService {
   }
 
   updateReminderRule(payload: Partial<ReminderRule>): Observable<ApiResponse<ReminderRule>> {
+    const sanitizedPayload = {
+      isActive: payload.isActive,
+      appointmentReminderHoursBefore: payload.appointmentReminderHoursBefore,
+      renewalAfterDays: payload.renewalAfterDays,
+      renewalNotifyBeforeDays: payload.renewalNotifyBeforeDays,
+      quietHoursStart: payload.quietHoursStart,
+      quietHoursEnd: payload.quietHoursEnd,
+    }
+
     return this.http.patch<ApiResponse<ReminderRule>>(
       `${this.API_URL}/reminders/rule`,
-      payload
+      sanitizedPayload
     )
   }
 
