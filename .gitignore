@@ -1,3 +1,7 @@
 # Ignorar archivos de entorno globales
 .env
 /.env
+
+# WhatsApp WebJS runtime/cache artifacts
+backend-nest-oftalmologia/.wwebjs_cache/
+backend-nest-oftalmologia/uploads/whatsapp-auth*/
