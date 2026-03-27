@@ -56,13 +56,19 @@ export class NotificationsService {
   ) {}
 
   async initWhatsAppSession(branchId: string, companyId: string | null, userId: string) {
+     const startTime = Date.now();
+     console.log(`[WHATSAPP_INIT_START] sessionKey=unknown, timestamp=${startTime}`);
     const session = await this.getOrCreateSession(branchId, companyId, userId);
+     console.log(`[WHATSAPP_SESSION_CREATED] sessionKey=${session.sessionKey}`);
     let snapshot = await this.whatsappProvider.requestQrRefresh(
       session.sessionKey,
       'startup',
     );
+     const afterRequestQrTime = Date.now();
+     console.log(`[WHATSAPP_AFTER_REQUEST_QR] sessionKey=${session.sessionKey}, elapsed=${afterRequestQrTime - startTime}ms, qrCode=${!!snapshot.qrCode}, state=${snapshot.state}`);
 
     if (!snapshot.connected && !snapshot.qrCode) {
+       console.log(`[WHATSAPP_WAITING_FOR_STATE] sessionKey=${session.sessionKey}, starting wait...`);
       snapshot = await this.withTimeout(
         this.whatsappProvider.waitForState(
           session.sessionKey,
@@ -73,9 +79,13 @@ export class NotificationsService {
         `waitForState.startup(${session.sessionKey})`,
         async () => this.whatsappProvider.getSessionSnapshot(session.sessionKey),
       );
+       const afterWaitForStateTime = Date.now();
+       console.log(`[WHATSAPP_AFTER_WAIT_FOR_STATE] sessionKey=${session.sessionKey}, elapsed=${afterWaitForStateTime - startTime}ms, qrCode=${!!snapshot.qrCode}, state=${snapshot.state}`);
     }
 
     const savedSession = await this.applySnapshotToSession(session, snapshot);
+     const endTime = Date.now();
+     console.log(`[WHATSAPP_INIT_COMPLETE] sessionKey=${session.sessionKey}, totalElapsed=${endTime - startTime}ms`);
 
     return {
       messageKey: 'NOTIFICATIONS.WHATSAPP_SESSION_INITIALIZED',

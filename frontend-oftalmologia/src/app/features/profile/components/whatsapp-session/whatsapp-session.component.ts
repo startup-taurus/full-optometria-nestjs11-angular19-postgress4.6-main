@@ -139,16 +139,20 @@ export class WhatsAppSessionComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true
+     const userActionStart = Date.now();
+     console.log(`[FE_INIT_SESSION_START] timestamp=${userActionStart}`);
     this.notificationsService
       .initWhatsAppSession()
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (response) => {
+           console.log(`[FE_INIT_SESSION_SUCCESS] elapsed=${Date.now() - userActionStart}ms`);
           this.session = response.data
           this.silentRefreshErrors = 0
           this.syncQrRefreshLifecycle()
         },
         error: (err) => {
+           console.log(`[FE_INIT_SESSION_ERROR] elapsed=${Date.now() - userActionStart}ms, status=${err?.status || 'unknown'}`);
           void err
           this.notificationService.showNotification({
             title: 'NOTIFICATIONS.TITLE',
