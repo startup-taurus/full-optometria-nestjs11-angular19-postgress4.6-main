@@ -45,6 +45,7 @@ services:
       MAIL_SECURE: ${MAIL_SECURE}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASS: ${MAIL_PASS}
+      WHATSAPP_AUTH_BASE_PATH: /app/uploads/whatsapp-auth
     volumes:
       - backend_uploads:/app/uploads
     ports:

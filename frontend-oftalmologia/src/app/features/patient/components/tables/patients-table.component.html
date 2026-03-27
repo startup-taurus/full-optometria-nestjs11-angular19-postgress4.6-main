@@ -97,7 +97,10 @@
 </ng-template>
 
 <ng-template #branchTemplate let-row="row" let-rowIndex="rowIndex">
-  <span class="badge common-badge bg-black" *ngIf="row.branch">
+  <span
+    class="badge common-badge bg-primary-subtle text-primary-emphasis border border-primary-subtle"
+    *ngIf="row.branch"
+  >
     {{ row.branch.name }}
   </span>
   <span class="text-muted small" *ngIf="!row.branch">

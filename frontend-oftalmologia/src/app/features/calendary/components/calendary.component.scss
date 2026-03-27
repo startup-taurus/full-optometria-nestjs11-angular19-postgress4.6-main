@@ -84,6 +84,7 @@
           }
 
           .more-events-indicator {
+            width: 100%;
             text-align: center;
             padding: 0.25rem;
             background-color: rgba(var(--app-primary-rgb), 0.1);
@@ -93,6 +94,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            border: 0;
 
             &:hover {
               background-color: rgba(var(--app-primary-rgb), 0.2);
@@ -188,6 +190,15 @@
   .modal-footer {
     border-top: 2px solid var(--bs-border-color);
     padding: 1rem 1.5rem;
+  }
+}
+
+.day-shift-item {
+  border-color: var(--bs-border-color);
+
+  &:hover {
+    border-color: rgba(var(--app-primary-rgb), 0.4);
+    background-color: rgba(var(--app-primary-rgb), 0.06);
   }
 }
 

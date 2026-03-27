@@ -55,7 +55,9 @@ export class CalendaryComponent implements OnInit, OnDestroy {
   private isInitialLoad = true
 
   showDetailModal = signal(false)
+  showDayShiftsModal = signal(false)
   selectedShift = signal<CalendarShift | null>(null)
+  selectedDayForList = signal<Date | null>(null)
 
   updateShiftForm: FormGroup
 
@@ -249,6 +251,27 @@ export class CalendaryComponent implements OnInit, OnDestroy {
     this.showDetailModal.set(true)
   }
 
+  openDayShiftsModal(day: Date, event: Event) {
+    event.stopPropagation()
+    this.selectedDate.set(day)
+    this.selectedDayForList.set(day)
+    this.showDayShiftsModal.set(true)
+  }
+
+  closeDayShiftsModal() {
+    this.showDayShiftsModal.set(false)
+    this.selectedDayForList.set(null)
+  }
+
+  getSelectedDayShifts(): CalendarShift[] {
+    return this.getShiftsForDay(this.selectedDayForList())
+  }
+
+  openShiftFromDayList(shift: CalendarShift): void {
+    this.closeDayShiftsModal()
+    this.openDetailModal(shift)
+  }
+
   closeDetailModal() {
     this.showDetailModal.set(false)
     this.selectedShift.set(null)
@@ -399,6 +422,14 @@ export class CalendaryComponent implements OnInit, OnDestroy {
       minute: '2-digit',
       hour12: false,
     })
+  }
+
+  formatShiftTooltip(shift: CalendarShift): string {
+    return (
+      `${shift.patient.firstName} ${shift.patient.lastName}` +
+      ` - ${this.formatTime(shift.appointmentDate)}\n` +
+      `${shift.status.name} | ${shift.branch.name}`
+    )
   }
 
   trackByShiftId(index: number, shift: CalendarShift): string {
