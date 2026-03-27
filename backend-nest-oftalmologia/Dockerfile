@@ -14,7 +14,7 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 -S zgames_app && \
     adduser -u 1001 -S zgames_app -G zgames_app
 
-RUN apk add --no-cache vips-dev
+RUN apk add --no-cache vips-dev chromium
 
 COPY --from=build --chown=zgames_app:zgames_app /app/dist ./dist
 COPY --from=build --chown=zgames_app:zgames_app /app/node_modules ./node_modules
