@@ -490,14 +490,17 @@ export class NotificationsService {
       () => null,
     );
 
-    if (snapshot) {
-      if (snapshot.connected || snapshot.state === 'ready') {
-        return this.applySnapshotToSession(session, snapshot);
-      }
+    if (!snapshot) {
 
-      if (this.hasValidImageQr(snapshot.qrCode)) {
-        return this.applySnapshotToSession(session, snapshot);
-      }
+      return session;
+    }
+
+    if (snapshot.connected || snapshot.state === 'ready') {
+      return this.applySnapshotToSession(session, snapshot);
+    }
+
+    if (this.hasValidImageQr(snapshot.qrCode)) {
+      return this.applySnapshotToSession(session, snapshot);
     }
 
     if (
@@ -506,36 +509,6 @@ export class NotificationsService {
       !this.isQrExpired(session)
     ) {
       return session;
-    }
-
-    this.fireAndForgetQrRefresh(session.sessionKey, this.isQrExpired(session)
-      ? 'expired_qr'
-      : 'missing_qr');
-
-    const refreshedSnapshot = await this.withTimeout<WhatsAppSessionSnapshot | null>(
-      this.whatsappProvider.getSessionSnapshot(session.sessionKey),
-      this.refreshWaitTimeoutMs,
-      `getSessionSnapshot.ensureValidQrForSession(${session.sessionKey})`,
-      () => null,
-    );
-
-    if (refreshedSnapshot) {
-      const normalized = await this.applySnapshotToSession(session, refreshedSnapshot);
-      if (
-        normalized.status === WhatsAppSessionStatus.QR_READY &&
-        !this.hasValidImageQr(normalized.qrCode)
-      ) {
-        normalized.status = WhatsAppSessionStatus.DISCONNECTED;
-        normalized.qrCode = null;
-        return this.whatsappSessionRepository.save(normalized);
-      }
-
-      return normalized;
-    }
-
-    if (this.hasValidImageQr(session.qrCode) && !this.isQrExpired(session)) {
-      session.status = WhatsAppSessionStatus.QR_READY;
-      return this.whatsappSessionRepository.save(session);
     }
 
     session.status = WhatsAppSessionStatus.DISCONNECTED;

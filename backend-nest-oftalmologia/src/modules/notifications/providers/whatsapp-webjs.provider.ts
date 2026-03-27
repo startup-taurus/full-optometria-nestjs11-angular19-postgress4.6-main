@@ -96,6 +96,15 @@ export class WhatsAppWebJsProvider
       }
 
       if (reason === 'manual') {
+
+        if (runtime.state === 'booting' || runtime.state === 'authenticated') {
+          return this.toSnapshot(sessionKey, runtime);
+        }
+
+        if (this.hasFreshQr(runtime)) {
+          return this.toSnapshot(sessionKey, runtime);
+        }
+
         runtime = await this.ensureClient(
           sessionKey,
           true,
@@ -324,6 +333,11 @@ export class WhatsAppWebJsProvider
         clientId: sessionKey,
         dataPath: this.authBasePath,
       }),
+      webVersionCache: {
+        type: 'local',
+        path: path.join(this.authBasePath, '.wwebjs_cache'),
+        strict: false,
+      },
       userAgent:
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
       evalOnNewDoc: () => {
@@ -407,6 +421,7 @@ export class WhatsAppWebJsProvider
         reason: 'ready_event',
       });
       this.logger.log(`Sesión ${sessionKey} conectada en WhatsApp Web`);
+      console.log(`[WA_READY] sessionKey=${sessionKey}, runtimeId=${runtime.runtimeId.slice(0, 8)}`);
     });
 
     client.on('authenticated', () => {
@@ -418,6 +433,7 @@ export class WhatsAppWebJsProvider
         reason: 'authenticated_event',
       });
       this.logger.log(`Sesión ${sessionKey} autenticada`);
+      console.log(`[WA_AUTHENTICATED] sessionKey=${sessionKey}, runtimeId=${runtime.runtimeId.slice(0, 8)}`);
     });
 
     client.on('auth_failure', (message) => {
@@ -455,6 +471,7 @@ export class WhatsAppWebJsProvider
       });
 
       this.logger.warn(`Sesión ${sessionKey} desconectada. reason=${reasonValue}`);
+      console.log(`[WA_DISCONNECTED] sessionKey=${sessionKey}, runtimeId=${runtime.runtimeId.slice(0, 8)}, reason=${reasonValue}`);
 
       if (reasonValue.toUpperCase().includes('LOGOUT')) {
         void this.clearAuthState(sessionKey);

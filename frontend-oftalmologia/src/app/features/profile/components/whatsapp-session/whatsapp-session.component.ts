@@ -80,7 +80,6 @@ export class WhatsAppSessionComponent implements OnInit, OnDestroy {
           this.syncQrRefreshLifecycle()
         },
         error: (err) => {
-          this.stopAutoQrRefresh()
           void err
         },
       })
@@ -194,16 +193,7 @@ export class WhatsAppSessionComponent implements OnInit, OnDestroy {
   }
 
   private syncQrRefreshLifecycle(): void {
-    if (this.session?.status === 'qr_ready' && this.hasValidImageQr) {
-      this.startAutoQrRefresh()
-      return
-    }
-
     this.stopAutoQrRefresh()
-
-    if (this.session?.status === 'qr_ready' && !this.hasValidImageQr && !this.refreshingQr) {
-      this.refreshQr(true)
-    }
   }
 
   private startAutoQrRefresh(): void {
