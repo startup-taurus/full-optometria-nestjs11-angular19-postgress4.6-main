@@ -317,6 +317,8 @@ export class WhatsAppWebJsProvider
 
     await fs.mkdir(this.authBasePath, { recursive: true });
 
+   const clientCreationStart = Date.now();
+   console.log(`[WA_CLIENT_CREATING] sessionKey=${sessionKey}, runtimeId=${this.generateRuntimeId().slice(0, 8)}`);
     const client = new Client({
       authStrategy: new LocalAuth({
         clientId: sessionKey,
@@ -340,6 +342,7 @@ export class WhatsAppWebJsProvider
         timeout: 120000,
       },
     });
+   console.log(`[WA_CLIENT_CREATED] sessionKey=${sessionKey}, elapsed=${Date.now() - clientCreationStart}ms`);
 
     const runtime: SessionRuntime = {
       client,
@@ -366,6 +369,7 @@ export class WhatsAppWebJsProvider
       if (!this.isRuntimeCurrent(sessionKey, runtime.runtimeId)) {
         return;
       }
+     console.log(`[WA_QR_EVENT] sessionKey=${sessionKey}, runtimeId=${runtime.runtimeId.slice(0, 8)}, timestamp=${Date.now()}`);
 
       void (async () => {
         try {
@@ -378,6 +382,7 @@ export class WhatsAppWebJsProvider
             reason: 'qr_event',
           });
           this.logger.log(`QR generado para sesión ${sessionKey}`);
+         console.log(`[WA_QR_PROCESSED] sessionKey=${sessionKey}, qrImage size=${dataUrl.length} bytes`);
         } catch (error) {
           this.logger.warn(
             `Error generando imagen QR para ${sessionKey}: ${
@@ -470,13 +475,16 @@ export class WhatsAppWebJsProvider
       );
     });
 
-    runtime.initPromise = client
-      .initialize()
+     const initStart = Date.now();
+     console.log(`[WA_INIT_START] sessionKey=${sessionKey}, timestamp=${initStart}`);
+     runtime.initPromise = client
+       .initialize()
       .catch((error) => {
         if (!this.isRuntimeCurrent(sessionKey, runtime.runtimeId)) {
           return;
         }
 
+         console.log(`[WA_INIT_ERROR] sessionKey=${sessionKey}, error=${error instanceof Error ? error.message : 'unknown'}`);
         this.applyStateTransition(sessionKey, runtime, 'stuck', {
           reason: error instanceof Error ? error.message : 'initialize_failed',
         });
@@ -490,6 +498,7 @@ export class WhatsAppWebJsProvider
         if (!this.isRuntimeCurrent(sessionKey, runtime.runtimeId)) {
           return;
         }
+         console.log(`[WA_INIT_FINALLY] sessionKey=${sessionKey}, elapsed=${Date.now() - initStart}ms, state=${runtime.state}`);
 
         runtime.initPromise = null;
         runtime.lastEventAt = Date.now();

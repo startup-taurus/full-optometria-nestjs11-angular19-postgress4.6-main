@@ -9,6 +9,8 @@ import {
   WhatsAppSession,
 } from '@core/interfaces/api/notifications.interface'
 import { Observable } from 'rxjs'
+import { tap, catchError } from 'rxjs/operators'
+import { throwError } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -25,9 +27,19 @@ export class NotificationsService {
   }
 
   initWhatsAppSession(): Observable<ApiResponse<WhatsAppSession>> {
+     const requestStart = Date.now();
+     console.log(`[FE_WHATSAPP_INIT_REQUEST] timestamp=${requestStart}`);
     return this.http.post<ApiResponse<WhatsAppSession>>(
       `${this.API_URL}/whatsapp/session/init`,
       {}
+     ).pipe(
+       tap(() => {
+         console.log(`[FE_WHATSAPP_INIT_RESPONSE] elapsed=${Date.now() - requestStart}ms`);
+       }),
+       catchError((error) => {
+         console.log(`[FE_WHATSAPP_INIT_ERROR] elapsed=${Date.now() - requestStart}ms, error=${error?.status || 'unknown'}`);
+         throw error;
+       })
     )
   }
 
