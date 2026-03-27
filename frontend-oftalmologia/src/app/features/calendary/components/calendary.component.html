@@ -184,13 +184,7 @@
                         (click)="
                           openDetailModal(shift); $event.stopPropagation()
                         "
-                        [attr.title]="
-                          shift.patient.firstName +
-                          ' ' +
-                          shift.patient.lastName +
-                          ' - ' +
-                          formatTime(shift.appointmentDate)
-                        "
+                        [attr.title]="formatShiftTooltip(shift)"
                       >
                         <small class="d-block text-white fw-semibold"
                           >{{ shift.patient.firstName }}
@@ -202,9 +196,11 @@
                       </div>
                     </ng-container>
 
-                    <div
+                    <button
+                      type="button"
                       class="more-events-indicator"
                       *ngIf="getShiftsForDay(day).length > 3"
+                      (click)="openDayShiftsModal(day, $event)"
                       [attr.title]="
                         'Ver todas las ' +
                         getShiftsForDay(day).length +
@@ -212,7 +208,7 @@
                       "
                     >
                       +{{ getShiftsForDay(day).length - 3 }}
-                    </div>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -231,6 +227,78 @@
     </div>
   </div>
 </div>
+
+<div
+  class="modal fade calendar-detail-modal"
+  [class.show]="showDayShiftsModal()"
+  [style.display]="showDayShiftsModal() ? 'block' : 'none'"
+  [style.z-index]="showDayShiftsModal() ? '1055' : ''"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="dayShiftsModalLabel"
+  aria-hidden="!showDayShiftsModal()"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-dark" id="dayShiftsModalLabel">
+          <i class="ti ti-calendar-event me-2"></i>
+          Citas del {{ formatDate(selectedDayForList()!) }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close ms-auto"
+          (click)="closeDayShiftsModal()"
+          [attr.aria-label]="'CALENDAR.ACTIONS.CLOSE' | translate"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-grid gap-2" *ngIf="getSelectedDayShifts().length; else emptyDayShifts">
+          <button
+            type="button"
+            class="btn btn-outline-secondary text-start day-shift-item"
+            *ngFor="let shift of getSelectedDayShifts(); trackBy: trackByShiftId"
+            (click)="openShiftFromDayList(shift)"
+          >
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <div class="fw-semibold text-dark">
+                  {{ shift.patient.firstName }} {{ shift.patient.lastName }}
+                </div>
+                <div class="small text-muted">
+                  {{ shift.branch.name }}
+                </div>
+              </div>
+              <span class="badge rounded-pill" [style.background-color]="shift.status.color">
+                {{ formatTime(shift.appointmentDate) }}
+              </span>
+            </div>
+            <div class="small mt-1 text-secondary">{{ shift.status.name }}</div>
+          </button>
+        </div>
+        <ng-template #emptyDayShifts>
+          <div class="text-center text-muted py-3">No hay citas para este día</div>
+        </ng-template>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDayShiftsModal()"
+        >
+          {{ 'CALENDAR.ACTIONS.CLOSE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal-backdrop fade show"
+  *ngIf="showDayShiftsModal()"
+  (click)="closeDayShiftsModal()"
+  [style.z-index]="'1050'"
+></div>
 
 <div
   class="modal fade calendar-detail-modal"
