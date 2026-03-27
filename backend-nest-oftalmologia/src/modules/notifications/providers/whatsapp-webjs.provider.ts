@@ -340,6 +340,7 @@ export class WhatsAppWebJsProvider
           '--window-size=1366,768',
         ],
         timeout: 120000,
+        executablePath: this.getPuppeteerExecutablePath(),
       },
     });
    console.log(`[WA_CLIENT_CREATED] sessionKey=${sessionKey}, elapsed=${Date.now() - clientCreationStart}ms`);
@@ -720,6 +721,29 @@ export class WhatsAppWebJsProvider
     }
 
     return path.resolve(process.cwd(), '.wwebjs_auth');
+  }
+
+  private getPuppeteerExecutablePath(): string | undefined {
+
+    const linuxPaths = [
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium',
+      '/snap/bin/chromium',
+    ];
+
+    if (process.platform === 'linux') {
+      for (const chromiumPath of linuxPaths) {
+        try {
+          require('fs').accessSync(chromiumPath);
+          console.log(`[PUPPETEER_CONFIG] Found Chrome at ${chromiumPath}`);
+          return chromiumPath;
+        } catch {}
+      }
+      console.warn(`[PUPPETEER_CONFIG] No Chrome executable found in common Linux paths. Puppeteer will attempt to use bundled browser.`);
+      return undefined;
+    }
+
+    return undefined;
   }
 
   private ensureRuntimeHardening(): void {
