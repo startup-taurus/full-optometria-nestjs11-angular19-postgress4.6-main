@@ -325,6 +325,7 @@ export class WhatsAppWebJsProvider
     const nextAttempt = (existing?.attempt ?? 0) + 1;
 
     await fs.mkdir(this.authBasePath, { recursive: true });
+    await this.cleanupChromiumProfileLocks(sessionKey);
 
    const clientCreationStart = Date.now();
    console.log(`[WA_CLIENT_CREATING] sessionKey=${sessionKey}, runtimeId=${this.generateRuntimeId().slice(0, 8)}`);
@@ -702,6 +703,51 @@ export class WhatsAppWebJsProvider
       width: 260,
       margin: 1,
     });
+  }
+
+  private async cleanupChromiumProfileLocks(sessionKey: string): Promise<void> {
+    if (process.platform !== 'linux') {
+      return;
+    }
+
+    const profilePaths = [
+      path.join(this.authBasePath, `session-${sessionKey}`),
+      path.join(this.authBasePath, sessionKey),
+    ];
+
+    const knownLockFiles = [
+      'SingletonLock',
+      'SingletonCookie',
+      'SingletonSocket',
+      'Singleton',
+      'DevToolsActivePort',
+      'chrome_shutdown_ms',
+    ];
+
+    for (const profilePath of profilePaths) {
+      for (const lockFile of knownLockFiles) {
+        await fs
+          .rm(path.join(profilePath, lockFile), { force: true })
+          .catch(() => undefined);
+      }
+
+      let entries: string[] = [];
+      try {
+        entries = await fs.readdir(profilePath);
+      } catch {
+        continue;
+      }
+
+      for (const entry of entries) {
+        if (!/^\d+$/.test(entry)) {
+          continue;
+        }
+
+        await fs
+          .rm(path.join(profilePath, entry), { force: true })
+          .catch(() => undefined);
+      }
+    }
   }
 
   private async clearAuthState(sessionKey: string): Promise<void> {
