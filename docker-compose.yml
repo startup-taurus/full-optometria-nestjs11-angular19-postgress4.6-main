@@ -20,6 +20,7 @@ services:
     build:
       context: ./backend-nest-oftalmologia
       dockerfile: Dockerfile
+    hostname: optometria-backend
     user: "1001:1001"
     environment:
       NODE_ENV: production

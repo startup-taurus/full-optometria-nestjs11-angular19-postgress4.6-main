@@ -33,7 +33,7 @@ export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
   private readonly qrTtlMs = 60000;
   private readonly sessionNormalizationTimeoutMs = 2500;
-  private readonly runtimeStartTimeoutMs = 90000;
+  private readonly runtimeStartTimeoutMs = 45000;
   private readonly refreshWaitTimeoutMs = 5000;
 
   constructor(
@@ -72,7 +72,7 @@ export class NotificationsService {
       snapshot = await this.withTimeout(
         this.whatsappProvider.waitForState(
           session.sessionKey,
-          ['qr_ready', 'ready'],
+          ['qr_ready', 'ready', 'stuck', 'auth_failure', 'disconnected'],
           this.runtimeStartTimeoutMs,
         ),
         this.runtimeStartTimeoutMs,
@@ -120,7 +120,7 @@ export class NotificationsService {
       snapshot = await this.withTimeout(
         this.whatsappProvider.waitForState(
           session.sessionKey,
-          ['qr_ready', 'ready'],
+          ['qr_ready', 'ready', 'stuck', 'auth_failure', 'disconnected'],
           this.refreshWaitTimeoutMs,
         ),
         this.refreshWaitTimeoutMs,
@@ -503,6 +503,13 @@ export class NotificationsService {
       return this.applySnapshotToSession(session, snapshot);
     }
 
+    // Durante reinicios/despliegues el runtime puede quedar en estados transitorios
+    // sin QR todavía. En ese caso conservamos el estado persistido para evitar
+    // desconexiones falsas en la UI y en la base de datos.
+    if (snapshot.state === 'booting' || snapshot.state === 'authenticated') {
+      return session;
+    }
+
     if (
       session.status === WhatsAppSessionStatus.QR_READY &&
       this.hasValidImageQr(session.qrCode) &&
@@ -532,6 +539,10 @@ export class NotificationsService {
       session.status = WhatsAppSessionStatus.QR_READY;
       session.qrCode = snapshot.qrCode;
       return this.whatsappSessionRepository.save(session);
+    }
+
+    if (snapshot.state === 'booting' || snapshot.state === 'authenticated') {
+      return session;
     }
 
     if (
