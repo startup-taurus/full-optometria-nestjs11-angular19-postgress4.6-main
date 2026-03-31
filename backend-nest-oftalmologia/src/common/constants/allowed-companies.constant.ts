@@ -3,7 +3,8 @@
 export const ALLOWED_COMPANIES: Record<string, boolean> = {
   sorti: true,
   'optica-sie': true,
-  'startup': true
+  'startup': true,
+  'visionary': true,
 };
 
 export function getAllowedCompanyNames(): string[] {
