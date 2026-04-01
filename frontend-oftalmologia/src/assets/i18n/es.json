@@ -218,15 +218,17 @@
       "TITLE": "Reglas de recordatorio",
       "RENEWAL_AFTER_DAYS": "Renovar después de (días)",
       "NOTIFY_BEFORE_DAYS": "Avisar antes de (días)",
-      "QUIET_HOURS_START": "Inicio horario silencioso",
-      "QUIET_HOURS_END": "Fin horario silencioso",
+      "QUIET_HOURS_START": "Inicio de horario silencioso",
+      "QUIET_HOURS_END": "Fin de horario silencioso",
       "ACTIVE": "Regla activa",
       "SAVE": "Guardar reglas",
       "UPDATED": "Reglas actualizadas",
-      "TOOLTIP_GENERAL": "Define cuándo notificar y en qué horario evitar envíos para no molestar al paciente.",
-      "TOOLTIP_RENEWAL_AFTER": "Cantidad de días después de la última entrega o control para considerar la renovación.",
-      "TOOLTIP_NOTIFY_BEFORE": "Días de anticipación para enviar recordatorio antes de la fecha estimada.",
-      "TOOLTIP_QUIET_HOURS": "Durante este rango horario no se envían mensajes automáticos."
+      "TOOLTIP_GENERAL": "Aquí decides cuándo mandar recordatorios y en qué horas NO enviar mensajes.",
+      "TOOLTIP_RENEWAL_AFTER": "Cuántos días deben pasar para considerar que toca renovación. Ejemplo: 365 = una vez al año.",
+      "TOOLTIP_NOTIFY_BEFORE": "Cuántos días antes quieres avisar. Ejemplo: 5 = se avisa 5 días antes.",
+      "TOOLTIP_QUIET_HOURS_START": "Desde esta hora empiezan las horas de silencio. Desde aquí no se envían mensajes automáticos.",
+      "TOOLTIP_QUIET_HOURS_END": "A esta hora termina el silencio. Desde aquí se pueden volver a enviar mensajes automáticos.",
+      "TOOLTIP_ACTIVE": "Si está activada, se aplican estas reglas. Si la desactivas, no se envían recordatorios automáticos."
     },
     "ELIGIBLE": {
       "TITLE": "Pacientes elegibles para renovación",

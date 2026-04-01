@@ -19,6 +19,7 @@ import {
   UpdateLaboratoryOrderDto,
   PreloadedOrderData,
   LaboratoryOrder,
+  LaboratoryOrderLineItem,
 } from '@core/interfaces/api/laboratory-order.interface'
 import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf.interface'
 import { Branch } from '@core/interfaces/api/user.interface'
@@ -28,6 +29,7 @@ import { LaboratoryOrderStep2Component } from '../steps/laboratory-order-step2/l
 import { LaboratoryOrderStep3Component } from '../steps/laboratory-order-step3/laboratory-order-step3.component'
 import { LaboratoryOrderStep4Component } from '../steps/laboratory-order-step4/laboratory-order-step4.component'
 import { firstValueFrom } from 'rxjs'
+import Swal from 'sweetalert2'
 
 export type ModalMode = 'create' | 'edit'
 
@@ -138,6 +140,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
     this.stepForms[4] = this._fb.group({
       productIds: [[]],
+      lineItems: [[] as LaboratoryOrderLineItem[]],
       frameType: [null],
       frameTypeDescription: [null],
       frameBrand: [null],
@@ -255,6 +258,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
           : order.productId
             ? [order.productId]
             : [],
+      lineItems: Array.isArray(order.lineItems) ? order.lineItems : [],
       frameType: order.frameType,
       frameTypeDescription: order.frameTypeDescription,
       frameBrand: order.frameBrand,
@@ -377,10 +381,45 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
         this.activeModal.close({ success: true, data: response })
       },
-      error: () => {
+      error: (error: any) => {
         this.isSaving = false
-        // El interceptor global ya muestra el mensaje de error localizado
+
+        const stockPayload = this.extractStockValidationPayload(error)
+        if (stockPayload?.stockValidation) {
+          this.confirmCreateDespiteStock(data)
+        }
       },
+    })
+  }
+
+  private extractStockValidationPayload(error: any): any {
+    return (
+      error?.error?.data ||
+      error?.originalError?.error?.data ||
+      null
+    )
+  }
+
+  private confirmCreateDespiteStock(data: CreateLaboratoryOrderDto): void {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Stock insuficiente',
+      text: 'Las cantidades exceden el stock disponible. Puedes volver a editar o generar la orden de todas formas.',
+      showCancelButton: true,
+      confirmButtonText: 'Generar de todas formas',
+      cancelButtonText: 'Volver a editar',
+      reverseButtons: true,
+    }).then((result) => {
+      if (!result.isConfirmed) {
+        return
+      }
+
+      this.isSaving = true
+      const forceData: CreateLaboratoryOrderDto = {
+        ...data,
+        ignoreStockValidation: true,
+      }
+      this.createOrder(forceData)
     })
   }
 
@@ -419,12 +458,14 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
         this._branchService.getBranchFilterState()
       )
 
-      let currentBranch: Branch | null = null
-      if (branchState.selectedBranch) {
-        currentBranch = branchState.selectedBranch
-      } else if (branchState.availableBranches.length > 0) {
-        currentBranch = branchState.availableBranches[0]
+      const branchId = branchState.selectedBranchId || order.branchId
+      if (!branchId) {
+        throw new Error('No se pudo obtener el ID de la sucursal')
       }
+
+      const currentBranch = await firstValueFrom(
+        this._branchService.getBranchById(branchId)
+      )
 
       if (!currentBranch) {
         throw new Error('No se pudo obtener la información de la sucursal')

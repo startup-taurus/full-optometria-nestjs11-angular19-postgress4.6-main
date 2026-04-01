@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsInt,
   Min,
+  Matches,
 } from 'class-validator';
 
 export class CreateCompanyCompleteDto {
@@ -20,6 +21,7 @@ export class CreateCompanyCompleteDto {
   @IsString()
   @MinLength(2)
   @MaxLength(20)
+  @Matches(/^\d+$/)
   code: string;
 
   @IsOptional()

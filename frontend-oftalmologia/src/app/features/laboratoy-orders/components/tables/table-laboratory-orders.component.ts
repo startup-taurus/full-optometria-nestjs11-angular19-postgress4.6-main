@@ -375,13 +375,52 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   }
 
   public getOrderProductsText(order: LaboratoryOrder): string {
+    const formatProduct = (product: {
+      code?: string
+      name?: string
+      quantity?: number
+    }) => {
+      const code = product.code ? `${product.code} - ` : ''
+      const name = product.name || '-'
+      const quantity = Number(product.quantity || 0)
+      const qtyLabel = quantity > 0 ? ` x${quantity}` : ''
+      return `${code}${name}${qtyLabel}`
+    }
+
+    const lineItems = order.lineItems || []
+    if (lineItems.length > 0) {
+      return lineItems
+        .map((lineItem) =>
+          formatProduct({
+            code: lineItem.product?.code,
+            name: lineItem.product?.name,
+            quantity: lineItem.quantity,
+          })
+        )
+        .join(', ')
+    }
+
     const products = order.products || []
 
     if (products.length > 0) {
-      return products.map((product) => product.name).join(', ')
+      return products
+        .map((product) =>
+          formatProduct({
+            code: product.code,
+            name: product.name,
+          })
+        )
+        .join(', ')
     }
 
-    return order.product?.name || order.frameModel || '-'
+    if (order.product) {
+      return formatProduct({
+        code: order.product.code,
+        name: order.product.name,
+      })
+    }
+
+    return order.frameModel || '-'
   }
 
   public onSendWhatsApp(order: LaboratoryOrder): void {

@@ -88,6 +88,17 @@ export class ErrorInterceptor implements HttpInterceptor {
       return fallback
     }
 
+    if (
+      payload.message &&
+      typeof payload.message === 'object' &&
+      (payload.message['es'] || payload.message['en'])
+    ) {
+      const localized = payload.message as Record<string, string>
+      return (
+        localized[preferredLang] || localized['es'] || localized['en'] || fallback
+      )
+    }
+
     // 1. localizedMessage: objeto { es, en } serializado desde el backend — máxima precisión
     if (
       payload.data?.localizedMessage &&

@@ -161,6 +161,7 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
           Validators.required,
           Validators.minLength(2),
           Validators.maxLength(20),
+          Validators.pattern(/^\d+$/),
         ],
       ],
       email: ['', [Validators.email, Validators.maxLength(100)]],
@@ -187,9 +188,8 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       code: ['', [Validators.required, Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
       city: ['', [Validators.required, Validators.maxLength(50)]],
-      phone: ['', [Validators.maxLength(20)]],
-      corporateEmail: ['', [Validators.email]],
-      openingHours: ['', [Validators.maxLength(100)]],
+      phone: ['', [Validators.required, Validators.maxLength(20)]],
+      corporateEmail: ['', [Validators.required, Validators.email]],
     })
 
     this.stepForms[4] = this._fb.group(
@@ -654,9 +654,6 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
     }
     if (formValues.corporateEmail && formValues.corporateEmail.trim()) {
       branchData.corporateEmail = formValues.corporateEmail.trim()
-    }
-    if (formValues.openingHours && formValues.openingHours.trim()) {
-      branchData.openingHours = formValues.openingHours.trim()
     }
 
     this._branchService

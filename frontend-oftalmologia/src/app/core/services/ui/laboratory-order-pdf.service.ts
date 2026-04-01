@@ -510,7 +510,34 @@ export class LaboratoryOrderPdfService {
   private buildFrameDataSection(data: LaboratoryOrderPdfData): Content {
     const order = data.order
     const productSectionTitle = this.getProductSectionTitle(order)
-    const productNames = this.getProductNames(order)
+    const productRows = this.getProductRows(order)
+    const productTableBody =
+      productRows.length > 0
+        ? [
+            [
+              { text: 'Código', bold: true, fillColor: '#E3F2FD' },
+              { text: 'Producto', bold: true, fillColor: '#E3F2FD' },
+              { text: 'Marca', bold: true, fillColor: '#E3F2FD' },
+              { text: 'Stock', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
+              { text: 'Cant.', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
+            ],
+            ...productRows,
+          ]
+        : [
+            [
+              {
+                text: 'Sin productos',
+                colSpan: 5,
+                alignment: 'center',
+                margin: [0, 4, 0, 4],
+              },
+              {},
+              {},
+              {},
+              {},
+            ],
+          ]
+            const hasProducts = productRows.length > 0
 
     return {
       stack: [
@@ -518,6 +545,16 @@ export class LaboratoryOrderPdfService {
           text: productSectionTitle,
           style: 'sectionTitle',
         },
+        {
+          table: {
+            widths: ['22%', '30%', '18%', '15%', '15%'],
+            headerRows: hasProducts ? 1 : 0,
+            dontBreakRows: true,
+            body: productTableBody,
+          },
+          layout: 'lightHorizontalLines',
+        },
+        { text: '', margin: [0, 6, 0, 6] },
         {
           table: {
             widths: ['50%', '50%'],
@@ -535,20 +572,6 @@ export class LaboratoryOrderPdfService {
                   bold: true,
                 },
                 { text: order.frameTypeDescription || '-' },
-              ],
-              [
-                {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.PRODUCTS')}:`,
-                  bold: true,
-                },
-                { text: productNames },
-              ],
-              [
-                {
-                  text: `${this._translateService.instant('PDF.LABORATORY_ORDER.BRAND')}:`,
-                  bold: true,
-                },
-                { text: order.frameBrand || '-' },
               ],
               [
                 {
@@ -700,14 +723,50 @@ export class LaboratoryOrderPdfService {
     return []
   }
 
-  private getProductNames(order: any): string {
+  private getProductRows(order: any): any[] {
+    const lineItems = Array.isArray(order?.lineItems) ? order.lineItems : []
+
+    if (lineItems.length > 0) {
+      return lineItems.map((lineItem: any) => [
+        { text: lineItem.product?.code || '-', margin: [0, 2, 0, 2] },
+        { text: lineItem.product?.name || '-', margin: [0, 2, 0, 2] },
+        { text: lineItem.product?.brand || '-', margin: [0, 2, 0, 2] },
+        {
+          text:
+            Number.isFinite(Number(lineItem.product?.quantity))
+              ? String(lineItem.product.quantity)
+              : '-',
+          alignment: 'center',
+          margin: [0, 2, 0, 2],
+        },
+        {
+          text: String(Number(lineItem.quantity || 1)),
+          alignment: 'center',
+          margin: [0, 2, 0, 2],
+        },
+      ])
+    }
+
     const products = this.getOrderProducts(order)
 
     if (products.length > 0) {
-      return products.map((product) => product.name || '-').join(', ')
+      return products.map((product) => [
+        { text: product.code || '-', margin: [0, 2, 0, 2] },
+        { text: product.name || '-', margin: [0, 2, 0, 2] },
+        { text: product.brand || '-', margin: [0, 2, 0, 2] },
+        {
+          text:
+            Number.isFinite(Number((product as any).quantity))
+              ? String((product as any).quantity)
+              : '-',
+          alignment: 'center',
+          margin: [0, 2, 0, 2],
+        },
+        { text: '1', alignment: 'center', margin: [0, 2, 0, 2] },
+      ])
     }
 
-    return order.frameModel || '-'
+    return []
   }
 
   private getProductSectionTitle(order: any): string {

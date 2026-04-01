@@ -109,7 +109,7 @@
                 <span>{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_START' | translate }}</span>
                 <i
                   class="ri-question-line text-muted"
-                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS' | translate"
+                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS_START' | translate"
                   container="body"
                 ></i>
               </label>
@@ -120,7 +120,7 @@
                 <span>{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_END' | translate }}</span>
                 <i
                   class="ri-question-line text-muted"
-                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS' | translate"
+                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS_END' | translate"
                   container="body"
                 ></i>
               </label>
@@ -134,7 +134,12 @@
                 [(ngModel)]="reminderRule.isActive"
               />
               <label class="form-check-label" for="ruleActive">
-                {{ 'NOTIFICATIONS.RULE.ACTIVE' | translate }}
+                <span>{{ 'NOTIFICATIONS.RULE.ACTIVE' | translate }}</span>
+                <i
+                  class="ri-question-line text-muted ms-1"
+                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_ACTIVE' | translate"
+                  container="body"
+                ></i>
               </label>
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
   ValidateIf,
   IsInt,
   Min,
+  Matches,
 } from 'class-validator';
 
 export class UpdateCompanyDto {
@@ -22,6 +23,7 @@ export class UpdateCompanyDto {
   @IsString()
   @MinLength(2)
   @MaxLength(20)
+  @Matches(/^\d+$/)
   code?: string;
 
   @IsOptional()

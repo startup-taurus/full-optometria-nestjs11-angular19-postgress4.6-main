@@ -3,7 +3,6 @@
 import { Component, inject, Renderer2, OnDestroy, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { CommonModule } from '@angular/common'
-import { LogoComponent } from '../logo/logo.component'
 import { credits, currentYear } from '@core/helpers/ui/constants'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -22,7 +21,6 @@ import { LanguageComponent } from '@core/interfaces/ui/language.interface'
   imports: [
     CommonModule,
     RouterModule,
-    LogoComponent,
     TranslateModule,
     NgbDropdownModule,
   ],
