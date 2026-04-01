@@ -20,11 +20,19 @@ export enum FrameType {
   COMPLETE = 'completo',
 }
 
+export enum LaboratoryOrderStatus {
+  PENDING = 'pending',
+  SENT = 'sent',
+  RECEIVED = 'received',
+  DELIVERED = 'delivered',
+}
+
 @Entity('laboratory_orders')
 @Index(['companyId'])
 @Index(['branchId'])
 @Index(['patientId'])
 @Index(['isConfirmed'])
+@Index(['status'])
 @Index(['attendanceDate'])
 @Index(['orderNumber'], { unique: true })
 export class LaboratoryOrder {
@@ -174,6 +182,14 @@ export class LaboratoryOrder {
   // Estado
   @Column({ name: 'is_confirmed', default: false })
   isConfirmed: boolean;
+
+  @Column({
+    name: 'status',
+    type: 'varchar',
+    length: 20,
+    default: LaboratoryOrderStatus.PENDING,
+  })
+  status: LaboratoryOrderStatus;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

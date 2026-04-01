@@ -74,9 +74,9 @@
               <div class="d-flex justify-content-end mb-2">
                 <span
                   class="badge rounded-pill"
-                  [ngClass]="getStatusClass(order.isConfirmed)"
+                  [ngClass]="getStatusClass(order)"
                 >
-                  {{ getStatusText(order.isConfirmed) | translate }}
+                  {{ getStatusText(order) | translate }}
                 </span>
               </div>
 
@@ -149,13 +149,14 @@
                     </button>
                     <button
                       type="button"
-                      class="btn btn-outline-info btn-action"
+                      class="btn btn-outline-secondary btn-action status-action-btn"
+                      [ngClass]="getStatusActionClass(order)"
                       (click)="onChangeStatusClick($event, order)"
                       [title]="
                         'LABORATORY_ORDERS_MODULE.CHANGE_STATUS' | translate
                       "
                     >
-                      <i class="ti ti-toggle-right"></i>
+                      <i class="ti ti-switch-horizontal"></i>
                     </button>
 
                     <div class="position-relative">

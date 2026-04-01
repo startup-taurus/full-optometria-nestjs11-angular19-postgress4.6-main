@@ -11,6 +11,7 @@ import {
   LaboratoryOrderQueryParams,
   ChangeStatusDto,
   PreloadedOrderData,
+  LaboratoryOrderStatus,
 } from '../../interfaces/api/laboratory-order.interface'
 import {
   ApiResponse,
@@ -98,8 +99,11 @@ export class LaboratoryOrdersService extends BranchAwareService<LaboratoryOrder>
       .pipe(map((response) => response.data!))
   }
 
-  changeStatus(id: string, isConfirmed: boolean): Observable<LaboratoryOrder> {
-    const dto: ChangeStatusDto = { isConfirmed }
+  changeStatus(
+    id: string,
+    status: LaboratoryOrderStatus
+  ): Observable<LaboratoryOrder> {
+    const dto: ChangeStatusDto = { status }
     return this.http
       .patch<
         ApiResponse<LaboratoryOrder>

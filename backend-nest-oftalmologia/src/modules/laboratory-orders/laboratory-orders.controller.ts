@@ -91,7 +91,7 @@ export class LaboratoryOrdersController {
   ) {
     return this.laboratoryOrdersService.changeStatus(
       id,
-      statusDto.isConfirmed,
+      statusDto.status,
       branchId,
       companyId
     );

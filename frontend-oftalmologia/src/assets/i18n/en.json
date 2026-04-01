@@ -1496,6 +1496,8 @@
     "CHANGE_STATUS": "Change status",
     "PENDING": "Pending",
     "SENT": "Sent",
+    "RECEIVED": "Received",
+    "DELIVERED": "Delivered",
     "CANCELLED": "Cancelled"
   },
   "LABORATORY_ORDERS": {
@@ -1512,6 +1514,8 @@
     "STEP4_FRAME_DATA": "Product Data",
     "STATUS_CONFIRMED": "Confirmed",
     "STATUS_PENDING": "Pending",
+    "RECEIVED": "Received",
+    "DELIVERED": "Delivered",
     "STATUS": {
       "PENDING": "Pending",
       "IN_PROGRESS": "In Progress",
@@ -1643,9 +1647,13 @@
       "DELETE_SUCCESS": "Order deleted successfully",
       "DELETE_ERROR": "Error deleting order",
       "STATUS_CHANGE_CONFIRM": "Change order status?",
-      "STATUS_CHANGE_TEXT": "Do you want to mark this order as",
-      "CONFIRMED": "confirmed",
+      "STATUS_CHANGE_TEXT": "Select the new order status",
+      "STATUS_SELECT_PLACEHOLDER": "Select a status",
+      "STATUS_SELECT_REQUIRED": "You must select a status",
       "PENDING_STATUS": "pending",
+      "SENT_STATUS": "sent",
+      "RECEIVED_STATUS": "received",
+      "DELIVERED_STATUS": "delivered",
       "STATUS_CHANGE_SUCCESS": "Status updated successfully",
       "STATUS_CHANGE_ERROR": "Error updating status",
       "PRINT_SUCCESS": "Preparing to print...",

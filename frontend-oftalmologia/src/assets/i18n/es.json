@@ -1515,6 +1515,8 @@
     "CHANGE_STATUS": "Cambiar estado",
     "PENDING": "Pendiente",
     "SENT": "Enviado",
+    "RECEIVED": "Recibido",
+    "DELIVERED": "Entregado",
     "CANCELLED": "Cancelado"
   },
   "LABORATORY_ORDERS": {
@@ -1531,6 +1533,8 @@
     "STEP4_FRAME_DATA": "Datos del Producto",
     "STATUS_CONFIRMED": "Confirmado",
     "STATUS_PENDING": "Pendiente",
+    "RECEIVED": "Recibido",
+    "DELIVERED": "Entregado",
     "FIELDS": {
       "ATTENDANCE_DATE": "Fecha de Atención",
       "DELIVERY_DATE": "Fecha de Entrega",
@@ -1629,9 +1633,13 @@
       "DELETE_SUCCESS": "Orden eliminada exitosamente",
       "DELETE_ERROR": "Error al eliminar la orden",
       "STATUS_CHANGE_CONFIRM": "¿Cambiar estado de la orden?",
-      "STATUS_CHANGE_TEXT": "¿Desea marcar esta orden como",
-      "CONFIRMED": "confirmada",
+      "STATUS_CHANGE_TEXT": "Seleccione el nuevo estado de la orden",
+      "STATUS_SELECT_PLACEHOLDER": "Selecciona un estado",
+      "STATUS_SELECT_REQUIRED": "Debe seleccionar un estado",
       "PENDING_STATUS": "pendiente",
+      "SENT_STATUS": "enviada",
+      "RECEIVED_STATUS": "recibida",
+      "DELIVERED_STATUS": "entregada",
       "STATUS_CHANGE_SUCCESS": "Estado actualizado exitosamente",
       "STATUS_CHANGE_ERROR": "Error al actualizar el estado",
       "PRINT_SUCCESS": "Preparando impresión...",

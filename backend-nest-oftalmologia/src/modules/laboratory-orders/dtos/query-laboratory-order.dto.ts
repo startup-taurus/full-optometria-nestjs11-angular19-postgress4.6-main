@@ -39,7 +39,7 @@ export class QueryLaboratoryOrderDto {
 
   @IsOptional()
   @IsString()
-  status?: string; 
+  status?: string;
 
   @IsOptional()
   @IsString()

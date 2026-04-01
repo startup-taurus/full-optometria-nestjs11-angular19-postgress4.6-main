@@ -74,7 +74,7 @@ export class LaboratoryOrdersStatusChartComponent
         colors: ['#304758'],
       },
     },
-    colors: ['#f59e0b', '#10b981'], // Solo 2 colores: Pendientes (naranja) y Confirmadas (verde)
+    colors: ['#f59e0b', '#0dcaf0', '#198754', '#0d6efd'],
     xaxis: {
       categories: [],
       labels: {

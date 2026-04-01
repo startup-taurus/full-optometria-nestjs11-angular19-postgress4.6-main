@@ -4,6 +4,13 @@ export enum FrameType {
   COMPLETE = 'completo',
 }
 
+export enum LaboratoryOrderStatus {
+  PENDING = 'pending',
+  SENT = 'sent',
+  RECEIVED = 'received',
+  DELIVERED = 'delivered',
+}
+
 export interface LaboratoryOrderLineItem {
   productId: string
   quantity: number
@@ -61,6 +68,7 @@ export interface LaboratoryOrder {
   frameVertical?: string
   frameBridge?: string
   observations?: string
+  status?: LaboratoryOrderStatus
   isConfirmed: boolean
   createdAt: string
   updatedAt: string
@@ -154,7 +162,7 @@ export interface LaboratoryOrderQueryParams {
   firstName?: string
   lastName?: string
   phone?: string
-  status?: string
+  status?: LaboratoryOrderStatus | 'confirmed'
   dateFrom?: string
   dateTo?: string
   sortBy?: string
@@ -162,7 +170,7 @@ export interface LaboratoryOrderQueryParams {
 }
 
 export interface ChangeStatusDto {
-  isConfirmed: boolean
+  status: LaboratoryOrderStatus
 }
 
 export interface PreloadedOrderData {
