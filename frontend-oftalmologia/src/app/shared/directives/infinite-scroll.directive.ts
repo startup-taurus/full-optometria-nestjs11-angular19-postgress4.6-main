@@ -7,7 +7,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core'
-import { fromEvent, Subject, debounceTime, takeUntil } from 'rxjs'
+import { fromEvent, merge, Subject, debounceTime, takeUntil } from 'rxjs'
 
 @Directive({
   selector: '[appInfiniteScroll]',
@@ -26,11 +26,13 @@ export class InfiniteScrollDirective implements OnInit, OnDestroy {
   constructor(private el: ElementRef) {}
 
   ngOnInit(): void {
-    fromEvent(this.el.nativeElement, 'scroll')
+    merge(fromEvent(this.el.nativeElement, 'scroll'), fromEvent(window, 'scroll'), fromEvent(window, 'resize'))
       .pipe(debounceTime(this.scrollDebounce), takeUntil(this.destroy$))
       .subscribe(() => {
         this.onScroll()
       })
+
+    this.onScroll()
   }
 
   ngOnDestroy(): void {
@@ -43,16 +45,28 @@ export class InfiniteScrollDirective implements OnInit, OnDestroy {
       return
     }
 
-    const element = this.el.nativeElement
-    const scrollTop = element.scrollTop
-    const scrollHeight = element.scrollHeight
-    const clientHeight = element.clientHeight
-
-    const scrollPosition = scrollTop + clientHeight
-    const scrollEnd = scrollHeight - this.scrollThreshold
-
-    if (scrollPosition >= scrollEnd) {
+    if (this.hasReachedScrollEnd()) {
       this.scrolled.emit()
     }
+  }
+
+  private hasReachedScrollEnd(): boolean {
+    const element = this.el.nativeElement as HTMLElement
+
+    if (this.isElementScrollable(element)) {
+      const scrollPosition = element.scrollTop + element.clientHeight
+      const scrollEnd = element.scrollHeight - this.scrollThreshold
+      return scrollPosition >= scrollEnd
+    }
+
+    const rect = element.getBoundingClientRect()
+    const viewportBottom = window.innerHeight
+    const distanceToBottom = rect.bottom - viewportBottom
+
+    return distanceToBottom <= this.scrollThreshold
+  }
+
+  private isElementScrollable(element: HTMLElement): boolean {
+    return element.scrollHeight > element.clientHeight + 1
   }
 }
