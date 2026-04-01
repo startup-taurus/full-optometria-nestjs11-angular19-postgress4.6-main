@@ -4,6 +4,7 @@ import { Repository, Between, In } from 'typeorm';
 import { Shift } from '../shift-management/entities/shift.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
 import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
+import { LaboratoryOrderStatus } from '../laboratory-orders/entities/laboratory-order.entity';
 import { Product } from '../products/entities/product.entity';
 import { User } from '../users/entities/user.entity';
 import { Patient } from '../patients/entities/patient.entity';
@@ -140,23 +141,31 @@ export class DashboardService {
 
     const orders = await this.laboratoryOrderRepository.find({
       where: whereCondition,
-      select: ['isConfirmed'],
+      select: ['isConfirmed', 'status'],
     });
 
-    let confirmed = 0;
     let pending = 0;
+    let sent = 0;
+    let received = 0;
+    let delivered = 0;
 
     orders.forEach((order) => {
-      if (order.isConfirmed) {
-        confirmed++;
-      } else {
+      const status = order.status || (order.isConfirmed ? LaboratoryOrderStatus.RECEIVED : LaboratoryOrderStatus.PENDING);
+
+      if (status === LaboratoryOrderStatus.PENDING) {
         pending++;
+      } else if (status === LaboratoryOrderStatus.SENT) {
+        sent++;
+      } else if (status === LaboratoryOrderStatus.RECEIVED) {
+        received++;
+      } else if (status === LaboratoryOrderStatus.DELIVERED) {
+        delivered++;
       }
     });
 
     return {
-      labels: ['Pendientes', 'Confirmadas'],
-      data: [pending, confirmed],
+      labels: ['Pendientes', 'Enviadas', 'Recibidas', 'Entregadas'],
+      data: [pending, sent, received, delivered],
       total: orders.length,
     };
   }

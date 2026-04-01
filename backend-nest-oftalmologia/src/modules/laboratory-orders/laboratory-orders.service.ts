@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { LaboratoryOrder } from './entities/laboratory-order.entity';
+import { LaboratoryOrderStatus } from './entities/laboratory-order.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
 import { Product } from '../products/entities/product.entity';
 import { StockMovement } from '../products/entities/stock-movement.entity';
@@ -123,6 +124,7 @@ export class LaboratoryOrdersService {
           companyId,
           orderNumber,
           productQuantities: normalizedLineItems,
+          status: LaboratoryOrderStatus.PENDING,
         });
 
         const savedOrder = await queryRunner.manager
@@ -279,11 +281,10 @@ export class LaboratoryOrdersService {
     }
 
     if (status) {
-      const isConfirmedValue =
-        status === 'sent' ? true : status === 'pending' ? false : null;
-      if (isConfirmedValue !== null) {
-        queryBuilder.andWhere('lo.isConfirmed = :statusFilter', {
-          statusFilter: isConfirmedValue,
+      const normalizedStatus = this.normalizeStatus(status);
+      if (normalizedStatus) {
+        queryBuilder.andWhere('lo.status = :statusFilter', {
+          statusFilter: normalizedStatus,
         });
       }
     }
@@ -373,7 +374,7 @@ export class LaboratoryOrdersService {
 
   async changeStatus(
     id: string,
-    isConfirmed: boolean,
+    status: LaboratoryOrderStatus | null,
     branchId: string,
     companyId?: string
   ) {
@@ -390,8 +391,25 @@ export class LaboratoryOrdersService {
       { id, branchId },
       companyId
     );
+    if (!status) {
+      throw new BadRequestException({
+        messageKey: 'ERROR.VALIDATION',
+        message: 'Laboratory order status is required',
+      });
+    }
+
+    const normalizedStatus = this.normalizeStatus(status);
+
+    if (!normalizedStatus) {
+      throw new BadRequestException({
+        messageKey: 'ERROR.VALIDATION',
+        message: 'Invalid laboratory order status',
+      });
+    }
+
     await this.laboratoryOrderRepository.update(whereCondition, {
-      isConfirmed,
+      status: normalizedStatus,
+      isConfirmed: this.getLegacyConfirmedValue(normalizedStatus),
     });
 
     const updatedOrder = await this.findOne(id, branchId, companyId);
@@ -413,6 +431,10 @@ export class LaboratoryOrdersService {
       companyId
     );
     await this.laboratoryOrderRepository.delete(whereCondition);
+
+    const resolvedStatus =
+      this.normalizeStatus(laboratoryOrder.status) ||
+      this.deriveStatusFromLegacyFlag(laboratoryOrder.isConfirmed);
 
     return {
       messageKey: 'SUCCESS.DELETED',
@@ -494,6 +516,9 @@ export class LaboratoryOrdersService {
       : null;
     const primaryProduct = products[0] || fallbackProduct;
     const lineItems = this.buildResponseLineItems(laboratoryOrder, products);
+    const resolvedStatus =
+      this.normalizeStatus(laboratoryOrder.status) ||
+      this.deriveStatusFromLegacyFlag(laboratoryOrder.isConfirmed);
 
     return {
       id: laboratoryOrder.id,
@@ -540,7 +565,8 @@ export class LaboratoryOrdersService {
       frameVertical: laboratoryOrder.frameVertical,
       frameBridge: laboratoryOrder.frameBridge,
       observations: laboratoryOrder.observations,
-      isConfirmed: laboratoryOrder.isConfirmed,
+      status: resolvedStatus,
+      isConfirmed: this.getLegacyConfirmedValue(resolvedStatus),
       createdAt: laboratoryOrder.createdAt,
       updatedAt: laboratoryOrder.updatedAt,
       patient: laboratoryOrder.patient
@@ -659,6 +685,42 @@ export class LaboratoryOrdersService {
       productIds: uniqueProductIds,
       lineItems,
     } as T;
+  }
+
+  private normalizeStatus(status?: string | null): LaboratoryOrderStatus | null {
+    if (!status) {
+      return null;
+    }
+
+    const normalized = status.trim().toLowerCase();
+
+    switch (normalized) {
+      case LaboratoryOrderStatus.PENDING:
+      case 'pending':
+        return LaboratoryOrderStatus.PENDING;
+      case LaboratoryOrderStatus.SENT:
+      case 'sent':
+        return LaboratoryOrderStatus.SENT;
+      case LaboratoryOrderStatus.RECEIVED:
+      case 'received':
+      case 'confirmed':
+      case 'confirmado':
+        return LaboratoryOrderStatus.RECEIVED;
+      case LaboratoryOrderStatus.DELIVERED:
+      case 'delivered':
+      case 'entregado':
+        return LaboratoryOrderStatus.DELIVERED;
+      default:
+        return null;
+    }
+  }
+
+  private deriveStatusFromLegacyFlag(isConfirmed?: boolean): LaboratoryOrderStatus {
+    return isConfirmed ? LaboratoryOrderStatus.RECEIVED : LaboratoryOrderStatus.PENDING;
+  }
+
+  private getLegacyConfirmedValue(status: LaboratoryOrderStatus | null | undefined): boolean {
+    return status === LaboratoryOrderStatus.RECEIVED || status === LaboratoryOrderStatus.DELIVERED;
   }
 
   private normalizeLineItems(

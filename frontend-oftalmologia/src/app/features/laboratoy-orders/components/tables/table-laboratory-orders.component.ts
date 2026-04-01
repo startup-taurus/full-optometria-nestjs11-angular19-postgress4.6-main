@@ -17,7 +17,10 @@ import { LaboratoryOrdersService } from '@core/services/api/laboratory-orders.se
 import { BranchService } from '@core/services/api/branch.service'
 import { LaboratoryOrderPdfService } from '@core/services/ui/laboratory-order-pdf.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
-import { LaboratoryOrder } from '@core/interfaces/api/laboratory-order.interface'
+import {
+  LaboratoryOrder,
+  LaboratoryOrderStatus,
+} from '@core/interfaces/api/laboratory-order.interface'
 import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf.interface'
 import { Branch } from '@core/interfaces/api/branch.interface'
 import { LaboratoryOrderUpsertModalComponent } from '../laboratory-order-upsert-modal/laboratory-order-upsert-modal.component'
@@ -207,14 +210,43 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     })
   }
 
-  public getStatusClass(isConfirmed: boolean): string {
-    return isConfirmed ? 'bg-success' : 'bg-warning'
+  public getStatusClass(order: LaboratoryOrder): string {
+    switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.SENT:
+        return 'bg-info'
+      case LaboratoryOrderStatus.RECEIVED:
+        return 'bg-success'
+      case LaboratoryOrderStatus.DELIVERED:
+        return 'bg-primary'
+      default:
+        return 'bg-warning'
+    }
   }
 
-  public getStatusText(isConfirmed: boolean): string {
-    return isConfirmed
-      ? 'LABORATORY_ORDERS.STATUS_CONFIRMED'
-      : 'LABORATORY_ORDERS.STATUS_PENDING'
+  public getStatusText(order: LaboratoryOrder): string {
+    switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.SENT:
+        return 'LABORATORY_ORDERS_MODULE.SENT'
+      case LaboratoryOrderStatus.RECEIVED:
+        return 'LABORATORY_ORDERS_MODULE.RECEIVED'
+      case LaboratoryOrderStatus.DELIVERED:
+        return 'LABORATORY_ORDERS_MODULE.DELIVERED'
+      default:
+        return 'LABORATORY_ORDERS_MODULE.PENDING'
+    }
+  }
+
+  public getStatusActionClass(order: LaboratoryOrder): string {
+    switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.SENT:
+        return 'status-action--sent'
+      case LaboratoryOrderStatus.RECEIVED:
+        return 'status-action--received'
+      case LaboratoryOrderStatus.DELIVERED:
+        return 'status-action--delivered'
+      default:
+        return 'status-action--pending'
+    }
   }
 
   public onViewClick(event: Event, order: LaboratoryOrder): void {
@@ -299,26 +331,62 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   }
 
   public onChangeStatus(order: LaboratoryOrder): void {
-    const newStatus = !order.isConfirmed
-    const statusText = newStatus
-      ? this._translateService.instant('LABORATORY_ORDERS.MESSAGES.CONFIRMED')
-      : this._translateService.instant(
-          'LABORATORY_ORDERS.MESSAGES.PENDING_STATUS'
-        )
+    const currentStatus = this.normalizeStatus(order)
+    const statusOptions = this.getStatusOptions()
 
     Swal.fire({
       title: this._translateService.instant(
         'LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_CONFIRM'
       ),
-      text: `${this._translateService.instant('LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_TEXT')} ${statusText}?`,
+      input: 'select',
+      inputOptions: statusOptions,
+      inputValue: currentStatus,
+      inputPlaceholder: this._translateService.instant(
+        'LABORATORY_ORDERS.MESSAGES.STATUS_SELECT_PLACEHOLDER'
+      ),
+      text: this._translateService.instant(
+        'LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_TEXT'
+      ),
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      reverseButtons: true,
       confirmButtonText: this._translateService.instant('SWEET_ALERT.CONFIRM'),
       cancelButtonText: this._translateService.instant('SWEET_ALERT.CANCEL'),
+      customClass: {
+        popup: 'status-change-modal',
+        htmlContainer: 'status-modal-content',
+        input: 'status-modal-select',
+      },
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage(
+            this._translateService.instant(
+              'LABORATORY_ORDERS.MESSAGES.STATUS_SELECT_REQUIRED'
+            )
+          )
+          return false
+        }
+
+        return value
+      },
+      didOpen: () => {
+        const confirmButton = Swal.getConfirmButton()
+        if (confirmButton) {
+          confirmButton.disabled = false
+        }
+      },
+      allowOutsideClick: () => false,
+      allowEscapeKey: false,
     }).then((result) => {
-      if (result.isConfirmed) {
+      if (result.isConfirmed && result.value) {
+        const newStatus = result.value as LaboratoryOrderStatus
+
+        if (newStatus === currentStatus) {
+          return
+        }
+
         this._laboratoryOrdersService
           .changeStatus(order.id, newStatus)
           .subscribe({
@@ -338,7 +406,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
               Swal.fire({
                 icon: 'error',
                 title: this._translateService.instant('COMMON.ERROR'),
-                text: this._translateService.instant(
+                html: error.error?.message?.es || error.error?.message || this._translateService.instant(
                   'LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_ERROR'
                 ),
               })
@@ -420,7 +488,34 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
       })
     }
 
-    return order.frameModel || '-'
+    return '-'
+  }
+
+  private normalizeStatus(order: LaboratoryOrder): LaboratoryOrderStatus {
+    if (order.status) {
+      return order.status
+    }
+
+    return order.isConfirmed
+      ? LaboratoryOrderStatus.RECEIVED
+      : LaboratoryOrderStatus.PENDING
+  }
+
+  private getStatusOptions(): Record<string, string> {
+    return {
+      [LaboratoryOrderStatus.PENDING]: this._translateService.instant(
+        'LABORATORY_ORDERS_MODULE.PENDING'
+      ),
+      [LaboratoryOrderStatus.SENT]: this._translateService.instant(
+        'LABORATORY_ORDERS_MODULE.SENT'
+      ),
+      [LaboratoryOrderStatus.RECEIVED]: this._translateService.instant(
+        'LABORATORY_ORDERS_MODULE.RECEIVED'
+      ),
+      [LaboratoryOrderStatus.DELIVERED]: this._translateService.instant(
+        'LABORATORY_ORDERS_MODULE.DELIVERED'
+      ),
+    }
   }
 
   public onSendWhatsApp(order: LaboratoryOrder): void {

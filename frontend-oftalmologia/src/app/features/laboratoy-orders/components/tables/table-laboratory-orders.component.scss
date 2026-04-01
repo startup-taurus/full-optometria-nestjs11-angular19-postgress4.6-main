@@ -99,3 +99,66 @@
     }
   }
 }
+
+.status-action-btn {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    right: -1px;
+    bottom: -1px;
+    border: 1px solid #fff;
+    background: currentColor;
+  }
+
+  &.status-action--pending {
+    color: #b58100;
+    border-color: #ffc107;
+    background-color: rgba(255, 193, 7, 0.08);
+  }
+
+  &.status-action--sent {
+    color: #0a8ca8;
+    border-color: #0dcaf0;
+    background-color: rgba(13, 202, 240, 0.08);
+  }
+
+  &.status-action--received {
+    color: #157347;
+    border-color: #198754;
+    background-color: rgba(25, 135, 84, 0.08);
+  }
+
+  &.status-action--delivered {
+    color: #0b5ed7;
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.08);
+  }
+}
+
+:host ::ng-deep .status-change-modal {
+  border-radius: 12px;
+}
+
+:host ::ng-deep .status-change-modal .swal2-title {
+  font-weight: 600;
+}
+
+:host ::ng-deep .status-modal-content {
+  font-size: 0.95rem;
+}
+
+:host ::ng-deep .status-modal-select {
+  border: 1px solid var(--bs-border-color) !important;
+  border-radius: 8px !important;
+  min-height: 42px !important;
+}
+
+:host ::ng-deep .status-modal-select:focus {
+  border-color: var(--bs-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2) !important;
+}
