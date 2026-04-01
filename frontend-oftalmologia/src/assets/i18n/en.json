@@ -216,10 +216,12 @@
       "ACTIVE": "Rule active",
       "SAVE": "Save rules",
       "UPDATED": "Rules updated",
-      "TOOLTIP_GENERAL": "Define when to notify and which hours should block automatic sends.",
-      "TOOLTIP_RENEWAL_AFTER": "Number of days after last delivery or checkup to consider renewal.",
-      "TOOLTIP_NOTIFY_BEFORE": "How many days in advance reminders are sent before the estimated date.",
-      "TOOLTIP_QUIET_HOURS": "No automatic messages are sent during this time range."
+      "TOOLTIP_GENERAL": "Choose when reminders are sent and which hours should NOT send messages.",
+      "TOOLTIP_RENEWAL_AFTER": "How many days must pass before renewal is due. Example: 365 = once a year.",
+      "TOOLTIP_NOTIFY_BEFORE": "How many days before you want to notify. Example: 5 = notify 5 days earlier.",
+      "TOOLTIP_QUIET_HOURS_START": "Silent hours start at this time. From here, automatic messages are paused.",
+      "TOOLTIP_QUIET_HOURS_END": "Silent hours end at this time. From here, automatic messages can be sent again.",
+      "TOOLTIP_ACTIVE": "If enabled, these rules are applied. If disabled, automatic reminders are not sent."
     },
     "ELIGIBLE": {
       "TITLE": "Renewal eligible patients",

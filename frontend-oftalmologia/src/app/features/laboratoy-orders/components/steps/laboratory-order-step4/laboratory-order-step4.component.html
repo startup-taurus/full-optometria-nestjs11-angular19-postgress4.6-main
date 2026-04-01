@@ -34,9 +34,95 @@
               [closeOnSelect]="false"
             >
               <ng-template ng-option-tmp let-item="item">
-                {{ item.name }}
+                <div class="d-flex justify-content-between align-items-center w-100 gap-2">
+                  <span>{{ getProductDisplayName(item) }}</span>
+                  <small class="text-muted">Stock: {{ item.quantity || 0 }}</small>
+                </div>
               </ng-template>
             </ng-select>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-1" *ngIf="lineItems.length > 0">
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table align-middle purchase-order-table mb-0">
+                <thead>
+                  <tr>
+                    <th style="width: 14%">Código</th>
+                    <th>Producto</th>
+                    <th style="width: 18%">Marca</th>
+                    <th class="text-center" style="width: 12%">Stock</th>
+                    <th class="text-center" style="width: 18%">Cantidad</th>
+                    <th class="text-center" style="width: 56px"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let lineItem of lineItems">
+                    <td>
+                      {{ getLineItemProduct(lineItem.productId)?.code || '-' }}
+                    </td>
+                    <td class="text-center">
+                      <div class="text-start">
+                        <div class="fw-medium">
+                          {{ getLineItemProduct(lineItem.productId)?.name || lineItem.productId }}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {{ getLineItemProduct(lineItem.productId)?.brand || '-' }}
+                    </td>
+                    <td class="text-center">
+                      <span [class.text-danger]="isLineItemOverStock(lineItem)">
+                        {{ getProductStock(lineItem.productId) }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="quantity-control d-flex align-items-center justify-content-center gap-2">
+                        <button
+                          type="button"
+                          class="btn btn-outline-secondary btn-icon btn-sm"
+                          (click)="decrementQuantity(lineItem.productId)"
+                          [disabled]="!canDecrementQuantity(lineItem.productId)"
+                          aria-label="Disminuir cantidad"
+                        >
+                          <i class="ti ti-minus"></i>
+                        </button>
+                        <div
+                          class="quantity-box d-inline-flex align-items-center justify-content-center"
+                          [class.text-danger]="isLineItemOverStock(lineItem)"
+                        >
+                          {{ getLineItemQuantity(lineItem.productId) }}
+                        </div>
+                        <button
+                          type="button"
+                          class="btn btn-outline-primary btn-icon btn-sm"
+                          (click)="incrementQuantity(lineItem.productId)"
+                          [disabled]="!canIncrementQuantity(lineItem.productId)"
+                          aria-label="Aumentar cantidad"
+                        >
+                          <i class="ti ti-plus"></i>
+                        </button>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <button
+                        type="button"
+                        class="btn btn-link text-danger p-0"
+                        (click)="removeLineItem(lineItem.productId)"
+                      >
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="hasOverStockLineItems()">
+            <small class="text-danger">
+              Hay productos con cantidad mayor al stock disponible.
+            </small>
           </div>
         </div>
       </div>
@@ -101,32 +187,33 @@
         </h6>
       </div>
       <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">{{
-              'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control disabled-field"
-              formControlName="frameModel"
-              [placeholder]="'LABORATORY_ORDERS.FIELDS.PRODUCT' | translate"
-              [readonly]="true"
-            />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">{{
-              'LABORATORY_ORDERS.LABELS.BRAND' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control disabled-field"
-              formControlName="frameBrand"
-              [placeholder]="'LABORATORY_ORDERS.FIELDS.FRAME_BRAND' | translate"
-              [readonly]="true"
-            />
-          </div>
+        <div class="table-responsive mb-3">
+          <table class="table align-middle purchase-order-table mb-0">
+            <thead>
+              <tr>
+                <th style="width: 14%">Código</th>
+                <th>Producto</th>
+                <th style="width: 18%">Marca</th>
+                <th class="text-center" style="width: 12%">Stock</th>
+                <th class="text-center" style="width: 18%">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of getSelectedProductRows()">
+                <td>{{ row.code }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.brand }}</td>
+                <td class="text-center">{{ row.stock ?? '-' }}</td>
+                <td class="text-center">{{ row.quantity }}</td>
+              </tr>
+              <tr *ngIf="getSelectedProductRows().length === 0">
+                <td colspan="5" class="text-center text-muted">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
+        <div class="row g-3">
           <div class="col-md-12">
             <label class="form-label">{{
               'LABORATORY_ORDERS.LABELS.FRAME_DATA' | translate

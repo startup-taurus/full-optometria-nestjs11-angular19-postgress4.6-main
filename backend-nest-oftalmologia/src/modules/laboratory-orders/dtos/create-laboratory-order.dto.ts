@@ -6,8 +6,27 @@ import {
   IsDateString,
   IsEnum,
   IsArray,
+  ValidateNested,
+  IsInt,
+  Min,
+  IsBoolean,
+  Allow,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { FrameType } from '../entities/laboratory-order.entity';
+
+export class LaboratoryOrderLineItemDto {
+  @Allow()
+  @IsUUID()
+  @IsNotEmpty()
+  productId: string;
+
+  @Allow()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  quantity: number;
+}
 
 export class CreateLaboratoryOrderDto {
   @IsUUID()
@@ -130,6 +149,18 @@ export class CreateLaboratoryOrderDto {
   @IsArray()
   @IsUUID('4', { each: true })
   productIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @Allow()
+  @ValidateNested({ each: true })
+  @Type(() => LaboratoryOrderLineItemDto)
+  lineItems?: LaboratoryOrderLineItemDto[];
+
+  @IsOptional()
+  @IsBoolean()
+  @Allow()
+  ignoreStockValidation?: boolean;
 
   @IsOptional()
   @IsEnum(FrameType)

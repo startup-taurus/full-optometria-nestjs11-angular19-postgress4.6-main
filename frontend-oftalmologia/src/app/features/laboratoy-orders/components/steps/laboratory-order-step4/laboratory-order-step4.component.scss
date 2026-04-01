@@ -36,6 +36,41 @@
     }
   }
 
+  .purchase-order-table {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+
+    thead th {
+      background: var(--bs-tertiary-bg);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    tbody td {
+      vertical-align: middle;
+    }
+  }
+
+  .quantity-box {
+    min-width: 2.75rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    background: var(--bs-body-bg);
+    font-weight: 600;
+  }
+
+  .btn-icon {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   ::ng-deep {
     .ng-select {
       .ng-select-container {

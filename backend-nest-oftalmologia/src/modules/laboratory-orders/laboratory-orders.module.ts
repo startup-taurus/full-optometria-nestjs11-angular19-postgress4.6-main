@@ -5,10 +5,16 @@ import { LaboratoryOrdersController } from './laboratory-orders.controller';
 import { LaboratoryOrder } from './entities/laboratory-order.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
 import { Product } from '../products/entities/product.entity';
+import { StockMovement } from '../products/entities/stock-movement.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([LaboratoryOrder, ClinicalHistory, Product]),
+    TypeOrmModule.forFeature([
+      LaboratoryOrder,
+      ClinicalHistory,
+      Product,
+      StockMovement,
+    ]),
   ],
   controllers: [LaboratoryOrdersController],
   providers: [LaboratoryOrdersService],

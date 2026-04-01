@@ -6,6 +6,7 @@ import { NgSelectModule } from '@ng-select/ng-select'
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs'
 import { ProductService } from '@core/services/api/product.service'
 import { Product } from '@core/interfaces/api/inventory.interface'
+import { LaboratoryOrderLineItem } from '@core/interfaces/api/laboratory-order.interface'
 
 @Component({
   selector: 'app-laboratory-order-step4',
@@ -23,6 +24,7 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
 
   public products: Product[] = []
   public selectedProducts: Product[] = []
+  public lineItems: LaboratoryOrderLineItem[] = []
   public productsLoading = false
   public selectedFrameType: string = ''
 
@@ -111,7 +113,21 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
       ids.includes(product.id)
     )
 
-    const productNames = this.selectedProducts.map((product) => product.name)
+    const currentLineItems = this.getCurrentLineItemsByProductId()
+    this.lineItems = this.selectedProducts.map((product) => {
+      const currentQuantity = currentLineItems.get(product.id)
+      return {
+        productId: product.id,
+        quantity:
+          typeof currentQuantity === 'number' && currentQuantity > 0
+            ? currentQuantity
+            : 1,
+      }
+    })
+
+    const productNames = this.selectedProducts.map((product) =>
+      this.getProductDisplayName(product)
+    )
     const productBrands = Array.from(
       new Set(
         this.selectedProducts
@@ -122,11 +138,114 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
 
     this.formGroup.patchValue(
       {
+        lineItems: this.lineItems,
         frameBrand: productBrands.join(', '),
         frameModel: productNames.join(', '),
       },
       { emitEvent: false }
     )
+  }
+
+  private getCurrentLineItemsByProductId(): Map<string, number> {
+    const current = this.formGroup.get('lineItems')?.value
+    const map = new Map<string, number>()
+
+    if (!Array.isArray(current)) {
+      return map
+    }
+
+    current.forEach((line: any) => {
+      if (
+        line &&
+        typeof line.productId === 'string' &&
+        Number.isFinite(Number(line.quantity))
+      ) {
+        map.set(line.productId, Math.max(1, Number(line.quantity)))
+      }
+    })
+
+    return map
+  }
+
+  public getProductStock(productId: string): number {
+    const product = this.products.find((item) => item.id === productId)
+    return Number(product?.quantity || 0)
+  }
+
+  public getLineItemProduct(productId: string): Product | undefined {
+    return this.products.find((item) => item.id === productId)
+  }
+
+  public getLineItemDisplayName(productId: string): string {
+    const product = this.getLineItemProduct(productId)
+    return product ? this.getProductDisplayName(product) : productId
+  }
+
+  public onQuantityChange(productId: string, value: string): void {
+    const parsed = Number(value)
+    const normalized = Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1
+
+    this.lineItems = this.lineItems.map((line) =>
+      line.productId === productId ? { ...line, quantity: normalized } : line
+    )
+
+    this.formGroup.patchValue(
+      {
+        lineItems: this.lineItems,
+      },
+      { emitEvent: false }
+    )
+  }
+
+  public incrementQuantity(productId: string): void {
+    const current = this.getLineItemQuantity(productId)
+    const stock = this.getProductStock(productId)
+    if (stock > 0 && current >= stock) {
+      return
+    }
+
+    this.onQuantityChange(productId, String(current + 1))
+  }
+
+  public decrementQuantity(productId: string): void {
+    const current = this.getLineItemQuantity(productId)
+    if (current <= 1) {
+      return
+    }
+
+    this.onQuantityChange(productId, String(current - 1))
+  }
+
+  public getLineItemQuantity(productId: string): number {
+    const lineItem = this.lineItems.find((item) => item.productId === productId)
+    return Number(lineItem?.quantity || 1)
+  }
+
+  public canIncrementQuantity(productId: string): boolean {
+    const stock = this.getProductStock(productId)
+    return stock <= 0 || this.getLineItemQuantity(productId) < stock
+  }
+
+  public canDecrementQuantity(productId: string): boolean {
+    return this.getLineItemQuantity(productId) > 1
+  }
+
+  public removeLineItem(productId: string): void {
+    const nextLineItems = this.lineItems.filter((line) => line.productId !== productId)
+    const nextProductIds = nextLineItems.map((line) => line.productId)
+
+    this.formGroup.patchValue({
+      productIds: nextProductIds,
+      lineItems: nextLineItems,
+    })
+  }
+
+  public isLineItemOverStock(lineItem: LaboratoryOrderLineItem): boolean {
+    return lineItem.quantity > this.getProductStock(lineItem.productId)
+  }
+
+  public hasOverStockLineItems(): boolean {
+    return this.lineItems.some((lineItem) => this.isLineItemOverStock(lineItem))
   }
 
   public getProductDisplayName(product: Product): string {
@@ -137,6 +256,27 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
     return this.selectedProducts.length > 1
       ? 'LABORATORY_ORDERS.LABELS.PRODUCTS_DATA_SECTION'
       : 'LABORATORY_ORDERS.LABELS.PRODUCT_DATA_SECTION'
+  }
+
+  public getSelectedProductRows(): Array<{
+    code: string
+    name: string
+    brand: string
+    stock: number | null
+    quantity: number
+  }> {
+    return this.lineItems.map((lineItem) => {
+      const product = this.getLineItemProduct(lineItem.productId)
+
+      return {
+        code: product?.code || '-',
+        name: product?.name || lineItem.productId,
+        brand: product?.brand || '-',
+        stock:
+          typeof product?.quantity === 'number' ? product.quantity : null,
+        quantity: lineItem.quantity,
+      }
+    })
   }
 
   public onFrameTypeToggle(value: string): void {

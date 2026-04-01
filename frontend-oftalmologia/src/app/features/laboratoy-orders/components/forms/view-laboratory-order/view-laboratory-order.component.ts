@@ -100,13 +100,107 @@ export class ViewLaboratoryOrderComponent implements OnInit {
   public getOrderProductsText(): string {
     if (!this.order) return '-'
 
+    const formatProduct = (product: {
+      code?: string
+      name?: string
+      quantity?: number
+    }) => {
+      const code = product.code ? `${product.code} - ` : ''
+      const name = product.name || '-'
+      const quantity = Number(product.quantity || 0)
+      const qtyLabel = quantity > 0 ? ` x${quantity}` : ''
+      return `${code}${name}${qtyLabel}`
+    }
+
+    const lineItems = this.order.lineItems || []
+    if (lineItems.length > 0) {
+      return lineItems
+        .map((lineItem) =>
+          formatProduct({
+            code: lineItem.product?.code,
+            name: lineItem.product?.name,
+            quantity: lineItem.quantity,
+          })
+        )
+        .join(', ')
+    }
+
     const products = this.order.products || []
 
     if (products.length > 0) {
-      return products.map((product) => product.name).join(', ')
+      return products
+        .map((product) =>
+          formatProduct({
+            code: product.code,
+            name: product.name,
+          })
+        )
+        .join(', ')
     }
 
-    return this.order.product?.name || this.order.frameModel || '-'
+    if (this.order.product) {
+      return formatProduct({
+        code: this.order.product.code,
+        name: this.order.product.name,
+      })
+    }
+
+    return this.order.frameModel || '-'
+  }
+
+  public getOrderProductRows(): Array<{
+    code: string
+    name: string
+    brand: string
+    stock: number | null
+    quantity: number
+  }> {
+    if (!this.order) return []
+
+    const lineItems = this.order.lineItems || []
+    if (lineItems.length > 0) {
+      return lineItems.map((lineItem) => ({
+        code: lineItem.product?.code || '-',
+        name: lineItem.product?.name || '-',
+        brand: lineItem.product?.brand || '-',
+        stock:
+          typeof lineItem.product?.quantity === 'number'
+            ? lineItem.product.quantity
+            : null,
+        quantity: Number(lineItem.quantity || 1),
+      }))
+    }
+
+    const products = this.order.products || []
+    if (products.length > 0) {
+      return products.map((product) => ({
+        code: product.code || '-',
+        name: product.name || '-',
+        brand: product.brand || '-',
+        stock:
+          typeof (product as any).quantity === 'number'
+            ? (product as any).quantity
+            : null,
+        quantity: 1,
+      }))
+    }
+
+    if (this.order.product) {
+      return [
+        {
+          code: this.order.product.code || '-',
+          name: this.order.product.name || '-',
+          brand: this.order.product.brand || '-',
+          stock:
+            typeof (this.order.product as any).quantity === 'number'
+              ? (this.order.product as any).quantity
+              : null,
+          quantity: 1,
+        },
+      ]
+    }
+
+    return []
   }
 
   public hasMultipleProducts(): boolean {

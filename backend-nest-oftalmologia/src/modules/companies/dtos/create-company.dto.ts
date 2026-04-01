@@ -8,6 +8,7 @@ import {
   IsEmail,
   IsInt,
   Min,
+  Matches,
 } from 'class-validator';
 
 export class CreateCompanyDto {
@@ -21,6 +22,7 @@ export class CreateCompanyDto {
   @IsString()
   @MinLength(2)
   @MaxLength(20)
+  @Matches(/^\d+$/)
   code: string;
 
   @IsOptional()

@@ -454,6 +454,7 @@
         <div class="col-md-6 mb-3">
           <label for="phone" class="form-label">
             {{ 'BRANCHES_MODULE.PHONE' | translate }}
+            <span class="text-danger">*</span>
           </label>
           <input
             type="text"
@@ -473,6 +474,7 @@
         <div class="col-md-6 mb-3">
           <label for="corporateEmail" class="form-label">
             {{ 'BRANCHES_MODULE.CORPORATE_EMAIL' | translate }}
+            <span class="text-danger">*</span>
           </label>
           <input
             type="email"
@@ -487,27 +489,6 @@
           @if (isFieldInvalid(stepForms[3], 'corporateEmail')) {
             <div class="invalid-feedback">
               {{ getFieldError(stepForms[3], 'corporateEmail') | translate }}
-            </div>
-          }
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="openingHours" class="form-label">
-            {{ 'BRANCHES_MODULE.OPENING_HOURS' | translate }}
-          </label>
-          <input
-            type="text"
-            class="form-control"
-            id="openingHours"
-            formControlName="openingHours"
-            [class.is-invalid]="isFieldInvalid(stepForms[3], 'openingHours')"
-            [placeholder]="
-              'BRANCHES_MODULE.OPENING_HOURS_PLACEHOLDER' | translate
-            "
-          />
-          @if (isFieldInvalid(stepForms[3], 'openingHours')) {
-            <div class="invalid-feedback">
-              {{ getFieldError(stepForms[3], 'openingHours') | translate }}
             </div>
           }
         </div>

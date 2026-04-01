@@ -4,6 +4,18 @@ export enum FrameType {
   COMPLETE = 'completo',
 }
 
+export interface LaboratoryOrderLineItem {
+  productId: string
+  quantity: number
+  product?: {
+    id: string
+    code: string
+    name: string
+    brand: string
+    quantity?: number
+  }
+}
+
 export interface LaboratoryOrder {
   id: string
   orderNumber?: number
@@ -38,6 +50,7 @@ export interface LaboratoryOrder {
   engraving?: string
   productId?: string
   productIds?: string[]
+  lineItems?: LaboratoryOrderLineItem[]
   frameType?: FrameType
   frameTypeDescription?: string
   frameBrand?: string
@@ -114,6 +127,8 @@ export interface CreateLaboratoryOrderDto {
   engraving?: string
   productId?: string
   productIds?: string[]
+  lineItems?: LaboratoryOrderLineItem[]
+  ignoreStockValidation?: boolean
   frameType?: FrameType
   frameTypeDescription?: string
   frameBrand?: string

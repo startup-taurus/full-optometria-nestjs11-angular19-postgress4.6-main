@@ -71,6 +71,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status: 'error',
       message: messageObj,
       data: {
+        localizedMessage: messageObj,
         error: errorMessage,
         details: extracted.errorDetails,
         timestamp: new Date().toISOString(),
