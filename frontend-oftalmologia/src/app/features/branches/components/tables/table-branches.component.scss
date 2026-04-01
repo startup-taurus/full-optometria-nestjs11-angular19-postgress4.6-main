@@ -1,26 +1,6 @@
 .branches-container {
-  max-height: calc(100vh - 210px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 8px;
+  overflow: visible;
   padding-bottom: 40px;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.3);
-    }
-  }
 
   .new-branch-card {
     h6 {
@@ -46,9 +26,7 @@
 
 @media (max-width: 991.98px) {
   .branches-container {
-    max-height: none;
-    overflow-y: visible;
-    padding-right: 0;
+    overflow: visible;
     padding-bottom: 24px;
   }
 }

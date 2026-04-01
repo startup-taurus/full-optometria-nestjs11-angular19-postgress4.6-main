@@ -1,25 +1,5 @@
 .laboratory-orders-container {
-  max-height: calc(100vh - 210px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 8px;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.3);
-    }
-  }
+  overflow: visible;
 
   .order-card {
     transition:
@@ -57,9 +37,7 @@
 
 @media (max-width: 991.98px) {
   .laboratory-orders-container {
-    max-height: none;
-    overflow-y: visible;
-    padding-right: 0;
+    overflow: visible;
   }
 }
 
