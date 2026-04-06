@@ -1,0 +1,73 @@
+name: Deploy Develop Environment
+
+on:
+  push:
+    branches:
+      - develop
+
+concurrency:
+  group: deploy-dev-oftalmologia-develop
+  cancel-in-progress: true
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    env:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+
+    steps:
+      - name: Install sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Deploy develop over SSH
+        env:
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          PORT="${SERVER_PORT:-22}"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -p "$PORT" "$SERVER_USER@$SERVER_HOST" <<'EOF'
+            set -e
+
+            PROJECT_PATH="/var/www/dev-oftalmologia"
+            PROJECT_NAME="dev-oftalmologia"
+            REPO_SSH_URL="git@github.com:${{ github.repository }}.git"
+            REPO_HTTPS_URL="https://github.com/${{ github.repository }}.git"
+
+            mkdir -p "$PROJECT_PATH"
+
+            if [ ! -d "$PROJECT_PATH/.git" ]; then
+              git clone --branch develop --single-branch "$REPO_SSH_URL" "$PROJECT_PATH" || \
+              git clone --branch develop --single-branch "$REPO_HTTPS_URL" "$PROJECT_PATH"
+            fi
+
+            cd "$PROJECT_PATH"
+            git config --global --add safe.directory "$PROJECT_PATH"
+
+            git fetch origin develop
+            git checkout develop
+            git reset --hard origin/develop
+            git clean -fd
+
+            if command -v docker-compose >/dev/null 2>&1; then
+              COMPOSE_CMD="docker-compose"
+            else
+              COMPOSE_CMD="docker compose"
+            fi
+
+            echo "=== Deteniendo solo contenedores del entorno dev-oftalmologia ==="
+            $COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" down --remove-orphans || true
+
+            echo "=== Reconstruyendo imagenes del entorno dev-oftalmologia ==="
+            $COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" build --pull
+
+            echo "=== Iniciando entorno dev-oftalmologia ==="
+            $COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" up -d
+
+            echo "=== Estado del entorno dev-oftalmologia ==="
+            $COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" ps
+
+            echo "=== Despliegue de develop completado ==="
+          EOF
