@@ -254,6 +254,70 @@
       </div>
     </div>
 
+    <div class="mb-4">
+      <h6 class="form-section-title mb-3 d-flex align-items-center justify-content-between">
+        <span>
+          <i class="ti ti-users"></i>
+          {{ 'CLIENT.SINGULAR' | translate }}
+        </span>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          (click)="openCreateClientModal()"
+          [disabled]="loading || !selectedPatient?.id"
+        >
+          <i class="ti ti-plus me-1"></i>
+          {{ 'CLIENT.CREATE_NEW' | translate }}
+        </button>
+      </h6>
+
+      <div class="app-form-card">
+        <div class="text-muted small mb-3" *ngIf="!selectedPatient?.id">
+          {{ 'PATIENT.FORM.SAVE_PATIENT_FIRST_FOR_CLIENTS' | translate }}
+        </div>
+
+        <div class="text-center py-2" *ngIf="selectedPatient?.id && clientsLoading">
+          <div class="spinner-border spinner-border-sm text-primary" role="status">
+            <span class="visually-hidden">{{ 'WORDS.LOADING' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="text-muted small" *ngIf="selectedPatient?.id && !clientsLoading && clients.length === 0">
+          {{ 'CLIENT.NO_DATA_FOR_PATIENT' | translate }}
+        </div>
+
+        <div class="table-responsive" *ngIf="selectedPatient?.id && !clientsLoading && clients.length > 0">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>{{ 'CLIENT.SINGULAR' | translate }}</th>
+                <th>{{ 'CLIENT.DOCUMENT_NUMBER' | translate }}</th>
+                <th>{{ 'CLIENT.EMAIL' | translate }}</th>
+                <th class="text-end">{{ 'COMMON.ACTIONS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let client of clients">
+                <td>{{ client.firstName }} {{ client.lastName }}</td>
+                <td>{{ client.documentNumber }}</td>
+                <td>{{ client.email || 'N/A' }}</td>
+                <td class="text-end">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-xs"
+                    ngbTooltip="Editar cliente"
+                    (click)="openEditClientModal(client)"
+                  >
+                    <i class="ti ti-pencil"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div class="mb-4" *ngIf="isEditMode">
       <h6 class="form-section-title mb-3">
         <i class="ti ti-toggle-right"></i>
@@ -303,6 +367,15 @@
     [disabled]="loading"
   >
     {{ 'WORDS.CANCEL' | translate }}
+  </button>
+  <button
+    *ngIf="!isEditMode"
+    type="button"
+    class="btn btn-outline-primary"
+    (click)="createAndAddClient()"
+    [disabled]="loading || patientForm.invalid"
+  >
+    {{ 'PATIENT.FORM.CREATE_AND_ADD_CLIENT' | translate }}
   </button>
   <button
     type="submit"

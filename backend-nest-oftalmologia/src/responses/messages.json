@@ -228,5 +228,60 @@
   "AUTH.ADMIN_BRANCH_FILTER_CLEARED": {
     "es": "Filtro de sucursal eliminado exitosamente",
     "en": "Branch filter cleared successfully"
+  },
+
+  "CLIENT.CREATED": {
+    "es": "Cliente creado correctamente",
+    "en": "Client created successfully"
+  },
+  "CLIENT.UPDATED": {
+    "es": "Cliente actualizado correctamente",
+    "en": "Client updated successfully"
+  },
+  "CLIENT.DELETED": {
+    "es": "Cliente eliminado correctamente",
+    "en": "Client deleted successfully"
+  },
+  "CLIENT.FOUND": {
+    "es": "Clientes obtenidos correctamente",
+    "en": "Clients fetched successfully"
+  },
+  "CLIENT.FETCHED": {
+    "es": "Cliente obtenido correctamente",
+    "en": "Client fetched successfully"
+  },
+  "CLIENT.SEARCH_RESULTS": {
+    "es": "Resultados de búsqueda obtenidos",
+    "en": "Search results retrieved"
+  },
+
+  "PURCHASE_ORDER.CREATED": {
+    "es": "Orden de pedido creada correctamente",
+    "en": "Purchase order created successfully"
+  },
+  "PURCHASE_ORDER.UPDATED": {
+    "es": "Orden de pedido actualizada correctamente",
+    "en": "Purchase order updated successfully"
+  },
+  "PURCHASE_ORDER.DELETED": {
+    "es": "Orden de pedido eliminada correctamente",
+    "en": "Purchase order deleted successfully"
+  },
+  "PURCHASE_ORDER.FOUND": {
+    "es": "Órdenes de pedido obtenidas correctamente",
+    "en": "Purchase orders fetched successfully"
+  },
+  "PURCHASE_ORDER.FETCHED": {
+    "es": "Orden de pedido obtenida correctamente",
+    "en": "Purchase order fetched successfully"
+  },
+
+  "ERROR.INVALID_RELATION": {
+    "es": "No se encontró la entidad relacionada",
+    "en": "Related entity not found"
+  },
+  "ERROR.INTERNAL_SERVER": {
+    "es": "Error inesperado del servidor",
+    "en": "Unexpected server error"
   }
 }

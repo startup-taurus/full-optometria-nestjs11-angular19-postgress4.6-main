@@ -99,6 +99,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
   private initializeForms(): void {
     this.stepForms[1] = this._fb.group({
+      clientId: [null],
       attendanceDate: [this.getTodayDateString()],
       deliveryDate: [null, Validators.required],
     })
@@ -212,6 +213,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
   private patchFormWithOrderData(order: any): void {
     this.stepForms[1].patchValue({
+      clientId: order.clientId || null,
       attendanceDate: order.attendanceDate,
       deliveryDate: order.deliveryDate,
     })
@@ -339,6 +341,26 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
       ...this.stepForms[2].value,
       ...this.stepForms[3].value,
       ...this.stepForms[4].value,
+    }
+
+    // clientId es opcional, pero si viene del select como objeto debe enviarse solo su UUID.
+    if (data.clientId && typeof data.clientId === 'object') {
+      data.clientId = data.clientId.id || null
+    }
+
+    // Si no es UUID válido, no se envía para evitar error de validación en backend.
+    if (
+      data.clientId &&
+      (typeof data.clientId !== 'string' ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          data.clientId
+        ))
+    ) {
+      data.clientId = null
+    }
+
+    if (!data.clientId) {
+      delete data.clientId
     }
 
     if (this.clinicalHistoryId) {

@@ -86,8 +86,17 @@ export class PatientsController {
   remove(
     @Param('id') id: string,
     @BranchContext() branchId: string,
-    @CompanyId() companyId: string | null
+    @CompanyId() companyId: string | null,
+    @Query('deleteAssociatedClients') deleteAssociatedClients?: string
   ) {
-    return this.patientsService.remove(id, branchId, companyId);
+    const shouldDeleteAssociatedClients =
+      (deleteAssociatedClients || '').toLowerCase() === 'true';
+
+    return this.patientsService.remove(
+      id,
+      branchId,
+      companyId,
+      shouldDeleteAssociatedClients
+    );
   }
 }

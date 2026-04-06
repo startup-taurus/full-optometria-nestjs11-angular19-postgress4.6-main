@@ -38,6 +38,10 @@ export class CreateLaboratoryOrderDto {
   clinicalHistoryId?: string;
 
   @IsOptional()
+  @IsUUID()
+  clientId?: string;
+
+  @IsOptional()
   @IsDateString()
   attendanceDate?: string;
 

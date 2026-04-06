@@ -13,6 +13,7 @@ import { Patient } from '../../patients/entities/patient.entity';
 import { Product } from '../../products/entities/product.entity';
 import { ClinicalHistory } from '../../clinical-histories/entities/clinical-history.entity';
 import { Company } from '../../companies/entities/company.entity';
+import { Client } from '../../patients/entities/client.entity';
 
 export enum FrameType {
   THREE_PIECES_AIR = '3_piezas_al_aire',
@@ -31,6 +32,7 @@ export enum LaboratoryOrderStatus {
 @Index(['companyId'])
 @Index(['branchId'])
 @Index(['patientId'])
+@Index(['clientId'])
 @Index(['isConfirmed'])
 @Index(['status'])
 @Index(['attendanceDate'])
@@ -53,6 +55,9 @@ export class LaboratoryOrder {
 
   @Column({ name: 'clinical_history_id', nullable: true })
   clinicalHistoryId: string;
+
+  @Column({ name: 'client_id', nullable: true })
+  clientId: string;
 
   // Step 1: Datos del Cliente
   @Column({ name: 'attendance_date', type: 'date', nullable: true })
@@ -209,6 +214,10 @@ export class LaboratoryOrder {
   @ManyToOne(() => Patient)
   @JoinColumn({ name: 'patient_id' })
   patient: Patient;
+
+  @ManyToOne(() => Client, { nullable: true })
+  @JoinColumn({ name: 'client_id' })
+  client: Client;
 
   @ManyToOne(() => Product, { nullable: true })
   @JoinColumn({ name: 'product_id' })

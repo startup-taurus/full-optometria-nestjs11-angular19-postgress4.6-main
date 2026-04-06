@@ -1,0 +1,19 @@
+.detail-block {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  height: 100%;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.detail-value {
+  margin-bottom: 0;
+  font-weight: 500;
+}

@@ -1,0 +1,139 @@
+<page-title [title]="'PURCHASE_ORDERS.TITLE' | translate" />
+
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card common-datatable-card border-0 shadow-sm">
+        <div class="card-header border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-primary">
+              <i class="ti ti-shopping-cart me-2"></i>
+              {{ 'PURCHASE_ORDERS.LIST' | translate }}
+            </h5>
+
+            <div class="d-flex gap-2">
+              <button
+                *ngIf="sideFilterPanel?.hasActiveFilters()"
+                class="btn btn-outline-danger btn-sm filter-clear-btn"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RESET' | translate"
+                (click)="sideFilterPanel.resetFilters()"
+              >
+                <i class="ti ti-filter-off"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
+                (click)="reloadDatatable(filter)"
+              >
+                <i class="ti ti-refresh"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <shared-ngx-datatable
+            [config]="config$ | async"
+            [data]="data$ | async"
+            (onChangeLimit)="onChangeLimit($event)"
+            (onChangePage)="onChangePage($event)"
+            class="common-ngx-datatable"
+          >
+          </shared-ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  [config]="{
+    title: 'PURCHASE_ORDERS.FILTERS.TITLE',
+    showBadge: true,
+    position: 'right',
+    width: '360px',
+    backdrop: true,
+    closeOnEsc: true,
+  }"
+  (filterApplied)="onSideFilterApplied($event)"
+  (filterCleared)="onSideFilterCleared()"
+  (resetRequested)="onSideFilterCleared()"
+>
+</side-filter-panel>
+
+<ng-template #orderNumberTemplate let-row="row">
+  <span class="fw-semibold">#{{ row.orderNumber || '-' }}</span>
+</ng-template>
+
+<ng-template #clientTemplate let-row="row">
+  <div class="d-flex flex-column">
+    <span class="fw-medium">
+      {{ row.client?.firstName || '-' }} {{ row.client?.lastName || '' }}
+    </span>
+    <small class="text-body-secondary">{{ row.client?.documentNumber || '-' }}</small>
+  </div>
+</ng-template>
+
+<ng-template #labOrderTemplate let-row="row">
+  <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">
+    #{{ row.laboratoryOrder?.id ? (row.laboratoryOrder?.id | slice: 0 : 8) : '-' }}
+  </span>
+</ng-template>
+
+<ng-template #statusTemplate let-row="row">
+  <span class="badge" [ngClass]="getStatusBadgeClass(row.status)">
+    {{ ('PURCHASE_ORDERS.STATUS_' + (row.status || '').toUpperCase()) | translate }}
+  </span>
+</ng-template>
+
+<ng-template #invoiceTemplate let-row="row">
+  <span
+    class="badge"
+    [class.bg-success]="row.shouldInvoice"
+    [class.bg-secondary]="!row.shouldInvoice"
+  >
+    {{ (row.shouldInvoice ? 'COMMON.YES' : 'COMMON.NO') | translate }}
+  </span>
+</ng-template>
+
+<ng-template #createdAtTemplate let-row="row">
+  <span class="text-body-secondary">{{ row.createdAt | date: 'short' }}</span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row="row">
+  <div class="d-flex gap-1 flex-wrap">
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      type="button"
+      [ngbTooltip]="'COMMON.VIEW' | translate"
+      (click)="openViewModal(row)"
+    >
+      <i class="ti ti-eye"></i>
+    </button>
+
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      type="button"
+      [ngbTooltip]="'COMMON.EDIT' | translate"
+      (click)="openEditModal(row)"
+    >
+      <i class="ti ti-edit"></i>
+    </button>
+
+    <button
+      class="btn btn-outline-danger btn-xs"
+      type="button"
+      [ngbTooltip]="'COMMON.DELETE' | translate"
+      (click)="deleteOrder(row)"
+    >
+      <i class="ti ti-trash"></i>
+    </button>
+  </div>
+</ng-template>

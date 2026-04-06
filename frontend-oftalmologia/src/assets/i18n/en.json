@@ -94,10 +94,12 @@
     "CALENDAR": "Calendar",
     "LABORATORY_SECTION": "Laboratory",
     "LABORATORY_ORDERS": "Laboratory Orders",
+    "PURCHASE_ORDERS": "Purchase Orders",
     "MEDICAL_HISTORY_CONFIGURATION": "Medical Configuration",
     "CLINICAL_MANAGEMENT": "Clinical Management",
     "COMPANIES": "Companies",
     "PATIENTS": "Patients",
+    "CLIENTS": "Clients",
     "NOTIFICATIONS": "WhatsApp Notifications"
   },
   "TOPBAR": {
@@ -479,6 +481,7 @@
   },
   "PATIENT": {
     "TITLE": "Patients",
+    "SINGULAR": "Patient",
     "BUTTONS": {
       "ADD_PATIENT": "Add patient",
       "EDIT_PATIENT": "Edit patient",
@@ -536,7 +539,9 @@
       "MOBILE_PHONE": "Mobile phone",
       "MOBILE_PHONE_PLACEHOLDER": "Enter mobile phone...",
       "IS_ACTIVE": "Active patient",
-      "IS_ACTIVE_HELP": "Determines if the patient is active in the system"
+      "IS_ACTIVE_HELP": "Determines if the patient is active in the system",
+      "SAVE_PATIENT_FIRST_FOR_CLIENTS": "Save the patient first to add related clients",
+      "CREATE_AND_ADD_CLIENT": "Create and add client"
     },
     "MODAL": {
       "CREATE_TITLE": "Create Patient",
@@ -594,6 +599,33 @@
     }
   },
   "PATIENTS": "Patients",
+  "CLIENTS": "Clients",
+  "CLIENT": {
+    "SINGULAR": "Client",
+    "FIRST_NAME": "First name",
+    "LAST_NAME": "Last name",
+    "EMAIL": "Email",
+    "DOCUMENT_NUMBER": "Document number",
+    "MOBILE_PHONE": "Mobile phone",
+    "HOME_PHONE": "Home phone",
+    "ADDRESS": "Address",
+    "SELECT_OR_CREATE": "Select or create client",
+    "SELECT_PLACEHOLDER": "Select a client",
+    "CREATE_NEW": "Create new client",
+    "CREATED": "Client created successfully",
+    "UPDATED": "Client updated successfully",
+    "IS_PATIENT": "Is the patient",
+    "UNIDENTIFIED": "Unidentified",
+    "NO_DATA_FOR_PATIENT": "This patient has no linked clients yet",
+    "SELECT_PATIENT_OPTIONAL": "Select a patient (optional)",
+    "PATIENT_LINK": "Patient link",
+    "HAS_PATIENT_LINK": "With linked patient",
+    "WITHOUT_PATIENT_LINK": "Without linked patient",
+    "DELETE_CONFIRMATION": "Are you sure you want to delete this client?",
+    "FILTER": {
+      "SEARCH_PLACEHOLDER": "Search by name, document or email"
+    }
+  },
   "COMMON": {
     "OPTIONAL": "Optional",
     "LEAVE_EMPTY_TO_KEEP_CURRENT": "Leave empty to keep current",
@@ -634,7 +666,16 @@
     },
     "NO": "No",
     "YES": "Yes",
-    "PRESS_ESC_TO_CLOSE": "Press Esc to close"
+    "PRESS_ESC_TO_CLOSE": "Press Esc to close",
+    "PAGE": "Page",
+    "OF": "of",
+    "TOTAL": "Total",
+    "FILTERS": "Filters",
+    "RESET": "Reset",
+    "TOGGLE": "Toggle",
+    "VIEW": "View",
+    "NO_DATA": "No data available",
+    "SEARCH": "Search"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
@@ -900,7 +941,8 @@
     "VALIDATION_ERROR": "Validation error",
     "UNKNOWN_ERROR": "Unknown error",
     "SERVER_ERROR": "Server error",
-    "NETWORK_ERROR": "Network connection error"
+    "NETWORK_ERROR": "Network connection error",
+    "PATIENT_NOT_SELECTED": "You must select a patient before creating a client"
   },
   "SYSTEM": {
     "ACCESS_DENIED": "Access Denied",
@@ -1659,6 +1701,47 @@
       "PRINT_SUCCESS": "Preparing to print...",
       "WHATSAPP_SUCCESS": "Opening WhatsApp...",
       "EMAIL_SUCCESS": "Preparing email..."
+    }
+  },
+  "PURCHASE_ORDERS": {
+    "MODULE": "Purchase Orders",
+    "DESCRIPTION": "Manage purchase orders and invoicing",
+    "TITLE": "Purchase Orders",
+    "LIST": "List of Purchase Orders",
+    "CREATE_TITLE": "Create Purchase Order",
+    "EDIT_TITLE": "Edit Purchase Order",
+    "VIEW_TITLE": "View Purchase Order",
+    "NUMBER": "Order Number",
+    "TOTAL_AMOUNT": "Total Amount",
+    "STATUS": "Status",
+    "STATUS_PENDING": "Pending",
+    "STATUS_INVOICED": "Invoiced",
+    "STATUS_CANCELLED": "Cancelled",
+    "SHOULD_INVOICE": "Should Invoice",
+    "INVOICE": "Invoicing",
+    "SEARCH": "Search order",
+    "DETAIL": "Order Detail",
+    "FIELDS": {
+      "ORDER_NUMBER": "Order Number",
+      "CLIENT": "Client",
+      "LAB_ORDER": "Laboratory Order",
+      "SHOULD_INVOICE": "Should Be Invoiced",
+      "STATUS": "Status",
+      "TOTAL_AMOUNT": "Total Amount",
+      "CREATED_AT": "Creation Date",
+      "UPDATED_AT": "Update Date"
+    },
+    "MESSAGES": {
+      "LOADING": "Loading purchase orders...",
+      "NO_DATA": "No purchase orders available",
+      "CREATED_SUCCESS": "Purchase order created successfully",
+      "UPDATED_SUCCESS": "Purchase order updated successfully",
+      "DELETED_SUCCESS": "Purchase order deleted successfully",
+      "ERROR_CREATING": "Error creating purchase order",
+      "ERROR_UPDATING": "Error updating purchase order",
+      "ERROR_DELETING": "Error deleting purchase order",
+      "DELETE_CONFIRM": "Are you sure you want to delete this order?",
+      "DELETE_TEXT": "This action cannot be undone"
     }
   },
   "BRANCH_SELECTOR": {

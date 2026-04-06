@@ -1,0 +1,81 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ 'PURCHASE_ORDERS.VIEW_TITLE' | translate }}</h5>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="text-center py-4" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && purchaseOrder" class="row g-3">
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.NUMBER' | translate }}</label>
+        <p class="detail-value">#{{ purchaseOrder.orderNumber || '-' }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.STATUS' | translate }}</label>
+        <p class="detail-value">
+          <span class="badge" [ngClass]="getStatusBadgeClass(purchaseOrder.status)">
+            {{ ('PURCHASE_ORDERS.STATUS_' + (purchaseOrder.status || '').toUpperCase()) | translate }}
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'CLIENT.SINGULAR' | translate }}</label>
+        <p class="detail-value">
+          {{ purchaseOrder.client?.firstName || '-' }} {{ purchaseOrder.client?.lastName || '' }}
+        </p>
+        <small class="text-body-secondary">{{ purchaseOrder.client?.documentNumber || '-' }}</small>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.TOTAL_AMOUNT' | translate }}</label>
+        <p class="detail-value">{{ (purchaseOrder.totalAmount || 0) | currency }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.SHOULD_INVOICE' | translate }}</label>
+        <p class="detail-value">
+          <span
+            class="badge"
+            [class.bg-success]="purchaseOrder.shouldInvoice"
+            [class.bg-secondary]="!purchaseOrder.shouldInvoice"
+          >
+            {{ (purchaseOrder.shouldInvoice ? 'COMMON.YES' : 'COMMON.NO') | translate }}
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'COMMON.CREATED_AT' | translate }}</label>
+        <p class="detail-value">{{ purchaseOrder.createdAt | date: 'short' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !purchaseOrder" class="alert alert-warning mb-0">
+    {{ 'COMMON.NO_DATA' | translate }}
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">
+    {{ 'COMMON.CLOSE' | translate }}
+  </button>
+</div>

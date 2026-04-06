@@ -1,0 +1,37 @@
+<div class="purchase-orders-filter filter-form filter-form-unified">
+  <form [formGroup]="purchaseOrdersFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'PURCHASE_ORDERS.STATUS' | translate }}</label>
+        <select class="form-select" formControlName="status">
+          <option value="">{{ 'WORDS.ALL' | translate }}</option>
+          <option [value]="purchaseOrderStatus.PENDING">{{ 'PURCHASE_ORDERS.STATUS_PENDING' | translate }}</option>
+          <option [value]="purchaseOrderStatus.INVOICED">{{ 'PURCHASE_ORDERS.STATUS_INVOICED' | translate }}</option>
+          <option [value]="purchaseOrderStatus.CANCELLED">{{ 'PURCHASE_ORDERS.STATUS_CANCELLED' | translate }}</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'PURCHASE_ORDERS.INVOICE' | translate }}</label>
+        <select class="form-select" formControlName="shouldInvoice">
+          <option value="">{{ 'WORDS.ALL' | translate }}</option>
+          <option value="true">{{ 'COMMON.YES' | translate }}</option>
+          <option value="false">{{ 'COMMON.NO' | translate }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onReset()">
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

@@ -4,12 +4,11 @@ import { TranslateModule } from '@ngx-translate/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { ClinicalHistory } from '@core/interfaces/api/clinical-history.interface'
 import { ClinicalHistoriesService } from '@core/services/api/clinical-histories.service'
-import { FormatValuePipe } from '../../../../../../shared/pipes/format-value.pipe'
 
 @Component({
   selector: 'app-view-medical-history',
   standalone: true,
-  imports: [CommonModule, TranslateModule, FormatValuePipe],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './view-medical-history.component.html',
   styleUrls: ['./view-medical-history.component.scss'],
 })

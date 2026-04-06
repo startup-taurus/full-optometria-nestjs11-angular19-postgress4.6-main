@@ -31,6 +31,7 @@ export interface LaboratoryOrder {
   clinicalHistoryId?: string
   attendanceDate: string
   deliveryDate: string
+  clientId?: string
   odSphere?: string
   odCylinder?: string
   odAxis?: string
@@ -81,6 +82,16 @@ export interface LaboratoryOrder {
     mobilePhone: string
     homePhone: string
   }
+  client?: {
+    id: string
+    firstName: string
+    lastName: string
+    documentNumber: string
+    email: string
+    mobilePhone: string
+    homePhone: string
+    address?: string
+  }
   product?: {
     id: string
     code: string
@@ -107,6 +118,7 @@ export interface LaboratoryOrder {
 export interface CreateLaboratoryOrderDto {
   patientId: string
   clinicalHistoryId?: string
+  clientId?: string
   attendanceDate: string
   deliveryDate: string
   odSphere?: string

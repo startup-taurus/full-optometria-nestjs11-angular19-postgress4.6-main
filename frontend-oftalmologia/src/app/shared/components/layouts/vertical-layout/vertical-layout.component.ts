@@ -81,7 +81,6 @@ export class VerticalLayoutComponent implements OnInit {
       this.renderer.setStyle(document.body, 'paddingRight', null)
     })
   }
-  @HostListener('window:resize', ['$event'])
   ngOnInit(): void {
     this.store.select('layout').subscribe((data: LayoutState) => {
       document.documentElement.setAttribute('data-bs-theme', data.LAYOUT_THEME)
@@ -98,6 +97,7 @@ export class VerticalLayoutComponent implements OnInit {
     }
   }
 
+  @HostListener('window:resize')
   onResize() {
     if (
       document.documentElement.clientWidth <= 1140 &&

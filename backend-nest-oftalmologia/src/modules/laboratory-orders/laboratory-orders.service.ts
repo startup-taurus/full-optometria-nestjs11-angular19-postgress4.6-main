@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
@@ -15,6 +17,7 @@ import { UpdateLaboratoryOrderDto } from './dtos/update-laboratory-order.dto';
 import { QueryLaboratoryOrderDto } from './dtos/query-laboratory-order.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
+import { PurchaseOrdersService } from '../purchase-orders/purchase-orders.service';
 
 @Injectable()
 export class LaboratoryOrdersService {
@@ -25,7 +28,9 @@ export class LaboratoryOrdersService {
     @InjectRepository(ClinicalHistory)
     private clinicalHistoryRepository: Repository<ClinicalHistory>,
     @InjectRepository(Product)
-    private productRepository: Repository<Product>
+    private productRepository: Repository<Product>,
+    @Inject(forwardRef(() => PurchaseOrdersService))
+    private purchaseOrdersService: PurchaseOrdersService,
   ) {}
 
   async create(
@@ -180,11 +185,33 @@ export class LaboratoryOrdersService {
         const orderWithRelations = await this.laboratoryOrderRepository.findOne(
           {
             where: { id: savedOrder.id },
-            relations: ['patient', 'product', 'branch'],
+            relations: ['patient', 'product', 'branch', 'client'],
           }
         );
 
+        let purchaseOrderWarning: { es: string; en: string } | null = null;
+
+        if (normalizedCreateDtoWithAttendance.clientId) {
+          try {
+            await this.purchaseOrdersService.createFromLaboratoryOrder(
+              savedOrder.id,
+              normalizedCreateDtoWithAttendance.clientId,
+              companyId || null,
+              branchId,
+            );
+          } catch (error) {
+            purchaseOrderWarning = {
+              es: 'La orden de laboratorio fue creada, pero no se pudo crear la orden de pedido automáticamente',
+              en: 'Laboratory order was created, but purchase order could not be generated automatically',
+            };
+            console.error('Error creating purchase order:', error);
+          }
+        }
+
         const response = await this.formatResponse(orderWithRelations);
+        if (purchaseOrderWarning) {
+          (response as any).warning = purchaseOrderWarning;
+        }
         return response;
       } catch (error) {
         try {
@@ -235,6 +262,7 @@ export class LaboratoryOrdersService {
       .createQueryBuilder('lo')
       .leftJoinAndSelect('lo.patient', 'patient')
       .leftJoinAndSelect('lo.product', 'product')
+      .leftJoinAndSelect('lo.client', 'client')
       .leftJoinAndSelect('lo.branch', 'branch')
       .where('lo.branchId = :branchId', { branchId });
 
@@ -320,7 +348,7 @@ export class LaboratoryOrdersService {
 
     const laboratoryOrder = await this.laboratoryOrderRepository.findOne({
       where: whereCondition,
-      relations: ['patient', 'product', 'branch'],
+      relations: ['patient', 'product', 'branch', 'client'],
     });
 
     if (!laboratoryOrder) {
@@ -525,6 +553,7 @@ export class LaboratoryOrdersService {
       orderNumber: laboratoryOrder.orderNumber,
       branchId: laboratoryOrder.branchId,
       patientId: laboratoryOrder.patientId,
+      clientId: laboratoryOrder.clientId,
       clinicalHistoryId: laboratoryOrder.clinicalHistoryId,
       attendanceDate: laboratoryOrder.attendanceDate,
       deliveryDate: laboratoryOrder.deliveryDate,
@@ -578,6 +607,18 @@ export class LaboratoryOrdersService {
             email: laboratoryOrder.patient.email,
             mobilePhone: laboratoryOrder.patient.mobilePhone,
             homePhone: laboratoryOrder.patient.homePhone,
+          }
+        : null,
+      client: laboratoryOrder.client
+        ? {
+            id: laboratoryOrder.client.id,
+            firstName: laboratoryOrder.client.firstName,
+            lastName: laboratoryOrder.client.lastName,
+            documentNumber: laboratoryOrder.client.documentNumber,
+            email: laboratoryOrder.client.email,
+            mobilePhone: laboratoryOrder.client.mobilePhone,
+            homePhone: laboratoryOrder.client.homePhone,
+            address: laboratoryOrder.client.address,
           }
         : null,
       product: primaryProduct,

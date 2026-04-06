@@ -92,10 +92,12 @@
     "CALENDAR": "Calendario",
     "LABORATORY_SECTION": "Laboratorio",
     "LABORATORY_ORDERS": "Órdenes de Laboratorio",
+    "PURCHASE_ORDERS": "Órdenes de Pedido",
     "MEDICAL_HISTORY_CONFIGURATION": "Configuración Clínica",
     "CLINICAL_MANAGEMENT": "Gestión Clínica",
     "COMPANIES": "Compañias",
     "PATIENTS": "Pacientes",
+    "CLIENTS": "Clientes",
     "NOTIFICATIONS": "Notificaciones WhatsApp",
     "FEEDBACK_USER": "Feedback",
     "FEEDBACK_ADMIN": "Feedback General"
@@ -486,6 +488,7 @@
   },
   "PATIENT": {
     "TITLE": "Pacientes",
+    "SINGULAR": "Paciente",
     "BUTTONS": {
       "ADD_PATIENT": "Agregar paciente",
       "EDIT_PATIENT": "Editar paciente",
@@ -543,7 +546,9 @@
       "MOBILE_PHONE": "Teléfono móvil",
       "MOBILE_PHONE_PLACEHOLDER": "Ingrese teléfono móvil...",
       "IS_ACTIVE": "Paciente activo",
-      "IS_ACTIVE_HELP": "Determina si el paciente está activo en el sistema"
+      "IS_ACTIVE_HELP": "Determina si el paciente está activo en el sistema",
+      "SAVE_PATIENT_FIRST_FOR_CLIENTS": "Primero guarde el paciente para poder agregar clientes relacionados",
+      "CREATE_AND_ADD_CLIENT": "Crear y agregar cliente"
     },
     "MODAL": {
       "CREATE_TITLE": "Crear Paciente",
@@ -601,6 +606,33 @@
     }
   },
   "PATIENTS": "Pacientes",
+  "CLIENTS": "Clientes",
+  "CLIENT": {
+    "SINGULAR": "Cliente",
+    "FIRST_NAME": "Nombres",
+    "LAST_NAME": "Apellidos",
+    "EMAIL": "Correo electrónico",
+    "DOCUMENT_NUMBER": "Cédula",
+    "MOBILE_PHONE": "Teléfono móvil",
+    "HOME_PHONE": "Teléfono fijo",
+    "ADDRESS": "Dirección",
+    "SELECT_OR_CREATE": "Seleccionar o crear cliente",
+    "SELECT_PLACEHOLDER": "Seleccione un cliente",
+    "CREATE_NEW": "Crear nuevo cliente",
+    "CREATED": "Cliente creado correctamente",
+    "UPDATED": "Cliente actualizado correctamente",
+    "IS_PATIENT": "Es el paciente",
+    "UNIDENTIFIED": "Sin identificación",
+    "NO_DATA_FOR_PATIENT": "Este paciente aún no tiene clientes vinculados",
+    "SELECT_PATIENT_OPTIONAL": "Selecciona un paciente (opcional)",
+    "PATIENT_LINK": "Vinculación con paciente",
+    "HAS_PATIENT_LINK": "Con paciente vinculado",
+    "WITHOUT_PATIENT_LINK": "Sin paciente vinculado",
+    "DELETE_CONFIRMATION": "¿Está seguro de eliminar este cliente?",
+    "FILTER": {
+      "SEARCH_PLACEHOLDER": "Buscar por nombre, documento o correo"
+    }
+  },
   "COMMON": {
     "OPTIONAL": "Opcional",
     "LEAVE_EMPTY_TO_KEEP_CURRENT": "Dejar vacío para mantener la actual",
@@ -649,7 +681,16 @@
     "PRESS_ESC_TO_CLOSE": "Presiona Esc para cerrar",
     "YES_DELETE": "Sí, Eliminar",
     "DELETED": "¡Eliminado!",
-    "DELETE_CONFIG": "Eliminar Configuración"
+    "DELETE_CONFIG": "Eliminar Configuración",
+    "PAGE": "Página",
+    "OF": "de",
+    "TOTAL": "Total",
+    "FILTERS": "Filtrar",
+    "RESET": "Restablecer",
+    "TOGGLE": "Cambiar",
+    "VIEW": "Ver",
+    "NO_DATA": "Sin datos disponibles",
+    "SEARCH": "Buscar"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
@@ -916,7 +957,8 @@
     "VALIDATION_ERROR": "Error de validación",
     "UNKNOWN_ERROR": "Error desconocido",
     "SERVER_ERROR": "Error del servidor",
-    "NETWORK_ERROR": "Error de conexión"
+    "NETWORK_ERROR": "Error de conexión",
+    "PATIENT_NOT_SELECTED": "Debe seleccionar un paciente para crear un cliente"
   },
   "SYSTEM": {
     "ACCESS_DENIED": "Acceso Denegado",
@@ -1648,6 +1690,60 @@
       "EMAIL_SUCCESS": "Preparando correo...",
       "NO_PHONE": "No hay número de teléfono disponible para este paciente",
       "NO_EMAIL": "No hay email disponible para este paciente"
+    }
+  },
+  "PURCHASE_ORDERS": {
+    "MODULE": "Órdenes de Pedido",
+    "DESCRIPTION": "Administra las órdenes de pedido y facturación",
+    "TITLE": "Órdenes de Pedido",
+    "LIST": "Lista de Órdenes de Pedido",
+    "CREATE_TITLE": "Crear Orden de Pedido",
+    "EDIT_TITLE": "Editar Orden de Pedido",
+    "VIEW_TITLE": "Ver Orden de Pedido",
+    "NUMBER": "Número de Orden",
+    "TOTAL_AMOUNT": "Monto Total",
+    "STATUS": "Estado",
+    "STATUS_PENDING": "Pendiente",
+    "STATUS_INVOICED": "Facturado",
+    "STATUS_CANCELLED": "Cancelado",
+    "SHOULD_INVOICE": "Deber Facturar",
+    "INVOICE": "Facturación",
+    "SEARCH": "Buscar orden",
+    "FILTERS": {
+      "TITLE": "Filtros de órdenes"
+    },
+    "TABLE": {
+      "ORDER": "Orden",
+      "CLIENT": "Cliente",
+      "LAB_ORDER": "Orden laboratorio",
+      "STATUS": "Estado",
+      "INVOICE": "Facturación",
+      "TOTAL": "Total",
+      "CREATED_AT": "Fecha de creación",
+      "ACTIONS": "Acciones"
+    },
+    "DETAIL": "Detalle de Orden",
+    "FIELDS": {
+      "ORDER_NUMBER": "Número de Orden",
+      "CLIENT": "Cliente",
+      "LAB_ORDER": "Orden de Laboratorio",
+      "SHOULD_INVOICE": "Debe Facturarse",
+      "STATUS": "Estado",
+      "TOTAL_AMOUNT": "Monto Total",
+      "CREATED_AT": "Fecha de Creación",
+      "UPDATED_AT": "Fecha de Actualización"
+    },
+    "MESSAGES": {
+      "LOADING": "Cargando órdenes de pedido...",
+      "NO_DATA": "No hay órdenes de pedido disponibles",
+      "CREATED_SUCCESS": "Orden de pedido creada exitosamente",
+      "UPDATED_SUCCESS": "Orden de pedido actualizada exitosamente",
+      "DELETED_SUCCESS": "Orden de pedido eliminada exitosamente",
+      "ERROR_CREATING": "Error al crear la orden de pedido",
+      "ERROR_UPDATING": "Error al actualizar la orden de pedido",
+      "ERROR_DELETING": "Error al eliminar la orden de pedido",
+      "DELETE_CONFIRM": "¿Está seguro de eliminar esta orden?",
+      "DELETE_TEXT": "Esta acción no se puede deshacer"
     }
   },
   "BRANCH_SELECTOR": {

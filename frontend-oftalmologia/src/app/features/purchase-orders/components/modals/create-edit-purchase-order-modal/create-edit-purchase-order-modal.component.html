@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ 'PURCHASE_ORDERS.EDIT_TITLE' | translate }}</h5>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form">
+    <div class="mb-3">
+      <label class="form-label">
+        {{ 'PURCHASE_ORDERS.STATUS' | translate }}
+        <span class="text-danger">*</span>
+      </label>
+      <select class="form-select" formControlName="status" [class.is-invalid]="isFieldInvalid('status')">
+        <option [value]="purchaseOrderStatus.PENDING">{{ 'PURCHASE_ORDERS.STATUS_PENDING' | translate }}</option>
+        <option [value]="purchaseOrderStatus.INVOICED">{{ 'PURCHASE_ORDERS.STATUS_INVOICED' | translate }}</option>
+        <option [value]="purchaseOrderStatus.CANCELLED">{{ 'PURCHASE_ORDERS.STATUS_CANCELLED' | translate }}</option>
+      </select>
+      <div class="invalid-feedback" *ngIf="isFieldInvalid('status')">
+        {{ getFieldError('status') | translate }}
+      </div>
+    </div>
+
+    <div class="mb-0">
+      <label class="form-label">{{ 'PURCHASE_ORDERS.SHOULD_INVOICE' | translate }}</label>
+      <select class="form-select" formControlName="shouldInvoice">
+        <option [ngValue]="true">{{ 'COMMON.YES' | translate }}</option>
+        <option [ngValue]="false">{{ 'COMMON.NO' | translate }}</option>
+      </select>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" [disabled]="isLoading" (click)="activeModal.dismiss()">
+    {{ 'COMMON.CANCEL' | translate }}
+  </button>
+  <button type="button" class="btn btn-primary" [disabled]="isLoading || form.invalid" (click)="onSubmit()">
+    <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+    {{ 'COMMON.UPDATE' | translate }}
+  </button>
+</div>

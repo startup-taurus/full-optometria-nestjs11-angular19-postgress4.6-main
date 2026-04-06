@@ -161,6 +161,14 @@
       <i class="ti ti-edit"></i>
     </button>
     <button
+      class="btn btn-outline-primary btn-xs"
+      placement="left"
+      ngbTooltip="Añadir cliente"
+      (click)="openCreateClientModal(row)"
+    >
+      <i class="ti ti-user-plus"></i>
+    </button>
+    <button
       class="btn btn-outline-danger btn-xs"
       placement="left"
       [ngbTooltip]="'PATIENT.BUTTONS.DELETE_PATIENT' | translate"

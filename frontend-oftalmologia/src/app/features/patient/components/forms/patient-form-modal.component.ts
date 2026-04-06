@@ -18,14 +18,18 @@ import {
 import { HttpClient } from '@angular/common/http'
 import { environment } from '@environment/environment'
 import { BUTTON_ACTIONS } from '@core/helpers/ui/constants'
+import { Client } from '@core/interfaces/api/client.interface'
 import { Patient } from '@core/interfaces/api/patient.interface'
 import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { ModalWithAction } from '@core/interfaces/ui/bootstrap-modal.interface'
+import { ClientsService } from '@core/services/api/clients.service'
 import { PatientService } from '@core/services/api/patient.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { ToastrNotificationService } from '@core/services/ui/notification.service'
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
 import { Subject, takeUntil, firstValueFrom } from 'rxjs'
+import { ClientModalComponent } from '../../../laboratoy-orders/components/modals/client-modal/client-modal.component'
 
 @Component({
   selector: 'app-patient-form-modal',
@@ -50,10 +54,18 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   public photoPreviewUrl: string | null = null
   public uploadedPhotoFileId: string | null = null
   public photoMarkedForDeletion = false
+  public clients: Client[] = []
+  public clientsLoading = false
+  private fileBaseUrl: string = environment.fileBaseUrl
 
   private unsubscribe$ = new Subject<void>()
+  private openClientAfterCreate = false
+  private hasClientChanges = false
 
   private _formBuilder = inject(FormBuilder)
+  private _clientsService = inject(ClientsService)
+  private _modalService = inject(NgbModal)
+  private _notificationService = inject(ToastrNotificationService)
   private _patientService = inject(PatientService)
   private _activeModal = inject(NgbActiveModal)
   private _bsModalService = inject(
@@ -84,11 +96,16 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     this.isEditMode = this.buttonAction === BUTTON_ACTIONS.EDIT
 
     this.initializeForm()
+    this.resetPhotoState()
 
     if (this.isEditMode && data.selectedRow) {
       this.populateForm()
+      this.loadClients()
+      this.hasClientChanges = false
       this.loading = false
     } else {
+      this.clients = []
+      this.hasClientChanges = false
       this.loading = false
     }
 
@@ -144,8 +161,11 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
 
       // Cargar foto de perfil si existe
       if (this.selectedPatient.profilePhoto) {
-        this.photoPreviewUrl = `${environment.apiBaseUrl}${this.selectedPatient.profilePhoto}`
+        this.photoPreviewUrl = this.formatUrl(this.selectedPatient.profilePhoto)
         this.uploadedPhotoFileId = this.selectedPatient.profilePhoto
+      } else {
+        this.photoPreviewUrl = null
+        this.uploadedPhotoFileId = null
       }
 
       const formData = {
@@ -161,6 +181,17 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
       }
 
       this.patientForm.patchValue(formData)
+    }
+  }
+
+  private resetPhotoState(): void {
+    this.selectedPhotoFile = null
+    this.photoPreviewUrl = null
+    this.uploadedPhotoFileId = null
+    this.photoMarkedForDeletion = false
+
+    if (this.photoInput?.nativeElement) {
+      this.photoInput.nativeElement.value = ''
     }
   }
 
@@ -243,15 +274,36 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: async (response) => {
-          if (this.selectedPhotoFile && response.data?.id) {
-            await this.uploadPhoto(response.data.id)
+          const createdPatient = response.data
+
+          if (this.selectedPhotoFile && createdPatient?.id) {
+            await this.uploadPhoto(createdPatient.id)
           }
+
           this.loading = false
-          this.patientCreated.emit(response.data)
+
+          if (createdPatient) {
+            this.patientCreated.emit(createdPatient)
+          }
+
+          if (this.openClientAfterCreate && createdPatient?.id) {
+            this.openClientAfterCreate = false
+            this.selectedPatient = createdPatient
+            this.isEditMode = true
+            this.buttonAction = BUTTON_ACTIONS.EDIT
+            this.setModalTitle()
+            this.initializeForm()
+            this.populateForm()
+            this.loadClients()
+            this.openCreateClientModal()
+            return
+          }
+
           this._activeModal.close('created')
         },
         error: (error) => {
           console.error('PatientFormModal - Create patient ERROR:', error)
+          this.openClientAfterCreate = false
           this.loading = false
         },
       })
@@ -314,7 +366,118 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   }
 
   public onCancel(): void {
+    if (this.hasClientChanges) {
+      this._activeModal.close('updated')
+      return
+    }
+
     this._activeModal.dismiss('cancel')
+  }
+
+  public createAndAddClient(): void {
+    if (this.patientForm.invalid) {
+      this.markFormGroupTouched()
+      return
+    }
+
+    this.openClientAfterCreate = true
+    this.onSubmit()
+  }
+
+  public openCreateClientModal(): void {
+    if (!this.selectedPatient?.id) {
+      this._notificationService.showNotification({
+        type: 'error',
+        message: 'ERROR.PATIENT_NOT_SELECTED',
+      })
+      return
+    }
+
+    const modalRef = this._modalService.open(ClientModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true,
+    })
+
+    modalRef.componentInstance.mode = 'create'
+    modalRef.componentInstance.patientId = this.selectedPatient.id
+
+    modalRef.result.then(
+      (createdClient?: Client) => {
+        if (createdClient?.id) {
+          this.hasClientChanges = true
+          this.clients = [
+            createdClient,
+            ...this.clients.filter((client) => client.id !== createdClient.id),
+          ]
+          this.loadClients(createdClient)
+          return
+        }
+        this.loadClients()
+      },
+      () => {}
+    )
+  }
+
+  public openEditClientModal(client: Client): void {
+    if (!this.selectedPatient?.id || !client?.id) {
+      return
+    }
+
+    const modalRef = this._modalService.open(ClientModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true,
+    })
+
+    modalRef.componentInstance.mode = 'edit'
+    modalRef.componentInstance.patientId = this.selectedPatient.id
+    modalRef.componentInstance.client = client
+
+    modalRef.result.then(
+      (updatedClient?: Client) => {
+        if (updatedClient?.id) {
+          this.hasClientChanges = true
+          this.clients = this.mergeClients(updatedClient, this.clients)
+          this.loadClients(updatedClient)
+          return
+        }
+        this.loadClients()
+      },
+      () => {}
+    )
+  }
+
+  private loadClients(recentlyCreatedClient?: Client): void {
+    if (!this.selectedPatient?.id) {
+      this.clients = []
+      return
+    }
+
+    this.clientsLoading = true
+    this._clientsService
+      .getAll(this.selectedPatient.id, { page: 1, limit: 50 })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (result) => {
+          const fetchedClients = result.data || []
+          this.clients = recentlyCreatedClient?.id
+            ? this.mergeClients(recentlyCreatedClient, fetchedClients)
+            : fetchedClients
+          this.clientsLoading = false
+        },
+        error: () => {
+          this.clients = []
+          this.clientsLoading = false
+        },
+      })
+  }
+
+  private mergeClients(createdClient: Client, fetchedClients: Client[]): Client[] {
+    return [
+      createdClient,
+      ...fetchedClients.filter((client) => client.id !== createdClient.id),
+    ]
   }
 
   public triggerPhotoInput(): void {
@@ -380,5 +543,23 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
       console.error('Error al subir la imagen:', error)
       return null
     }
+  }
+
+  private formatUrl(url?: string): string {
+    if (!url) {
+      return 'assets/images/default-avatar.png'
+    }
+
+    const cleanUrl = url.replace('/uploads/uploads/', '/uploads/')
+
+    if (cleanUrl.startsWith('/')) {
+      return (
+        this.fileBaseUrl + cleanUrl.replace(/ /g, '%20').replace(/\\/g, '/')
+      )
+    }
+
+    return (
+      this.fileBaseUrl + '/' + cleanUrl.replace(/ /g, '%20').replace(/\\/g, '/')
+    )
   }
 }

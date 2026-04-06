@@ -82,6 +82,58 @@
     </div>
   </div>
 
+  <div class="card mb-3">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="ti ti-user-check me-2"></i>
+        {{ 'CLIENT.SINGULAR' | translate }}
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row g-3" [formGroup]="formGroup">
+        <div class="col-12">
+          <label class="form-label">
+            {{ 'CLIENT.SELECT_OR_CREATE' | translate }}
+          </label>
+          <div class="input-group">
+            <ng-select
+              [items]="clients"
+              bindLabel="displayLabel"
+              bindValue="id"
+              placeholder="{{ 'CLIENT.SELECT_PLACEHOLDER' | translate }}"
+              [loading]="clientsLoading"
+              [searchFn]="searchClient"
+              [compareWith]="compareClients"
+              (change)="onClientSelected($event)"
+              formControlName="clientId"
+              class="flex-grow-1 filter-select-v2"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <div class="d-flex justify-content-between w-100">
+                  <span>
+                    {{ item.firstName }} {{ item.lastName }}
+                    <span *ngIf="item.isPatientSelf" class="text-primary"
+                      >({{ 'CLIENT.IS_PATIENT' | translate }})</span
+                    >
+                  </span>
+                  <small class="text-muted">{{ item.documentNumber }}</small>
+                </div>
+              </ng-template>
+            </ng-select>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="openClientModal()"
+              title="{{ 'CLIENT.CREATE_NEW' | translate }}"
+            >
+              <i class="ti ti-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header bg-light">
       <h6 class="mb-0">

@@ -22,6 +22,7 @@ import { ToastrModule } from 'ngx-toastr'
 
 import { HttpClient } from '@angular/common/http'
 import { AUTH_TOKEN_INTERCEPTOR_PROVIDERS } from '@core/interceptors/auth-token.interceptor'
+import { API_BASE_URL_INTERCEPTOR_PROVIDERS } from '@core/interceptors/api-base-url.interceptor'
 import { BRANCH_HEADER_INTERCEPTOR_PROVIDERS } from '@core/interceptors/branch-header.interceptor'
 import { ROOT_EFFECTS, ROOT_REDUCERS } from '@core/states'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
@@ -79,6 +80,7 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
     AUTH_TOKEN_INTERCEPTOR_PROVIDERS,
+    API_BASE_URL_INTERCEPTOR_PROVIDERS,
     RESPONSE_INTERCEPTOR_PROVIDERS,
     BRANCH_HEADER_INTERCEPTOR_PROVIDERS,
     ERROR_INTERCEPTOR_PROVIDERS,

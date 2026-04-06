@@ -5,7 +5,6 @@ import { LaboratoryOrdersStatusChartComponent } from '../components/laboratory-o
 import { ProductsInventoryChartComponent } from '../components/products-inventory-chart/products-inventory-chart.component'
 import { ShiftStatusDistributionChartComponent } from '../components/shift-status-distribution-chart/shift-status-distribution-chart.component'
 import { PatientsAgeDistributionChartComponent } from '../components/patients-age-distribution-chart/patients-age-distribution-chart.component'
-import { FlatpickrDirective } from '@/app/shared/directives/flatpickr.directive'
 import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
@@ -18,7 +17,6 @@ import { TranslateModule } from '@ngx-translate/core'
     ProductsInventoryChartComponent,
     ShiftStatusDistributionChartComponent,
     PatientsAgeDistributionChartComponent,
-    FlatpickrDirective,
     TranslateModule,
   ],
   templateUrl: './dashboard.component.html',

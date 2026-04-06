@@ -5,8 +5,14 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryFailedError } from 'typeorm';
+import {
+  Repository,
+  QueryFailedError,
+  SelectQueryBuilder,
+  DeleteQueryBuilder,
+} from 'typeorm';
 import { Patient } from './entities/patient.entity';
+import { Client } from './entities/client.entity';
 import { CreatePatientDto } from './dtos/create-patient.dto';
 import { UpdatePatientDto } from './dtos/update-patient.dto';
 import { QueryPatientDto } from './dtos/query-patient.dto';
@@ -19,8 +25,97 @@ export class PatientsService {
   constructor(
     @InjectRepository(Patient)
     private patientRepository: Repository<Patient>,
+    @InjectRepository(Client)
+    private clientRepository: Repository<Client>,
     private filesService: FilesService
   ) {}
+
+  private applyClientCompanyScope(
+    queryBuilder: SelectQueryBuilder<Client> | DeleteQueryBuilder<Client>,
+    companyId: string | null
+  ): void {
+    if (companyId) {
+      queryBuilder.andWhere('client.companyId = :companyId', { companyId });
+      return;
+    }
+
+    queryBuilder.andWhere('client.companyId IS NULL');
+  }
+
+  private async countAssociatedClients(
+    patientId: string,
+    branchId: string,
+    companyId: string | null
+  ): Promise<number> {
+    const queryBuilder = this.clientRepository
+      .createQueryBuilder('client')
+      .innerJoin('client_patients', 'cp', 'cp.client_id = client.id')
+      .where('cp.patient_id = :patientId', { patientId })
+      .andWhere('client.branchId = :branchId', { branchId });
+
+    if (companyId) {
+      queryBuilder.andWhere('client.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.andWhere('client.companyId IS NULL');
+    }
+
+    const result = await queryBuilder
+      .select('COUNT(DISTINCT client.id)', 'count')
+      .getRawOne();
+    return Number(result?.count || 0);
+  }
+
+  private async deleteAssociatedClients(
+    patientId: string,
+    branchId: string,
+    companyId: string | null
+  ): Promise<number> {
+    const associatedClientsQuery = this.clientRepository
+      .createQueryBuilder('client')
+      .innerJoin('client_patients', 'cp', 'cp.client_id = client.id')
+      .where('cp.patient_id = :patientId', { patientId })
+      .andWhere('client.branchId = :branchId', { branchId });
+
+    if (companyId) {
+      associatedClientsQuery.andWhere('client.companyId = :companyId', { companyId });
+    } else {
+      associatedClientsQuery.andWhere('client.companyId IS NULL');
+    }
+
+    const associatedClients = await associatedClientsQuery
+      .select('client.id', 'id')
+      .getRawMany<{ id: string }>();
+
+    let deletedClientsCount = 0;
+
+    for (const associatedClient of associatedClients) {
+      const links = await this.clientRepository.query(
+        'SELECT patient_id FROM client_patients WHERE client_id = $1',
+        [associatedClient.id]
+      );
+
+      const remainingPatientIds = links
+        .map((row: { patient_id: string }) => row.patient_id)
+        .filter((id: string) => id !== patientId);
+
+      if (!remainingPatientIds.length) {
+        await this.clientRepository.delete({ id: associatedClient.id });
+        deletedClientsCount += 1;
+        continue;
+      }
+
+      await this.clientRepository.query(
+        'DELETE FROM client_patients WHERE client_id = $1 AND patient_id = $2',
+        [associatedClient.id, patientId]
+      );
+
+      await this.clientRepository.update(associatedClient.id, {
+        patientId: remainingPatientIds[0],
+      });
+    }
+
+    return deletedClientsCount;
+  }
 
   async create(
     createPatientDto: CreatePatientDto,
@@ -360,7 +455,12 @@ export class PatientsService {
     };
   }
 
-  async remove(id: string, branchId: string, companyId: string | null) {
+  async remove(
+    id: string,
+    branchId: string,
+    companyId: string | null,
+    deleteAssociatedClients: boolean = false
+  ) {
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
       { id, branchId },
       companyId
@@ -471,6 +571,42 @@ export class PatientsService {
       });
     }
 
+    const associatedClientsCount = await this.countAssociatedClients(
+      id,
+      branchId,
+      companyId
+    );
+
+    if (associatedClientsCount > 0 && !deleteAssociatedClients) {
+      throw new ConflictException({
+        messageKey: 'ERROR.VALIDATION',
+        message: {
+          es: `No se puede eliminar el paciente ${patient.firstName} ${patient.lastName} porque tiene ${associatedClientsCount} cliente${
+            associatedClientsCount > 1 ? 's' : ''
+          } asociado${
+            associatedClientsCount > 1 ? 's' : ''
+          }. Confirme si desea eliminar también los clientes asociados.`,
+          en: `Cannot delete patient ${patient.firstName} ${patient.lastName} because it has ${associatedClientsCount} associated client${
+            associatedClientsCount > 1 ? 's' : ''
+          }. Confirm if you also want to delete associated clients.`,
+        },
+        data: {
+          associatedClientsCount,
+          requiresClientDeletionConfirmation: true,
+        },
+      });
+    }
+
+    let deletedClientsCount = 0;
+
+    if (associatedClientsCount > 0 && deleteAssociatedClients) {
+      deletedClientsCount = await this.deleteAssociatedClients(
+        id,
+        branchId,
+        companyId
+      );
+    }
+
     await this.patientRepository.remove(patient);
 
     return {
@@ -479,7 +615,10 @@ export class PatientsService {
         es: 'Paciente eliminado correctamente',
         en: 'Patient deleted successfully',
       },
-      data: { id },
+      data: {
+        id,
+        deletedClientsCount,
+      },
     };
   }
 

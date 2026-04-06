@@ -18,6 +18,11 @@ export const VIEWS_ROUTES: Route[] = [
       import('./patient/patient.route').then((mod) => mod.PATIENT_ROUTES),
   },
   {
+    path: 'clients',
+    loadChildren: () =>
+      import('./clients/clients.route').then((mod) => mod.CLIENTS_ROUTES),
+  },
+  {
     path: 'system-management',
     loadChildren: () =>
       import('./system-management/system-management.route').then(
@@ -70,6 +75,13 @@ export const VIEWS_ROUTES: Route[] = [
     loadChildren: () =>
       import('./laboratoy-orders/laboratory-orders.route').then(
         (mod) => mod.LABORATORY_ORDERS_ROUTES
+      ),
+  },
+  {
+    path: 'purchase-orders',
+    loadChildren: () =>
+      import('./purchase-orders/purchase-orders.route').then(
+        (mod) => mod.PURCHASE_ORDERS_ROUTES
       ),
   },
   {

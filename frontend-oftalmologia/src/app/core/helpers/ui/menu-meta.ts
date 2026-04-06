@@ -67,6 +67,13 @@ export const MENU_ITEMS: MenuItemType[] = [
     requiredPermissions: [PERMISSION_IDS.PATIENTS],
   },
   {
+    key: 'CLIENTS',
+    label: 'CLIENTS',
+    icon: 'ti-users',
+    url: '/clients',
+    requiredPermissions: [PERMISSION_IDS.CLIENTS],
+  },
+  {
     key: 'FEEDBACK_USER',
     label: 'FEEDBACK_USER',
     icon: 'ti-message-report',
@@ -191,7 +198,11 @@ export const MENU_ITEMS: MenuItemType[] = [
     key: 'LABORATORY_SECTION',
     label: 'LABORATORY_SECTION',
     isTitle: true,
-    requiredPermissions: [PERMISSION_IDS.LABORATORY_ORDERS],
+    requiredPermissions: [
+      PERMISSION_IDS.LABORATORY_ORDERS,
+      PERMISSION_IDS.PURCHASE_ORDERS,
+    ],
+    permissionOperator: 'OR',
   },
   {
     key: 'LABORATORY_ORDERS',
@@ -199,6 +210,13 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ti-test-pipe',
     url: '/laboratory-orders',
     requiredPermissions: [PERMISSION_IDS.LABORATORY_ORDERS],
+  },
+  {
+    key: 'PURCHASE_ORDERS',
+    label: 'PURCHASE_ORDERS',
+    icon: 'ti-file-invoice',
+    url: '/purchase-orders',
+    requiredPermissions: [PERMISSION_IDS.PURCHASE_ORDERS],
   },
 ]
 

@@ -58,6 +58,8 @@ import { PatientFormModalComponent } from '../forms/patient-form-modal.component
 import { PatientDetailsModalComponent } from '../modals/patient-details-modal.component'
 import { ClinicalHistoryUpsertModalComponent } from '../../../medical-history/components/modals/clinical-history-upsert-modal.component'
 import { ViewMedicalHistoryComponent } from '../../../medical-history/components/forms/view-medical-history/view-medical-history/view-medical-history.component'
+import { Client } from '@core/interfaces/api/client.interface'
+import { ClientModalComponent } from '../../../laboratoy-orders/components/modals/client-modal/client-modal.component'
 
 @Component({
   selector: 'app-patients-table',
@@ -311,6 +313,14 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       }
 
       const modalRef = this._bsModalService.openModal(modalConfig)
+
+      if (modalRef) {
+        modalRef.closed.subscribe((result: string) => {
+          if (result === 'updated') {
+            this.reloadDatatable(this.filter)
+          }
+        })
+      }
     }
 
     if (buttonAction === BUTTON_ACTIONS.EDIT && patient) {
@@ -359,28 +369,129 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       cancelButtonText: 'Cancelar',
     }).then((result: any) => {
       if (result.isConfirmed) {
-        this._patientService
-          .deletePatient(patient.id)
-          .pipe(takeUntil(this.unsubscribe$))
-          .subscribe({
-            next: () => {
-              Swal.fire({
-                ...SWAL_SUCCESS_CONFIG,
-                title: '¡Eliminado!',
-                text: 'El paciente ha sido eliminado correctamente.',
-              })
-              this.reloadDatatable(this.filter)
-            },
-            error: (error) => {
-              Swal.fire({
-                ...SWAL_ERROR_CONFIG,
-                title: 'Error',
-                text: 'No se pudo eliminar el paciente. Intente nuevamente.',
-              })
-            },
-          })
+        this.executeDeletePatient(patient, false)
       }
     })
+  }
+
+  public openCreateClientModal(patient: Patient): void {
+    if (!patient?.id) {
+      return
+    }
+
+    const modalRef = this._modal.open(ClientModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true,
+    })
+
+    modalRef.componentInstance.mode = 'create'
+    modalRef.componentInstance.patientId = patient.id
+
+    modalRef.result
+      .then((createdClient?: Client) => {
+        if (createdClient?.id) {
+          this.reloadDatatable(this.filter)
+        }
+      })
+      .catch(() => {})
+  }
+
+  private executeDeletePatient(
+    patient: Patient,
+    deleteAssociatedClients: boolean
+  ): void {
+    this._patientService
+      .deletePatient(patient.id, deleteAssociatedClients)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          const deletedClientsCount = Number(
+            (response as any)?.data?.deletedClientsCount || 0
+          )
+
+          Swal.fire({
+            ...SWAL_SUCCESS_CONFIG,
+            title: '¡Eliminado!',
+            text:
+              deletedClientsCount > 0
+                ? `El paciente y ${deletedClientsCount} cliente${
+                    deletedClientsCount > 1 ? 's' : ''
+                  } asociado${
+                    deletedClientsCount > 1 ? 's' : ''
+                  } fueron eliminados correctamente.`
+                : 'El paciente ha sido eliminado correctamente.',
+          })
+          this.reloadDatatable(this.filter)
+        },
+        error: (error) => {
+          const requiresClientConfirmation =
+            this.requiresClientDeletionConfirmation(error)
+
+          if (!deleteAssociatedClients && requiresClientConfirmation) {
+            const associatedClientsCount =
+              this.getAssociatedClientsCount(error) || 0
+
+            Swal.fire({
+              ...SWAL_DELETE_CONFIRM_CONFIG,
+              title: 'Paciente con clientes asociados',
+              text: `Este paciente tiene ${associatedClientsCount} cliente${
+                associatedClientsCount > 1 ? 's' : ''
+              } asociado${
+                associatedClientsCount > 1 ? 's' : ''
+              }. ¿Desea eliminar también los clientes asociados?`,
+              confirmButtonText: 'Sí, eliminar todo',
+              cancelButtonText: 'Cancelar',
+            }).then((result: any) => {
+              if (result.isConfirmed) {
+                this.executeDeletePatient(patient, true)
+              }
+            })
+
+            return
+          }
+
+          Swal.fire({
+            ...SWAL_ERROR_CONFIG,
+            title: 'Error',
+            text:
+              this.getLocalizedErrorMessage(error) ||
+              'No se pudo eliminar el paciente. Intente nuevamente.',
+          })
+        },
+      })
+  }
+
+  private requiresClientDeletionConfirmation(error: any): boolean {
+    const payload = error?.error
+    return !!payload?.data?.requiresClientDeletionConfirmation
+  }
+
+  private getAssociatedClientsCount(error: any): number | null {
+    const count = error?.error?.data?.associatedClientsCount
+    if (count === null || count === undefined) {
+      return null
+    }
+
+    return Number(count)
+  }
+
+  private getLocalizedErrorMessage(error: any): string | null {
+    const message = error?.error?.message
+
+    if (!message) {
+      return null
+    }
+
+    if (typeof message === 'string') {
+      return message
+    }
+
+    if (typeof message === 'object') {
+      return message.es || message.en || null
+    }
+
+    return null
   }
 
   public manageMedicalHistory(patient: Patient): void {
