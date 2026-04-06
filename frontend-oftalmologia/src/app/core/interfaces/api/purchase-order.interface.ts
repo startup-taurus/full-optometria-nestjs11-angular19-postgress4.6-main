@@ -21,6 +21,21 @@ export interface PurchaseOrder {
   updatedAt: string;
   client?: Client;
   laboratoryOrder?: LaboratoryOrder;
+  items?: PurchaseOrderItem[];
+}
+
+export interface PurchaseOrderItem {
+  id: string;
+  purchaseOrderId: string;
+  productId: string;
+  productCode: string;
+  productName: string;
+  productBrand?: string | null;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreatePurchaseOrderDto {

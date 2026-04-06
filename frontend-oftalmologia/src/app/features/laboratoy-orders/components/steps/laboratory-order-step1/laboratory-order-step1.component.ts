@@ -8,7 +8,7 @@ import {
   inject,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { ReactiveFormsModule, FormGroup } from '@angular/forms'
+import { ReactiveFormsModule, FormGroup, FormsModule } from '@angular/forms'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
@@ -28,7 +28,7 @@ interface ClientOption extends Client {
 @Component({
   selector: 'app-laboratory-order-step1',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule, NgSelectModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule, NgSelectModule],
   templateUrl: './laboratory-order-step1.component.html',
   styleUrls: ['./laboratory-order-step1.component.scss'],
 })
@@ -47,6 +47,7 @@ export class LaboratoryOrderStep1Component
   public clients: ClientOption[] = []
   public clientsLoading = false
   public selectedClient: ClientOption | null = null
+  public showPatientClientsOnly = false
   private readonly selfClientOptionId = '__patient_as_client__'
   private clientControlSyncInitialized = false
   private readonly loadingClientIds = new Set<string>()
@@ -87,34 +88,68 @@ export class LaboratoryOrderStep1Component
     if (!this.preloadedData?.patientId) return
 
     this.clientsLoading = true
-    this._clientsService
-      .getAll(this.preloadedData.patientId, { page: 1, limit: 100 })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (result) => {
-          const selectedId = this.extractClientId(this.formGroup.get('clientId')?.value)
-          const fetchedClients = (result.data || []) as Client[]
+    
+    if (this.showPatientClientsOnly) {
+      // Load only clients associated with this patient
+      this._clientsService
+        .getAll(this.preloadedData.patientId, { page: 1, limit: 100 })
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (result) => {
+            const selectedId = this.extractClientId(this.formGroup.get('clientId')?.value)
+            const fetchedClients = (result.data || []) as Client[]
 
-          if (
-            selectedId &&
-            selectedId !== this.selfClientOptionId &&
-            !fetchedClients.some((client) => client.id === selectedId)
-          ) {
-            this.ensureSelectedClientInFetchedList(selectedId, fetchedClients)
-            return
-          }
+            if (
+              selectedId &&
+              selectedId !== this.selfClientOptionId &&
+              !fetchedClients.some((client) => client.id === selectedId)
+            ) {
+              this.ensureSelectedClientInFetchedList(selectedId, fetchedClients)
+              return
+            }
 
-          this.clients = this.buildClientOptions(fetchedClients)
-          this.clientsLoading = false
-          this.syncSelectedClientWithControlValue()
-        },
-        error: (error) => {
-          this.clients = this.buildClientOptions([])
-          this.clientsLoading = false
-          this.syncSelectedClientWithControlValue()
-          console.error('Error loading clients:', error)
-        },
-      })
+            this.clients = this.buildClientOptions(fetchedClients)
+            this.clientsLoading = false
+            this.syncSelectedClientWithControlValue()
+          },
+          error: (error) => {
+            this.clients = this.buildClientOptions([])
+            this.clientsLoading = false
+            this.syncSelectedClientWithControlValue()
+            console.error('Error loading clients:', error)
+          },
+        })
+    } else {
+      // Load all clients in the system
+      this._clientsService
+        .getAllGlobal({ page: 1, limit: 100 })
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (result) => {
+            const selectedId = this.extractClientId(this.formGroup.get('clientId')?.value)
+            const fetchedClients = (result.data || []) as Client[]
+
+            if (
+              selectedId &&
+              selectedId !== this.selfClientOptionId &&
+              !fetchedClients.some((client) => client.id === selectedId)
+            ) {
+              this.ensureSelectedClientInFetchedList(selectedId, fetchedClients)
+              return
+            }
+
+            this.clients = this.buildClientOptions(fetchedClients)
+            this.clientsLoading = false
+            this.syncSelectedClientWithControlValue()
+          },
+          error: (error) => {
+            this.clients = this.buildClientOptions([])
+            this.clientsLoading = false
+            this.syncSelectedClientWithControlValue()
+            console.error('Error loading clients:', error)
+          },
+        })
+    }
   }
 
   private ensureSelectedClientInFetchedList(
@@ -356,6 +391,10 @@ export class LaboratoryOrderStep1Component
       },
       () => {},
     )
+  }
+
+  public onTogglePatientClientsFilter(): void {
+    this.loadClientList()
   }
 
   get userDisplayName(): string {

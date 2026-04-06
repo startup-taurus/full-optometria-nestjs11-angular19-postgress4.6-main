@@ -46,8 +46,11 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     this.purchaseOrdersFilterForm = this.fb.group({
+      search: [''],
       status: [''],
       shouldInvoice: [''],
+      dateFrom: [''],
+      dateTo: [''],
     })
   }
 
@@ -62,6 +65,7 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
 
         if (filter && Object.keys(filter).length > 0) {
           const formValue = {
+            search: filter['search'] || '',
             status: filter['status'] || '',
             shouldInvoice:
               filter['shouldInvoice'] !== undefined
@@ -69,6 +73,8 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
                   ? 'true'
                   : 'false'
                 : '',
+            dateFrom: filter['dateFrom'] || '',
+            dateTo: filter['dateTo'] || '',
           }
 
           this.purchaseOrdersFilterForm?.patchValue(formValue)
@@ -100,12 +106,24 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
     const formValue = this.purchaseOrdersFilterForm.value
     const cleanedFilter: FilterValue = {}
 
+    if (formValue.search) {
+      cleanedFilter['search'] = formValue.search
+    }
+
     if (formValue.status) {
       cleanedFilter['status'] = formValue.status
     }
 
     if (formValue.shouldInvoice !== '') {
       cleanedFilter['shouldInvoice'] = formValue.shouldInvoice === 'true'
+    }
+
+    if (formValue.dateFrom) {
+      cleanedFilter['dateFrom'] = formValue.dateFrom
+    }
+
+    if (formValue.dateTo) {
+      cleanedFilter['dateTo'] = formValue.dateTo
     }
 
     this.filterCommunicationService.changeFilter(cleanedFilter)

@@ -71,6 +71,7 @@ import { LaboratoryOrder } from './modules/laboratory-orders/entities/laboratory
 import { Patient } from './modules/patients/entities/patient.entity';
 import { Client } from './modules/patients/entities/client.entity';
 import { PurchaseOrder } from './modules/purchase-orders/entities/purchase-order.entity';
+import { PurchaseOrderItem } from './modules/purchase-orders/entities/purchase-order-item.entity';
 import { Feedback } from './modules/feedback/entities/feedback.entity';
 import { WhatsAppSession } from './modules/notifications/entities/whatsapp-session.entity';
 import { ReminderRule } from './modules/notifications/entities/reminder-rule.entity';
@@ -122,6 +123,7 @@ import { PatientContactPreference } from './modules/notifications/entities/patie
           Patient,
           Client,
           PurchaseOrder,
+          PurchaseOrderItem,
           Feedback,
           WhatsAppSession,
           ReminderRule,

@@ -1,6 +1,6 @@
-<div class="modal-header">
+<div class="modal-header d-flex justify-content-between align-items-center">
   <h5 class="modal-title">{{ 'PURCHASE_ORDERS.VIEW_TITLE' | translate }}</h5>
-  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()" aria-label="Close"></button>
 </div>
 
 <div class="modal-body">
@@ -41,13 +41,6 @@
 
     <div class="col-md-6">
       <div class="detail-block">
-        <label class="detail-label">{{ 'PURCHASE_ORDERS.TOTAL_AMOUNT' | translate }}</label>
-        <p class="detail-value">{{ (purchaseOrder.totalAmount || 0) | currency }}</p>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="detail-block">
         <label class="detail-label">{{ 'PURCHASE_ORDERS.SHOULD_INVOICE' | translate }}</label>
         <p class="detail-value">
           <span
@@ -65,6 +58,49 @@
       <div class="detail-block">
         <label class="detail-label">{{ 'COMMON.CREATED_AT' | translate }}</label>
         <p class="detail-value">{{ purchaseOrder.createdAt | date: 'short' }}</p>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.ITEMS_TITLE' | translate }}</label>
+
+        <div class="table-responsive" *ngIf="getPurchaseOrderItems().length > 0; else noItems">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>{{ 'PURCHASE_ORDERS.FIELDS.PRODUCT' | translate }}</th>
+                <th class="text-center">{{ 'PURCHASE_ORDERS.FIELDS.QUANTITY' | translate }}</th>
+                <th class="text-end">{{ 'PURCHASE_ORDERS.FIELDS.UNIT_PRICE' | translate }}</th>
+                <th class="text-end">{{ 'PURCHASE_ORDERS.FIELDS.LINE_TOTAL' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of getPurchaseOrderItems()">
+                <td>
+                  <div class="fw-semibold">{{ item.productName }}</div>
+                  <small class="text-body-secondary">
+                    {{ item.productCode }}
+                    <span *ngIf="item.productBrand"> - {{ item.productBrand }}</span>
+                  </small>
+                </td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-end">{{ formatCurrency(item.unitPrice) }}</td>
+                <td class="text-end">{{ formatCurrency(getItemAmount(item)) }}</td>
+              </tr>
+              <tr class="table-bottom-total">
+                <td colspan="3" class="text-end fw-semibold">
+                  {{ 'PURCHASE_ORDERS.TOTAL_AMOUNT' | translate }}:
+                </td>
+                <td class="text-end fw-semibold">{{ formatCurrency(purchaseOrder.totalAmount) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ng-template #noItems>
+          <div class="text-muted small">{{ 'COMMON.NO_DATA' | translate }}</div>
+        </ng-template>
       </div>
     </div>
   </div>

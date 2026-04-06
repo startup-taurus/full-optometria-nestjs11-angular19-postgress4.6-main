@@ -6,7 +6,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, QueryFailedError, Repository } from 'typeorm';
 import { LaboratoryOrder } from './entities/laboratory-order.entity';
 import { LaboratoryOrderStatus } from './entities/laboratory-order.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
@@ -220,7 +220,12 @@ export class LaboratoryOrdersService {
         }
         await queryRunner.release();
         lastError = error;
-        if (error.code === '23505' && attempt < maxRetries - 1) {
+        const isUniqueConstraintError =
+          error instanceof QueryFailedError &&
+          (error as QueryFailedError & { driverError?: { code?: string } })
+            .driverError?.code === '23505';
+
+        if (isUniqueConstraintError && attempt < maxRetries - 1) {
           await new Promise((resolve) =>
             setTimeout(resolve, 100 * (attempt + 1))
           );

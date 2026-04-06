@@ -51,6 +51,7 @@ import {
 import { FilterPurchaseOrdersComponent } from '../filters/filter-purchase-orders.component'
 import { ViewPurchaseOrderModalComponent } from '../modals/view-purchase-order-modal/view-purchase-order-modal.component'
 import { CreateEditPurchaseOrderModalComponent } from '../modals/create-edit-purchase-order-modal/create-edit-purchase-order-modal.component'
+import { ViewLaboratoryOrderComponent } from '../../../laboratoy-orders/components/forms/view-laboratory-order/view-laboratory-order.component'
 
 @Component({
   selector: 'table-purchase-orders',
@@ -82,6 +83,8 @@ export class TablePurchaseOrdersComponent
   public statusTemplate?: TemplateRef<HTMLElement>
   @ViewChild('invoiceTemplate', { static: false })
   public invoiceTemplate?: TemplateRef<HTMLElement>
+  @ViewChild('priceTemplate', { static: false })
+  public priceTemplate?: TemplateRef<HTMLElement>
   @ViewChild('labOrderTemplate', { static: false })
   public labOrderTemplate?: TemplateRef<HTMLElement>
   @ViewChild('createdAtTemplate', { static: false })
@@ -168,9 +171,10 @@ export class TablePurchaseOrdersComponent
           sortable: false,
         },
         {
-          name: 'PURCHASE_ORDERS.TABLE.TOTAL',
-          prop: 'totalAmount',
+          name: 'PURCHASE_ORDERS.TABLE.PRICE',
+          cellTemplate: this.priceTemplate,
           width: 130,
+          sortable: false,
         },
         {
           name: 'PURCHASE_ORDERS.TABLE.CREATED_AT',
@@ -255,6 +259,22 @@ export class TablePurchaseOrdersComponent
     modalRef.componentInstance.orderId = order.id
   }
 
+  public openLinkedLaboratoryOrder(order: PurchaseOrder): void {
+    const linkedOrderId = order?.laboratoryOrder?.id
+    if (!linkedOrderId) {
+      return
+    }
+
+    const modalRef = this.modalService.open(ViewLaboratoryOrderComponent, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static',
+      keyboard: false,
+    })
+
+    modalRef.componentInstance.orderId = linkedOrderId
+  }
+
   public openEditModal(order: PurchaseOrder): void {
     const modalRef = this.modalService.open(CreateEditPurchaseOrderModalComponent, {
       size: 'md',
@@ -318,6 +338,15 @@ export class TablePurchaseOrdersComponent
       default:
         return 'bg-warning text-dark'
     }
+  }
+
+  public formatPrice(value?: number): string {
+    const amount = Number(value)
+    if (!Number.isFinite(amount)) {
+      return '$0.00'
+    }
+
+    return `$${amount.toFixed(2)}`
   }
 
   public hasActiveFilters(): boolean {

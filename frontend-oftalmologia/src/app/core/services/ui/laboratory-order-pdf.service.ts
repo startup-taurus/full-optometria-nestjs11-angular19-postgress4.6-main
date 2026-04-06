@@ -518,7 +518,6 @@ export class LaboratoryOrderPdfService {
               { text: 'Código', bold: true, fillColor: '#E3F2FD' },
               { text: 'Producto', bold: true, fillColor: '#E3F2FD' },
               { text: 'Marca', bold: true, fillColor: '#E3F2FD' },
-              { text: 'Stock', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
               { text: 'Cant.', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
             ],
             ...productRows,
@@ -527,11 +526,10 @@ export class LaboratoryOrderPdfService {
             [
               {
                 text: 'Sin productos',
-                colSpan: 5,
+                colSpan: 4,
                 alignment: 'center',
                 margin: [0, 4, 0, 4],
               },
-              {},
               {},
               {},
               {},
@@ -547,7 +545,7 @@ export class LaboratoryOrderPdfService {
         },
         {
           table: {
-            widths: ['22%', '30%', '18%', '15%', '15%'],
+            widths: ['25%', '35%', '20%', '20%'],
             headerRows: hasProducts ? 1 : 0,
             dontBreakRows: true,
             body: productTableBody,
@@ -732,14 +730,6 @@ export class LaboratoryOrderPdfService {
         { text: lineItem.product?.name || '-', margin: [0, 2, 0, 2] },
         { text: lineItem.product?.brand || '-', margin: [0, 2, 0, 2] },
         {
-          text:
-            Number.isFinite(Number(lineItem.product?.quantity))
-              ? String(lineItem.product.quantity)
-              : '-',
-          alignment: 'center',
-          margin: [0, 2, 0, 2],
-        },
-        {
           text: String(Number(lineItem.quantity || 1)),
           alignment: 'center',
           margin: [0, 2, 0, 2],
@@ -754,14 +744,6 @@ export class LaboratoryOrderPdfService {
         { text: product.code || '-', margin: [0, 2, 0, 2] },
         { text: product.name || '-', margin: [0, 2, 0, 2] },
         { text: product.brand || '-', margin: [0, 2, 0, 2] },
-        {
-          text:
-            Number.isFinite(Number((product as any).quantity))
-              ? String((product as any).quantity)
-              : '-',
-          alignment: 'center',
-          margin: [0, 2, 0, 2],
-        },
         { text: '1', alignment: 'center', margin: [0, 2, 0, 2] },
       ])
     }

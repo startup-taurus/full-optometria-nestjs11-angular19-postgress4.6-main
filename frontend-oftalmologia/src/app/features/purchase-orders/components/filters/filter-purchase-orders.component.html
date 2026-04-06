@@ -2,6 +2,16 @@
   <form [formGroup]="purchaseOrdersFilterForm!" (ngSubmit)="onSubmit()">
     <div class="row g-3">
       <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'WORDS.SEARCH' | translate }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="search"
+          [placeholder]="'PURCHASE_ORDERS.SEARCH_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
         <label class="form-label fw-semibold">{{ 'PURCHASE_ORDERS.STATUS' | translate }}</label>
         <select class="form-select" formControlName="status">
           <option value="">{{ 'WORDS.ALL' | translate }}</option>
@@ -18,6 +28,24 @@
           <option value="true">{{ 'COMMON.YES' | translate }}</option>
           <option value="false">{{ 'COMMON.NO' | translate }}</option>
         </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'WORDS.DATE_FROM' | translate }}</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="dateFrom"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'WORDS.DATE_TO' | translate }}</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="dateTo"
+        />
       </div>
     </div>
 

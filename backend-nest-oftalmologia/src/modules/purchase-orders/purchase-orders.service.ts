@@ -5,11 +5,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In, EntityManager } from 'typeorm';
 import { PurchaseOrder, PurchaseOrderStatus } from './entities/purchase-order.entity';
+import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { Client } from '../patients/entities/client.entity';
 import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
-import { CreatePurchaseOrderDto } from './dtos/create-purchase-order.dto';
+import { Product } from '../products/entities/product.entity';
 import { UpdatePurchaseOrderDto } from './dtos/update-purchase-order.dto';
 import { QueryPurchaseOrderDto } from './dtos/query-purchase-order.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
@@ -20,11 +21,125 @@ export class PurchaseOrdersService {
     private dataSource: DataSource,
     @InjectRepository(PurchaseOrder)
     private purchaseOrderRepository: Repository<PurchaseOrder>,
+    @InjectRepository(PurchaseOrderItem)
+    private purchaseOrderItemRepository: Repository<PurchaseOrderItem>,
     @InjectRepository(Client)
     private clientRepository: Repository<Client>,
     @InjectRepository(LaboratoryOrder)
     private laboratoryOrderRepository: Repository<LaboratoryOrder>,
   ) {}
+
+  private extractLaboratoryOrderProductIds(laboratoryOrder: LaboratoryOrder): string[] {
+    const orderAny = laboratoryOrder as any;
+
+    const idsFromArray = Array.isArray(orderAny.productIds)
+      ? orderAny.productIds.filter(Boolean)
+      : [];
+
+    if (idsFromArray.length > 0) {
+      return Array.from(new Set(idsFromArray));
+    }
+
+    if (orderAny.productId) {
+      return [orderAny.productId];
+    }
+
+    return [];
+  }
+
+  private getLaboratoryOrderQuantityMap(
+    laboratoryOrder: LaboratoryOrder,
+  ): Map<string, number> {
+    const orderAny = laboratoryOrder as any;
+    const quantityMap = new Map<string, number>();
+
+    const persistedLines = Array.isArray(orderAny.productQuantities)
+      ? orderAny.productQuantities
+      : Array.isArray(orderAny.lineItems)
+        ? orderAny.lineItems
+        : [];
+
+    persistedLines.forEach((line: any) => {
+      if (!line || typeof line.productId !== 'string') {
+        return;
+      }
+
+      const qty = Number(line.quantity);
+      quantityMap.set(line.productId, Number.isFinite(qty) && qty > 0 ? qty : 1);
+    });
+
+    if (!quantityMap.size) {
+      this.extractLaboratoryOrderProductIds(laboratoryOrder).forEach((productId) => {
+        quantityMap.set(productId, 1);
+      });
+    }
+
+    return quantityMap;
+  }
+
+  private async buildPurchaseOrderItemSnapshots(
+    laboratoryOrder: LaboratoryOrder,
+    branchId: string,
+    manager: EntityManager,
+    strict = true,
+  ): Promise<PurchaseOrderItem[]> {
+    const quantityMap = this.getLaboratoryOrderQuantityMap(laboratoryOrder);
+    const productIds = Array.from(quantityMap.keys());
+
+    if (!productIds.length) {
+      return [];
+    }
+
+    const products = await manager.getRepository(Product).find({
+      where: { id: In(productIds), branchId },
+      select: ['id', 'code', 'name', 'brand', 'unitPrice'],
+    });
+
+    const productMap = new Map(
+      products.map((product) => [product.id, product]),
+    );
+
+    if (strict && productMap.size !== productIds.length) {
+      throw new NotFoundException({
+        messageKey: 'ERROR.NOT_FOUND',
+        message: {
+          es: 'Uno o más productos de la orden de laboratorio no fueron encontrados',
+          en: 'One or more laboratory order products were not found',
+        },
+      });
+    }
+
+    const snapshots: PurchaseOrderItem[] = [];
+
+    quantityMap.forEach((quantity, productId) => {
+      const product = productMap.get(productId);
+      const unitPrice = Number(product?.unitPrice || 0);
+      const lineTotal = Number((unitPrice * quantity).toFixed(2));
+
+      snapshots.push(
+        this.purchaseOrderItemRepository.create({
+          productId,
+          productCode: product?.code || productId,
+          productName: product?.name || '-',
+          productBrand: product?.brand || null,
+          quantity,
+          unitPrice,
+          lineTotal,
+        }),
+      );
+    });
+
+    return snapshots;
+  }
+
+  private calculateTotalAmountFromItems(items: PurchaseOrderItem[]): number {
+    const total = items.reduce(
+      (sum, item) => sum + Number(item.lineTotal || 0),
+      0,
+    );
+
+    return Number(total.toFixed(2));
+  }
 
   private async generateOrderNumber(): Promise<number> {
     const lastOrder = await this.purchaseOrderRepository
@@ -86,18 +201,54 @@ export class PurchaseOrdersService {
 
     const orderNumber = await this.generateOrderNumber();
 
-    const purchaseOrder = this.purchaseOrderRepository.create({
-      orderNumber,
-      laboratoryOrderId,
-      clientId,
-      companyId,
-      branchId,
-      shouldInvoice: false,
-      status: PurchaseOrderStatus.PENDING,
-    });
-
     try {
-      const savedPurchaseOrder = await this.purchaseOrderRepository.save(purchaseOrder);
+      const result = await this.dataSource.transaction(async (manager) => {
+        const itemSnapshots = await this.buildPurchaseOrderItemSnapshots(
+          laboratoryOrder,
+          branchId,
+          manager,
+          true,
+        );
+
+        const totalAmount = this.calculateTotalAmountFromItems(itemSnapshots);
+
+        const purchaseOrderRepository = manager.getRepository(PurchaseOrder);
+        const purchaseOrderItemRepository = manager.getRepository(PurchaseOrderItem);
+
+        const purchaseOrder = purchaseOrderRepository.create({
+          orderNumber,
+          laboratoryOrderId,
+          clientId,
+          companyId,
+          branchId,
+          shouldInvoice: false,
+          status: PurchaseOrderStatus.PENDING,
+          totalAmount,
+        });
+
+        const savedPurchaseOrder = await purchaseOrderRepository.save(purchaseOrder);
+
+        const itemsToSave = itemSnapshots.map((item) =>
+          purchaseOrderItemRepository.create({
+            ...item,
+            purchaseOrderId: savedPurchaseOrder.id,
+          }),
+        );
+
+        if (itemsToSave.length > 0) {
+          await purchaseOrderItemRepository.save(itemsToSave);
+        }
+
+        const reloadedPurchaseOrder = await purchaseOrderRepository.findOne({
+          where: { id: savedPurchaseOrder.id },
+          relations: ['client', 'laboratoryOrder', 'items'],
+        });
+
+        return reloadedPurchaseOrder || {
+          ...savedPurchaseOrder,
+          items: itemsToSave,
+        };
+      });
 
       return {
         messageKey: 'PURCHASE_ORDER.CREATED',
@@ -105,7 +256,7 @@ export class PurchaseOrdersService {
           es: 'Orden de pedido creada correctamente',
           en: 'Purchase order created successfully',
         },
-        data: savedPurchaseOrder,
+        data: result,
       };
     } catch (error) {
       throw new InternalServerErrorException({
@@ -131,6 +282,7 @@ export class PurchaseOrdersService {
       .createQueryBuilder('po')
       .leftJoinAndSelect('po.client', 'client')
       .leftJoinAndSelect('po.laboratoryOrder', 'laboratoryOrder')
+      .leftJoinAndSelect('po.items', 'items')
       .where('po.branchId = :branchId', { branchId })
       .andWhere('po.companyId = :companyId', { companyId });
 
@@ -171,7 +323,7 @@ export class PurchaseOrdersService {
   async findOne(id: string, branchId: string, companyId: string | null) {
     const purchaseOrder = await this.purchaseOrderRepository.findOne({
       where: { id, branchId, companyId },
-      relations: ['client', 'laboratoryOrder'],
+      relations: ['client', 'laboratoryOrder', 'items'],
     });
 
     if (!purchaseOrder) {
@@ -202,6 +354,7 @@ export class PurchaseOrdersService {
   ) {
     const purchaseOrder = await this.purchaseOrderRepository.findOne({
       where: { id, branchId, companyId },
+      relations: ['items'],
     });
 
     if (!purchaseOrder) {
@@ -267,7 +420,7 @@ export class PurchaseOrdersService {
   async getPurchaseOrderByLaboratoryOrderId(laboratoryOrderId: string) {
     return this.purchaseOrderRepository.findOne({
       where: { laboratoryOrderId },
-      relations: ['client', 'laboratoryOrder'],
+      relations: ['client', 'laboratoryOrder', 'items'],
     });
   }
 }

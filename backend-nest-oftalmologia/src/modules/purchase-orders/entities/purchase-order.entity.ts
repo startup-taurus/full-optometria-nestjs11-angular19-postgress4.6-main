@@ -8,11 +8,13 @@ import {
   JoinColumn,
   Index,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { Client } from '../../patients/entities/client.entity';
 import { LaboratoryOrder } from '../../laboratory-orders/entities/laboratory-order.entity';
 import { Company } from '../../companies/entities/company.entity';
 import { Branch } from '../../branches/entities/branch.entity';
+import { PurchaseOrderItem } from './purchase-order-item.entity';
 
 export enum PurchaseOrderStatus {
   PENDING = 'pending',
@@ -73,6 +75,9 @@ export class PurchaseOrder {
   @OneToOne(() => LaboratoryOrder)
   @JoinColumn({ name: 'laboratory_order_id' })
   laboratoryOrder: LaboratoryOrder;
+
+  @OneToMany(() => PurchaseOrderItem, (item) => item.purchaseOrder)
+  items: PurchaseOrderItem[];
 
   @ManyToOne(() => Company)
   @JoinColumn({ name: 'company_id' })

@@ -55,4 +55,23 @@ export class ViewPurchaseOrderModalComponent implements OnInit {
         return 'bg-warning text-dark'
     }
   }
+
+  public getPurchaseOrderItems() {
+    return this.purchaseOrder?.items || []
+  }
+
+  public getItemAmount(item: { quantity?: number; unitPrice?: number }): number {
+    const quantity = Number(item.quantity || 0)
+    const unitPrice = Number(item.unitPrice || 0)
+    return Number((quantity * unitPrice).toFixed(2))
+  }
+
+  public formatCurrency(value?: number | string | null): string {
+    const amount = Number(value || 0)
+    if (!Number.isFinite(amount)) {
+      return '$0.00'
+    }
+
+    return `$${amount.toFixed(2)}`
+  }
 }

@@ -84,6 +84,41 @@
         </div>
 
         <div class="col-lg-6 mb-4">
+          <div class="info-card mb-4">
+            <div class="card-header">
+              <h6>
+                <i class="ti ti-receipt-2 me-2"></i>
+                {{ 'LABORATORY_ORDERS.FIELDS.CLIENT_INFO' | translate }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.FIRST_NAME' | translate }}:</strong>
+                <span>{{ order.client?.firstName || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.LAST_NAME' | translate }}:</strong>
+                <span>{{ order.client?.lastName || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.DOCUMENT_NUMBER' | translate }}:</strong>
+                <span>{{ order.client?.documentNumber || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.EMAIL' | translate }}:</strong>
+                <span>{{ order.client?.email || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.MOBILE_PHONE' | translate }}:</strong>
+                <span>{{ order.client?.mobilePhone || '-' }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.HOME_PHONE' | translate }}:</strong>
+                <span>{{ order.client?.homePhone || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
           <div class="info-card">
             <div class="card-header">
               <h6>
@@ -237,7 +272,6 @@
                       <th>Código</th>
                       <th>Producto</th>
                       <th>Marca</th>
-                      <th class="text-center">Stock</th>
                       <th class="text-center">Cant.</th>
                     </tr>
                   </thead>
@@ -246,11 +280,10 @@
                       <td>{{ row.code }}</td>
                       <td>{{ row.name }}</td>
                       <td>{{ row.brand }}</td>
-                      <td class="text-center">{{ row.stock ?? '-' }}</td>
                       <td class="text-center">{{ row.quantity }}</td>
                     </tr>
                     <tr *ngIf="getOrderProductRows().length === 0">
-                      <td colspan="5" class="text-center text-muted">-</td>
+                      <td colspan="4" class="text-center text-muted">-</td>
                     </tr>
                   </tbody>
                 </table>

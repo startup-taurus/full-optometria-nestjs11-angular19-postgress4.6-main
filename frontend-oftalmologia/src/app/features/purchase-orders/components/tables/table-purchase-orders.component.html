@@ -82,9 +82,16 @@
 </ng-template>
 
 <ng-template #labOrderTemplate let-row="row">
-  <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">
-    #{{ row.laboratoryOrder?.id ? (row.laboratoryOrder?.id | slice: 0 : 8) : '-' }}
-  </span>
+  <button
+    class="btn btn-outline-secondary btn-xs"
+    type="button"
+    placement="left"
+    [ngbTooltip]="'LABORATORY_ORDERS.ACTIONS.VIEW' | translate"
+    [disabled]="!row.laboratoryOrder?.id"
+    (click)="openLinkedLaboratoryOrder(row)"
+  >
+    <i class="ti ti-external-link"></i>
+  </button>
 </ng-template>
 
 <ng-template #statusTemplate let-row="row">
@@ -103,6 +110,12 @@
   </span>
 </ng-template>
 
+<ng-template #priceTemplate let-row="row">
+  <span class="fw-semibold">
+    {{ formatPrice(row.totalAmount) }}
+  </span>
+</ng-template>
+
 <ng-template #createdAtTemplate let-row="row">
   <span class="text-body-secondary">{{ row.createdAt | date: 'short' }}</span>
 </ng-template>
@@ -112,6 +125,7 @@
     <button
       class="btn btn-outline-secondary btn-xs"
       type="button"
+      placement="left"
       [ngbTooltip]="'COMMON.VIEW' | translate"
       (click)="openViewModal(row)"
     >
@@ -121,6 +135,7 @@
     <button
       class="btn btn-outline-secondary btn-xs"
       type="button"
+      placement="left"
       [ngbTooltip]="'COMMON.EDIT' | translate"
       (click)="openEditModal(row)"
     >
@@ -130,6 +145,7 @@
     <button
       class="btn btn-outline-danger btn-xs"
       type="button"
+      placement="left"
       [ngbTooltip]="'COMMON.DELETE' | translate"
       (click)="deleteOrder(row)"
     >

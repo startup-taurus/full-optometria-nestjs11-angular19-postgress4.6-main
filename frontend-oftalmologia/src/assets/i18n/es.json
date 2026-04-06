@@ -629,6 +629,9 @@
     "HAS_PATIENT_LINK": "Con paciente vinculado",
     "WITHOUT_PATIENT_LINK": "Sin paciente vinculado",
     "DELETE_CONFIRMATION": "¿Está seguro de eliminar este cliente?",
+    "PATIENT_CLIENTS_ONLY": "Solo clientes del paciente",
+      "SHOW_ALL_CLIENTS": "Ver todos los clientes",
+      "SHOW_PATIENT_CLIENTS_ONLY": "Solo clientes de este paciente",
     "FILTER": {
       "SEARCH_PLACEHOLDER": "Buscar por nombre, documento o correo"
     }
@@ -1612,6 +1615,7 @@
       "FRAME_BRIDGE": "Puente",
       "OBSERVATIONS": "Observaciones",
       "PATIENT_INFO": "Información del Paciente",
+      "CLIENT_INFO": "Información del Cliente (Facturación)",
       "FIRST_NAME": "Nombres",
       "LAST_NAME": "Apellidos",
       "DOCUMENT_NUMBER": "Cédula",
@@ -1640,7 +1644,7 @@
       "ADDITIONAL_TYPE_DESCRIPTION": "Descripción Adicional del Tipo",
       "FRAME_DATA_SECTION": "Datos del Producto",
       "PRODUCT_DATA_SECTION": "Datos del Producto",
-      "PRODUCTS_DATA_SECTION": "Datos de los Productos",
+      "PRODUCTS_DATA_SECTION": "Datos de productos",
       "BRAND": "Marca",
       "MODEL": "Modelo",
       "FRAME_DATA": "Datos del Producto",
@@ -1709,6 +1713,7 @@
     "SHOULD_INVOICE": "Deber Facturar",
     "INVOICE": "Facturación",
     "SEARCH": "Buscar orden",
+    "SEARCH_PLACEHOLDER": "Buscar por número de orden, cliente o documento",
     "FILTERS": {
       "TITLE": "Filtros de órdenes"
     },
@@ -1718,10 +1723,11 @@
       "LAB_ORDER": "Orden laboratorio",
       "STATUS": "Estado",
       "INVOICE": "Facturación",
-      "TOTAL": "Total",
+      "PRICE": "Precio",
       "CREATED_AT": "Fecha de creación",
       "ACTIONS": "Acciones"
     },
+    "ITEMS_TITLE": "Detalle de productos",
     "DETAIL": "Detalle de Orden",
     "FIELDS": {
       "ORDER_NUMBER": "Número de Orden",
@@ -1730,6 +1736,10 @@
       "SHOULD_INVOICE": "Debe Facturarse",
       "STATUS": "Estado",
       "TOTAL_AMOUNT": "Monto Total",
+      "PRODUCT": "Producto",
+      "QUANTITY": "Cantidad",
+      "UNIT_PRICE": "Precio unitario",
+      "LINE_TOTAL": "Total línea",
       "CREATED_AT": "Fecha de Creación",
       "UPDATED_AT": "Fecha de Actualización"
     },

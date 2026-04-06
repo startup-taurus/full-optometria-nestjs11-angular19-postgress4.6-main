@@ -30,6 +30,7 @@
     "LOCK_SCREEN": {
       "TITLE": "Lock Screen",
       "HI": "Hi",
+    "ITEMS_TITLE": "Product details",
       "PLEASE_ENTER_PASSWORD": "Please enter your password",
       "PLEASE_WAIT": "Please wait...",
       "ENTER_PASSWORD": "Access",
@@ -38,6 +39,10 @@
       "BACK_TO_LOGIN": "Back to login"
     }
   },
+      "PRODUCT": "Product",
+      "QUANTITY": "Quantity",
+      "UNIT_PRICE": "Unit price",
+      "LINE_TOTAL": "Line total",
   "AUTH": {
     "EMAIL": "Email",
     "EMAIL_PLACEHOLDER": "Enter your email",
@@ -622,6 +627,9 @@
     "HAS_PATIENT_LINK": "With linked patient",
     "WITHOUT_PATIENT_LINK": "Without linked patient",
     "DELETE_CONFIRMATION": "Are you sure you want to delete this client?",
+    "PATIENT_CLIENTS_ONLY": "Only patient clients",
+      "SHOW_ALL_CLIENTS": "Show all clients",
+      "SHOW_PATIENT_CLIENTS_ONLY": "Only this patient's clients",
     "FILTER": {
       "SEARCH_PLACEHOLDER": "Search by name, document or email"
     }
@@ -1624,6 +1632,7 @@
       "SELECT_STATUS": "Select status",
       "OBSERVATIONS": "Observations",
       "PATIENT_INFO": "Patient Information",
+      "CLIENT_INFO": "Billing Client Information",
       "FIRST_NAME": "First Name",
       "LAST_NAME": "Last Name",
       "DOCUMENT_NUMBER": "Document Number",
@@ -1654,7 +1663,7 @@
       "ADDITIONAL_TYPE_DESCRIPTION": "Additional Type Description",
       "FRAME_DATA_SECTION": "Product Data",
       "PRODUCT_DATA_SECTION": "Product Data",
-      "PRODUCTS_DATA_SECTION": "Products Data",
+      "PRICE": "Price",
       "BRAND": "Brand",
       "MODEL": "Model",
       "FRAME_DATA": "Product Data",
@@ -1720,6 +1729,7 @@
     "SHOULD_INVOICE": "Should Invoice",
     "INVOICE": "Invoicing",
     "SEARCH": "Search order",
+    "SEARCH_PLACEHOLDER": "Search by order number, client or document",
     "DETAIL": "Order Detail",
     "FIELDS": {
       "ORDER_NUMBER": "Order Number",
