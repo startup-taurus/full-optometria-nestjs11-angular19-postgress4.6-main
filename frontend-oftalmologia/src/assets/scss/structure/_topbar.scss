@@ -8,22 +8,38 @@ Topbar CSS
 
 .app-topbar {
   position: sticky;
-  top: 15px;
+  top: 0;
   z-index: 1000;
-  box-shadow: var(--#{$prefix}box-shadow);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
   background: var(--#{$prefix}topbar-bg);
   min-height: $topbar-height;
-  margin-left: calc($sidenav-width + 35px);
-  margin-right: 15px;
-  transition: $transition-base;
+  margin-left: $sidenav-width;
+  margin-right: 0;
+  transition:
+    margin-left 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
   border-bottom: $card-border-width solid $card-border-color;
-  padding: 0 calc($grid-gutter-width * 0.5);
-  border-radius: 30px;
+  border-left: $card-border-width solid rgba(var(--#{$prefix}body-color-rgb), 0.08);
+  padding: 0 var(--layout-inline-gap, calc($grid-gutter-width * 0.5));
+  border-radius: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(var(--#{$prefix}body-color-rgb), 0.07);
+    pointer-events: none;
+  }
 
   .topbar-menu {
     display: flex;
     justify-content: space-between;
     position: relative;
+    min-height: $topbar-height;
 
     .topbar-item {
       display: flex;
@@ -39,13 +55,23 @@ Topbar CSS
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
+        min-height: 40px;
+        min-width: 40px;
+        padding: 0.45rem;
+        border-radius: 10px;
+        transition: $transition-base;
         color: var(--#{$prefix}topbar-item-color);
 
         &:hover,
         &:active,
         &:focus {
           color: var(--#{$prefix}topbar-item-hover-color);
+          background-color: rgba(var(--#{$prefix}light-rgb), 0.16);
+        }
+
+        &:focus-visible {
+          outline: 2px solid rgba(var(--#{$prefix}light-rgb), 0.55);
+          outline-offset: 2px;
         }
       }
     }
@@ -87,17 +113,17 @@ html[data-bs-theme='dark'] {
   gap: 10px;
   border-width: 0;
   border-style: none;
-  background-color: var(--#{$prefix}topbar-bg);
+  background-color: transparent;
   min-height: $topbar-height;
   transition: none;
-  border-radius: 0 30px 30px 0;
+  border-radius: 0;
 
   > .topbar-link h5,
   > .topbar-link h6,
   > .topbar-link span,
   > .topbar-link .ti-chevron-down {
-    color: #fff !important;
-    opacity: 1 !important;
+    color: var(--#{$prefix}topbar-item-color);
+    opacity: 1;
   }
 }
 
@@ -179,13 +205,16 @@ html[data-bs-theme='dark'] {
 
 @include media-breakpoint-down(sm) {
   .app-topbar {
-    border-radius: 30px;
-    margin-left: 15px;
-    margin-right: 15px;
-    top: 10px;
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    top: 0;
+    padding: 0 var(--layout-inline-gap, 0.75rem);
+    min-height: 64px;
 
     .topbar-menu {
       position: initial;
+      min-height: 64px;
     }
 
     .dropdown {
@@ -202,11 +231,11 @@ html[data-bs-theme='dark'] {
 
 @include media-breakpoint-down(md) {
   .app-topbar {
-    padding: 0 $spacer * 0.5;
-    border-radius: 30px;
-    margin-left: 15px;
-    margin-right: 15px;
-    top: 10px;
+    padding: 0 var(--layout-inline-gap, $spacer * 0.5);
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    top: 0;
   }
 
   .logo-topbar {
