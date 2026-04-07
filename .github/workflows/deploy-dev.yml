@@ -34,13 +34,11 @@ jobs:
             PROJECT_PATH="/var/www/dev-oftalmologia"
             PROJECT_NAME="dev-oftalmologia"
             REPO_SSH_URL="git@github.com:${{ github.repository }}.git"
-            REPO_HTTPS_URL="https://github.com/${{ github.repository }}.git"
 
             mkdir -p "$PROJECT_PATH"
 
             if [ ! -d "$PROJECT_PATH/.git" ]; then
-              git clone --branch develop --single-branch "$REPO_SSH_URL" "$PROJECT_PATH" || \
-              git clone --branch develop --single-branch "$REPO_HTTPS_URL" "$PROJECT_PATH"
+              git clone --branch develop --single-branch "$REPO_SSH_URL" "$PROJECT_PATH"
             fi
 
             cd "$PROJECT_PATH"
