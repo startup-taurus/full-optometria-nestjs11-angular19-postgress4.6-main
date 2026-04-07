@@ -68,6 +68,9 @@ services:
     build:
       context: ./frontend-oftalmologia
       dockerfile: Dockerfile
+      args:
+        FRONTEND_API_BASE_URL: ${FRONTEND_API_BASE_URL:-https://api-optometria.zgameslatam.com/v1/api}
+        FRONTEND_FILE_BASE_URL: ${FRONTEND_FILE_BASE_URL:-https://api-optometria.zgameslatam.com}
     ports:
       - "8081:80"
     networks:
