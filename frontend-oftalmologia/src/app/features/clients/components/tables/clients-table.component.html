@@ -84,9 +84,14 @@
 
 <ng-template #patientLinkTemplate let-row="row">
   <span
-    class="badge"
-    [class.text-bg-light]="!row.patientIds?.length"
-    [class.text-bg-info]="!!row.patientIds?.length"
+    class="badge common-badge"
+    [class.bg-info-subtle]="!!row.patientIds?.length"
+    [class.text-info-emphasis]="!!row.patientIds?.length"
+    [class.border]="true"
+    [class.border-info-subtle]="!!row.patientIds?.length"
+    [class.bg-secondary-subtle]="!row.patientIds?.length"
+    [class.text-secondary-emphasis]="!row.patientIds?.length"
+    [class.border-secondary-subtle]="!row.patientIds?.length"
   >
     {{ getPatientLabel(row) }}
   </span>
@@ -94,9 +99,13 @@
 
 <ng-template #statusTemplate let-row="row">
   <span
-    class="badge"
-    [class.text-bg-success]="row.isActive"
-    [class.text-bg-secondary]="!row.isActive"
+    class="badge common-badge badge-sm border"
+    [class.bg-success-subtle]="row.isActive"
+    [class.text-success-emphasis]="row.isActive"
+    [class.border-success-subtle]="row.isActive"
+    [class.bg-secondary-subtle]="!row.isActive"
+    [class.text-secondary-emphasis]="!row.isActive"
+    [class.border-secondary-subtle]="!row.isActive"
   >
     {{
       row.isActive

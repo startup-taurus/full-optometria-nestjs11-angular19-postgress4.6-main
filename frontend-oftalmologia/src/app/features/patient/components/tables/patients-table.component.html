@@ -86,8 +86,13 @@
 <ng-template #statusTemplate let-row="row" let-rowIndex="rowIndex">
   <span
     class="badge common-badge badge-sm"
-    [class.bg-success]="row.isActive"
-    [class.bg-secondary]="!row.isActive"
+    [class.bg-success-subtle]="row.isActive"
+    [class.text-success-emphasis]="row.isActive"
+    [class.border]="true"
+    [class.border-success-subtle]="row.isActive"
+    [class.bg-secondary-subtle]="!row.isActive"
+    [class.text-secondary-emphasis]="!row.isActive"
+    [class.border-secondary-subtle]="!row.isActive"
   >
     {{
       (row.isActive ? 'PATIENT.STATUS.ACTIVE' : 'PATIENT.STATUS.INACTIVE')

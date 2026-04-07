@@ -24,7 +24,7 @@
 
 <!-- Cell templates -->
 <ng-template #typeTemplate let-row="row">
-  <span class="badge common-badge" [ngClass]="getTypeBadgeClass(row.type)">
+  <span class="badge common-badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">
     {{ ('FEEDBACK.TYPES.' + row.type.toUpperCase()) | translate }}
   </span>
 </ng-template>

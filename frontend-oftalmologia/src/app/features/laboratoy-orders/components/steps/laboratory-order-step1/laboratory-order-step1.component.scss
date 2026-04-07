@@ -29,6 +29,21 @@
     }
   }
 
+  .lab-client-select-group {
+    .ng-select.filter-select-v2 {
+      min-width: 0;
+
+      .ng-select-container {
+        min-height: 40px;
+      }
+    }
+
+    .btn {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
   .card {
     border: 1px solid var(--bs-border-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -172,6 +187,21 @@
 
     .text-danger {
       font-size: 0.75rem;
+    }
+
+    .lab-client-select-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .ng-select.filter-select-v2 {
+        flex: 1 1 100%;
+      }
+
+      .btn {
+        width: 100%;
+        border-radius: 0.5rem;
+      }
     }
   }
 }

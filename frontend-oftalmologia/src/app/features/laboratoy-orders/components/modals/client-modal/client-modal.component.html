@@ -32,24 +32,27 @@
       <div class="row g-3 mb-3" *ngIf="allowPatientSelection">
         <div class="col-12">
           <label class="form-label">{{ 'PATIENT.SINGULAR' | translate }}</label>
-          <ng-select
-            [items]="patientOptions"
-            bindValue="id"
-            formControlName="patientIds"
-            [searchable]="true"
-            [clearable]="true"
-            [multiple]="true"
-            [loading]="searchingPatients"
-            [placeholder]="'CLIENT.SELECT_PATIENT_OPTIONAL' | translate"
-            (search)="onPatientSearch($event.term)"
-          >
-            <ng-template ng-label-tmp let-item="item">
-              {{ getPatientLabel(item) }}
-            </ng-template>
-            <ng-template ng-option-tmp let-item="item">
-              {{ getPatientLabel(item) }}
-            </ng-template>
-          </ng-select>
+          <div class="client-patient-select-shell">
+            <ng-select
+              class="client-patient-select"
+              [items]="patientOptions"
+              bindValue="id"
+              formControlName="patientIds"
+              [searchable]="true"
+              [clearable]="true"
+              [multiple]="true"
+              [loading]="searchingPatients"
+              [placeholder]="'CLIENT.SELECT_PATIENT_OPTIONAL' | translate"
+              (search)="onPatientSearch($event.term)"
+            >
+              <ng-template ng-label-tmp let-item="item">
+                {{ getPatientLabel(item) }}
+              </ng-template>
+              <ng-template ng-option-tmp let-item="item">
+                {{ getPatientLabel(item) }}
+              </ng-template>
+            </ng-select>
+          </div>
         </div>
       </div>
       <div class="row row-cols-1 row-cols-md-2 g-3">
