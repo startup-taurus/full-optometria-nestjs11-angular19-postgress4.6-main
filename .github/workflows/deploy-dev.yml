@@ -55,10 +55,6 @@ jobs:
               exit 1
             fi
 
-            set -a
-            . "$PROJECT_PATH/.env"
-            set +a
-
             if command -v docker-compose >/dev/null 2>&1; then
               COMPOSE_CMD="docker-compose"
             else
@@ -76,12 +72,11 @@ jobs:
 
             echo "=== Verificando esquema base en la base de datos ==="
             SCHEMA_OK=$($COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" exec -T db \
-              psql -U "$DB_USER" -d "$DB_NAME" -Atc \
-              "SELECT (
-                 EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='users') AND
-                 EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='companies') AND
-                 EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='branches')
-               )::text;" | tr -d '[:space:]')
+              sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT (
+                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\"public\" AND table_name=\"users\") AND
+                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\"public\" AND table_name=\"companies\") AND
+                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\"public\" AND table_name=\"branches\")
+              )::text;"' | tr -d '[:space:]')
 
             if [ "$SCHEMA_OK" != "true" ]; then
               echo "ADVERTENCIA: Esquema base incompleto. Se forzara reinicializacion de volumen de BD una sola vez."
@@ -89,12 +84,11 @@ jobs:
               $COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" up -d
 
               SCHEMA_OK=$($COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" exec -T db \
-                psql -U "$DB_USER" -d "$DB_NAME" -Atc \
-                "SELECT (
-                   EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='users') AND
-                   EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='companies') AND
-                   EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='branches')
-                 )::text;" | tr -d '[:space:]')
+                sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT (
+                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\"public\" AND table_name=\"users\") AND
+                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\"public\" AND table_name=\"companies\") AND
+                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\"public\" AND table_name=\"branches\")
+                )::text;"' | tr -d '[:space:]')
 
               if [ "$SCHEMA_OK" != "true" ]; then
                 echo "ERROR: La base sigue incompleta despues de reinicializacion. Revisa db_init/02-restore-data.sql y logs de db."
