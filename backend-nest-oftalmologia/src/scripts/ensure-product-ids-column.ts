@@ -3,16 +3,76 @@ import { Client } from 'pg';
 
 config();
 
-async function ensureProductIdsColumn(): Promise<boolean> {
-  const client = new Client({
-    host: process.env.DATABASE_HOST,
-    port: Number(process.env.DATABASE_PORT || 5432),
-    user: process.env.DB_USER || process.env.DATABASE_USERNAME,
-    password: process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD,
-    database: process.env.DB_NAME || process.env.DATABASE_NAME,
-  });
+type DbConnectionConfig = {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+};
 
-  await client.connect();
+function buildConnectionCandidates(): DbConnectionConfig[] {
+  const host = process.env.DATABASE_HOST || process.env.DB_HOST || 'localhost';
+  const port = Number(
+    process.env.DATABASE_PORT || process.env.DB_PORT || 5432
+  );
+
+  const primary: DbConnectionConfig = {
+    host,
+    port,
+    user: process.env.DATABASE_USERNAME || process.env.DB_USER || '',
+    password: process.env.DATABASE_PASSWORD || process.env.DB_PASSWORD || '',
+    database: process.env.DATABASE_NAME || process.env.DB_NAME || '',
+  };
+
+  const fallback: DbConnectionConfig = {
+    host,
+    port,
+    user: process.env.DB_USER || process.env.DATABASE_USERNAME || '',
+    password: process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD || '',
+    database: process.env.DB_NAME || process.env.DATABASE_NAME || '',
+  };
+
+  const serialize = (cfg: DbConnectionConfig) =>
+    `${cfg.host}:${cfg.port}:${cfg.user}:${cfg.database}`;
+
+  const unique = new Map<string, DbConnectionConfig>();
+  for (const candidate of [primary, fallback]) {
+    if (candidate.user && candidate.database) {
+      unique.set(serialize(candidate), candidate);
+    }
+  }
+
+  return Array.from(unique.values());
+}
+
+async function connectWithFallback(): Promise<Client> {
+  const candidates = buildConnectionCandidates();
+  if (candidates.length === 0) {
+    throw new Error(
+      'No hay credenciales DB válidas. Define DATABASE_USERNAME/DATABASE_PASSWORD/DATABASE_NAME o DB_USER/DB_PASSWORD/DB_NAME.'
+    );
+  }
+
+  let lastError: unknown;
+  for (const cfg of candidates) {
+    const client = new Client(cfg);
+    try {
+      await client.connect();
+      return client;
+    } catch (error) {
+      lastError = error;
+      await client.end().catch(() => undefined);
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error('No fue posible conectar a PostgreSQL con las credenciales disponibles.');
+}
+
+async function ensureProductIdsColumn(): Promise<boolean> {
+  const client = await connectWithFallback();
 
   try {
     let hasChanges = false;

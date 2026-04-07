@@ -20,11 +20,44 @@ export class CreateClientsAndPurchaseOrders1743667200000 implements MigrationInt
         "is_active" boolean NOT NULL DEFAULT true,
         "created_at" TIMESTAMP NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_clients_id" PRIMARY KEY ("id"),
-        CONSTRAINT "FK_clients_patient_id" FOREIGN KEY ("patient_id") REFERENCES "patients"("id"),
-        CONSTRAINT "FK_clients_company_id" FOREIGN KEY ("company_id") REFERENCES "companies"("id"),
-        CONSTRAINT "FK_clients_branch_id" FOREIGN KEY ("branch_id") REFERENCES "branches"("id")
+        CONSTRAINT "PK_clients_id" PRIMARY KEY ("id")
       )
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'patients')
+           AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_clients_patient_id') THEN
+          ALTER TABLE "clients"
+          ADD CONSTRAINT "FK_clients_patient_id"
+          FOREIGN KEY ("patient_id") REFERENCES "patients"("id");
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'companies')
+           AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_clients_company_id') THEN
+          ALTER TABLE "clients"
+          ADD CONSTRAINT "FK_clients_company_id"
+          FOREIGN KEY ("company_id") REFERENCES "companies"("id");
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'branches')
+           AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_clients_branch_id') THEN
+          ALTER TABLE "clients"
+          ADD CONSTRAINT "FK_clients_branch_id"
+          FOREIGN KEY ("branch_id") REFERENCES "branches"("id");
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
@@ -58,12 +91,45 @@ export class CreateClientsAndPurchaseOrders1743667200000 implements MigrationInt
         "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_purchase_orders_id" PRIMARY KEY ("id"),
         CONSTRAINT "FK_purchase_orders_client_id" FOREIGN KEY ("client_id") REFERENCES "clients"("id"),
-        CONSTRAINT "FK_purchase_orders_laboratory_order_id" FOREIGN KEY ("laboratory_order_id") REFERENCES "laboratory_orders"("id"),
-        CONSTRAINT "FK_purchase_orders_company_id" FOREIGN KEY ("company_id") REFERENCES "companies"("id"),
-        CONSTRAINT "FK_purchase_orders_branch_id" FOREIGN KEY ("branch_id") REFERENCES "branches"("id"),
         CONSTRAINT "UQ_purchase_orders_order_number" UNIQUE ("order_number"),
         CONSTRAINT "UQ_purchase_orders_laboratory_order_id" UNIQUE ("laboratory_order_id")
       )
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'laboratory_orders')
+           AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_purchase_orders_laboratory_order_id') THEN
+          ALTER TABLE "purchase_orders"
+          ADD CONSTRAINT "FK_purchase_orders_laboratory_order_id"
+          FOREIGN KEY ("laboratory_order_id") REFERENCES "laboratory_orders"("id");
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'companies')
+           AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_purchase_orders_company_id') THEN
+          ALTER TABLE "purchase_orders"
+          ADD CONSTRAINT "FK_purchase_orders_company_id"
+          FOREIGN KEY ("company_id") REFERENCES "companies"("id");
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'branches')
+           AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_purchase_orders_branch_id') THEN
+          ALTER TABLE "purchase_orders"
+          ADD CONSTRAINT "FK_purchase_orders_branch_id"
+          FOREIGN KEY ("branch_id") REFERENCES "branches"("id");
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
@@ -91,19 +157,15 @@ export class CreateClientsAndPurchaseOrders1743667200000 implements MigrationInt
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "laboratory_orders" ADD COLUMN IF NOT EXISTS "client_id" uuid
-    `);
-
-    await queryRunner.query(`
-      CREATE INDEX IF NOT EXISTS "IDX_laboratory_orders_client_id" ON "laboratory_orders" ("client_id")
-    `);
-
-    await queryRunner.query(`
       DO $$
       BEGIN
-        IF NOT EXISTS (
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'laboratory_orders'
+        ) AND NOT EXISTS (
           SELECT 1 FROM pg_constraint WHERE conname = 'FK_laboratory_orders_client_id'
         ) THEN
+          ALTER TABLE "laboratory_orders" ADD COLUMN IF NOT EXISTS "client_id" uuid;
+          CREATE INDEX IF NOT EXISTS "IDX_laboratory_orders_client_id" ON "laboratory_orders" ("client_id");
           ALTER TABLE "laboratory_orders"
           ADD CONSTRAINT "FK_laboratory_orders_client_id"
           FOREIGN KEY ("client_id") REFERENCES "clients"("id");
