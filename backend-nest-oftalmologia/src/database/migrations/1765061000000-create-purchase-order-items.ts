@@ -33,9 +33,25 @@ export class CreatePurchaseOrderItems1765061000000 implements MigrationInterface
         "line_total" numeric(12,2) NOT NULL,
         "created_at" TIMESTAMP NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_purchase_order_items" PRIMARY KEY ("id"),
-        CONSTRAINT "FK_purchase_order_items_purchase_order_id" FOREIGN KEY ("purchase_order_id") REFERENCES "purchase_orders"("id") ON DELETE CASCADE
+        CONSTRAINT "PK_purchase_order_items" PRIMARY KEY ("id")
       )
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'purchase_orders'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'purchase_order_items' AND constraint_name = 'FK_purchase_order_items_purchase_order_id'
+        ) THEN
+          ALTER TABLE "purchase_order_items"
+          ADD CONSTRAINT "FK_purchase_order_items_purchase_order_id"
+          FOREIGN KEY ("purchase_order_id") REFERENCES "purchase_orders"("id") ON DELETE CASCADE;
+        END IF;
+      END $$;
     `);
 
     await queryRunner.query(`
@@ -49,6 +65,30 @@ export class CreatePurchaseOrderItems1765061000000 implements MigrationInterface
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS "IDX_purchase_order_items_product_id" ON "purchase_order_items" ("product_id")
     `);
+
+    const baseTablesExist = await queryRunner.query(`
+      SELECT
+        EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'purchase_orders'
+        ) AS purchase_orders_exists,
+        EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'laboratory_orders'
+        ) AS laboratory_orders_exists,
+        EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'products'
+        ) AS products_exists
+    `);
+
+    const purchaseOrdersExists = Boolean(baseTablesExist[0]?.purchase_orders_exists);
+    const laboratoryOrdersExists = Boolean(baseTablesExist[0]?.laboratory_orders_exists);
+    const productsExists = Boolean(baseTablesExist[0]?.products_exists);
+
+    if (!purchaseOrdersExists || !laboratoryOrdersExists || !productsExists) {
+      return;
+    }
 
     const purchaseOrders = (await queryRunner.query(`
       SELECT

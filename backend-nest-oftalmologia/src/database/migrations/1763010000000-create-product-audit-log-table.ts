@@ -7,27 +7,27 @@ export class CreateProductAuditLogTable1763010000000 implements MigrationInterfa
     await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
 
     await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS "product_audit_log" (
+        "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+        "company_id" uuid NULL,
+        "branch_id" uuid NOT NULL,
+        "product_id" uuid NOT NULL,
+        "event_type" character varying(30) NOT NULL,
+        "changed_fields" jsonb NULL,
+        "metadata" jsonb NULL,
+        "created_by_user_id" uuid NULL,
+        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+        CONSTRAINT "PK_product_audit_log" PRIMARY KEY ("id")
+      )
+    `);
+
+    await queryRunner.query(`
       DO $$
       BEGIN
-        IF NOT EXISTS (
-          SELECT FROM information_schema.tables
-          WHERE table_schema = 'public'
-            AND table_name = 'product_audit_log'
-        ) THEN
-          CREATE TABLE "product_audit_log" (
-            "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-            "company_id" uuid NULL,
-            "branch_id" uuid NOT NULL,
-            "product_id" uuid NOT NULL,
-            "event_type" character varying(30) NOT NULL,
-            "changed_fields" jsonb NULL,
-            "metadata" jsonb NULL,
-            "created_by_user_id" uuid NULL,
-            "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-            CONSTRAINT "PK_product_audit_log" PRIMARY KEY ("id"),
-            CONSTRAINT "FK_product_audit_log_product" FOREIGN KEY ("product_id")
-              REFERENCES "products"("id") ON DELETE CASCADE
-          );
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'products')
+           AND NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema = 'public' AND table_name = 'product_audit_log' AND constraint_name = 'FK_product_audit_log_product') THEN
+          ALTER TABLE "product_audit_log"
+          ADD CONSTRAINT "FK_product_audit_log_product" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE;
         END IF;
       END $$;
     `);

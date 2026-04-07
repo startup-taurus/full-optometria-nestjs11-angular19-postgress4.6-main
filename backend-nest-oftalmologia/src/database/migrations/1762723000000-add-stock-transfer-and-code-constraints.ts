@@ -7,48 +7,109 @@ export class AddStockTransferAndCodeConstraints1762723000000
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS "inventory_transfers" (
+        "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+        "company_id" uuid NULL,
+        "source_branch_id" uuid NOT NULL,
+        "target_branch_id" uuid NOT NULL,
+        "source_product_id" uuid NOT NULL,
+        "target_product_id" uuid NOT NULL,
+        "source_code" varchar(50) NOT NULL,
+        "quantity" integer NOT NULL,
+        "note" text NULL,
+        "created_by_user_id" uuid NULL,
+        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+        CONSTRAINT "chk_inventory_transfers_quantity_positive" CHECK ("quantity" > 0),
+        CONSTRAINT "chk_inventory_transfers_branchs_diff" CHECK ("source_branch_id" <> "target_branch_id")
+      )
+    `);
+
+    await queryRunner.query(`
+      ALTER TABLE "inventory_transfers"
+      ADD COLUMN IF NOT EXISTS "created_by_user_id" uuid NULL
+    `);
+
+    await queryRunner.query(`
       DO $$
       BEGIN
-        IF NOT EXISTS (
-          SELECT FROM information_schema.tables
-          WHERE table_schema = 'public'
-            AND table_name = 'inventory_transfers'
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'branches'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'inventory_transfers' AND constraint_name = 'fk_inventory_transfers_source_branch'
         ) THEN
-          CREATE TABLE "inventory_transfers" (
-            "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-            "company_id" uuid NULL,
-            "source_branch_id" uuid NOT NULL,
-            "target_branch_id" uuid NOT NULL,
-            "source_product_id" uuid NOT NULL,
-            "target_product_id" uuid NOT NULL,
-            "source_code" varchar(50) NOT NULL,
-            "quantity" integer NOT NULL,
-            "note" text NULL,
-            "created_by_user_id" uuid NULL,
-            "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-            CONSTRAINT "chk_inventory_transfers_quantity_positive" CHECK ("quantity" > 0),
-            CONSTRAINT "chk_inventory_transfers_branchs_diff" CHECK ("source_branch_id" <> "target_branch_id"),
-            CONSTRAINT "fk_inventory_transfers_source_branch" FOREIGN KEY ("source_branch_id") REFERENCES "branches"("id") ON DELETE RESTRICT,
-            CONSTRAINT "fk_inventory_transfers_target_branch" FOREIGN KEY ("target_branch_id") REFERENCES "branches"("id") ON DELETE RESTRICT,
-            CONSTRAINT "fk_inventory_transfers_source_product" FOREIGN KEY ("source_product_id") REFERENCES "products"("id") ON DELETE RESTRICT,
-            CONSTRAINT "fk_inventory_transfers_target_product" FOREIGN KEY ("target_product_id") REFERENCES "products"("id") ON DELETE RESTRICT,
-            CONSTRAINT "fk_inventory_transfers_created_by" FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL
-          );
-        ELSE
           ALTER TABLE "inventory_transfers"
-          ADD COLUMN IF NOT EXISTS "created_by_user_id" uuid NULL;
+          ADD CONSTRAINT "fk_inventory_transfers_source_branch"
+          FOREIGN KEY ("source_branch_id") REFERENCES "branches"("id") ON DELETE RESTRICT;
+        END IF;
+      END $$;
+    `);
 
-          IF NOT EXISTS (
-            SELECT 1
-            FROM information_schema.table_constraints
-            WHERE table_schema = 'public'
-              AND table_name = 'inventory_transfers'
-              AND constraint_name = 'fk_inventory_transfers_created_by'
-          ) THEN
-            ALTER TABLE "inventory_transfers"
-            ADD CONSTRAINT "fk_inventory_transfers_created_by"
-            FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL;
-          END IF;
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'branches'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'inventory_transfers' AND constraint_name = 'fk_inventory_transfers_target_branch'
+        ) THEN
+          ALTER TABLE "inventory_transfers"
+          ADD CONSTRAINT "fk_inventory_transfers_target_branch"
+          FOREIGN KEY ("target_branch_id") REFERENCES "branches"("id") ON DELETE RESTRICT;
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'products'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'inventory_transfers' AND constraint_name = 'fk_inventory_transfers_source_product'
+        ) THEN
+          ALTER TABLE "inventory_transfers"
+          ADD CONSTRAINT "fk_inventory_transfers_source_product"
+          FOREIGN KEY ("source_product_id") REFERENCES "products"("id") ON DELETE RESTRICT;
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'products'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'inventory_transfers' AND constraint_name = 'fk_inventory_transfers_target_product'
+        ) THEN
+          ALTER TABLE "inventory_transfers"
+          ADD CONSTRAINT "fk_inventory_transfers_target_product"
+          FOREIGN KEY ("target_product_id") REFERENCES "products"("id") ON DELETE RESTRICT;
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'users'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'inventory_transfers' AND constraint_name = 'fk_inventory_transfers_created_by'
+        ) THEN
+          ALTER TABLE "inventory_transfers"
+          ADD CONSTRAINT "fk_inventory_transfers_created_by"
+          FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL;
         END IF;
       END $$;
     `);
@@ -63,46 +124,75 @@ export class AddStockTransferAndCodeConstraints1762723000000
     `);
 
     await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS "stock_movements" (
+        "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+        "company_id" uuid NULL,
+        "branch_id" uuid NOT NULL,
+        "product_id" uuid NOT NULL,
+        "movement_type" varchar(50) NOT NULL,
+        "quantity" integer NOT NULL,
+        "balance_after" integer NOT NULL,
+        "reference_type" varchar(50) NULL,
+        "reference_id" uuid NULL,
+        "note" text NULL,
+        "created_by_user_id" uuid NULL,
+        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+        CONSTRAINT "chk_stock_movements_quantity_positive" CHECK ("quantity" > 0)
+      )
+    `);
+
+    await queryRunner.query(`
+      ALTER TABLE "stock_movements"
+      ADD COLUMN IF NOT EXISTS "created_by_user_id" uuid NULL
+    `);
+
+    await queryRunner.query(`
       DO $$
       BEGIN
-        IF NOT EXISTS (
-          SELECT FROM information_schema.tables
-          WHERE table_schema = 'public'
-            AND table_name = 'stock_movements'
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'branches'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'stock_movements' AND constraint_name = 'fk_stock_movements_branch'
         ) THEN
-          CREATE TABLE "stock_movements" (
-            "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-            "company_id" uuid NULL,
-            "branch_id" uuid NOT NULL,
-            "product_id" uuid NOT NULL,
-            "movement_type" varchar(50) NOT NULL,
-            "quantity" integer NOT NULL,
-            "balance_after" integer NOT NULL,
-            "reference_type" varchar(50) NULL,
-            "reference_id" uuid NULL,
-            "note" text NULL,
-            "created_by_user_id" uuid NULL,
-            "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-            CONSTRAINT "chk_stock_movements_quantity_positive" CHECK ("quantity" > 0),
-            CONSTRAINT "fk_stock_movements_branch" FOREIGN KEY ("branch_id") REFERENCES "branches"("id") ON DELETE RESTRICT,
-            CONSTRAINT "fk_stock_movements_product" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT,
-            CONSTRAINT "fk_stock_movements_created_by" FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL
-          );
-        ELSE
           ALTER TABLE "stock_movements"
-          ADD COLUMN IF NOT EXISTS "created_by_user_id" uuid NULL;
+          ADD CONSTRAINT "fk_stock_movements_branch"
+          FOREIGN KEY ("branch_id") REFERENCES "branches"("id") ON DELETE RESTRICT;
+        END IF;
+      END $$;
+    `);
 
-          IF NOT EXISTS (
-            SELECT 1
-            FROM information_schema.table_constraints
-            WHERE table_schema = 'public'
-              AND table_name = 'stock_movements'
-              AND constraint_name = 'fk_stock_movements_created_by'
-          ) THEN
-            ALTER TABLE "stock_movements"
-            ADD CONSTRAINT "fk_stock_movements_created_by"
-            FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL;
-          END IF;
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'products'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'stock_movements' AND constraint_name = 'fk_stock_movements_product'
+        ) THEN
+          ALTER TABLE "stock_movements"
+          ADD CONSTRAINT "fk_stock_movements_product"
+          FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT;
+        END IF;
+      END $$;
+    `);
+
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'users'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE table_schema = 'public' AND table_name = 'stock_movements' AND constraint_name = 'fk_stock_movements_created_by'
+        ) THEN
+          ALTER TABLE "stock_movements"
+          ADD CONSTRAINT "fk_stock_movements_created_by"
+          FOREIGN KEY ("created_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL;
         END IF;
       END $$;
     `);
@@ -120,16 +210,21 @@ export class AddStockTransferAndCodeConstraints1762723000000
       DO $$
       DECLARE duplicate_count integer;
       BEGIN
-        SELECT COUNT(*) INTO duplicate_count
-        FROM (
-          SELECT branch_id, code
-          FROM products
-          GROUP BY branch_id, code
-          HAVING COUNT(*) > 1
-        ) duplicates;
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'products'
+        ) THEN
+          SELECT COUNT(*) INTO duplicate_count
+          FROM (
+            SELECT branch_id, code
+            FROM products
+            GROUP BY branch_id, code
+            HAVING COUNT(*) > 1
+          ) duplicates;
 
-        IF duplicate_count = 0 THEN
-          CREATE UNIQUE INDEX IF NOT EXISTS "ux_products_branch_code" ON "products" ("branch_id", "code");
+          IF duplicate_count = 0 THEN
+            CREATE UNIQUE INDEX IF NOT EXISTS "ux_products_branch_code" ON "products" ("branch_id", "code");
+          END IF;
         END IF;
       END $$;
     `);
