@@ -49,6 +49,12 @@ jobs:
             git reset --hard origin/develop
             git clean -fd
 
+            if [ ! -f "$PROJECT_PATH/.env" ]; then
+              echo "ERROR: Falta el archivo .env en $PROJECT_PATH"
+              echo "Crea $PROJECT_PATH/.env con las variables requeridas antes del despliegue."
+              exit 1
+            fi
+
             if command -v docker-compose >/dev/null 2>&1; then
               COMPOSE_CMD="docker-compose"
             else

@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict N7gtqTehpdQWPaNrh9Tld745XDIb1qHbazTx8erDgoPfY5OTreK4E0KOY1wYCon
 
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
@@ -3046,5 +3045,4 @@ ALTER TABLE ONLY public.stock_movements
 -- PostgreSQL database dump complete
 --
 
-\unrestrict N7gtqTehpdQWPaNrh9Tld745XDIb1qHbazTx8erDgoPfY5OTreK4E0KOY1wYCon
 
