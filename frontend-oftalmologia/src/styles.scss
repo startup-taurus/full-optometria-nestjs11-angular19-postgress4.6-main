@@ -1860,9 +1860,9 @@
     }
 
     &.completed {
-      border-color: var(--bs-success);
-      background-color: var(--bs-success);
-      color: #ffffff;
+      border-color: var(--bs-success-border-subtle);
+      background-color: var(--bs-success-bg-subtle);
+      color: var(--bs-success-text-emphasis);
     }
 
     &.clickable {
