@@ -18,6 +18,18 @@ export interface ProductsInventoryResponse extends ChartDataResponse {
   }
 }
 
+export interface TopProductSoldItem {
+  productId: string
+  productName: string
+  quantitySold: number
+  totalRevenue: number
+}
+
+export interface TopProductsSoldResponse extends ChartDataResponse {
+  period: string
+  items: TopProductSoldItem[]
+}
+
 export interface ApiResponse<T> {
   statusCode: number
   status: string

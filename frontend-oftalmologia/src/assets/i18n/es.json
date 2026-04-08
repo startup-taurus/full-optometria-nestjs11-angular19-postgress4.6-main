@@ -740,6 +740,20 @@
       "HIGH_STOCK_TITLE": "Stock Alto (≥50 unidades)",
       "HIGH_STOCK_MESSAGE": "Productos con inventario abundante y bien surtido."
     },
+    "TOP_PRODUCTS_SOLD": {
+      "TITLE": "Productos Más Vendidos",
+      "TOOLTIP": "Muestra los productos con mayor cantidad vendida en el período seleccionado.",
+      "LOADING": "Cargando productos más vendidos...",
+      "NO_DATA": "No hay ventas registradas en este período",
+      "SHOW_TABLE": "Ver tabla",
+      "SHOW_CHART": "Ver gráfico",
+      "TOTAL_UNITS": "Unidades totales",
+      "TABLE": {
+        "PRODUCT": "Producto",
+        "UNITS": "Unidades vendidas",
+        "REVENUE": "Total vendido"
+      }
+    },
     "SHIFT_STATUS": {
       "TITLE": "Distribución de Estados de Turnos",
       "TOOLTIP": "Muestra el porcentaje de citas que están confirmadas, canceladas o completadas.",

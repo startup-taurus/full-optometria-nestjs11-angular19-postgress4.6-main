@@ -733,15 +733,15 @@
   padding-inline: 0.75rem;
 
   @media (max-width: 575.98px) {
-    padding-inline: 0.5rem;
+    padding-inline: 0.25rem;
   }
 
   .row {
     @media (max-width: 575.98px) {
-      margin-inline: -0.5rem;
+      margin-inline: -0.25rem;
 
       [class*='col-'] {
-        padding-inline: 0.5rem;
+        padding-inline: 0.25rem;
       }
     }
   }

@@ -6,6 +6,7 @@ import { environment } from '@/environments/environment'
 import {
   ChartDataResponse,
   ProductsInventoryResponse,
+  TopProductsSoldResponse,
   ApiResponse,
 } from '../models/dashboard.model'
 
@@ -67,6 +68,18 @@ export class DashboardService {
       .get<
         ApiResponse<ChartDataResponse>
       >(`${this.apiUrl}/shift-status-distribution`)
+      .pipe(
+        map((response) => {
+          return response.data
+        })
+      )
+  }
+
+  getTopProductsSold(months: number = 1): Observable<TopProductsSoldResponse> {
+    return this.http
+      .get<
+        ApiResponse<TopProductsSoldResponse>
+      >(`${this.apiUrl}/top-products-sold?months=${months}`)
       .pipe(
         map((response) => {
           return response.data

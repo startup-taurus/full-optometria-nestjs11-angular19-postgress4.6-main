@@ -730,6 +730,20 @@
       "HIGH_STOCK_TITLE": "High Stock (≥50 units)",
       "HIGH_STOCK_MESSAGE": "Products with abundant and well-stocked inventory."
     },
+    "TOP_PRODUCTS_SOLD": {
+      "TITLE": "Top Sold Products",
+      "TOOLTIP": "Shows products with the highest sold quantity for the selected period.",
+      "LOADING": "Loading top sold products...",
+      "NO_DATA": "No sales recorded for this period",
+      "SHOW_TABLE": "Show table",
+      "SHOW_CHART": "Show chart",
+      "TOTAL_UNITS": "Total units",
+      "TABLE": {
+        "PRODUCT": "Product",
+        "UNITS": "Units sold",
+        "REVENUE": "Total revenue"
+      }
+    },
     "SHIFT_STATUS": {
       "TITLE": "Shift Status Distribution",
       "TOOLTIP": "Shows the percentage of appointments that are confirmed, cancelled, or completed.",
