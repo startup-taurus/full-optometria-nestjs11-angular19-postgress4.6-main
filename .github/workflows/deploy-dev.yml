@@ -73,9 +73,9 @@ jobs:
             echo "=== Verificando esquema base en la base de datos ==="
             SCHEMA_OK=$($COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" exec -T db \
               sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT (
-                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=$$public$$ AND table_name=$$users$$) AND
-                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=$$public$$ AND table_name=$$companies$$) AND
-                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=$$public$$ AND table_name=$$branches$$)
+                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\$\$public\$\$ AND table_name=\$\$users\$\$) AND
+                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\$\$public\$\$ AND table_name=\$\$companies\$\$) AND
+                EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\$\$public\$\$ AND table_name=\$\$branches\$\$)
               )::text;"' | tr -d '[:space:]')
 
             if [ "$SCHEMA_OK" != "true" ]; then
@@ -85,9 +85,9 @@ jobs:
 
               SCHEMA_OK=$($COMPOSE_CMD -f docker-compose.dev.yml -p "$PROJECT_NAME" exec -T db \
                 sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT (
-                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=$$public$$ AND table_name=$$users$$) AND
-                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=$$public$$ AND table_name=$$companies$$) AND
-                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=$$public$$ AND table_name=$$branches$$)
+                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\$\$public\$\$ AND table_name=\$\$users\$\$) AND
+                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\$\$public\$\$ AND table_name=\$\$companies\$\$) AND
+                  EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema=\$\$public\$\$ AND table_name=\$\$branches\$\$)
                 )::text;"' | tr -d '[:space:]')
 
               if [ "$SCHEMA_OK" != "true" ]; then
