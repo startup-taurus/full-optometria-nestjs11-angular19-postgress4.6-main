@@ -7,6 +7,7 @@ import { ClinicalHistory } from '../clinical-histories/entities/clinical-history
 import { Product } from '../products/entities/product.entity';
 import { StockMovement } from '../products/entities/stock-movement.entity';
 import { PurchaseOrdersModule } from '../purchase-orders/purchase-orders.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PurchaseOrdersModule } from '../purchase-orders/purchase-orders.module'
       StockMovement,
     ]),
     forwardRef(() => PurchaseOrdersModule),
+    NotificationsModule,
   ],
   controllers: [LaboratoryOrdersController],
   providers: [LaboratoryOrdersService],

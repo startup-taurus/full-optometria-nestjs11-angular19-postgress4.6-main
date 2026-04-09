@@ -26,6 +26,9 @@ export class Shift {
   @Column({ name: 'branch_id' })
   branchId: string;
 
+  @Column({ name: 'created_by_user_id', nullable: true })
+  createdByUserId: string | null;
+
   @Column({ name: 'status_id' })
   statusId: string;
 

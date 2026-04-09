@@ -37,6 +37,7 @@ export enum LaboratoryOrderStatus {
 @Index(['status'])
 @Index(['attendanceDate'])
 @Index(['orderNumber'], { unique: true })
+@Index(['createdByUserId'])
 export class LaboratoryOrder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -49,6 +50,9 @@ export class LaboratoryOrder {
 
   @Column({ name: 'branch_id' })
   branchId: string;
+
+  @Column({ name: 'created_by_user_id', nullable: true })
+  createdByUserId: string | null;
 
   @Column({ name: 'patient_id' })
   patientId: string;

@@ -18,6 +18,7 @@ import { QueryLaboratoryOrderDto } from './dtos/query-laboratory-order.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 import { PurchaseOrdersService } from '../purchase-orders/purchase-orders.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class LaboratoryOrdersService {
@@ -31,12 +32,14 @@ export class LaboratoryOrdersService {
     private productRepository: Repository<Product>,
     @Inject(forwardRef(() => PurchaseOrdersService))
     private purchaseOrdersService: PurchaseOrdersService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(
     createDto: CreateLaboratoryOrderDto,
     branchId: string,
-    companyId?: string
+    companyId?: string,
+    createdByUserId?: string,
   ) {
     const maxRetries = 3;
     let lastError: any;
@@ -127,6 +130,7 @@ export class LaboratoryOrdersService {
           ...persistableCreateDto,
           branchId,
           companyId,
+          createdByUserId: createdByUserId || null,
           orderNumber,
           productQuantities: normalizedLineItems,
           status: LaboratoryOrderStatus.PENDING,
@@ -409,7 +413,8 @@ export class LaboratoryOrdersService {
     id: string,
     status: LaboratoryOrderStatus | null,
     branchId: string,
-    companyId?: string
+    companyId?: string,
+    updatedByUserId?: string,
   ) {
     const existingOrder = await this.findOne(id, branchId, companyId);
 
@@ -432,6 +437,8 @@ export class LaboratoryOrdersService {
     }
 
     const normalizedStatus = this.normalizeStatus(status);
+    const previousStatus = this.normalizeStatus(existingOrder?.status) ||
+      this.deriveStatusFromLegacyFlag(existingOrder?.isConfirmed);
 
     if (!normalizedStatus) {
       throw new BadRequestException({
@@ -444,6 +451,18 @@ export class LaboratoryOrdersService {
       status: normalizedStatus,
       isConfirmed: this.getLegacyConfirmedValue(normalizedStatus),
     });
+
+    if (
+      previousStatus !== LaboratoryOrderStatus.RECEIVED &&
+      normalizedStatus === LaboratoryOrderStatus.RECEIVED
+    ) {
+      await this.notificationsService.sendLaboratoryOrderReceivedReminder(
+        id,
+        branchId,
+        companyId || null,
+        updatedByUserId || null,
+      );
+    }
 
     const updatedOrder = await this.findOne(id, branchId, companyId);
     return updatedOrder;

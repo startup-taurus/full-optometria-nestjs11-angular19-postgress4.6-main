@@ -17,6 +17,7 @@ import { UpdateShiftDto } from '../dtos/update-shift.dto';
 import { QueryShiftDto } from '../dtos/query-shift.dto';
 import { BranchContext } from '../../../common/decorators/branch-context.decorator';
 import { CompanyId } from '../../../common/decorators/company-context.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 
 @Controller('shift-management/shifts')
 @UseGuards(AuthGuard('jwt'))
@@ -27,9 +28,10 @@ export class ShiftsController {
   async create(
     @Body(ValidationPipe) createShiftDto: CreateShiftDto,
     @BranchContext() branchId: string,
-    @CompanyId() companyId?: string
+    @CompanyId() companyId?: string,
+    @CurrentUser() user?: any,
   ) {
-    return this.shiftsService.create(createShiftDto, branchId, companyId);
+    return this.shiftsService.create(createShiftDto, branchId, companyId, user?.id);
   }
 
   @Get('get-all')

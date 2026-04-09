@@ -689,8 +689,12 @@ export class WhatsAppWebJsProvider
 
   private toWhatsAppJid(phone: string): string {
     const digits = phone.replace(/\D/g, '');
-    if (!digits) {
-      throw new Error('Número de teléfono inválido para WhatsApp');
+    const isValidInternationalDigits = /^[1-9]\d{7,14}$/.test(digits);
+
+    if (!isValidInternationalDigits) {
+      throw new Error(
+        'Número de teléfono inválido para WhatsApp. Usa formato internacional',
+      );
     }
 
     return `${digits}@c.us`;
