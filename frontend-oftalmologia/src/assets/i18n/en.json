@@ -1766,6 +1766,27 @@
       "ERROR_DELETING": "Error deleting purchase order",
       "DELETE_CONFIRM": "Are you sure you want to delete this order?",
       "DELETE_TEXT": "This action cannot be undone"
+    },
+    "SUMMARY": {
+      "PENDING": "Pending",
+      "PENDING_DESC": "Pending orders not marked for invoicing",
+      "PENDING_TOOLTIP": "Pending orders not yet moved to invoicing",
+      "TO_INVOICE": "To Invoice",
+      "TO_INVOICE_DESC": "Pending orders ready for invoice generation",
+      "TO_INVOICE_TOOLTIP": "Processed orders pending invoicing or SRI submission",
+      "INVOICED": "Invoiced",
+      "INVOICED_DESC": "Orders already invoiced",
+      "INVOICED_TOOLTIP": "Orders already invoiced and processed",
+      "TOTAL_ORDERS": "Total Orders",
+      "TOTAL_ORDERS_DESC": "Total registered orders",
+      "TOTAL_ORDERS_TOOLTIP": "Shows all orders without filters",
+      "TOTAL_INVOICED": "Total Invoiced",
+      "TOTAL_INVOICED_DESC": "Sum of invoiced orders",
+      "TOTAL_NON_INVOICED": "Total Non-Invoiced",
+      "TOTAL_NON_INVOICED_DESC": "Sum of pending orders",
+      "TOTAL_SOLD": "Total Sold",
+      "TOTAL_SOLD_DESC": "Invoiced + non-invoiced (excluding cancelled)",
+      "EMPTY": "No purchase orders to display"
     }
   },
   "BRANCH_SELECTOR": {

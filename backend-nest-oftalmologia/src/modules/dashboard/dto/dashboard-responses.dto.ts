@@ -55,3 +55,18 @@ export interface TopProductsSoldResponse {
   period: string;
   items: TopProductSoldItemResponse[];
 }
+
+export interface PurchaseOrdersSummaryResponse {
+  totalOrders: number;
+  statuses: {
+    pending: number;
+    pendingToInvoice: number;
+    invoiced: number;
+    cancelled: number;
+  };
+  amounts: {
+    invoiced: number;
+    nonInvoiced: number;
+    gross: number;
+  };
+}

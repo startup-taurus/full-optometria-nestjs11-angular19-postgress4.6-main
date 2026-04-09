@@ -79,4 +79,14 @@ export class DashboardController {
   ) {
     return this.dashboardService.getPatientsAgeDemographics(branchId, companyId);
   }
+
+  @Get('purchase-orders-summary')
+  @RequirePermissions('dashboard_read')
+  async getPurchaseOrdersSummary(
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null
+  ) {
+    return this.dashboardService.getPurchaseOrdersSummary(branchId, companyId);
+  }
 }
+

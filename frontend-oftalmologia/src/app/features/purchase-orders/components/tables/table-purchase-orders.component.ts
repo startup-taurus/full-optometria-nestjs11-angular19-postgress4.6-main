@@ -52,6 +52,7 @@ import { FilterPurchaseOrdersComponent } from '../filters/filter-purchase-orders
 import { ViewPurchaseOrderModalComponent } from '../modals/view-purchase-order-modal/view-purchase-order-modal.component'
 import { CreateEditPurchaseOrderModalComponent } from '../modals/create-edit-purchase-order-modal/create-edit-purchase-order-modal.component'
 import { ViewLaboratoryOrderComponent } from '../../../laboratoy-orders/components/forms/view-laboratory-order/view-laboratory-order.component'
+import { PurchaseOrdersSummaryComponent } from '../purchase-orders-summary/purchase-orders-summary.component'
 
 @Component({
   selector: 'table-purchase-orders',
@@ -61,6 +62,7 @@ import { ViewLaboratoryOrderComponent } from '../../../laboratoy-orders/componen
     TranslateModule,
     NgbModule,
     PageTitleComponent,
+    PurchaseOrdersSummaryComponent,
     NgxDatatableComponent,
     SideFilterPanelComponent,
   ],
@@ -133,6 +135,32 @@ export class TablePurchaseOrdersComponent
 
         this.reloadDatatable(this.filter)
       })
+  }
+
+  public onSummaryFilterApplied(status: string): void {
+    let newFilter: Partial<PurchaseOrderQueryParams> = {}
+
+    if (status === 'pendingToInvoice') {
+      // Mostrar órdenes pendientes que deben facturarse
+      newFilter = {
+        status: PurchaseOrderStatus.PENDING,
+        shouldInvoice: true,
+      }
+    } else if (status === 'pending') {
+      // Mostrar órdenes pendientes que NO deben facturarse aún
+      newFilter = {
+        status: PurchaseOrderStatus.PENDING,
+        shouldInvoice: false,
+      }
+    } else if (status === 'invoiced') {
+      newFilter = {
+        status: PurchaseOrderStatus.INVOICED,
+      }
+    } else if (status === 'all') {
+      newFilter = {}
+    }
+
+    this.reloadDatatable(newFilter)
   }
 
   private setConfigDatatable(): BehaviorSubject<Partial<NgxDatatableConfig>> {

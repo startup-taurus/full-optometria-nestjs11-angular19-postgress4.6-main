@@ -30,6 +30,21 @@ export interface TopProductsSoldResponse extends ChartDataResponse {
   items: TopProductSoldItem[]
 }
 
+export interface PurchaseOrdersSummaryResponse {
+  totalOrders: number
+  statuses: {
+    pending: number
+    pendingToInvoice: number
+    invoiced: number
+    cancelled: number
+  }
+  amounts: {
+    invoiced: number
+    nonInvoiced: number
+    gross: number
+  }
+}
+
 export interface ApiResponse<T> {
   statusCode: number
   status: string

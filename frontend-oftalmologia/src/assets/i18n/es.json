@@ -1768,6 +1768,27 @@
       "ERROR_DELETING": "Error al eliminar la orden de pedido",
       "DELETE_CONFIRM": "¿Está seguro de eliminar esta orden?",
       "DELETE_TEXT": "Esta acción no se puede deshacer"
+    },
+    "SUMMARY": {
+      "PENDING": "Pendientes",
+      "PENDING_DESC": "Pendientes sin marcar para facturación",
+      "PENDING_TOOLTIP": "Órdenes pendientes que todavía no pasan a facturación",
+      "TO_INVOICE": "Por Facturar",
+      "TO_INVOICE_DESC": "Pendientes listas para generar factura",
+      "TO_INVOICE_TOOLTIP": "Órdenes procesadas y pendientes de facturación o envío al SRI",
+      "INVOICED": "Facturadas",
+      "INVOICED_DESC": "Órdenes ya facturadas",
+      "INVOICED_TOOLTIP": "Órdenes ya facturadas y procesadas",
+      "TOTAL_ORDERS": "Total Órdenes",
+      "TOTAL_ORDERS_DESC": "Cantidad total registrada",
+      "TOTAL_ORDERS_TOOLTIP": "Muestra todas las órdenes sin aplicar filtros",
+      "TOTAL_INVOICED": "Total Facturado",
+      "TOTAL_INVOICED_DESC": "Suma de órdenes con estado facturado",
+      "TOTAL_NON_INVOICED": "Total No Facturado",
+      "TOTAL_NON_INVOICED_DESC": "Suma de órdenes pendientes",
+      "TOTAL_SOLD": "Total Vendido",
+      "TOTAL_SOLD_DESC": "Facturado + no facturado (sin anuladas)",
+      "EMPTY": "No hay órdenes de pedido para mostrar"
     }
   },
   "BRANCH_SELECTOR": {
