@@ -326,8 +326,8 @@ export class TablePurchaseOrdersComponent
     Swal.fire({
       ...SWAL_DELETE_CONFIRM_CONFIG,
       title: '¿Está seguro?',
-      text: `¿Desea eliminar la orden #${order.orderNumber || '-'}?`,
-      confirmButtonText: 'Sí, eliminar',
+      text: `¿Desea cancelar la orden #${order.orderNumber || '-'}?`,
+      confirmButtonText: 'Sí, cancelar',
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (!result.isConfirmed) {
@@ -341,16 +341,19 @@ export class TablePurchaseOrdersComponent
           next: () => {
             Swal.fire({
               ...SWAL_SUCCESS_CONFIG,
-              title: '¡Eliminado!',
-              text: 'La orden de pedido ha sido eliminada.',
+              title: '¡Cancelada!',
+              text: 'La orden de pedido ha sido cancelada.',
             })
             this.reloadDatatable(this.filter)
           },
-          error: () => {
+          error: (error: any) => {
             Swal.fire({
               ...SWAL_ERROR_CONFIG,
               title: 'Error',
-              text: 'No se pudo eliminar la orden de pedido.',
+              text: this.getErrorMessage(
+                error,
+                'No se pudo cancelar la orden de pedido.'
+              ),
             })
           },
         })
@@ -379,5 +382,16 @@ export class TablePurchaseOrdersComponent
 
   public hasActiveFilters(): boolean {
     return Object.keys(this.filter).length > 0
+  }
+
+  private getErrorMessage(error: any, fallback: string): string {
+    return (
+      error?.error?.message?.es ||
+      error?.error?.message?.en ||
+      error?.error?.data?.localizedMessage?.es ||
+      error?.error?.data?.localizedMessage?.en ||
+      error?.error?.data?.error ||
+      fallback
+    )
   }
 }

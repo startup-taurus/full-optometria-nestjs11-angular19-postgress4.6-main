@@ -128,6 +128,10 @@
             </div>
             <div class="card-body">
               <div class="data-field">
+                <strong>{{ 'COMMON.CREATED_AT' | translate }}:</strong>
+                <span>{{ formatDateTime(order?.createdAt || null) }}</span>
+              </div>
+              <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.ATTENDANCE_DATE' | translate }}:</strong>
                 <span>{{ formatDate(order?.attendanceDate || null) }}</span>
               </div>

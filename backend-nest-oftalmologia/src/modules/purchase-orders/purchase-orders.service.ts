@@ -3,14 +3,26 @@ import {
   NotFoundException,
   ConflictException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, In, EntityManager } from 'typeorm';
+import {
+  Repository,
+  DataSource,
+  In,
+  EntityManager,
+  FindOptionsWhere,
+  IsNull,
+} from 'typeorm';
 import { PurchaseOrder, PurchaseOrderStatus } from './entities/purchase-order.entity';
 import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { Client } from '../patients/entities/client.entity';
-import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
+import {
+  LaboratoryOrder,
+  LaboratoryOrderStatus,
+} from '../laboratory-orders/entities/laboratory-order.entity';
 import { Product } from '../products/entities/product.entity';
+import { StockMovement } from '../products/entities/stock-movement.entity';
 import { UpdatePurchaseOrderDto } from './dtos/update-purchase-order.dto';
 import { QueryPurchaseOrderDto } from './dtos/query-purchase-order.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
@@ -28,6 +40,9 @@ export class PurchaseOrdersService {
     @InjectRepository(LaboratoryOrder)
     private laboratoryOrderRepository: Repository<LaboratoryOrder>,
   ) {}
+
+  private static readonly STOCK_MOVEMENT_LAB_CREATE = 'LABORATORY_ORDER_CREATE';
+  private static readonly STOCK_MOVEMENT_LAB_CANCEL = 'LABORATORY_ORDER_CANCEL';
 
   private extractLaboratoryOrderProductIds(laboratoryOrder: LaboratoryOrder): string[] {
     const orderAny = laboratoryOrder as any;
@@ -149,6 +164,503 @@ export class PurchaseOrdersService {
 
     const maxNumber = lastOrder?.maxNumber ? parseInt(lastOrder.maxNumber, 10) : 0;
     return maxNumber + 1;
+  }
+
+  private withCompanyScope<T extends { companyId?: string | null }>(
+    where: FindOptionsWhere<T>,
+    companyId: string | null,
+  ): FindOptionsWhere<T> {
+    return {
+      ...where,
+      companyId: companyId ?? IsNull(),
+    } as FindOptionsWhere<T>;
+  }
+
+  private normalizeLaboratoryOrderStatus(
+    laboratoryOrder: Pick<LaboratoryOrder, 'status' | 'isConfirmed'>,
+  ): LaboratoryOrderStatus {
+    if (laboratoryOrder.status) {
+      return laboratoryOrder.status;
+    }
+
+    return laboratoryOrder.isConfirmed
+      ? LaboratoryOrderStatus.RECEIVED
+      : LaboratoryOrderStatus.PENDING;
+  }
+
+  private validatePendingCancellation(
+    purchaseOrder: PurchaseOrder | null,
+    laboratoryOrder: LaboratoryOrder,
+  ): void {
+    if (
+      purchaseOrder &&
+      purchaseOrder.status !== PurchaseOrderStatus.PENDING &&
+      purchaseOrder.status !== PurchaseOrderStatus.CANCELLED
+    ) {
+      throw new BadRequestException({
+        messageKey: 'ERROR.VALIDATION',
+        message: {
+          es: 'Solo se pueden cancelar órdenes de pedido en estado pendiente',
+          en: 'Only pending purchase orders can be cancelled',
+        },
+      });
+    }
+
+    const laboratoryOrderStatus = this.normalizeLaboratoryOrderStatus(laboratoryOrder);
+    if (
+      laboratoryOrderStatus !== LaboratoryOrderStatus.PENDING &&
+      laboratoryOrderStatus !== LaboratoryOrderStatus.CANCELLED
+    ) {
+      throw new BadRequestException({
+        messageKey: 'ERROR.VALIDATION',
+        message: {
+          es: 'No se puede cancelar porque la orden de laboratorio vinculada ya no está pendiente',
+          en: 'Cancellation is not allowed because the linked laboratory order is no longer pending',
+        },
+      });
+    }
+  }
+
+  private async getRestorableStockMap(
+    manager: EntityManager,
+    laboratoryOrder: LaboratoryOrder,
+  ): Promise<Map<string, number>> {
+    const stockMovementRepo = manager.getRepository(StockMovement);
+
+    const stockMovements = await stockMovementRepo.find({
+      where: {
+        referenceType: 'LABORATORY_ORDER',
+        referenceId: laboratoryOrder.id,
+        movementType: In([
+          PurchaseOrdersService.STOCK_MOVEMENT_LAB_CREATE,
+          PurchaseOrdersService.STOCK_MOVEMENT_LAB_CANCEL,
+        ]),
+      },
+      select: ['productId', 'quantity', 'movementType'],
+      order: { createdAt: 'ASC' },
+    });
+
+    const quantityMap = new Map<string, number>();
+
+    if (stockMovements.length > 0) {
+      const createdMap = new Map<string, number>();
+      const cancelledMap = new Map<string, number>();
+
+      stockMovements.forEach((movement) => {
+        const productId = movement.productId;
+        const quantity = Number(movement.quantity || 0);
+        if (!productId || !Number.isFinite(quantity) || quantity <= 0) {
+          return;
+        }
+
+        if (movement.movementType === PurchaseOrdersService.STOCK_MOVEMENT_LAB_CREATE) {
+          createdMap.set(productId, (createdMap.get(productId) || 0) + quantity);
+          return;
+        }
+
+        if (movement.movementType === PurchaseOrdersService.STOCK_MOVEMENT_LAB_CANCEL) {
+          cancelledMap.set(productId, (cancelledMap.get(productId) || 0) + quantity);
+        }
+      });
+
+      createdMap.forEach((createdQuantity, productId) => {
+        const cancelledQuantity = cancelledMap.get(productId) || 0;
+        const restorableQuantity = createdQuantity - cancelledQuantity;
+        if (restorableQuantity > 0) {
+          quantityMap.set(productId, restorableQuantity);
+        }
+      });
+
+      return quantityMap;
+    }
+
+    const fallbackMap = this.getLaboratoryOrderQuantityMap(laboratoryOrder);
+    fallbackMap.forEach((quantity, productId) => {
+      const normalizedQty = Number(quantity || 0);
+      if (!Number.isFinite(normalizedQty) || normalizedQty <= 0) {
+        return;
+      }
+
+      quantityMap.set(productId, normalizedQty);
+    });
+
+    return quantityMap;
+  }
+
+  private async restoreLaboratoryOrderStock(
+    manager: EntityManager,
+    laboratoryOrder: LaboratoryOrder,
+    branchId: string,
+    companyId: string | null,
+  ): Promise<void> {
+    const quantityMap = await this.getRestorableStockMap(manager, laboratoryOrder);
+    if (!quantityMap.size) {
+      return;
+    }
+
+    const stockMovementRepo = manager.getRepository(StockMovement);
+    const productRepo = manager.getRepository(Product);
+
+    for (const [productId, quantity] of quantityMap.entries()) {
+      const product = await productRepo.findOne({
+        where: { id: productId, branchId },
+        select: ['id', 'quantity'],
+      });
+
+      if (!product) {
+        continue;
+      }
+
+      const currentStock = Number(product.quantity || 0);
+      const restoredStock = currentStock + quantity;
+
+      await productRepo.update({ id: productId, branchId }, { quantity: restoredStock });
+
+      const movement = stockMovementRepo.create({
+        companyId: companyId || null,
+        branchId,
+        productId,
+        movementType: PurchaseOrdersService.STOCK_MOVEMENT_LAB_CANCEL,
+        quantity,
+        balanceAfter: restoredStock,
+        referenceType: 'LABORATORY_ORDER',
+        referenceId: laboratoryOrder.id,
+        note: `Cancellation for laboratory order #${laboratoryOrder.orderNumber || '-'}`,
+      });
+
+      await stockMovementRepo.save(movement);
+    }
+  }
+
+  private async validateReactivationStockAvailability(
+    manager: EntityManager,
+    laboratoryOrder: LaboratoryOrder,
+    branchId: string,
+  ): Promise<Array<{ productId: string; productName: string; needed: number; available: number }>> {
+    const productRepo = manager.getRepository(Product);
+    const quantityMap = this.getLaboratoryOrderQuantityMap(laboratoryOrder);
+    const insufficientProducts: Array<{ productId: string; productName: string; needed: number; available: number }> = [];
+
+    for (const [productId, quantity] of quantityMap.entries()) {
+      const product = await productRepo.findOne({
+        where: { id: productId, branchId },
+        select: ['id', 'name', 'quantity'],
+      });
+
+      if (!product) {
+        insufficientProducts.push({
+          productId,
+          productName: `Unknown (${productId})`,
+          needed: quantity,
+          available: 0,
+        });
+        continue;
+      }
+
+      const currentStock = Number(product.quantity || 0);
+      if (currentStock < quantity) {
+        insufficientProducts.push({
+          productId,
+          productName: product.name || `Product ${productId}`,
+          needed: quantity,
+          available: currentStock,
+        });
+      }
+    }
+
+    return insufficientProducts;
+  }
+
+  private async deductLaboratoryOrderStock(
+    manager: EntityManager,
+    laboratoryOrder: LaboratoryOrder,
+    branchId: string,
+    companyId: string | null,
+  ): Promise<void> {
+    const quantityMap = this.getLaboratoryOrderQuantityMap(laboratoryOrder);
+    if (!quantityMap.size) {
+      return;
+    }
+
+    const stockMovementRepo = manager.getRepository(StockMovement);
+    const productRepo = manager.getRepository(Product);
+
+    for (const [productId, quantity] of quantityMap.entries()) {
+      const product = await productRepo.findOne({
+        where: { id: productId, branchId },
+        select: ['id', 'quantity'],
+      });
+
+      if (!product) {
+        continue;
+      }
+
+      const currentStock = Number(product.quantity || 0);
+      const deductedStock = Math.max(currentStock - quantity, 0);
+
+      await productRepo.update({ id: productId, branchId }, { quantity: deductedStock });
+
+      const movement = stockMovementRepo.create({
+        companyId: companyId || null,
+        branchId,
+        productId,
+        movementType: PurchaseOrdersService.STOCK_MOVEMENT_LAB_CREATE,
+        quantity,
+        balanceAfter: deductedStock,
+        referenceType: 'LABORATORY_ORDER',
+        referenceId: laboratoryOrder.id,
+        note: `Reactivation for laboratory order #${laboratoryOrder.orderNumber || '-'}`,
+      });
+
+      await stockMovementRepo.save(movement);
+    }
+  }
+
+  private async reactivateLinkedOrders(
+    branchId: string,
+    companyId: string | null,
+    options: { purchaseOrderId?: string; laboratoryOrderId?: string },
+  ): Promise<{ purchaseOrder: PurchaseOrder | null; laboratoryOrder: LaboratoryOrder }> {
+    return this.dataSource.transaction(async (manager) => {
+      const purchaseOrderRepo = manager.getRepository(PurchaseOrder);
+      const laboratoryOrderRepo = manager.getRepository(LaboratoryOrder);
+
+      let purchaseOrder: PurchaseOrder | null = null;
+
+      if (options.purchaseOrderId) {
+        const purchaseOrderWhere = this.withCompanyScope<PurchaseOrder>(
+          { id: options.purchaseOrderId, branchId },
+          companyId,
+        );
+
+        purchaseOrder = await purchaseOrderRepo.findOne({
+          where: purchaseOrderWhere,
+        });
+
+        if (!purchaseOrder) {
+          throw new NotFoundException({
+            messageKey: 'ERROR.NOT_FOUND',
+            message: {
+              es: 'Orden de pedido no encontrada',
+              en: 'Purchase order not found',
+            },
+          });
+        }
+      }
+
+      if (!purchaseOrder && options.laboratoryOrderId) {
+        const purchaseOrderWhere = this.withCompanyScope<PurchaseOrder>(
+          { laboratoryOrderId: options.laboratoryOrderId, branchId },
+          companyId,
+        );
+
+        purchaseOrder = await purchaseOrderRepo.findOne({
+          where: purchaseOrderWhere,
+        });
+      }
+
+      const laboratoryOrderId = options.laboratoryOrderId || purchaseOrder?.laboratoryOrderId;
+
+      if (!laboratoryOrderId) {
+        throw new NotFoundException({
+          messageKey: 'ERROR.NOT_FOUND',
+          message: {
+            es: 'Orden de laboratorio vinculada no encontrada',
+            en: 'Linked laboratory order not found',
+          },
+        });
+      }
+
+      const laboratoryOrderWhere = this.withCompanyScope<LaboratoryOrder>(
+        { id: laboratoryOrderId, branchId },
+        companyId,
+      );
+
+      const laboratoryOrder = await laboratoryOrderRepo.findOne({
+        where: laboratoryOrderWhere,
+      });
+
+      if (!laboratoryOrder) {
+        throw new NotFoundException({
+          messageKey: 'ERROR.NOT_FOUND',
+          message: {
+            es: 'Orden de laboratorio no encontrada',
+            en: 'Laboratory order not found',
+          },
+        });
+      }
+
+      // Validate both are in CANCELLED status
+      if (purchaseOrder && purchaseOrder.status !== PurchaseOrderStatus.CANCELLED) {
+        throw new BadRequestException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'La orden de pedido debe estar cancelada para reactivarla',
+            en: 'Purchase order must be cancelled to reactivate it',
+          },
+        });
+      }
+
+      const laboratoryOrderStatus = this.normalizeLaboratoryOrderStatus(laboratoryOrder);
+      if (laboratoryOrderStatus !== LaboratoryOrderStatus.CANCELLED) {
+        throw new BadRequestException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'La orden de laboratorio debe estar cancelada para reactivarla',
+            en: 'Laboratory order must be cancelled to reactivate it',
+          },
+        });
+      }
+
+      // Validate stock availability BEFORE making changes
+      const insufficientProducts = await this.validateReactivationStockAvailability(
+        manager,
+        laboratoryOrder,
+        branchId,
+      );
+
+      if (insufficientProducts.length > 0) {
+        throw new BadRequestException({
+          messageKey: 'REACTIVATION.INSUFFICIENT_STOCK',
+          message: {
+            es: 'No hay stock disponible para reactivar la orden',
+            en: 'Insufficient stock to reactivate order',
+          },
+          details: insufficientProducts,
+        });
+      }
+
+      // Deduct stock for reactivation
+      await this.deductLaboratoryOrderStock(manager, laboratoryOrder, branchId, companyId);
+
+      // Change both orders to PENDING
+      if (purchaseOrder) {
+        purchaseOrder.status = PurchaseOrderStatus.PENDING;
+        await purchaseOrderRepo.save(purchaseOrder);
+      }
+
+      laboratoryOrder.status = LaboratoryOrderStatus.PENDING;
+      laboratoryOrder.isConfirmed = false;
+      await laboratoryOrderRepo.save(laboratoryOrder);
+
+      return { purchaseOrder, laboratoryOrder };
+    });
+  }
+
+  private async cancelLinkedOrders(
+    branchId: string,
+    companyId: string | null,
+    options: { purchaseOrderId?: string; laboratoryOrderId?: string },
+  ): Promise<{ purchaseOrder: PurchaseOrder | null; laboratoryOrder: LaboratoryOrder }> {
+    return this.dataSource.transaction(async (manager) => {
+      const purchaseOrderRepo = manager.getRepository(PurchaseOrder);
+      const laboratoryOrderRepo = manager.getRepository(LaboratoryOrder);
+
+      let purchaseOrder: PurchaseOrder | null = null;
+
+      if (options.purchaseOrderId) {
+        const purchaseOrderWhere = this.withCompanyScope<PurchaseOrder>(
+          { id: options.purchaseOrderId, branchId },
+          companyId,
+        );
+
+        purchaseOrder = await purchaseOrderRepo.findOne({
+          where: purchaseOrderWhere,
+        });
+
+        if (!purchaseOrder) {
+          throw new NotFoundException({
+            messageKey: 'ERROR.NOT_FOUND',
+            message: {
+              es: 'Orden de pedido no encontrada',
+              en: 'Purchase order not found',
+            },
+          });
+        }
+      }
+
+      if (!purchaseOrder && options.laboratoryOrderId) {
+        const purchaseOrderWhere = this.withCompanyScope<PurchaseOrder>(
+          { laboratoryOrderId: options.laboratoryOrderId, branchId },
+          companyId,
+        );
+
+        purchaseOrder = await purchaseOrderRepo.findOne({
+          where: purchaseOrderWhere,
+        });
+      }
+
+      const laboratoryOrderId = options.laboratoryOrderId || purchaseOrder?.laboratoryOrderId;
+
+      if (!laboratoryOrderId) {
+        throw new NotFoundException({
+          messageKey: 'ERROR.NOT_FOUND',
+          message: {
+            es: 'Orden de laboratorio vinculada no encontrada',
+            en: 'Linked laboratory order not found',
+          },
+        });
+      }
+
+      const laboratoryOrderWhere = this.withCompanyScope<LaboratoryOrder>(
+        { id: laboratoryOrderId, branchId },
+        companyId,
+      );
+
+      const laboratoryOrder = await laboratoryOrderRepo.findOne({
+        where: laboratoryOrderWhere,
+      });
+
+      if (!laboratoryOrder) {
+        throw new NotFoundException({
+          messageKey: 'ERROR.NOT_FOUND',
+          message: {
+            es: 'Orden de laboratorio no encontrada',
+            en: 'Laboratory order not found',
+          },
+        });
+      }
+
+      this.validatePendingCancellation(purchaseOrder, laboratoryOrder);
+
+      const shouldCancelPurchase =
+        !!purchaseOrder && purchaseOrder.status !== PurchaseOrderStatus.CANCELLED;
+
+      const laboratoryOrderStatus = this.normalizeLaboratoryOrderStatus(laboratoryOrder);
+      const shouldCancelLaboratoryOrder =
+        laboratoryOrderStatus !== LaboratoryOrderStatus.CANCELLED;
+
+      if (shouldCancelPurchase && purchaseOrder) {
+        purchaseOrder.status = PurchaseOrderStatus.CANCELLED;
+        await purchaseOrderRepo.save(purchaseOrder);
+      }
+
+      if (shouldCancelLaboratoryOrder) {
+        laboratoryOrder.status = LaboratoryOrderStatus.CANCELLED;
+        laboratoryOrder.isConfirmed = false;
+        await laboratoryOrderRepo.save(laboratoryOrder);
+      }
+
+      await this.restoreLaboratoryOrderStock(manager, laboratoryOrder, branchId, companyId);
+
+      return { purchaseOrder, laboratoryOrder };
+    });
+  }
+
+  async cancelByLaboratoryOrderId(
+    laboratoryOrderId: string,
+    branchId: string,
+    companyId: string | null,
+  ): Promise<void> {
+    await this.cancelLinkedOrders(branchId, companyId, { laboratoryOrderId });
+  }
+
+  async reactivateByLaboratoryOrderId(
+    laboratoryOrderId: string,
+    branchId: string,
+    companyId: string | null,
+  ): Promise<void> {
+    await this.reactivateLinkedOrders(branchId, companyId, { laboratoryOrderId });
   }
 
   async createFromLaboratoryOrder(
@@ -367,6 +879,30 @@ export class PurchaseOrdersService {
       });
     }
 
+    if (updatePurchaseOrderDto.status === PurchaseOrderStatus.CANCELLED) {
+      return this.remove(id, branchId, companyId);
+    }
+
+    if (
+      updatePurchaseOrderDto.status === PurchaseOrderStatus.PENDING &&
+      purchaseOrder.status === PurchaseOrderStatus.CANCELLED
+    ) {
+      const { purchaseOrder: reactivatedOrder } = await this.reactivateLinkedOrders(
+        branchId,
+        companyId,
+        { purchaseOrderId: id },
+      );
+
+      return {
+        messageKey: 'PURCHASE_ORDER.REACTIVATED',
+        message: {
+          es: 'Orden de pedido reactivada correctamente',
+          en: 'Purchase order reactivated successfully',
+        },
+        data: reactivatedOrder,
+      };
+    }
+
     try {
       Object.assign(purchaseOrder, updatePurchaseOrderDto);
       const updatedPurchaseOrder = await this.purchaseOrderRepository.save(purchaseOrder);
@@ -391,29 +927,17 @@ export class PurchaseOrdersService {
   }
 
   async remove(id: string, branchId: string, companyId: string | null) {
-    const purchaseOrder = await this.purchaseOrderRepository.findOne({
-      where: { id, branchId, companyId },
+    const { purchaseOrder } = await this.cancelLinkedOrders(branchId, companyId, {
+      purchaseOrderId: id,
     });
 
-    if (!purchaseOrder) {
-      throw new NotFoundException({
-        messageKey: 'ERROR.NOT_FOUND',
-        message: {
-          es: 'Orden de pedido no encontrada',
-          en: 'Purchase order not found',
-        },
-      });
-    }
-
-    purchaseOrder.status = PurchaseOrderStatus.CANCELLED;
-    await this.purchaseOrderRepository.save(purchaseOrder);
-
     return {
-      messageKey: 'PURCHASE_ORDER.DELETED',
+      messageKey: 'PURCHASE_ORDER.CANCELLED',
       message: {
-        es: 'Orden de pedido eliminada correctamente',
-        en: 'Purchase order deleted successfully',
+        es: 'Orden de pedido cancelada correctamente',
+        en: 'Purchase order cancelled successfully',
       },
+      data: purchaseOrder,
     };
   }
 

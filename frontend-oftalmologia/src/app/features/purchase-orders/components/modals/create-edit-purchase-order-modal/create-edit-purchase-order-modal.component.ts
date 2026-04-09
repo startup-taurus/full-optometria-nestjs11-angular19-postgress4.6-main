@@ -65,22 +65,57 @@ export class CreateEditPurchaseOrderModalComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isLoading = false
+          const isCancellation =
+            this.form.value.status === PurchaseOrderStatus.CANCELLED
+
           Swal.fire({
             ...SWAL_SUCCESS_CONFIG,
-            title: 'Actualizado',
-            text: 'La orden de pedido fue actualizada.',
+            title: isCancellation ? 'Cancelada' : 'Actualizado',
+            text: isCancellation
+              ? 'La orden de pedido fue cancelada.'
+              : 'La orden de pedido fue actualizada.',
           })
           this.activeModal.close('updated')
         },
-        error: () => {
+        error: (error: any) => {
           this.isLoading = false
-          Swal.fire({
-            ...SWAL_ERROR_CONFIG,
-            title: 'Error',
-            text: 'No se pudo actualizar la orden de pedido.',
-          })
+          const errorMessage = this.getErrorMessage(
+            error,
+            'No se pudo actualizar la orden de pedido.'
+          );
+
+          // Handle insufficient stock for reactivation
+          if (error.error?.messageKey === 'REACTIVATION.INSUFFICIENT_STOCK' && error.error?.details?.length > 0) {
+            const insufficientProducts = error.error.details;
+            const productsList = insufficientProducts
+              .map((p: any) => `<li>${p.productName}: disponible ${p.available}, necesario ${p.needed}</li>`)
+              .join('');
+
+            Swal.fire({
+              ...SWAL_ERROR_CONFIG,
+              title: 'Error',
+              html: `<p>${errorMessage}</p><ul style="text-align: left;">${productsList}</ul>`,
+            });
+          } else {
+            Swal.fire({
+              ...SWAL_ERROR_CONFIG,
+              title: 'Error',
+              text: errorMessage,
+            });
+          }
         },
       })
+  }
+
+  private getErrorMessage(error: any, fallback: string): string {
+    return (
+      error?.error?.message?.es ||
+      error?.error?.message?.en ||
+      error?.error?.data?.localizedMessage?.es ||
+      error?.error?.data?.localizedMessage?.en ||
+      error?.error?.data?.error ||
+      fallback
+    )
   }
 
   public isFieldInvalid(fieldName: string): boolean {

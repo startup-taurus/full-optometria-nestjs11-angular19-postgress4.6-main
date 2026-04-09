@@ -447,6 +447,29 @@ export class LaboratoryOrdersService {
       });
     }
 
+    if (normalizedStatus === LaboratoryOrderStatus.CANCELLED) {
+      await this.purchaseOrdersService.cancelByLaboratoryOrderId(
+        id,
+        branchId,
+        companyId || null,
+      );
+
+      return this.findOne(id, branchId, companyId);
+    }
+
+    if (
+      normalizedStatus === LaboratoryOrderStatus.PENDING &&
+      previousStatus === LaboratoryOrderStatus.CANCELLED
+    ) {
+      await this.purchaseOrdersService.reactivateByLaboratoryOrderId(
+        id,
+        branchId,
+        companyId || null,
+      );
+
+      return this.findOne(id, branchId, companyId);
+    }
+
     await this.laboratoryOrderRepository.update(whereCondition, {
       status: normalizedStatus,
       isConfirmed: this.getLegacyConfirmedValue(normalizedStatus),
@@ -478,19 +501,18 @@ export class LaboratoryOrdersService {
       });
     }
 
-    const whereCondition = CompanyFilterUtil.buildWhereCondition(
-      { id, branchId },
-      companyId
+    await this.purchaseOrdersService.cancelByLaboratoryOrderId(
+      id,
+      branchId,
+      companyId || null,
     );
-    await this.laboratoryOrderRepository.delete(whereCondition);
-
-    const resolvedStatus =
-      this.normalizeStatus(laboratoryOrder.status) ||
-      this.deriveStatusFromLegacyFlag(laboratoryOrder.isConfirmed);
 
     return {
-      messageKey: 'SUCCESS.DELETED',
-      message: 'Laboratory order deleted successfully',
+      messageKey: 'LABORATORY_ORDER.CANCELLED',
+      message: {
+        es: 'Orden de laboratorio cancelada correctamente',
+        en: 'Laboratory order cancelled successfully',
+      },
     };
   }
 
@@ -775,6 +797,10 @@ export class LaboratoryOrdersService {
       case 'delivered':
       case 'entregado':
         return LaboratoryOrderStatus.DELIVERED;
+      case LaboratoryOrderStatus.CANCELLED:
+      case 'cancelled':
+      case 'cancelado':
+        return LaboratoryOrderStatus.CANCELLED;
       default:
         return null;
     }

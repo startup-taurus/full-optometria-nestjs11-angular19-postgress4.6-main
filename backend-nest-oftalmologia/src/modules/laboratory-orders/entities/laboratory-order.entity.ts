@@ -26,6 +26,7 @@ export enum LaboratoryOrderStatus {
   SENT = 'sent',
   RECEIVED = 'received',
   DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
 }
 
 @Entity('laboratory_orders')

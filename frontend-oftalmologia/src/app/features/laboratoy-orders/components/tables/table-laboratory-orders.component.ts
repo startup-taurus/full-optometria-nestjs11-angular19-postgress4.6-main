@@ -212,6 +212,8 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
   public getStatusClass(order: LaboratoryOrder): string {
     switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.CANCELLED:
+        return 'bg-danger'
       case LaboratoryOrderStatus.SENT:
         return 'bg-info'
       case LaboratoryOrderStatus.RECEIVED:
@@ -225,6 +227,8 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
   public getStatusText(order: LaboratoryOrder): string {
     switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.CANCELLED:
+        return 'LABORATORY_ORDERS_MODULE.CANCELLED'
       case LaboratoryOrderStatus.SENT:
         return 'LABORATORY_ORDERS_MODULE.SENT'
       case LaboratoryOrderStatus.RECEIVED:
@@ -238,6 +242,8 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
   public getStatusActionClass(order: LaboratoryOrder): string {
     switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.CANCELLED:
+        return 'status-action--cancelled'
       case LaboratoryOrderStatus.SENT:
         return 'status-action--sent'
       case LaboratoryOrderStatus.RECEIVED:
@@ -320,8 +326,11 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
             Swal.fire({
               ...SWAL_ERROR_CONFIG,
               title: this._translateService.instant('COMMON.ERROR'),
-              text: this._translateService.instant(
-                'LABORATORY_ORDERS.MESSAGES.DELETE_ERROR'
+              text: this.getErrorMessage(
+                error,
+                this._translateService.instant(
+                  'LABORATORY_ORDERS.MESSAGES.DELETE_ERROR'
+                )
               ),
             })
           },
@@ -403,13 +412,29 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
               this.resetAndLoad()
             },
             error: (error: any) => {
-              Swal.fire({
-                icon: 'error',
-                title: this._translateService.instant('COMMON.ERROR'),
-                html: error.error?.message?.es || error.error?.message || this._translateService.instant(
-                  'LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_ERROR'
-                ),
-              })
+              const errorMessage = error.error?.message?.es || error.error?.message || this._translateService.instant(
+                'LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_ERROR'
+              );
+
+              // Handle insufficient stock for reactivation
+              if (error.error?.messageKey === 'REACTIVATION.INSUFFICIENT_STOCK' && error.error?.details?.length > 0) {
+                const insufficientProducts = error.error.details;
+                const productsList = insufficientProducts
+                  .map((p: any) => `<li>${p.productName}: disponible ${p.available}, necesario ${p.needed}</li>`)
+                  .join('');
+
+                Swal.fire({
+                  icon: 'error',
+                  title: this._translateService.instant('COMMON.ERROR'),
+                  html: `<p>${errorMessage}</p><ul style="text-align: left;">${productsList}</ul>`,
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: this._translateService.instant('COMMON.ERROR'),
+                  html: errorMessage,
+                });
+              }
             },
           })
       }
@@ -515,7 +540,21 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
       [LaboratoryOrderStatus.DELIVERED]: this._translateService.instant(
         'LABORATORY_ORDERS_MODULE.DELIVERED'
       ),
+      [LaboratoryOrderStatus.CANCELLED]: this._translateService.instant(
+        'LABORATORY_ORDERS_MODULE.CANCELLED'
+      ),
     }
+  }
+
+  private getErrorMessage(error: any, fallback: string): string {
+    return (
+      error?.error?.message?.es ||
+      error?.error?.message?.en ||
+      error?.error?.data?.localizedMessage?.es ||
+      error?.error?.data?.localizedMessage?.en ||
+      error?.error?.data?.error ||
+      fallback
+    )
   }
 
   public onSendWhatsApp(order: LaboratoryOrder): void {

@@ -9,6 +9,7 @@ export enum LaboratoryOrderStatus {
   SENT = 'sent',
   RECEIVED = 'received',
   DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
 }
 
 export interface LaboratoryOrderLineItem {
