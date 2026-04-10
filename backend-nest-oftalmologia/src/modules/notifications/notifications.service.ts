@@ -37,6 +37,12 @@ export class NotificationsService {
   private readonly sessionNormalizationTimeoutMs = 2500;
   private readonly runtimeStartTimeoutMs = 45000;
   private readonly refreshWaitTimeoutMs = 5000;
+  private readonly throttleMinDelayMs = this.resolveThrottleMinDelayMs();
+  private readonly throttleMaxDelayMs = this.resolveThrottleMaxDelayMs();
+  private readonly sessionSendChains = new Map<string, Promise<void>>();
+  private readonly sessionNextAllowedSendAt = new Map<string, number>();
+  private appointmentReminderCronRunning = false;
+  private appointmentReminderLastRunAt: Date | null = null;
 
   constructor(
     @InjectRepository(WhatsAppSession)
@@ -345,10 +351,15 @@ export class NotificationsService {
       const savedLog = await this.messageDispatchLogRepository.save(log);
 
       try {
-        const result = await this.whatsappProvider.sendMessage(
+        const result = await this.enqueueSessionSend(
           session.sessionKey,
-          phone,
-          content,
+          'manual_renewal',
+          async () =>
+            this.whatsappProvider.sendMessage(
+              session.sessionKey,
+              phone,
+              content,
+            ),
         );
         savedLog.status = DispatchStatus.SENT;
         savedLog.sentAt = new Date();
@@ -424,67 +435,105 @@ export class NotificationsService {
 
   @Cron('* * * * *')
   async processAutomaticAppointmentReminders() {
+    if (this.appointmentReminderCronRunning) {
+      this.logger.warn('Se omite ejecución de recordatorios automáticos por solapamiento');
+      return;
+    }
+
+    this.appointmentReminderCronRunning = true;
     const toleranceMs = 2 * 60 * 1000;
-    const connectedSessions = await this.whatsappSessionRepository.find({
-      where: {
-        status: WhatsAppSessionStatus.CONNECTED,
-      },
-      take: 200,
-    });
+    const runStartedAt = new Date();
+    const runStartedAtMs = runStartedAt.getTime();
+    const previousRunAtMs = this.appointmentReminderLastRunAt?.getTime();
+    const windowBaseStartMs = previousRunAtMs
+      ? previousRunAtMs - toleranceMs
+      : runStartedAtMs - toleranceMs;
+    const windowBaseEndMs = runStartedAtMs + toleranceMs;
 
-    for (const session of connectedSessions) {
-      if (!session.branchId || !session.userId) {
-        continue;
-      }
+    let sessionsEvaluated = 0;
+    let shiftsEvaluated = 0;
+    let shiftsDispatched = 0;
+    const startedAtMs = Date.now();
 
-      const rule = await this.getOrCreateReminderRule(
-        session.branchId,
-        session.companyId || null,
-      );
-
-      if (!rule.isActive || this.isQuietHour(rule)) {
-        continue;
-      }
-
-      const now = new Date();
-      const reminderHours = Number(rule.appointmentReminderHoursBefore || 24);
-      const targetTime = now.getTime() + reminderHours * 60 * 60 * 1000;
-      const windowStart = new Date(targetTime - toleranceMs);
-      const windowEnd = new Date(targetTime + toleranceMs);
-
-      const where: any = {
-        branchId: session.branchId,
-        createdByUserId: session.userId,
-        appointmentDate: Between(windowStart, windowEnd),
-      };
-
-      if (session.companyId) {
-        where.companyId = session.companyId;
-      } else {
-        where.companyId = IsNull();
-      }
-
-      const shifts = await this.shiftRepository.find({
-        where,
-        relations: ['patient'],
+    try {
+      const connectedSessions = await this.whatsappSessionRepository.find({
+        where: {
+          status: WhatsAppSessionStatus.CONNECTED,
+        },
+        take: 200,
       });
 
-      const inferredConnectedPhone =
-        await this.inferConnectedPhoneFromRecentSuccessfulLogs(
+      for (const session of connectedSessions) {
+        sessionsEvaluated += 1;
+        if (!session.branchId || !session.userId) {
+          continue;
+        }
+
+        const rule = await this.getOrCreateReminderRule(
           session.branchId,
           session.companyId || null,
         );
 
-      for (const shift of shifts) {
-        await this.dispatchAppointmentReminder(
-          shift,
+        if (!rule.isActive || this.isQuietHour(rule)) {
+          continue;
+        }
+
+        const reminderHours = Number(rule.appointmentReminderHoursBefore || 24);
+        const reminderMs = reminderHours * 60 * 60 * 1000;
+        const windowStart = new Date(windowBaseStartMs + reminderMs);
+        const windowEnd = new Date(windowBaseEndMs + reminderMs);
+
+        const where: any = {
+          branchId: session.branchId,
+          createdByUserId: session.userId,
+          appointmentDate: Between(windowStart, windowEnd),
+        };
+
+        if (session.companyId) {
+          where.companyId = session.companyId;
+        } else {
+          where.companyId = IsNull();
+        }
+
+        const shifts = await this.shiftRepository.find({
+          where,
+          relations: ['patient'],
+          order: {
+            appointmentDate: 'ASC',
+            id: 'ASC',
+          },
+        });
+
+        shiftsEvaluated += shifts.length;
+
+        const inferredConnectedPhone =
+          await this.inferConnectedPhoneFromRecentSuccessfulLogs(
+            session.branchId,
+            session.companyId || null,
+          );
+
+        for (const shift of shifts) {
+          const dispatched = await this.dispatchAppointmentReminder(
+            shift,
           session.branchId,
           session.companyId || null,
-          session.userId,
-          reminderHours,
-          inferredConnectedPhone,
+            session.userId,
+            reminderHours,
+            inferredConnectedPhone,
         );
+
+          if (dispatched) {
+            shiftsDispatched += 1;
+          }
+        }
       }
+
+      this.logger.log(
+        `Recordatorios automáticos procesados: sesiones=${sessionsEvaluated}, candidatos=${shiftsEvaluated}, enviados=${shiftsDispatched}, duracionMs=${Date.now() - startedAtMs}`,
+      );
+    } finally {
+      this.appointmentReminderLastRunAt = runStartedAt;
+      this.appointmentReminderCronRunning = false;
     }
   }
 
@@ -617,13 +666,13 @@ export class NotificationsService {
     senderUserId: string,
     reminderHours: number,
     inferredConnectedPhone?: string | null,
-  ) {
+  ): Promise<boolean> {
     if (!shift.patientId || !shift.patient || !shift.createdByUserId) {
-      return;
+      return false;
     }
 
     if (shift.createdByUserId !== senderUserId) {
-      return;
+      return false;
     }
 
     const scheduledAt = new Date(
@@ -638,7 +687,7 @@ export class NotificationsService {
     );
 
     if (alreadyDispatched) {
-      return;
+      return false;
     }
 
     const preference = await this.patientContactPreferenceRepository.findOne({
@@ -652,7 +701,7 @@ export class NotificationsService {
     });
 
     if (preference && !preference.whatsappOptIn) {
-      return;
+      return false;
     }
 
     const session = await this.getConnectedSessionForSender(
@@ -662,7 +711,7 @@ export class NotificationsService {
     );
 
     if (!session) {
-      return;
+      return false;
     }
 
     const phone = this.resolvePatientPhone(
@@ -673,7 +722,7 @@ export class NotificationsService {
     );
 
     if (!phone) {
-      return;
+      return false;
     }
 
     const content = this.interpolateTemplate(
@@ -692,7 +741,11 @@ export class NotificationsService {
       content,
       sessionKey: session.sessionKey,
       scheduledAt,
+      useThrottle: true,
+      source: 'appointment_reminder',
     });
+
+    return true;
   }
 
   private async getConnectedSessionForSender(
@@ -771,9 +824,20 @@ export class NotificationsService {
     content: string;
     sessionKey: string;
     scheduledAt: Date;
+    useThrottle?: boolean;
+    source?: 'appointment_reminder' | 'manual_renewal' | 'other';
   }) {
-    const { branchId, companyId, patientId, phone, content, sessionKey, scheduledAt } =
-      params;
+    const {
+      branchId,
+      companyId,
+      patientId,
+      phone,
+      content,
+      sessionKey,
+      scheduledAt,
+      useThrottle,
+      source,
+    } = params;
 
     const log = this.messageDispatchLogRepository.create({
       branchId,
@@ -789,7 +853,15 @@ export class NotificationsService {
     const savedLog = await this.messageDispatchLogRepository.save(log);
 
     try {
-      const result = await this.whatsappProvider.sendMessage(sessionKey, phone, content);
+      const sendOperation = async () =>
+        this.whatsappProvider.sendMessage(sessionKey, phone, content);
+      const result = useThrottle
+        ? await this.enqueueSessionSend(
+            sessionKey,
+            source || 'other',
+            sendOperation,
+          )
+        : await sendOperation();
       savedLog.status = DispatchStatus.SENT;
       savedLog.sentAt = new Date();
       savedLog.providerMessageId = result.providerMessageId;
@@ -1295,6 +1367,80 @@ export class NotificationsService {
       this.logger.warn(`${label} falló: ${errorMessage}`);
       return fallback();
     }
+  }
+
+  private async enqueueSessionSend<T>(
+    sessionKey: string,
+    source: 'appointment_reminder' | 'manual_renewal' | 'other',
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    const previous = this.sessionSendChains.get(sessionKey) ?? Promise.resolve();
+
+    const current = previous
+      .catch(() => undefined)
+      .then(async () => {
+        await this.waitForSessionThrottle(sessionKey, source);
+        return operation();
+      });
+
+    this.sessionSendChains.set(
+      sessionKey,
+      current
+        .then(() => undefined)
+        .catch(() => undefined),
+    );
+
+    return current;
+  }
+
+  private async waitForSessionThrottle(
+    sessionKey: string,
+    source: 'appointment_reminder' | 'manual_renewal' | 'other',
+  ): Promise<void> {
+    const now = Date.now();
+    const nextAllowedAt = this.sessionNextAllowedSendAt.get(sessionKey) || now;
+    const waitMs = Math.max(0, nextAllowedAt - now);
+
+    if (waitMs > 0) {
+      this.logger.debug(
+        `Throttle WhatsApp aplicado: sessionKey=${sessionKey} source=${source} waitMs=${waitMs}`,
+      );
+      await this.delay(waitMs);
+    }
+
+    const jitterMs = this.randomIntInclusive(
+      this.throttleMinDelayMs,
+      this.throttleMaxDelayMs,
+    );
+    this.sessionNextAllowedSendAt.set(sessionKey, Date.now() + jitterMs);
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private randomIntInclusive(min: number, max: number): number {
+    const safeMin = Math.min(min, max);
+    const safeMax = Math.max(min, max);
+    return Math.floor(Math.random() * (safeMax - safeMin + 1)) + safeMin;
+  }
+
+  private resolveThrottleMinDelayMs(): number {
+    const raw = Number(process.env.WHATSAPP_THROTTLE_MIN_DELAY_MS);
+    if (Number.isFinite(raw) && raw >= 1000) {
+      return Math.trunc(raw);
+    }
+
+    return 5000;
+  }
+
+  private resolveThrottleMaxDelayMs(): number {
+    const raw = Number(process.env.WHATSAPP_THROTTLE_MAX_DELAY_MS);
+    if (Number.isFinite(raw) && raw >= this.throttleMinDelayMs) {
+      return Math.trunc(raw);
+    }
+
+    return 8000;
   }
 
 }
