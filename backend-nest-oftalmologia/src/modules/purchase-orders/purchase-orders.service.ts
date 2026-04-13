@@ -14,7 +14,10 @@ import {
   FindOptionsWhere,
   IsNull,
 } from 'typeorm';
-import { PurchaseOrder, PurchaseOrderStatus } from './entities/purchase-order.entity';
+import {
+  PurchaseOrder,
+  PurchaseOrderStatus,
+} from './entities/purchase-order.entity';
 import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { Client } from '../patients/entities/client.entity';
 import {
@@ -44,7 +47,9 @@ export class PurchaseOrdersService {
   private static readonly STOCK_MOVEMENT_LAB_CREATE = 'LABORATORY_ORDER_CREATE';
   private static readonly STOCK_MOVEMENT_LAB_CANCEL = 'LABORATORY_ORDER_CANCEL';
 
-  private extractLaboratoryOrderProductIds(laboratoryOrder: LaboratoryOrder): string[] {
+  private extractLaboratoryOrderProductIds(
+    laboratoryOrder: LaboratoryOrder,
+  ): string[] {
     const orderAny = laboratoryOrder as any;
 
     const idsFromArray = Array.isArray(orderAny.productIds)
@@ -80,13 +85,18 @@ export class PurchaseOrdersService {
       }
 
       const qty = Number(line.quantity);
-      quantityMap.set(line.productId, Number.isFinite(qty) && qty > 0 ? qty : 1);
+      quantityMap.set(
+        line.productId,
+        Number.isFinite(qty) && qty > 0 ? qty : 1,
+      );
     });
 
     if (!quantityMap.size) {
-      this.extractLaboratoryOrderProductIds(laboratoryOrder).forEach((productId) => {
-        quantityMap.set(productId, 1);
-      });
+      this.extractLaboratoryOrderProductIds(laboratoryOrder).forEach(
+        (productId) => {
+          quantityMap.set(productId, 1);
+        },
+      );
     }
 
     return quantityMap;
@@ -162,7 +172,9 @@ export class PurchaseOrdersService {
       .select('MAX(po.orderNumber)', 'maxNumber')
       .getRawOne();
 
-    const maxNumber = lastOrder?.maxNumber ? parseInt(lastOrder.maxNumber, 10) : 0;
+    const maxNumber = lastOrder?.maxNumber
+      ? parseInt(lastOrder.maxNumber, 10)
+      : 0;
     return maxNumber + 1;
   }
 
@@ -206,7 +218,8 @@ export class PurchaseOrdersService {
       });
     }
 
-    const laboratoryOrderStatus = this.normalizeLaboratoryOrderStatus(laboratoryOrder);
+    const laboratoryOrderStatus =
+      this.normalizeLaboratoryOrderStatus(laboratoryOrder);
     if (
       laboratoryOrderStatus !== LaboratoryOrderStatus.PENDING &&
       laboratoryOrderStatus !== LaboratoryOrderStatus.CANCELLED
@@ -253,13 +266,25 @@ export class PurchaseOrdersService {
           return;
         }
 
-        if (movement.movementType === PurchaseOrdersService.STOCK_MOVEMENT_LAB_CREATE) {
-          createdMap.set(productId, (createdMap.get(productId) || 0) + quantity);
+        if (
+          movement.movementType ===
+          PurchaseOrdersService.STOCK_MOVEMENT_LAB_CREATE
+        ) {
+          createdMap.set(
+            productId,
+            (createdMap.get(productId) || 0) + quantity,
+          );
           return;
         }
 
-        if (movement.movementType === PurchaseOrdersService.STOCK_MOVEMENT_LAB_CANCEL) {
-          cancelledMap.set(productId, (cancelledMap.get(productId) || 0) + quantity);
+        if (
+          movement.movementType ===
+          PurchaseOrdersService.STOCK_MOVEMENT_LAB_CANCEL
+        ) {
+          cancelledMap.set(
+            productId,
+            (cancelledMap.get(productId) || 0) + quantity,
+          );
         }
       });
 
@@ -293,7 +318,10 @@ export class PurchaseOrdersService {
     branchId: string,
     companyId: string | null,
   ): Promise<void> {
-    const quantityMap = await this.getRestorableStockMap(manager, laboratoryOrder);
+    const quantityMap = await this.getRestorableStockMap(
+      manager,
+      laboratoryOrder,
+    );
     if (!quantityMap.size) {
       return;
     }
@@ -314,7 +342,10 @@ export class PurchaseOrdersService {
       const currentStock = Number(product.quantity || 0);
       const restoredStock = currentStock + quantity;
 
-      await productRepo.update({ id: productId, branchId }, { quantity: restoredStock });
+      await productRepo.update(
+        { id: productId, branchId },
+        { quantity: restoredStock },
+      );
 
       const movement = stockMovementRepo.create({
         companyId: companyId || null,
@@ -336,10 +367,22 @@ export class PurchaseOrdersService {
     manager: EntityManager,
     laboratoryOrder: LaboratoryOrder,
     branchId: string,
-  ): Promise<Array<{ productId: string; productName: string; needed: number; available: number }>> {
+  ): Promise<
+    Array<{
+      productId: string;
+      productName: string;
+      needed: number;
+      available: number;
+    }>
+  > {
     const productRepo = manager.getRepository(Product);
     const quantityMap = this.getLaboratoryOrderQuantityMap(laboratoryOrder);
-    const insufficientProducts: Array<{ productId: string; productName: string; needed: number; available: number }> = [];
+    const insufficientProducts: Array<{
+      productId: string;
+      productName: string;
+      needed: number;
+      available: number;
+    }> = [];
 
     for (const [productId, quantity] of quantityMap.entries()) {
       const product = await productRepo.findOne({
@@ -398,7 +441,10 @@ export class PurchaseOrdersService {
       const currentStock = Number(product.quantity || 0);
       const deductedStock = Math.max(currentStock - quantity, 0);
 
-      await productRepo.update({ id: productId, branchId }, { quantity: deductedStock });
+      await productRepo.update(
+        { id: productId, branchId },
+        { quantity: deductedStock },
+      );
 
       const movement = stockMovementRepo.create({
         companyId: companyId || null,
@@ -420,7 +466,10 @@ export class PurchaseOrdersService {
     branchId: string,
     companyId: string | null,
     options: { purchaseOrderId?: string; laboratoryOrderId?: string },
-  ): Promise<{ purchaseOrder: PurchaseOrder | null; laboratoryOrder: LaboratoryOrder }> {
+  ): Promise<{
+    purchaseOrder: PurchaseOrder | null;
+    laboratoryOrder: LaboratoryOrder;
+  }> {
     return this.dataSource.transaction(async (manager) => {
       const purchaseOrderRepo = manager.getRepository(PurchaseOrder);
       const laboratoryOrderRepo = manager.getRepository(LaboratoryOrder);
@@ -459,7 +508,8 @@ export class PurchaseOrdersService {
         });
       }
 
-      const laboratoryOrderId = options.laboratoryOrderId || purchaseOrder?.laboratoryOrderId;
+      const laboratoryOrderId =
+        options.laboratoryOrderId || purchaseOrder?.laboratoryOrderId;
 
       if (!laboratoryOrderId) {
         throw new NotFoundException({
@@ -491,7 +541,10 @@ export class PurchaseOrdersService {
       }
 
       // Validate both are in CANCELLED status
-      if (purchaseOrder && purchaseOrder.status !== PurchaseOrderStatus.CANCELLED) {
+      if (
+        purchaseOrder &&
+        purchaseOrder.status !== PurchaseOrderStatus.CANCELLED
+      ) {
         throw new BadRequestException({
           messageKey: 'ERROR.VALIDATION',
           message: {
@@ -501,7 +554,8 @@ export class PurchaseOrdersService {
         });
       }
 
-      const laboratoryOrderStatus = this.normalizeLaboratoryOrderStatus(laboratoryOrder);
+      const laboratoryOrderStatus =
+        this.normalizeLaboratoryOrderStatus(laboratoryOrder);
       if (laboratoryOrderStatus !== LaboratoryOrderStatus.CANCELLED) {
         throw new BadRequestException({
           messageKey: 'ERROR.VALIDATION',
@@ -513,11 +567,12 @@ export class PurchaseOrdersService {
       }
 
       // Validate stock availability BEFORE making changes
-      const insufficientProducts = await this.validateReactivationStockAvailability(
-        manager,
-        laboratoryOrder,
-        branchId,
-      );
+      const insufficientProducts =
+        await this.validateReactivationStockAvailability(
+          manager,
+          laboratoryOrder,
+          branchId,
+        );
 
       if (insufficientProducts.length > 0) {
         throw new BadRequestException({
@@ -531,7 +586,12 @@ export class PurchaseOrdersService {
       }
 
       // Deduct stock for reactivation
-      await this.deductLaboratoryOrderStock(manager, laboratoryOrder, branchId, companyId);
+      await this.deductLaboratoryOrderStock(
+        manager,
+        laboratoryOrder,
+        branchId,
+        companyId,
+      );
 
       // Change both orders to PENDING
       if (purchaseOrder) {
@@ -551,7 +611,10 @@ export class PurchaseOrdersService {
     branchId: string,
     companyId: string | null,
     options: { purchaseOrderId?: string; laboratoryOrderId?: string },
-  ): Promise<{ purchaseOrder: PurchaseOrder | null; laboratoryOrder: LaboratoryOrder }> {
+  ): Promise<{
+    purchaseOrder: PurchaseOrder | null;
+    laboratoryOrder: LaboratoryOrder;
+  }> {
     return this.dataSource.transaction(async (manager) => {
       const purchaseOrderRepo = manager.getRepository(PurchaseOrder);
       const laboratoryOrderRepo = manager.getRepository(LaboratoryOrder);
@@ -590,7 +653,8 @@ export class PurchaseOrdersService {
         });
       }
 
-      const laboratoryOrderId = options.laboratoryOrderId || purchaseOrder?.laboratoryOrderId;
+      const laboratoryOrderId =
+        options.laboratoryOrderId || purchaseOrder?.laboratoryOrderId;
 
       if (!laboratoryOrderId) {
         throw new NotFoundException({
@@ -624,9 +688,11 @@ export class PurchaseOrdersService {
       this.validatePendingCancellation(purchaseOrder, laboratoryOrder);
 
       const shouldCancelPurchase =
-        !!purchaseOrder && purchaseOrder.status !== PurchaseOrderStatus.CANCELLED;
+        !!purchaseOrder &&
+        purchaseOrder.status !== PurchaseOrderStatus.CANCELLED;
 
-      const laboratoryOrderStatus = this.normalizeLaboratoryOrderStatus(laboratoryOrder);
+      const laboratoryOrderStatus =
+        this.normalizeLaboratoryOrderStatus(laboratoryOrder);
       const shouldCancelLaboratoryOrder =
         laboratoryOrderStatus !== LaboratoryOrderStatus.CANCELLED;
 
@@ -641,7 +707,12 @@ export class PurchaseOrdersService {
         await laboratoryOrderRepo.save(laboratoryOrder);
       }
 
-      await this.restoreLaboratoryOrderStock(manager, laboratoryOrder, branchId, companyId);
+      await this.restoreLaboratoryOrderStock(
+        manager,
+        laboratoryOrder,
+        branchId,
+        companyId,
+      );
 
       return { purchaseOrder, laboratoryOrder };
     });
@@ -660,7 +731,9 @@ export class PurchaseOrdersService {
     branchId: string,
     companyId: string | null,
   ): Promise<void> {
-    await this.reactivateLinkedOrders(branchId, companyId, { laboratoryOrderId });
+    await this.reactivateLinkedOrders(branchId, companyId, {
+      laboratoryOrderId,
+    });
   }
 
   async createFromLaboratoryOrder(
@@ -725,7 +798,8 @@ export class PurchaseOrdersService {
         const totalAmount = this.calculateTotalAmountFromItems(itemSnapshots);
 
         const purchaseOrderRepository = manager.getRepository(PurchaseOrder);
-        const purchaseOrderItemRepository = manager.getRepository(PurchaseOrderItem);
+        const purchaseOrderItemRepository =
+          manager.getRepository(PurchaseOrderItem);
 
         const purchaseOrder = purchaseOrderRepository.create({
           orderNumber,
@@ -738,7 +812,8 @@ export class PurchaseOrdersService {
           totalAmount,
         });
 
-        const savedPurchaseOrder = await purchaseOrderRepository.save(purchaseOrder);
+        const savedPurchaseOrder =
+          await purchaseOrderRepository.save(purchaseOrder);
 
         const itemsToSave = itemSnapshots.map((item) =>
           purchaseOrderItemRepository.create({
@@ -756,10 +831,12 @@ export class PurchaseOrdersService {
           relations: ['client', 'laboratoryOrder', 'items'],
         });
 
-        return reloadedPurchaseOrder || {
-          ...savedPurchaseOrder,
-          items: itemsToSave,
-        };
+        return (
+          reloadedPurchaseOrder || {
+            ...savedPurchaseOrder,
+            items: itemsToSave,
+          }
+        );
       });
 
       return {
@@ -795,6 +872,7 @@ export class PurchaseOrdersService {
       .leftJoinAndSelect('po.client', 'client')
       .leftJoinAndSelect('po.laboratoryOrder', 'laboratoryOrder')
       .leftJoinAndSelect('po.items', 'items')
+      .leftJoinAndSelect('po.invoice', 'invoice')
       .where('po.branchId = :branchId', { branchId })
       .andWhere('po.companyId = :companyId', { companyId });
 
@@ -810,7 +888,9 @@ export class PurchaseOrdersService {
     }
 
     if (shouldInvoice !== undefined) {
-      queryBuilder.andWhere('po.shouldInvoice = :shouldInvoice', { shouldInvoice });
+      queryBuilder.andWhere('po.shouldInvoice = :shouldInvoice', {
+        shouldInvoice,
+      });
     }
 
     const [purchaseOrders, total] = await queryBuilder
@@ -835,7 +915,7 @@ export class PurchaseOrdersService {
   async findOne(id: string, branchId: string, companyId: string | null) {
     const purchaseOrder = await this.purchaseOrderRepository.findOne({
       where: { id, branchId, companyId },
-      relations: ['client', 'laboratoryOrder', 'items'],
+      relations: ['client', 'laboratoryOrder', 'items', 'invoice'],
     });
 
     if (!purchaseOrder) {
@@ -887,11 +967,10 @@ export class PurchaseOrdersService {
       updatePurchaseOrderDto.status === PurchaseOrderStatus.PENDING &&
       purchaseOrder.status === PurchaseOrderStatus.CANCELLED
     ) {
-      const { purchaseOrder: reactivatedOrder } = await this.reactivateLinkedOrders(
-        branchId,
-        companyId,
-        { purchaseOrderId: id },
-      );
+      const { purchaseOrder: reactivatedOrder } =
+        await this.reactivateLinkedOrders(branchId, companyId, {
+          purchaseOrderId: id,
+        });
 
       return {
         messageKey: 'PURCHASE_ORDER.REACTIVATED',
@@ -905,7 +984,8 @@ export class PurchaseOrdersService {
 
     try {
       Object.assign(purchaseOrder, updatePurchaseOrderDto);
-      const updatedPurchaseOrder = await this.purchaseOrderRepository.save(purchaseOrder);
+      const updatedPurchaseOrder =
+        await this.purchaseOrderRepository.save(purchaseOrder);
 
       return {
         messageKey: 'PURCHASE_ORDER.UPDATED',
@@ -927,9 +1007,13 @@ export class PurchaseOrdersService {
   }
 
   async remove(id: string, branchId: string, companyId: string | null) {
-    const { purchaseOrder } = await this.cancelLinkedOrders(branchId, companyId, {
-      purchaseOrderId: id,
-    });
+    const { purchaseOrder } = await this.cancelLinkedOrders(
+      branchId,
+      companyId,
+      {
+        purchaseOrderId: id,
+      },
+    );
 
     return {
       messageKey: 'PURCHASE_ORDER.CANCELLED',
@@ -944,7 +1028,7 @@ export class PurchaseOrdersService {
   async getPurchaseOrderByLaboratoryOrderId(laboratoryOrderId: string) {
     return this.purchaseOrderRepository.findOne({
       where: { laboratoryOrderId },
-      relations: ['client', 'laboratoryOrder', 'items'],
+      relations: ['client', 'laboratoryOrder', 'items', 'invoice'],
     });
   }
 }

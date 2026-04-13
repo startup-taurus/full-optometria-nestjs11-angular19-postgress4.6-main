@@ -120,7 +120,7 @@
           <label for="slug" class="form-label">
             {{ 'COMPANIES_MODULE.URL_SLUG' | translate }}
             <span class="text-danger">*</span>
-            <i 
+            <i
               class="ti ti-info-circle ms-1 text-info"
               [ngbTooltip]="'COMPANIES_MODULE.URL_SLUG_TOOLTIP' | translate"
               placement="top"
@@ -141,7 +141,7 @@
           >
             {{ getFieldError(stepForms[1], 'slug') | translate }}
           </div>
-          
+
           <div class="mt-2" *ngIf="urlPreview">
             <label class="form-label text-muted small mb-1">
               {{ 'COMPANIES_MODULE.PUBLIC_URL_PREVIEW' | translate }}
@@ -169,7 +169,9 @@
           <div class="col-md-6">
             <label for="maxUsers" class="form-label">
               {{ 'COMPANIES_MODULE.MAX_USERS' | translate }}
-              <span class="text-muted small">({{ 'COMMON.OPTIONAL' | translate }})</span>
+              <span class="text-muted small"
+                >({{ 'COMMON.OPTIONAL' | translate }})</span
+              >
             </label>
             <input
               type="number"
@@ -177,7 +179,9 @@
               id="maxUsers"
               formControlName="maxUsers"
               [class.is-invalid]="isFieldInvalid(stepForms[1], 'maxUsers')"
-              [placeholder]="'COMPANIES_MODULE.MAX_USERS_PLACEHOLDER' | translate"
+              [placeholder]="
+                'COMPANIES_MODULE.MAX_USERS_PLACEHOLDER' | translate
+              "
               min="1"
             />
             <div class="form-text text-muted small">
@@ -193,7 +197,9 @@
           <div class="col-md-6">
             <label for="maxBranches" class="form-label">
               {{ 'COMPANIES_MODULE.MAX_BRANCHES' | translate }}
-              <span class="text-muted small">({{ 'COMMON.OPTIONAL' | translate }})</span>
+              <span class="text-muted small"
+                >({{ 'COMMON.OPTIONAL' | translate }})</span
+              >
             </label>
             <input
               type="number"
@@ -201,7 +207,9 @@
               id="maxBranches"
               formControlName="maxBranches"
               [class.is-invalid]="isFieldInvalid(stepForms[1], 'maxBranches')"
-              [placeholder]="'COMPANIES_MODULE.MAX_BRANCHES_PLACEHOLDER' | translate"
+              [placeholder]="
+                'COMPANIES_MODULE.MAX_BRANCHES_PLACEHOLDER' | translate
+              "
               min="1"
             />
             <div class="form-text text-muted small">
@@ -210,6 +218,53 @@
             <div
               class="invalid-feedback"
               *ngIf="isFieldInvalid(stepForms[1], 'maxBranches')"
+            >
+              {{ 'VALIDATION.MIN_VALUE_1' | translate }}
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="billingApiKey" class="form-label">
+              {{ 'COMPANIES_MODULE.BILLING_API_KEY' | translate }}
+              <span class="text-muted small"
+                >({{ 'COMMON.OPTIONAL' | translate }})</span
+              >
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="billingApiKey"
+              formControlName="billingApiKey"
+              [placeholder]="
+                'COMPANIES_MODULE.BILLING_API_KEY_PLACEHOLDER' | translate
+              "
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label for="billingContributorId" class="form-label">
+              {{ 'COMPANIES_MODULE.BILLING_CONTRIBUTOR_ID' | translate }}
+              <span class="text-muted small"
+                >({{ 'COMMON.OPTIONAL' | translate }})</span
+              >
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="billingContributorId"
+              formControlName="billingContributorId"
+              min="1"
+              [class.is-invalid]="
+                isFieldInvalid(stepForms[1], 'billingContributorId')
+              "
+              [placeholder]="
+                'COMPANIES_MODULE.BILLING_CONTRIBUTOR_ID_PLACEHOLDER'
+                  | translate
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="isFieldInvalid(stepForms[1], 'billingContributorId')"
             >
               {{ 'VALIDATION.MIN_VALUE_1' | translate }}
             </div>

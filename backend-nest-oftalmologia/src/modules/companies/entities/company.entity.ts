@@ -41,6 +41,17 @@ export class Company {
   @Column({ name: 'max_branches', type: 'int', nullable: true, default: null })
   maxBranches: number | null;
 
+  @Column({ name: 'billing_api_key', nullable: true })
+  billingApiKey: string | null;
+
+  @Column({
+    name: 'billing_contributor_id',
+    type: 'int',
+    nullable: true,
+    default: null,
+  })
+  billingContributorId: number | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

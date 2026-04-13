@@ -275,6 +275,34 @@
     "es": "Orden de pedido obtenida correctamente",
     "en": "Purchase order fetched successfully"
   },
+  "PURCHASE_ORDER.INVOICE_CREATED": {
+    "es": "Factura electrónica generada correctamente",
+    "en": "Electronic invoice created successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_RETRIED": {
+    "es": "Reintento de facturación ejecutado correctamente",
+    "en": "Invoice retry executed successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_FETCHED": {
+    "es": "Factura de la orden obtenida correctamente",
+    "en": "Order invoice fetched successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_AUTHORIZED": {
+    "es": "Factura autorizada correctamente",
+    "en": "Invoice authorized successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_XML_FETCHED": {
+    "es": "XML de factura obtenido correctamente",
+    "en": "Invoice XML fetched successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_STATUS_SYNCED": {
+    "es": "Estado de factura sincronizado correctamente",
+    "en": "Invoice status synced successfully"
+  },
+  "PURCHASE_ORDER.BILLING_PAYMENT_METHODS_FETCHED": {
+    "es": "Métodos de pago obtenidos correctamente",
+    "en": "Payment methods fetched successfully"
+  },
 
   "ERROR.INVALID_RELATION": {
     "es": "No se encontró la entidad relacionada",

@@ -15,6 +15,7 @@ import { LaboratoryOrder } from '../../laboratory-orders/entities/laboratory-ord
 import { Company } from '../../companies/entities/company.entity';
 import { Branch } from '../../branches/entities/branch.entity';
 import { PurchaseOrderItem } from './purchase-order-item.entity';
+import { PurchaseOrderInvoice } from './purchase-order-invoice.entity';
 
 export enum PurchaseOrderStatus {
   PENDING = 'pending',
@@ -59,7 +60,13 @@ export class PurchaseOrder {
   })
   status: PurchaseOrderStatus;
 
-  @Column({ name: 'total_amount', type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Column({
+    name: 'total_amount',
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    nullable: true,
+  })
   totalAmount: number;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -78,6 +85,9 @@ export class PurchaseOrder {
 
   @OneToMany(() => PurchaseOrderItem, (item) => item.purchaseOrder)
   items: PurchaseOrderItem[];
+
+  @OneToOne(() => PurchaseOrderInvoice, (invoice) => invoice.purchaseOrder)
+  invoice: PurchaseOrderInvoice;
 
   @ManyToOne(() => Company)
   @JoinColumn({ name: 'company_id' })

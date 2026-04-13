@@ -5,6 +5,8 @@ import {
   FormBuilder,
   FormGroup,
   Validators,
+  ValidationErrors,
+  AbstractControl,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
@@ -48,6 +50,19 @@ export class ClientModalComponent implements OnInit {
     this.initializeForm()
   }
 
+  private atLeastOnePhoneValidator(
+    control: AbstractControl
+  ): ValidationErrors | null {
+    const mobilePhone = String(control.get('mobilePhone')?.value || '').trim()
+    const homePhone = String(control.get('homePhone')?.value || '').trim()
+
+    if (!mobilePhone && !homePhone) {
+      return { atLeastOnePhone: true }
+    }
+
+    return null
+  }
+
   get isCreateMode(): boolean {
     return this.mode === 'create'
   }
@@ -55,16 +70,21 @@ export class ClientModalComponent implements OnInit {
   private initializeForm(): void {
     const initialPatientIds = this.resolveInitialPatientIds()
 
-    this.clientForm = this._fb.group({
-      patientIds: [initialPatientIds],
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      documentNumber: ['', Validators.required],
-      mobilePhone: [''],
-      homePhone: [''],
-      address: [''],
-    })
+    this.clientForm = this._fb.group(
+      {
+        patientIds: [initialPatientIds],
+        firstName: ['', [Validators.required, Validators.minLength(2)]],
+        lastName: ['', [Validators.required, Validators.minLength(2)]],
+        email: ['', [Validators.required, Validators.email]],
+        documentNumber: ['', Validators.required],
+        mobilePhone: [''],
+        homePhone: [''],
+        address: ['', [Validators.required]],
+      },
+      {
+        validators: this.atLeastOnePhoneValidator,
+      }
+    )
 
     if (this.mode === 'edit' && this.client) {
       this.clientForm.patchValue(this.client)
@@ -72,9 +92,9 @@ export class ClientModalComponent implements OnInit {
     }
 
     if (!this.allowPatientSelection) {
-      this.clientForm.get('patientIds')?.setValue(
-        this.patientId ? [this.patientId] : []
-      )
+      this.clientForm
+        .get('patientIds')
+        ?.setValue(this.patientId ? [this.patientId] : [])
     }
 
     if (this.allowPatientSelection) {
@@ -85,6 +105,15 @@ export class ClientModalComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.clientForm.get(fieldName)
     return !!(field && field.invalid && (field.dirty || field.touched))
+  }
+
+  isPhoneGroupInvalid(): boolean {
+    const mobileTouched = this.clientForm.get('mobilePhone')?.touched || false
+    const homeTouched = this.clientForm.get('homePhone')?.touched || false
+    return (
+      this.clientForm.hasError('atLeastOnePhone') &&
+      (mobileTouched || homeTouched || this.clientForm.dirty)
+    )
   }
 
   save(): void {
@@ -175,12 +204,17 @@ export class ClientModalComponent implements OnInit {
   }
 
   private resolveInitialPatientIds(): string[] {
-    if (Array.isArray(this.client?.patientIds) && this.client?.patientIds?.length) {
+    if (
+      Array.isArray(this.client?.patientIds) &&
+      this.client?.patientIds?.length
+    ) {
       return this.normalizePatientIds(this.client.patientIds)
     }
 
     if (Array.isArray(this.client?.patients) && this.client?.patients?.length) {
-      return this.normalizePatientIds(this.client.patients.map((item) => item.id))
+      return this.normalizePatientIds(
+        this.client.patients.map((item) => item.id)
+      )
     }
 
     if (this.client?.patientId) {
@@ -199,8 +233,8 @@ export class ClientModalComponent implements OnInit {
       new Set(
         (patientIds || [])
           .map((id) => String(id || '').trim())
-          .filter((id) => id.length > 0),
-      ),
+          .filter((id) => id.length > 0)
+      )
     )
   }
 
@@ -224,7 +258,7 @@ export class ClientModalComponent implements OnInit {
   }
 
   public getPatientLabel(
-    patient: Pick<Patient, 'id' | 'firstName' | 'lastName' | 'documentNumber'>,
+    patient: Pick<Patient, 'id' | 'firstName' | 'lastName' | 'documentNumber'>
   ): string {
     return `${patient.firstName} ${patient.lastName} - ${patient.documentNumber}`
   }

@@ -176,6 +176,8 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       ],
       maxUsers: [null, [Validators.min(1)]],
       maxBranches: [null, [Validators.min(1)]],
+      billingApiKey: [''],
+      billingContributorId: [null, [Validators.min(1)]],
     })
 
     this.stepForms[2] = this._fb.group({
@@ -558,6 +560,9 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       slug: this.stepForms[1].value.slug,
       maxUsers: this.stepForms[1].value.maxUsers || null,
       maxBranches: this.stepForms[1].value.maxBranches || null,
+      billingApiKey: this.stepForms[1].value.billingApiKey || undefined,
+      billingContributorId:
+        this.stepForms[1].value.billingContributorId || null,
     }
 
     this._companyService
@@ -695,6 +700,8 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       slug: this.selectedCompany.slug || '',
       maxUsers: this.selectedCompany.maxUsers ?? null,
       maxBranches: this.selectedCompany.maxBranches ?? null,
+      billingApiKey: this.selectedCompany.billingApiKey || '',
+      billingContributorId: this.selectedCompany.billingContributorId ?? null,
     })
 
     if (this.selectedCompany.logoFile?.path) {
@@ -736,6 +743,9 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
         slug: this.stepForms[1].value.slug,
         maxUsers: this.stepForms[1].value.maxUsers || null,
         maxBranches: this.stepForms[1].value.maxBranches || null,
+        billingApiKey: this.stepForms[1].value.billingApiKey || undefined,
+        billingContributorId:
+          this.stepForms[1].value.billingContributorId || null,
       }
 
       if (newLogoFileId) {

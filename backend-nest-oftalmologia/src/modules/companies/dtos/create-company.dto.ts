@@ -53,4 +53,14 @@ export class CreateCompanyDto {
   @IsInt()
   @Min(1)
   maxBranches?: number | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  billingApiKey?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  billingContributorId?: number | null;
 }

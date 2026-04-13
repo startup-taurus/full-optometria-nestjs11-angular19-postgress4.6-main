@@ -12,6 +12,7 @@
     "start:debug": "npm run db:patch:product-ids:dev && nest start --debug --watch",
     "start:prod": "node dist/main",
     "db:patch:product-ids:dev": "ts-node src/scripts/ensure-product-ids-column.ts",
+    "billing:diag": "ts-node src/scripts/verify-billing-api-connectivity.ts",
     "db:patch:product-ids": "node dist/scripts/ensure-product-ids-column.js",
     "start:prod:with-db-patch": "npm run migration:run:prod && npm run db:patch:product-ids && node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

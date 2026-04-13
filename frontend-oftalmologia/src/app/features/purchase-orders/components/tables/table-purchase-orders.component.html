@@ -85,7 +85,9 @@
     <span class="fw-medium">
       {{ row.client?.firstName || '-' }} {{ row.client?.lastName || '' }}
     </span>
-    <small class="text-body-secondary">{{ row.client?.documentNumber || '-' }}</small>
+    <small class="text-body-secondary">{{
+      row.client?.documentNumber || '-'
+    }}</small>
   </div>
 </ng-template>
 
@@ -104,18 +106,40 @@
 
 <ng-template #statusTemplate let-row="row">
   <span class="badge" [ngClass]="getStatusBadgeClass(row.status)">
-    {{ ('PURCHASE_ORDERS.STATUS_' + (row.status || '').toUpperCase()) | translate }}
+    {{
+      'PURCHASE_ORDERS.STATUS_' + (row.status || '').toUpperCase() | translate
+    }}
   </span>
 </ng-template>
 
 <ng-template #invoiceTemplate let-row="row">
-  <span
-    class="badge"
-    [class.bg-success]="row.shouldInvoice"
-    [class.bg-secondary]="!row.shouldInvoice"
-  >
-    {{ (row.shouldInvoice ? 'COMMON.YES' : 'COMMON.NO') | translate }}
-  </span>
+  <div class="d-flex flex-column gap-1">
+    <span
+      class="badge"
+      [ngClass]="
+        row.shouldInvoice
+          ? getInvoiceBadgeClass(row.invoice?.state)
+          : 'bg-secondary'
+      "
+    >
+      {{ getInvoiceStateLabelKey(row) | translate }}
+    </span>
+    <small class="text-body-secondary" *ngIf="row.invoice?.invoiceNumber">
+      {{ row.invoice?.invoiceNumber }}
+    </small>
+    <small
+      class="text-body-secondary"
+      *ngIf="!row.invoice?.invoiceNumber && row.invoice?.accessKey"
+    >
+      {{ row.invoice?.accessKey }}
+    </small>
+    <small
+      class="text-danger"
+      *ngIf="row.invoice?.state === 'FAILED' && row.invoice?.errorMessage"
+    >
+      {{ row.invoice?.errorMessage }}
+    </small>
+  </div>
 </ng-template>
 
 <ng-template #priceTemplate let-row="row">
@@ -130,6 +154,71 @@
 
 <ng-template #actionsTemplate let-row="row">
   <div class="d-flex gap-1 flex-wrap">
+    <button
+      *ngIf="canIssueInvoice(row)"
+      class="btn btn-outline-success btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'PURCHASE_ORDERS.BILLING.ACTION.ISSUE' | translate"
+      (click)="issueInvoice(row)"
+    >
+    </button>
+
+    <button
+      *ngIf="canRetryInvoice(row)"
+      class="btn btn-outline-warning btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'PURCHASE_ORDERS.BILLING.ACTION.RETRY' | translate"
+      (click)="retryInvoice(row)"
+    >
+      <i class="ti ti-refresh"></i>
+    </button>
+
+    <button
+      *ngIf="canAuthorizeInvoice(row)"
+      class="btn btn-outline-primary btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'PURCHASE_ORDERS.BILLING.ACTION.AUTHORIZE' | translate"
+      (click)="authorizeInvoice(row)"
+    >
+      <i class="ti ti-shield-check"></i>
+    </button>
+
+    <button
+      *ngIf="canCheckInvoiceStatus(row)"
+      class="btn btn-outline-dark btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'PURCHASE_ORDERS.BILLING.ACTION.CHECK_STATUS' | translate"
+      (click)="checkInvoiceStatus(row)"
+    >
+      <i class="ti ti-refresh-alert"></i>
+    </button>
+
+    <button
+      *ngIf="hasInvoiceXml(row)"
+      class="btn btn-outline-info btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'PURCHASE_ORDERS.BILLING.ACTION.VIEW_XML' | translate"
+      (click)="viewInvoiceXml(row)"
+    >
+      <i class="ti ti-file-search"></i>
+    </button>
+
+    <button
+      *ngIf="hasInvoiceXml(row)"
+      class="btn btn-outline-info btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'PURCHASE_ORDERS.BILLING.ACTION.DOWNLOAD_XML' | translate"
+      (click)="downloadInvoiceXml(row)"
+    >
+      <i class="ti ti-file-download"></i>
+    </button>
+
     <button
       class="btn btn-outline-secondary btn-xs"
       type="button"

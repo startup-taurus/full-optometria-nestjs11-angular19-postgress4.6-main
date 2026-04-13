@@ -9,13 +9,14 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core'
-import { TranslateModule } from '@ngx-translate/core'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import {
   BehaviorSubject,
   catchError,
   debounceTime,
   distinctUntilChanged,
+  firstValueFrom,
   map,
   Observable,
   of,
@@ -31,6 +32,9 @@ import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
 import { PurchaseOrdersService } from '@core/services/api/purchase-orders.service'
 import {
   PurchaseOrder,
+  PurchaseOrderInvoiceState,
+  BillingPaymentMethod,
+  CreatePurchaseOrderInvoiceDto,
   PurchaseOrderQueryParams,
   PurchaseOrderStatus,
 } from '@core/interfaces/api/purchase-order.interface'
@@ -106,6 +110,7 @@ export class TablePurchaseOrdersComponent
   private purchaseOrdersService = inject(PurchaseOrdersService)
   private modalService = inject(NgbModal)
   private store = inject(Store<AppState>)
+  private translateService = inject(TranslateService)
 
   ngOnInit(): void {
     this.subscribeToBranchChanges()
@@ -126,7 +131,11 @@ export class TablePurchaseOrdersComponent
   private subscribeToBranchChanges(): void {
     this.store
       .select(selectSelectedBranchId)
-      .pipe(takeUntil(this.unsubscribe$), distinctUntilChanged(), debounceTime(300))
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        distinctUntilChanged(),
+        debounceTime(300)
+      )
       .subscribe(() => {
         if (!this.hasInitializedBranchSubscription) {
           this.hasInitializedBranchSubscription = true
@@ -195,7 +204,7 @@ export class TablePurchaseOrdersComponent
         {
           name: 'PURCHASE_ORDERS.TABLE.INVOICE',
           cellTemplate: this.invoiceTemplate,
-          width: 140,
+          width: 230,
           sortable: false,
         },
         {
@@ -213,7 +222,7 @@ export class TablePurchaseOrdersComponent
         {
           name: 'PURCHASE_ORDERS.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate,
-          width: 180,
+          width: 280,
           sortable: false,
         },
       ],
@@ -304,11 +313,14 @@ export class TablePurchaseOrdersComponent
   }
 
   public openEditModal(order: PurchaseOrder): void {
-    const modalRef = this.modalService.open(CreateEditPurchaseOrderModalComponent, {
-      size: 'md',
-      centered: true,
-      backdrop: 'static',
-    })
+    const modalRef = this.modalService.open(
+      CreateEditPurchaseOrderModalComponent,
+      {
+        size: 'md',
+        centered: true,
+        backdrop: 'static',
+      }
+    )
 
     modalRef.componentInstance.purchaseOrder = order
 
@@ -371,6 +383,388 @@ export class TablePurchaseOrdersComponent
     }
   }
 
+  public getInvoiceBadgeClass(
+    state?: PurchaseOrderInvoiceState | null
+  ): string {
+    switch (state) {
+      case PurchaseOrderInvoiceState.AUTHORIZED:
+      case PurchaseOrderInvoiceState.APPROVED:
+        return 'bg-success'
+      case PurchaseOrderInvoiceState.FAILED:
+      case PurchaseOrderInvoiceState.NOT_APPROVED:
+      case PurchaseOrderInvoiceState.RETURNED:
+        return 'bg-danger'
+      case PurchaseOrderInvoiceState.NEW:
+      default:
+        return 'bg-warning text-dark'
+    }
+  }
+
+  public getInvoiceStateLabelKey(order: PurchaseOrder): string {
+    if (!order.shouldInvoice) {
+      return 'PURCHASE_ORDERS.BILLING.STATE.NOT_APPLICABLE'
+    }
+
+    if (!order.invoice) {
+      return 'PURCHASE_ORDERS.BILLING.STATE.PENDING_ISSUE'
+    }
+
+    const state = order.invoice.state
+
+    switch (state) {
+      case PurchaseOrderInvoiceState.AUTHORIZED:
+        return 'PURCHASE_ORDERS.BILLING.STATE.AUTHORIZED'
+      case PurchaseOrderInvoiceState.APPROVED:
+        return 'PURCHASE_ORDERS.BILLING.STATE.APPROVED'
+      case PurchaseOrderInvoiceState.RETURNED:
+        return 'PURCHASE_ORDERS.BILLING.STATE.RETURNED'
+      case PurchaseOrderInvoiceState.NOT_APPROVED:
+        return 'PURCHASE_ORDERS.BILLING.STATE.NOT_APPROVED'
+      case PurchaseOrderInvoiceState.FAILED:
+        return 'PURCHASE_ORDERS.BILLING.STATE.FAILED'
+      case PurchaseOrderInvoiceState.NEW:
+      default:
+        return 'PURCHASE_ORDERS.BILLING.STATE.CREATED'
+    }
+  }
+
+  public canIssueInvoice(order: PurchaseOrder): boolean {
+    return (
+      !!order.shouldInvoice &&
+      !order.invoice &&
+      order.status !== PurchaseOrderStatus.CANCELLED
+    )
+  }
+
+  public canRetryInvoice(order: PurchaseOrder): boolean {
+    const missingExternalId =
+      !!order.invoice &&
+      (!order.invoice.externalInvoiceId ||
+        String(order.invoice.externalInvoiceId).trim().length === 0)
+
+    return (
+      !!order.shouldInvoice &&
+      !!order.invoice &&
+      (order.invoice.state === PurchaseOrderInvoiceState.FAILED ||
+        missingExternalId) &&
+      order.status !== PurchaseOrderStatus.CANCELLED
+    )
+  }
+
+  public canAuthorizeInvoice(order: PurchaseOrder): boolean {
+    if (
+      !order.shouldInvoice ||
+      !order.invoice ||
+      order.status === PurchaseOrderStatus.CANCELLED
+    ) {
+      return false
+    }
+
+    if (
+      !order.invoice.externalInvoiceId ||
+      String(order.invoice.externalInvoiceId).trim().length === 0
+    ) {
+      return false
+    }
+
+    return (
+      order.invoice.state === PurchaseOrderInvoiceState.NEW ||
+      order.invoice.state === PurchaseOrderInvoiceState.NOT_APPROVED ||
+      order.invoice.state === PurchaseOrderInvoiceState.RETURNED ||
+      order.invoice.state === PurchaseOrderInvoiceState.FAILED
+    )
+  }
+
+  public canCheckInvoiceStatus(order: PurchaseOrder): boolean {
+    if (
+      !order.shouldInvoice ||
+      !order.invoice ||
+      order.status === PurchaseOrderStatus.CANCELLED
+    ) {
+      return false
+    }
+
+    return (
+      !!order.invoice.externalInvoiceId &&
+      String(order.invoice.externalInvoiceId).trim().length > 0
+    )
+  }
+
+  public hasInvoiceXml(order: PurchaseOrder): boolean {
+    if (!order.invoice) {
+      return false
+    }
+
+    return (
+      !!order.invoice.xmlBase64 ||
+      (!!order.invoice.externalInvoiceId &&
+        String(order.invoice.externalInvoiceId).trim().length > 0)
+    )
+  }
+
+  public async issueInvoice(order: PurchaseOrder): Promise<void> {
+    const missingFieldKeys = this.getMissingClientBillingFieldKeys(order)
+
+    if (missingFieldKeys.length > 0) {
+      const missingFieldsHtml = missingFieldKeys
+        .map((fieldKey) => `<li>${this.t(fieldKey)}</li>`)
+        .join('')
+
+      await Swal.fire({
+        ...SWAL_ERROR_CONFIG,
+        title: this.t(
+          'PURCHASE_ORDERS.BILLING.MESSAGES.MISSING_CLIENT_DATA_TITLE'
+        ),
+        html: `<p>${this.t('PURCHASE_ORDERS.BILLING.MESSAGES.MISSING_CLIENT_DATA_TEXT')}</p><ul style="text-align:left;">${missingFieldsHtml}</ul>`,
+      })
+      return
+    }
+
+    const paymentMethodsResponse = await firstValueFrom(
+      this.purchaseOrdersService
+        .getBillingPaymentMethods()
+        .pipe(catchError(() => of(this.getDefaultPaymentMethods())))
+    )
+
+    const paymentMethods = Array.isArray(paymentMethodsResponse)
+      ? paymentMethodsResponse
+      : this.getDefaultPaymentMethods()
+
+    const config = await this.openBillingConfigPrompt(paymentMethods, '01', 15)
+    if (!config) {
+      return
+    }
+
+    this.purchaseOrdersService
+      .createInvoice(order.id, config)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            ...SWAL_SUCCESS_CONFIG,
+            title: this.t(
+              'PURCHASE_ORDERS.BILLING.MESSAGES.INVOICE_CREATED_TITLE'
+            ),
+            text: this.t(
+              'PURCHASE_ORDERS.BILLING.MESSAGES.INVOICE_CREATED_TEXT'
+            ),
+          })
+          this.reloadDatatable(this.filter)
+        },
+        error: (error: any) => {
+          Swal.fire({
+            ...SWAL_ERROR_CONFIG,
+            title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.ISSUE_ERROR_TITLE'),
+            text: this.getErrorMessage(
+              error,
+              this.t('PURCHASE_ORDERS.BILLING.MESSAGES.ISSUE_ERROR_TEXT')
+            ),
+          })
+        },
+      })
+  }
+
+  public async retryInvoice(order: PurchaseOrder): Promise<void> {
+    const paymentMethodsResponse = await firstValueFrom(
+      this.purchaseOrdersService
+        .getBillingPaymentMethods()
+        .pipe(catchError(() => of(this.getDefaultPaymentMethods())))
+    )
+
+    const paymentMethods = Array.isArray(paymentMethodsResponse)
+      ? paymentMethodsResponse
+      : this.getDefaultPaymentMethods()
+
+    const config = await this.openBillingConfigPrompt(
+      paymentMethods,
+      order.invoice?.paymentMethod || '01',
+      Number(order.invoice?.taxPercent ?? 15)
+    )
+
+    if (!config) {
+      return
+    }
+
+    this.purchaseOrdersService
+      .retryInvoice(order.id, config)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            ...SWAL_SUCCESS_CONFIG,
+            title: this.t(
+              'PURCHASE_ORDERS.BILLING.MESSAGES.RETRY_SUCCESS_TITLE'
+            ),
+            text: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.RETRY_SUCCESS_TEXT'),
+          })
+          this.reloadDatatable(this.filter)
+        },
+        error: (error: any) => {
+          Swal.fire({
+            ...SWAL_ERROR_CONFIG,
+            title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.RETRY_ERROR_TITLE'),
+            text: this.getErrorMessage(
+              error,
+              this.t('PURCHASE_ORDERS.BILLING.MESSAGES.RETRY_ERROR_TEXT')
+            ),
+          })
+        },
+      })
+  }
+
+  public authorizeInvoice(order: PurchaseOrder): void {
+    this.purchaseOrdersService
+      .authorizeInvoice(order.id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            ...SWAL_SUCCESS_CONFIG,
+            title: this.t(
+              'PURCHASE_ORDERS.BILLING.MESSAGES.AUTH_SUCCESS_TITLE'
+            ),
+            text: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.AUTH_SUCCESS_TEXT'),
+          })
+          this.reloadDatatable(this.filter)
+        },
+        error: (error: any) => {
+          Swal.fire({
+            ...SWAL_ERROR_CONFIG,
+            title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.AUTH_ERROR_TITLE'),
+            text: this.getErrorMessage(
+              error,
+              this.t('PURCHASE_ORDERS.BILLING.MESSAGES.AUTH_ERROR_TEXT')
+            ),
+          })
+        },
+      })
+  }
+
+  public checkInvoiceStatus(order: PurchaseOrder): void {
+    this.purchaseOrdersService
+      .checkInvoiceStatus(order.id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            ...SWAL_SUCCESS_CONFIG,
+            title: this.t(
+              'PURCHASE_ORDERS.BILLING.MESSAGES.STATUS_SYNC_SUCCESS_TITLE'
+            ),
+            text: this.t(
+              'PURCHASE_ORDERS.BILLING.MESSAGES.STATUS_SYNC_SUCCESS_TEXT'
+            ),
+          })
+          this.reloadDatatable(this.filter)
+        },
+        error: (error: any) => {
+          Swal.fire({
+            ...SWAL_ERROR_CONFIG,
+            title: this.t(
+              'PURCHASE_ORDERS.BILLING.MESSAGES.STATUS_SYNC_ERROR_TITLE'
+            ),
+            text: this.getErrorMessage(
+              error,
+              this.t('PURCHASE_ORDERS.BILLING.MESSAGES.STATUS_SYNC_ERROR_TEXT')
+            ),
+          })
+        },
+      })
+  }
+
+  public viewInvoiceXml(order: PurchaseOrder): void {
+    this.purchaseOrdersService
+      .getInvoiceXml(order.id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: async (response) => {
+          if (!response?.xmlBase64) {
+            await Swal.fire({
+              ...SWAL_ERROR_CONFIG,
+              title: this.t(
+                'PURCHASE_ORDERS.BILLING.MESSAGES.XML_NOT_AVAILABLE_TITLE'
+              ),
+              text: this.t(
+                'PURCHASE_ORDERS.BILLING.MESSAGES.XML_NOT_AVAILABLE_TEXT'
+              ),
+            })
+            return
+          }
+
+          const xmlText = this.decodeBase64Xml(response.xmlBase64)
+          const summary = this.extractXmlSummary(xmlText)
+
+          const result = await Swal.fire({
+            title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.XML_PREVIEW_TITLE'),
+            html: `
+              <div style="text-align:left;display:grid;gap:8px;max-height:380px;overflow:auto;">
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.INVOICE_NUMBER')}:</strong> ${this.escapeHtml(summary.invoiceNumber || '-')}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.ACCESS_KEY')}:</strong> ${this.escapeHtml(summary.accessKey || '-')}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.CUSTOMER')}:</strong> ${this.escapeHtml(summary.customerName || '-')}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.IDENTIFICATION')}:</strong> ${this.escapeHtml(summary.customerId || '-')}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.DATE')}:</strong> ${this.escapeHtml(summary.issueDate || '-')}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.TOTAL')}:</strong> ${this.escapeHtml(summary.total || '-')}</div>
+              </div>
+            `,
+            showCancelButton: false,
+            showDenyButton: true,
+            confirmButtonText: this.t('COMMON.CLOSE'),
+            denyButtonText: this.t(
+              'PURCHASE_ORDERS.BILLING.ACTION.DOWNLOAD_XML'
+            ),
+          })
+
+          if (result.isDenied) {
+            this.downloadXmlFile(response.xmlBase64, order)
+          }
+        },
+        error: (error: any) => {
+          Swal.fire({
+            ...SWAL_ERROR_CONFIG,
+            title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.XML_ERROR_TITLE'),
+            text: this.getErrorMessage(
+              error,
+              this.t('PURCHASE_ORDERS.BILLING.MESSAGES.XML_ERROR_TEXT')
+            ),
+          })
+        },
+      })
+  }
+
+  public downloadInvoiceXml(order: PurchaseOrder): void {
+    this.purchaseOrdersService
+      .getInvoiceXml(order.id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          if (!response?.xmlBase64) {
+            Swal.fire({
+              ...SWAL_ERROR_CONFIG,
+              title: this.t(
+                'PURCHASE_ORDERS.BILLING.MESSAGES.XML_NOT_AVAILABLE_TITLE'
+              ),
+              text: this.t(
+                'PURCHASE_ORDERS.BILLING.MESSAGES.XML_NOT_AVAILABLE_TEXT'
+              ),
+            })
+            return
+          }
+
+          this.downloadXmlFile(response.xmlBase64, order)
+        },
+        error: (error: any) => {
+          Swal.fire({
+            ...SWAL_ERROR_CONFIG,
+            title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.XML_ERROR_TITLE'),
+            text: this.getErrorMessage(
+              error,
+              this.t('PURCHASE_ORDERS.BILLING.MESSAGES.XML_ERROR_TEXT')
+            ),
+          })
+        },
+      })
+  }
+
   public formatPrice(value?: number): string {
     const amount = Number(value)
     if (!Number.isFinite(amount)) {
@@ -393,5 +787,219 @@ export class TablePurchaseOrdersComponent
       error?.error?.data?.error ||
       fallback
     )
+  }
+
+  private t(key: string, params?: Record<string, unknown>): string {
+    return this.translateService.instant(key, params)
+  }
+
+  private getDefaultPaymentMethods(): BillingPaymentMethod[] {
+    return [
+      { code: '01', name: 'Efectivo', isActive: true },
+      { code: '16', name: 'Tarjeta débito', isActive: true },
+      { code: '19', name: 'Tarjeta crédito', isActive: true },
+      { code: '20', name: 'Transferencia o cheque', isActive: true },
+    ]
+  }
+
+  private getMissingClientBillingFieldKeys(order: PurchaseOrder): string[] {
+    const client = order.client
+    if (!client) {
+      return ['PURCHASE_ORDERS.BILLING.MISSING.CLIENT']
+    }
+
+    const missingKeys: string[] = []
+
+    if (!String(client.documentNumber || '').trim()) {
+      missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.DOCUMENT')
+    }
+
+    if (!String(client.email || '').trim()) {
+      missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.EMAIL')
+    }
+
+    if (!String(client.address || '').trim()) {
+      missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.ADDRESS')
+    }
+
+    const hasPhone =
+      String(client.mobilePhone || '').trim().length > 0 ||
+      String(client.homePhone || '').trim().length > 0
+
+    if (!hasPhone) {
+      missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.PHONE')
+    }
+
+    return missingKeys
+  }
+
+  private async openBillingConfigPrompt(
+    paymentMethods: BillingPaymentMethod[],
+    defaultPaymentMethod: string,
+    defaultTaxPercent: number
+  ): Promise<CreatePurchaseOrderInvoiceDto | null> {
+    const methods =
+      Array.isArray(paymentMethods) && paymentMethods.length > 0
+        ? paymentMethods
+        : this.getDefaultPaymentMethods()
+
+    const paymentOptions = methods
+      .map(
+        (item) =>
+          `<option value="${item.code}" ${item.code === defaultPaymentMethod ? 'selected' : ''}>${item.code} - ${item.name}</option>`
+      )
+      .join('')
+
+    const taxValues = [0, 5, 12, 13, 14, 15]
+    const taxOptions = taxValues
+      .map(
+        (value) =>
+          `<option value="${value}" ${value === defaultTaxPercent ? 'selected' : ''}>${value}%</option>`
+      )
+      .join('')
+
+    const result = await Swal.fire({
+      title: this.t('PURCHASE_ORDERS.BILLING.DIALOG.TITLE'),
+      html: `
+        <div style="text-align:left;display:grid;gap:12px;">
+          <div>
+            <label style="display:block;margin-bottom:6px;">${this.t('PURCHASE_ORDERS.BILLING.DIALOG.PAYMENT_METHOD')}</label>
+            <select id="billing-payment-method" class="swal2-select" style="width:100%;margin:0;">
+              ${paymentOptions}
+            </select>
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:6px;">${this.t('PURCHASE_ORDERS.BILLING.DIALOG.TAX_PERCENT')}</label>
+            <select id="billing-tax-percent" class="swal2-select" style="width:100%;margin:0;">
+              ${taxOptions}
+            </select>
+          </div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: this.t('PURCHASE_ORDERS.BILLING.DIALOG.CONFIRM'),
+      cancelButtonText: this.t('PURCHASE_ORDERS.BILLING.DIALOG.CANCEL'),
+      focusConfirm: false,
+      preConfirm: () => {
+        const paymentMethod = (
+          document.getElementById(
+            'billing-payment-method'
+          ) as HTMLSelectElement | null
+        )?.value
+        const taxPercentRaw = (
+          document.getElementById(
+            'billing-tax-percent'
+          ) as HTMLSelectElement | null
+        )?.value
+
+        if (!paymentMethod || !taxPercentRaw) {
+          Swal.showValidationMessage(
+            this.t('PURCHASE_ORDERS.BILLING.DIALOG.VALIDATION_REQUIRED')
+          )
+          return null
+        }
+
+        const taxPercent = Number(taxPercentRaw)
+        if (![0, 5, 12, 13, 14, 15].includes(taxPercent)) {
+          Swal.showValidationMessage(
+            this.t('PURCHASE_ORDERS.BILLING.DIALOG.VALIDATION_TAX_INVALID')
+          )
+          return null
+        }
+
+        return {
+          paymentMethod,
+          taxPercent,
+        }
+      },
+    })
+
+    if (!result.isConfirmed || !result.value) {
+      return null
+    }
+
+    return result.value as CreatePurchaseOrderInvoiceDto
+  }
+
+  private decodeBase64Xml(base64Value: string): string {
+    return atob(base64Value)
+  }
+
+  private extractXmlSummary(xmlText: string): {
+    invoiceNumber: string | null
+    accessKey: string | null
+    customerName: string | null
+    customerId: string | null
+    issueDate: string | null
+    total: string | null
+  } {
+    try {
+      const parser = new DOMParser()
+      const xmlDoc = parser.parseFromString(xmlText, 'application/xml')
+
+      const estab = this.getXmlTagText(xmlDoc, ['estab'])
+      const ptoEmi = this.getXmlTagText(xmlDoc, ['ptoEmi'])
+      const secuencial = this.getXmlTagText(xmlDoc, ['secuencial'])
+      const composedInvoiceNumber =
+        estab && ptoEmi && secuencial
+          ? `${estab}-${ptoEmi}-${secuencial}`
+          : null
+
+      return {
+        invoiceNumber: composedInvoiceNumber,
+        accessKey: this.getXmlTagText(xmlDoc, ['claveAcceso']),
+        customerName: this.getXmlTagText(xmlDoc, ['razonSocialComprador']),
+        customerId: this.getXmlTagText(xmlDoc, ['identificacionComprador']),
+        issueDate: this.getXmlTagText(xmlDoc, ['fechaEmision']),
+        total: this.getXmlTagText(xmlDoc, ['importeTotal', 'totalSinImpuestos']),
+      }
+    } catch {
+      return {
+        invoiceNumber: null,
+        accessKey: null,
+        customerName: null,
+        customerId: null,
+        issueDate: null,
+        total: null,
+      }
+    }
+  }
+
+  private getXmlTagText(xmlDoc: Document, tags: string[]): string | null {
+    for (const tag of tags) {
+      const element = xmlDoc.getElementsByTagName(tag)?.[0]
+      const value = element?.textContent?.trim()
+      if (value) {
+        return value
+      }
+    }
+
+    return null
+  }
+
+  private downloadXmlFile(xmlBase64: string, order: PurchaseOrder): void {
+    const byteCharacters = atob(xmlBase64)
+    const byteNumbers = new Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i += 1) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+    const blob = new Blob([byteArray], { type: 'application/xml' })
+    const fileName = `factura-${order.orderNumber || order.id}.xml`
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
   }
 }

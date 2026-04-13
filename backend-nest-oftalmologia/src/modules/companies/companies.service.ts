@@ -56,7 +56,9 @@ export class CompaniesService {
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto) {
-    const { name, code, slug } = createCompanyDto;
+    const normalizedCreateCompanyDto =
+      this.normalizeBillingFields(createCompanyDto);
+    const { name, code, slug } = normalizedCreateCompanyDto;
 
     const existingByName = await this.companyRepository.findOne({
       where: { name },
@@ -93,7 +95,7 @@ export class CompaniesService {
       }
     }
 
-    const company = this.companyRepository.create(createCompanyDto);
+    const company = this.companyRepository.create(normalizedCreateCompanyDto);
     const savedCompany = await this.companyRepository.save(company);
 
     return {
@@ -352,6 +354,9 @@ export class CompaniesService {
   }
 
   async update(id: string, updateCompanyDto: UpdateCompanyDto) {
+    const normalizedUpdateCompanyDto =
+      this.normalizeBillingFields(updateCompanyDto);
+
     const company = await this.companyRepository.findOne({
       where: { id },
       relations: ['logoFile'],
@@ -363,8 +368,8 @@ export class CompaniesService {
       });
     }
 
-    const { name, code } = updateCompanyDto;
-    const { slug } = updateCompanyDto;
+    const { name, code } = normalizedUpdateCompanyDto;
+    const { slug } = normalizedUpdateCompanyDto;
 
     if (name && name !== company.name) {
       const existingCompany = await this.companyRepository.findOne({
@@ -402,7 +407,7 @@ export class CompaniesService {
       }
     }
 
-    await this.companyRepository.update(id, updateCompanyDto);
+    await this.companyRepository.update(id, normalizedUpdateCompanyDto);
 
     const updatedCompany = await this.companyRepository.findOne({
       where: { id },
@@ -413,6 +418,49 @@ export class CompaniesService {
       messageKey: 'COMPANY.UPDATED',
       data: updatedCompany,
     };
+  }
+
+  private normalizeBillingFields<
+    T extends {
+      billingApiKey?: unknown;
+      billingContributorId?: unknown;
+    },
+  >(dto: T): T {
+    const normalized: T = { ...dto };
+
+    if (Object.prototype.hasOwnProperty.call(normalized, 'billingApiKey')) {
+      if (normalized.billingApiKey === undefined) {
+        normalized.billingApiKey = undefined;
+      } else if (normalized.billingApiKey === null) {
+        normalized.billingApiKey = null;
+      } else {
+        const cleanedApiKey = String(normalized.billingApiKey).trim();
+        normalized.billingApiKey = cleanedApiKey || null;
+      }
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(normalized, 'billingContributorId')
+    ) {
+      const rawContributor = normalized.billingContributorId;
+
+      if (rawContributor === undefined) {
+        normalized.billingContributorId = undefined;
+      } else if (
+        rawContributor === null ||
+        (typeof rawContributor === 'string' && rawContributor.trim() === '')
+      ) {
+        normalized.billingContributorId = null;
+      } else {
+        const parsedContributor = Number(rawContributor);
+        normalized.billingContributorId =
+          Number.isInteger(parsedContributor) && parsedContributor > 0
+            ? parsedContributor
+            : null;
+      }
+    }
+
+    return normalized as T;
   }
 
   async remove(id: string) {

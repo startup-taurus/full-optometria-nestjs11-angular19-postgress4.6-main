@@ -44,7 +44,6 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.module';
 
-
 // Entities
 import { User } from './modules/users/entities/user.entity';
 import { Role } from './modules/roles-permissions/entities/role.entity';
@@ -72,13 +71,15 @@ import { Patient } from './modules/patients/entities/patient.entity';
 import { Client } from './modules/patients/entities/client.entity';
 import { PurchaseOrder } from './modules/purchase-orders/entities/purchase-order.entity';
 import { PurchaseOrderItem } from './modules/purchase-orders/entities/purchase-order-item.entity';
+import { PurchaseOrderInvoice } from './modules/purchase-orders/entities/purchase-order-invoice.entity';
+import { PurchaseOrderInvoiceLog } from './modules/purchase-orders/entities/purchase-order-invoice-log.entity';
+import { BillingPaymentMethod } from './modules/purchase-orders/entities/billing-payment-method.entity';
 import { Feedback } from './modules/feedback/entities/feedback.entity';
 import { WhatsAppSession } from './modules/notifications/entities/whatsapp-session.entity';
 import { ReminderRule } from './modules/notifications/entities/reminder-rule.entity';
 import { Campaign } from './modules/notifications/entities/campaign.entity';
 import { MessageDispatchLog } from './modules/notifications/entities/message-dispatch-log.entity';
 import { PatientContactPreference } from './modules/notifications/entities/patient-contact-preference.entity';
-
 
 @Module({
   imports: [
@@ -124,6 +125,9 @@ import { PatientContactPreference } from './modules/notifications/entities/patie
           Client,
           PurchaseOrder,
           PurchaseOrderItem,
+          PurchaseOrderInvoice,
+          PurchaseOrderInvoiceLog,
+          BillingPaymentMethod,
           Feedback,
           WhatsAppSession,
           ReminderRule,
@@ -186,7 +190,7 @@ export class AppModule implements NestModule {
       .apply(
         AuthRoleMiddleware,
         CompanyFilterMiddleware,
-        BranchFilterMiddleware
+        BranchFilterMiddleware,
       )
       .forRoutes('*');
   }

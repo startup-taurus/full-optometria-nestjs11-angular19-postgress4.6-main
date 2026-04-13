@@ -135,37 +135,51 @@
       </div>
       <div class="row row-cols-1 row-cols-md-2 g-3">
         <div class="col">
-          <label class="form-label">{{
-            'CLIENT.MOBILE_PHONE' | translate
-          }}</label>
+          <label class="form-label">
+            {{ 'CLIENT.MOBILE_PHONE' | translate }}
+            <span class="text-danger">*</span>
+          </label>
           <input
             type="text"
             class="form-control"
             formControlName="mobilePhone"
+            [class.is-invalid]="isPhoneGroupInvalid()"
             placeholder="Ingrese teléfono móvil"
           />
+          <div class="invalid-feedback d-block" *ngIf="isPhoneGroupInvalid()">
+            Ingrese al menos un teléfono (móvil o fijo)
+          </div>
         </div>
 
         <div class="col">
-          <label class="form-label">{{
-            'CLIENT.HOME_PHONE' | translate
-          }}</label>
+          <label class="form-label">
+            {{ 'CLIENT.HOME_PHONE' | translate }}
+            <span class="text-danger">*</span>
+          </label>
           <input
             type="text"
             class="form-control"
             formControlName="homePhone"
+            [class.is-invalid]="isPhoneGroupInvalid()"
             placeholder="Ingrese teléfono fijo"
           />
         </div>
 
         <div class="col-12">
-          <label class="form-label">{{ 'CLIENT.ADDRESS' | translate }}</label>
+          <label class="form-label">
+            {{ 'CLIENT.ADDRESS' | translate }}
+            <span class="text-danger">*</span>
+          </label>
           <textarea
             class="form-control"
             rows="3"
             formControlName="address"
+            [class.is-invalid]="isFieldInvalid('address')"
             placeholder="Ingrese dirección"
           ></textarea>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('address')">
+            {{ 'VALIDATION.REQUIRED' | translate }}
+          </div>
         </div>
       </div>
     </div>

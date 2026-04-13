@@ -1789,6 +1789,77 @@
       "TOTAL_SOLD": "Total Vendido",
       "TOTAL_SOLD_DESC": "Facturado + no facturado (sin anuladas)",
       "EMPTY": "No hay órdenes de pedido para mostrar"
+    },
+    "BILLING": {
+      "ACTION": {
+        "ISSUE": "Facturar",
+        "RETRY": "Reintentar facturación",
+        "AUTHORIZE": "Autorizar en SRI",
+        "CHECK_STATUS": "Consultar estado",
+        "VIEW_XML": "Ver XML",
+        "DOWNLOAD_XML": "Descargar XML"
+      },
+      "STATE": {
+        "NOT_APPLICABLE": "No aplica",
+        "PENDING_ISSUE": "Pendiente de emisión",
+        "CREATED": "Creada",
+        "APPROVED": "Aprobada",
+        "RETURNED": "Devuelta",
+        "NOT_APPROVED": "No aprobada",
+        "AUTHORIZED": "Autorizada",
+        "FAILED": "Fallida"
+      },
+      "MISSING": {
+        "CLIENT": "Cliente asociado",
+        "DOCUMENT": "Cédula o identificación",
+        "EMAIL": "Correo electrónico",
+        "ADDRESS": "Dirección",
+        "PHONE": "Teléfono (móvil o fijo)"
+      },
+      "DIALOG": {
+        "TITLE": "Configurar factura",
+        "PAYMENT_METHOD": "Método de pago",
+        "TAX_PERCENT": "Impuesto",
+        "CONFIRM": "Facturar",
+        "CANCEL": "Cancelar",
+        "VALIDATION_REQUIRED": "Debe seleccionar método de pago e impuesto.",
+        "VALIDATION_TAX_INVALID": "El impuesto seleccionado no es válido."
+      },
+      "MESSAGES": {
+        "MISSING_CLIENT_DATA_TITLE": "Faltan datos del cliente",
+        "MISSING_CLIENT_DATA_TEXT": "Complete estos datos antes de facturar:",
+        "INVOICE_CREATED_TITLE": "Factura generada",
+        "INVOICE_CREATED_TEXT": "La factura electrónica se generó correctamente.",
+        "ISSUE_ERROR_TITLE": "Error al facturar",
+        "ISSUE_ERROR_TEXT": "No se pudo generar la factura.",
+        "RETRY_SUCCESS_TITLE": "Reintento exitoso",
+        "RETRY_SUCCESS_TEXT": "Se reintentó la facturación correctamente.",
+        "RETRY_ERROR_TITLE": "Error en reintento",
+        "RETRY_ERROR_TEXT": "No se pudo reintentar la factura.",
+        "AUTH_SUCCESS_TITLE": "Factura autorizada",
+        "AUTH_SUCCESS_TEXT": "La factura fue autorizada correctamente.",
+        "AUTH_ERROR_TITLE": "Error de autorización",
+        "AUTH_ERROR_TEXT": "No se pudo autorizar la factura.",
+        "STATUS_SYNC_SUCCESS_TITLE": "Estado actualizado",
+        "STATUS_SYNC_SUCCESS_TEXT": "Se consultó y actualizó el estado de la factura.",
+        "STATUS_SYNC_ERROR_TITLE": "Error al consultar estado",
+        "STATUS_SYNC_ERROR_TEXT": "No se pudo consultar el estado de la factura.",
+        "XML_PREVIEW_TITLE": "Vista XML de la factura",
+        "XML_NOT_AVAILABLE_TITLE": "Sin XML",
+        "XML_NOT_AVAILABLE_TEXT": "La factura no tiene XML disponible.",
+        "XML_ERROR_TITLE": "Error de descarga",
+        "XML_ERROR_TEXT": "No se pudo descargar el XML."
+      },
+      "XML": {
+        "LABELS": {
+          "INVOICE_NUMBER": "Número de factura",
+          "ACCESS_KEY": "Clave de acceso",
+          "CUSTOMER": "Cliente",
+          "IDENTIFICATION": "Identificación",
+          "DATE": "Fecha de emisión",
+          "TOTAL": "Total"
+        }
+      }
     }
   },
   "BRANCH_SELECTOR": {
@@ -2186,6 +2257,10 @@
     "MAX_BRANCHES": "Máximo de sucursales",
     "MAX_BRANCHES_PLACEHOLDER": "Sin límite",
     "MAX_BRANCHES_HINT": "Dejar vacío para sin límite",
+    "BILLING_API_KEY": "API Key de facturación",
+    "BILLING_API_KEY_PLACEHOLDER": "Clave API por empresa",
+    "BILLING_CONTRIBUTOR_ID": "Contributor ID",
+    "BILLING_CONTRIBUTOR_ID_PLACEHOLDER": "Ejemplo: 74",
     "USERS_USAGE_TITLE": "Usuarios: actual / máximo",
     "BRANCHES_USAGE_TITLE": "Sucursales: actual / máximo"
   },

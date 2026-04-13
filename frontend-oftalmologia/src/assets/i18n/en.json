@@ -1787,6 +1787,77 @@
       "TOTAL_SOLD": "Total Sold",
       "TOTAL_SOLD_DESC": "Invoiced + non-invoiced (excluding cancelled)",
       "EMPTY": "No purchase orders to display"
+    },
+    "BILLING": {
+      "ACTION": {
+        "ISSUE": "Issue invoice",
+        "RETRY": "Retry invoicing",
+        "AUTHORIZE": "Authorize in SRI",
+        "CHECK_STATUS": "Check status",
+        "VIEW_XML": "View XML",
+        "DOWNLOAD_XML": "Download XML"
+      },
+      "STATE": {
+        "NOT_APPLICABLE": "Not applicable",
+        "PENDING_ISSUE": "Pending issuance",
+        "CREATED": "Created",
+        "APPROVED": "Approved",
+        "RETURNED": "Returned",
+        "NOT_APPROVED": "Not approved",
+        "AUTHORIZED": "Authorized",
+        "FAILED": "Failed"
+      },
+      "MISSING": {
+        "CLIENT": "Linked client",
+        "DOCUMENT": "ID or document",
+        "EMAIL": "Email",
+        "ADDRESS": "Address",
+        "PHONE": "Phone (mobile or home)"
+      },
+      "DIALOG": {
+        "TITLE": "Configure invoice",
+        "PAYMENT_METHOD": "Payment method",
+        "TAX_PERCENT": "Tax",
+        "CONFIRM": "Issue",
+        "CANCEL": "Cancel",
+        "VALIDATION_REQUIRED": "You must select a payment method and tax.",
+        "VALIDATION_TAX_INVALID": "The selected tax is invalid."
+      },
+      "MESSAGES": {
+        "MISSING_CLIENT_DATA_TITLE": "Missing client data",
+        "MISSING_CLIENT_DATA_TEXT": "Complete these fields before invoicing:",
+        "INVOICE_CREATED_TITLE": "Invoice generated",
+        "INVOICE_CREATED_TEXT": "The electronic invoice was generated successfully.",
+        "ISSUE_ERROR_TITLE": "Invoicing error",
+        "ISSUE_ERROR_TEXT": "The invoice could not be generated.",
+        "RETRY_SUCCESS_TITLE": "Retry succeeded",
+        "RETRY_SUCCESS_TEXT": "Invoicing retry completed successfully.",
+        "RETRY_ERROR_TITLE": "Retry error",
+        "RETRY_ERROR_TEXT": "The invoice could not be retried.",
+        "AUTH_SUCCESS_TITLE": "Invoice authorized",
+        "AUTH_SUCCESS_TEXT": "The invoice was authorized successfully.",
+        "AUTH_ERROR_TITLE": "Authorization error",
+        "AUTH_ERROR_TEXT": "The invoice could not be authorized.",
+        "STATUS_SYNC_SUCCESS_TITLE": "Status updated",
+        "STATUS_SYNC_SUCCESS_TEXT": "Invoice status was checked and updated.",
+        "STATUS_SYNC_ERROR_TITLE": "Status check error",
+        "STATUS_SYNC_ERROR_TEXT": "The invoice status could not be checked.",
+        "XML_PREVIEW_TITLE": "Invoice XML preview",
+        "XML_NOT_AVAILABLE_TITLE": "No XML",
+        "XML_NOT_AVAILABLE_TEXT": "The invoice has no XML available.",
+        "XML_ERROR_TITLE": "Download error",
+        "XML_ERROR_TEXT": "The XML could not be downloaded."
+      },
+      "XML": {
+        "LABELS": {
+          "INVOICE_NUMBER": "Invoice number",
+          "ACCESS_KEY": "Access key",
+          "CUSTOMER": "Customer",
+          "IDENTIFICATION": "Identification",
+          "DATE": "Issue date",
+          "TOTAL": "Total"
+        }
+      }
     }
   },
   "BRANCH_SELECTOR": {
@@ -2181,6 +2252,10 @@
     "MAX_BRANCHES": "Maximum branches",
     "MAX_BRANCHES_PLACEHOLDER": "No limit",
     "MAX_BRANCHES_HINT": "Leave empty for no limit",
+    "BILLING_API_KEY": "Billing API Key",
+    "BILLING_API_KEY_PLACEHOLDER": "API key per company",
+    "BILLING_CONTRIBUTOR_ID": "Contributor ID",
+    "BILLING_CONTRIBUTOR_ID_PLACEHOLDER": "Example: 74",
     "USERS_USAGE_TITLE": "Users: current / maximum",
     "BRANCHES_USAGE_TITLE": "Branches: current / maximum"
   },
