@@ -235,11 +235,16 @@ export class PurchaseOrdersService {
       currentClientAddress: purchaseOrder.client?.address || null,
     });
 
+    const fallbackWhere: FindOptionsWhere<Client> = {
+      id: purchaseOrder.clientId,
+      branchId: purchaseOrder.branchId,
+      ...(purchaseOrder.companyId
+        ? { companyId: purchaseOrder.companyId }
+        : { companyId: IsNull() }),
+    };
+
     const fallbackClient = await this.clientRepository.findOne({
-      where: {
-        id: purchaseOrder.clientId,
-        branchId: purchaseOrder.branchId,
-      },
+      where: fallbackWhere,
     });
 
     if (fallbackClient) {

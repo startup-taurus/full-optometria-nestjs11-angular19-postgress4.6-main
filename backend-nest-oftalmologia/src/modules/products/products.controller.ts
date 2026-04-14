@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
+import { Express } from 'express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
@@ -132,8 +133,11 @@ export class ProductsController {
 
   @Get('discounts/active')
   @UseGuards(AuthGuard('jwt'))
-  async getActiveDiscounts(@BranchContext() branchId: string) {
-    return this.productsService.getActiveDiscounts(branchId);
+  async getActiveDiscounts(
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null,
+  ) {
+    return this.productsService.getActiveDiscounts(branchId, companyId);
   }
 
   @Get(':id')

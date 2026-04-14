@@ -20,7 +20,21 @@ import { ToastrNotificationService } from '@core/services/ui/notification.servic
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
-import { BehaviorSubject, Observable, Subject, of, takeUntil, tap, map, catchError } from 'rxjs'
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  of,
+  takeUntil,
+  tap,
+  map,
+  catchError,
+  distinctUntilChanged,
+  debounceTime,
+} from 'rxjs'
+import { Store } from '@ngrx/store'
+import { AppState } from '@core/states'
+import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
 import {
   SideFilterPanelComponent,
 } from '../../../../shared/components/filters/side-filter-panel/side-filter-panel.component'
@@ -68,15 +82,18 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
 
   public filter: ClientQueryParams = {}
   private _destroy$ = new Subject<void>()
+  private hasInitializedBranchSubscription = false
 
   private _clientsService = inject(ClientsService)
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _modalService = inject(NgbModal)
   private _translate = inject(TranslateService)
   private _notificationService = inject(ToastrNotificationService)
+  private _store = inject(Store<AppState>)
 
   ngOnInit(): void {
     this.config$ = this.setConfigDatatable()
+    this.subscribeToBranchChanges()
 
     this._filterCommunicationService.currentFilter
       .pipe(takeUntil(this._destroy$))
@@ -86,6 +103,20 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
       })
 
     this._filterCommunicationService.resetFilter()
+  }
+
+  private subscribeToBranchChanges(): void {
+    this._store
+      .select(selectSelectedBranchId)
+      .pipe(takeUntil(this._destroy$), distinctUntilChanged(), debounceTime(300))
+      .subscribe(() => {
+        if (!this.hasInitializedBranchSubscription) {
+          this.hasInitializedBranchSubscription = true
+          return
+        }
+
+        this.reloadDatatable(this.filter)
+      })
   }
 
   ngOnDestroy(): void {

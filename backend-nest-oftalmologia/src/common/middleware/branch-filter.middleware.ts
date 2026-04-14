@@ -50,9 +50,9 @@ export class BranchFilterMiddleware implements NestMiddleware {
     }
 
     const authHeader = req.headers.authorization;
-    let currentUser: User | null = null;
+    let currentUser: User | null = (req as any).user || null;
 
-    if (authHeader && authHeader.startsWith('Bearer ')) {
+    if (!currentUser && authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.substring(7);
         const decoded = this.jwtService.decode(token) as any;
@@ -64,6 +64,17 @@ export class BranchFilterMiddleware implements NestMiddleware {
           });
         }
       } catch (error) {}
+    }
+
+    if (!currentUser) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'No se pudo determinar el usuario autenticado para resolver la sucursal.',
+          en: 'Could not determine authenticated user to resolve branch.',
+        },
+      });
     }
 
     let branchId: string;
@@ -87,12 +98,6 @@ export class BranchFilterMiddleware implements NestMiddleware {
         } else {
           if (currentUser?.branchId) {
             branchId = currentUser.branchId;
-          } else {
-            const firstActiveBranch = await this.branchRepository.findOne({
-              where: { isActive: true },
-              order: { createdAt: 'ASC' }
-            });
-            branchId = firstActiveBranch?.id;
           }
         }
       }
@@ -142,6 +147,18 @@ export class BranchFilterMiddleware implements NestMiddleware {
         message: {
           es: 'La sucursal no está activa',
           en: 'Branch is not active',
+        },
+      });
+    }
+
+    const userCompanyId = currentUser.companyId ?? null;
+    if (userCompanyId && branch.companyId !== userCompanyId) {
+      throw new BadRequestException({
+        statusCode: 400,
+        success: false,
+        message: {
+          es: 'La sucursal seleccionada no pertenece a su compañía.',
+          en: 'Selected branch does not belong to your company.',
         },
       });
     }
