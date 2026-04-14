@@ -151,3 +151,57 @@
     color: #ff9a9a !important;
   }
 }
+
+:host ::ng-deep .billing-config-modal {
+  border-radius: 12px;
+}
+
+:host ::ng-deep .billing-config-modal .swal2-title {
+  font-weight: 600;
+}
+
+:host ::ng-deep .billing-config-modal-content {
+  margin-top: 0.75rem;
+  padding: 0;
+  text-align: left;
+}
+
+:host ::ng-deep .billing-config-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+:host ::ng-deep .billing-config-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+:host ::ng-deep .billing-config-label {
+  font-weight: 600;
+  color: var(--bs-body-color);
+}
+
+:host ::ng-deep .billing-config-select {
+  width: 100% !important;
+  margin: 0 !important;
+  min-height: 42px !important;
+  border: 1px solid var(--bs-border-color) !important;
+  border-radius: 8px !important;
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+:host ::ng-deep .billing-config-select:focus {
+  border-color: var(--bs-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.2) !important;
+}
+
+:host ::ng-deep .billing-config-modal .swal2-actions {
+  gap: 0.5rem;
+}
+
+:host-context([data-bs-theme='dark']) ::ng-deep .billing-config-select,
+:host-context([data-bs-theme='dark']) ::ng-deep .billing-config-select option {
+  background-color: var(--bs-secondary-bg) !important;
+  color: var(--bs-body-color) !important;
+}

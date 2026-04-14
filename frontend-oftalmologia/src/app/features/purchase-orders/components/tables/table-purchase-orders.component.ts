@@ -981,24 +981,31 @@ export class TablePurchaseOrdersComponent
     const result = await Swal.fire({
       title: this.t('PURCHASE_ORDERS.BILLING.DIALOG.TITLE'),
       html: `
-        <div style="text-align:left;display:grid;gap:12px;">
-          <div>
-            <label style="display:block;margin-bottom:6px;">${this.t('PURCHASE_ORDERS.BILLING.DIALOG.PAYMENT_METHOD')}</label>
-            <select id="billing-payment-method" class="swal2-select" style="width:100%;margin:0;">
+        <div class="billing-config-form">
+          <div class="billing-config-field">
+            <label class="billing-config-label">${this.t('PURCHASE_ORDERS.BILLING.DIALOG.PAYMENT_METHOD')}</label>
+            <select id="billing-payment-method" class="swal2-select billing-config-select">
               ${paymentOptions}
             </select>
           </div>
-          <div>
-            <label style="display:block;margin-bottom:6px;">${this.t('PURCHASE_ORDERS.BILLING.DIALOG.TAX_PERCENT')}</label>
-            <select id="billing-tax-percent" class="swal2-select" style="width:100%;margin:0;">
+          <div class="billing-config-field">
+            <label class="billing-config-label">${this.t('PURCHASE_ORDERS.BILLING.DIALOG.TAX_PERCENT')}</label>
+            <select id="billing-tax-percent" class="swal2-select billing-config-select">
               ${taxOptions}
             </select>
           </div>
         </div>
       `,
       showCancelButton: true,
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#6c757d',
+      reverseButtons: true,
       confirmButtonText: this.t('PURCHASE_ORDERS.BILLING.DIALOG.CONFIRM'),
       cancelButtonText: this.t('PURCHASE_ORDERS.BILLING.DIALOG.CANCEL'),
+      customClass: {
+        popup: 'billing-config-modal',
+        htmlContainer: 'billing-config-modal-content',
+      },
       focusConfirm: false,
       preConfirm: () => {
         const paymentMethod = (
