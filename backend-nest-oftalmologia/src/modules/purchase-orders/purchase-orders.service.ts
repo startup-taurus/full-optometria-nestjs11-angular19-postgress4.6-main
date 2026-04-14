@@ -166,16 +166,37 @@ export class PurchaseOrdersService {
     return Number(total.toFixed(2));
   }
 
-  private async generateOrderNumber(): Promise<number> {
-    const lastOrder = await this.purchaseOrderRepository
+  private async generateOrderNumber(
+    companyId: string | null,
+    manager?: EntityManager,
+  ): Promise<number> {
+    const repository = manager?.getRepository(PurchaseOrder) || this.purchaseOrderRepository;
+    const queryBuilder = repository
       .createQueryBuilder('po')
-      .select('MAX(po.orderNumber)', 'maxNumber')
-      .getRawOne();
+      .select('MAX(po.orderNumber)', 'maxNumber');
+
+    if (companyId) {
+      queryBuilder.where('po.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.where('po.companyId IS NULL');
+    }
+
+    const lastOrder = await queryBuilder.getRawOne();
 
     const maxNumber = lastOrder?.maxNumber
       ? parseInt(lastOrder.maxNumber, 10)
       : 0;
     return maxNumber + 1;
+  }
+
+  private async lockOrderNumberScope(
+    manager: EntityManager,
+    companyId: string | null,
+  ): Promise<void> {
+    const scopeKey = companyId ?? '__null_company__';
+    await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
+      `purchase_orders_order_number:${scopeKey}`,
+    ]);
   }
 
   private withCompanyScope<T extends { companyId?: string | null }>(
@@ -856,10 +877,11 @@ export class PurchaseOrdersService {
       });
     }
 
-    const orderNumber = await this.generateOrderNumber();
-
     try {
       const result = await this.dataSource.transaction(async (manager) => {
+        await this.lockOrderNumberScope(manager, companyId);
+        const orderNumber = await this.generateOrderNumber(companyId, manager);
+
         const itemSnapshots = await this.buildPurchaseOrderItemSnapshots(
           laboratoryOrder,
           branchId,
@@ -1200,13 +1222,24 @@ export class PurchaseOrdersService {
     };
   }
 
-  async getPurchaseOrderByLaboratoryOrderId(laboratoryOrderId: string) {
+  async getPurchaseOrderByLaboratoryOrderId(
+    laboratoryOrderId: string,
+    branchId: string,
+    companyId: string | null,
+  ) {
     console.log('[PurchaseOrdersService][getPurchaseOrderByLaboratoryOrderId] request', {
       laboratoryOrderId,
+      branchId,
+      companyId,
     });
 
+    const where = this.withCompanyScope<PurchaseOrder>(
+      { laboratoryOrderId, branchId },
+      companyId,
+    );
+
     const purchaseOrder = await this.purchaseOrderRepository.findOne({
-      where: { laboratoryOrderId },
+      where,
       relations: ['client', 'laboratoryOrder', 'items', 'invoice'],
     });
 

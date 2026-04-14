@@ -99,6 +99,16 @@ export class PurchaseOrdersService extends BranchAwareService<PurchaseOrder> {
       .pipe(map((response) => response.data || null))
   }
 
+  getByLaboratoryOrderId(
+    laboratoryOrderId: string
+  ): Observable<PurchaseOrder | null> {
+    return this.http
+      .get<ApiResponse<PurchaseOrder | null>>(
+        `${this.baseUrl}/laboratory-order/${laboratoryOrderId}`
+      )
+      .pipe(map((response) => response.data || null))
+  }
+
   override update(
     id: string,
     dto: UpdatePurchaseOrderDto

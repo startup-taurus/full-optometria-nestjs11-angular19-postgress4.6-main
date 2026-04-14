@@ -134,6 +134,14 @@
                     <button
                       type="button"
                       class="btn btn-outline-secondary btn-action"
+                      (click)="onViewLinkedPurchaseOrderClick($event, order)"
+                      [title]="'LABORATORY_ORDERS.ACTIONS.VIEW_PURCHASE_ORDER' | translate"
+                    >
+                      <i class="ti ti-shopping-cart"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary btn-action"
                       (click)="onEditClick($event, order)"
                       [title]="'LABORATORY_ORDERS_MODULE.EDIT' | translate"
                     >

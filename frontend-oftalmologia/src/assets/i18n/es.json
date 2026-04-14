@@ -1674,6 +1674,7 @@
       "DELETE": "Eliminar",
       "CHANGE_STATUS": "Cambiar Estado",
       "VIEW": "Ver",
+      "VIEW_PURCHASE_ORDER": "Ver orden de pedido",
       "PRINT": "Imprimir",
       "NEXT": "Siguiente",
       "PREVIOUS": "Anterior",
@@ -1706,6 +1707,7 @@
       "PRINT_ERROR": "No se pudo abrir la ventana de impresión. Por favor, verifica la configuración de tu navegador.",
       "WHATSAPP_SUCCESS": "Abriendo WhatsApp...",
       "EMAIL_SUCCESS": "Preparando correo...",
+      "PURCHASE_ORDER_NOT_FOUND": "No existe una orden de pedido asociada para esta orden de laboratorio",
       "NO_PHONE": "No hay número de teléfono disponible para este paciente",
       "NO_EMAIL": "No hay email disponible para este paciente"
     }

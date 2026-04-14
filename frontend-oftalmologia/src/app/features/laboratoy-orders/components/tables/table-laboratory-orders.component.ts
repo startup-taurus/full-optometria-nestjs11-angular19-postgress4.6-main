@@ -14,6 +14,7 @@ import { SideFilterPanelComponent } from '../../../../shared/components/filters/
 import { InfiniteScrollDirective } from '../../../../shared/directives/infinite-scroll.directive'
 import { FilterLaboratoryOrdersComponent } from '../filters/filter-laboratory-orders.component'
 import { LaboratoryOrdersService } from '@core/services/api/laboratory-orders.service'
+import { PurchaseOrdersService } from '@core/services/api/purchase-orders.service'
 import { BranchService } from '@core/services/api/branch.service'
 import { LaboratoryOrderPdfService } from '@core/services/ui/laboratory-order-pdf.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
@@ -25,6 +26,7 @@ import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf
 import { Branch } from '@core/interfaces/api/branch.interface'
 import { LaboratoryOrderUpsertModalComponent } from '../laboratory-order-upsert-modal/laboratory-order-upsert-modal.component'
 import { ViewLaboratoryOrderComponent } from '../forms/view-laboratory-order/view-laboratory-order.component'
+import { ViewPurchaseOrderModalComponent } from '../../../purchase-orders/components/modals/view-purchase-order-modal/view-purchase-order-modal.component'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
 import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
@@ -59,6 +61,7 @@ import {
 })
 export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   private _laboratoryOrdersService = inject(LaboratoryOrdersService)
+  private _purchaseOrdersService = inject(PurchaseOrdersService)
   private _branchService = inject(BranchService)
   private _pdfService = inject(LaboratoryOrderPdfService)
   private _modalService = inject(NgbModal)
@@ -275,6 +278,14 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     this.onChangeStatus(order)
   }
 
+  public onViewLinkedPurchaseOrderClick(
+    event: Event,
+    order: LaboratoryOrder
+  ): void {
+    event.stopPropagation()
+    this.onViewLinkedPurchaseOrder(order)
+  }
+
   public onEdit(order: LaboratoryOrder): void {
     const modalRef = this._modalService.open(
       LaboratoryOrderUpsertModalComponent,
@@ -449,6 +460,40 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     })
 
     modalRef.componentInstance.orderId = order.id
+  }
+
+  public onViewLinkedPurchaseOrder(order: LaboratoryOrder): void {
+    this._purchaseOrdersService.getByLaboratoryOrderId(order.id).subscribe({
+      next: (purchaseOrder) => {
+        if (!purchaseOrder?.id) {
+          Swal.fire({
+            icon: 'warning',
+            title: this._translateService.instant('COMMON.WARNING'),
+            text: this._translateService.instant(
+              'LABORATORY_ORDERS.MESSAGES.PURCHASE_ORDER_NOT_FOUND'
+            ),
+          })
+          return
+        }
+
+        const modalRef = this._modalService.open(ViewPurchaseOrderModalComponent, {
+          size: 'lg',
+          centered: true,
+          backdrop: 'static',
+        })
+
+        modalRef.componentInstance.orderId = purchaseOrder.id
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'warning',
+          title: this._translateService.instant('COMMON.WARNING'),
+          text: this._translateService.instant(
+            'LABORATORY_ORDERS.MESSAGES.PURCHASE_ORDER_NOT_FOUND'
+          ),
+        })
+      },
+    })
   }
 
   trackByOrderId(index: number, order: LaboratoryOrder): string {

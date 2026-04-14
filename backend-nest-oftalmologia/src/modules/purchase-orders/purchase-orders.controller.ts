@@ -157,6 +157,19 @@ export class PurchaseOrdersController {
     return this.purchaseOrdersService.findAll(queryDto, branchId, companyId);
   }
 
+  @Get('laboratory-order/:laboratoryOrderId')
+  findByLaboratoryOrderId(
+    @Param('laboratoryOrderId') laboratoryOrderId: string,
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null,
+  ) {
+    return this.purchaseOrdersService.getPurchaseOrderByLaboratoryOrderId(
+      laboratoryOrderId,
+      branchId,
+      companyId,
+    );
+  }
+
   @Get(':id')
   findOne(
     @Param('id') id: string,

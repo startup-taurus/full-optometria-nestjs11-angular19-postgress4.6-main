@@ -24,7 +24,14 @@ export enum PurchaseOrderStatus {
 }
 
 @Entity('purchase_orders')
-@Index(['orderNumber'], { unique: true })
+@Index('UQ_purchase_orders_company_order_number', ['companyId', 'orderNumber'], {
+  unique: true,
+  where: '"company_id" IS NOT NULL AND "order_number" IS NOT NULL',
+})
+@Index('UQ_purchase_orders_null_company_order_number', ['orderNumber'], {
+  unique: true,
+  where: '"company_id" IS NULL AND "order_number" IS NOT NULL',
+})
 @Index(['laboratoryOrderId'], { unique: true })
 @Index(['clientId'])
 @Index(['companyId'])
@@ -34,7 +41,7 @@ export class PurchaseOrder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'order_number', unique: true, nullable: true })
+  @Column({ name: 'order_number', nullable: true })
   orderNumber: number;
 
   @Column({ name: 'client_id' })

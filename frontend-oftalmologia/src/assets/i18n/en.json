@@ -1693,6 +1693,7 @@
       "DELETE": "Delete Order",
       "CHANGE_STATUS": "Change Status",
       "VIEW": "View Details",
+      "VIEW_PURCHASE_ORDER": "View purchase order",
       "PRINT": "Print Order",
       "NEXT": "Next",
       "PREVIOUS": "Previous",
@@ -1723,7 +1724,8 @@
       "STATUS_CHANGE_ERROR": "Error updating status",
       "PRINT_SUCCESS": "Preparing to print...",
       "WHATSAPP_SUCCESS": "Opening WhatsApp...",
-      "EMAIL_SUCCESS": "Preparing email..."
+      "EMAIL_SUCCESS": "Preparing email...",
+      "PURCHASE_ORDER_NOT_FOUND": "No purchase order is associated with this laboratory order"
     }
   },
   "PURCHASE_ORDERS": {
