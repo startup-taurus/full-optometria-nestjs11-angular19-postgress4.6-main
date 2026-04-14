@@ -188,6 +188,75 @@ export class PurchaseOrdersService {
     } as FindOptionsWhere<T>;
   }
 
+  private async loadScopedClient(
+    clientId: string,
+    branchId: string,
+    companyId: string | null,
+  ): Promise<Client | null> {
+    const queryBuilder = this.clientRepository
+      .createQueryBuilder('client')
+      .where('client.id = :clientId', { clientId })
+      .andWhere('client.branchId = :branchId', { branchId });
+
+    if (companyId) {
+      queryBuilder.andWhere('client.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.andWhere('client.companyId IS NULL');
+    }
+
+    return queryBuilder.getOne();
+  }
+
+  private async refreshPurchaseOrderClient(
+    purchaseOrder: PurchaseOrder,
+  ): Promise<PurchaseOrder> {
+    if (!purchaseOrder?.clientId || !purchaseOrder.branchId) {
+      return purchaseOrder;
+    }
+
+    const scopedClient = await this.loadScopedClient(
+      purchaseOrder.clientId,
+      purchaseOrder.branchId,
+      purchaseOrder.companyId ?? null,
+    );
+
+    if (scopedClient) {
+      return {
+        ...purchaseOrder,
+        client: scopedClient,
+      };
+    }
+
+    console.log('[PurchaseOrdersService][refreshPurchaseOrderClient] scoped client not found, trying fallback by id+branch', {
+      purchaseOrderId: purchaseOrder.id,
+      clientId: purchaseOrder.clientId,
+      branchId: purchaseOrder.branchId,
+      companyId: purchaseOrder.companyId ?? null,
+      currentClientAddress: purchaseOrder.client?.address || null,
+    });
+
+    const fallbackClient = await this.clientRepository.findOne({
+      where: {
+        id: purchaseOrder.clientId,
+        branchId: purchaseOrder.branchId,
+      },
+    });
+
+    if (fallbackClient) {
+      console.log('[PurchaseOrdersService][refreshPurchaseOrderClient] fallback client found', {
+        purchaseOrderId: purchaseOrder.id,
+        clientId: fallbackClient.id,
+        clientCompanyId: fallbackClient.companyId ?? null,
+        clientAddress: fallbackClient.address || null,
+      });
+    }
+
+    return {
+      ...purchaseOrder,
+      client: fallbackClient || purchaseOrder.client,
+    };
+  }
+
   private normalizeLaboratoryOrderStatus(
     laboratoryOrder: Pick<LaboratoryOrder, 'status' | 'isConfirmed'>,
   ): LaboratoryOrderStatus {
@@ -756,9 +825,7 @@ export class PurchaseOrdersService {
       });
     }
 
-    const client = await this.clientRepository.findOne({
-      where: { id: clientId, branchId, companyId },
-    });
+    const client = await this.loadScopedClient(clientId, branchId, companyId);
 
     if (!client) {
       throw new NotFoundException({
@@ -831,12 +898,12 @@ export class PurchaseOrdersService {
           relations: ['client', 'laboratoryOrder', 'items'],
         });
 
-        return (
-          reloadedPurchaseOrder || {
-            ...savedPurchaseOrder,
-            items: itemsToSave,
-          }
-        );
+        const purchaseOrderResult = reloadedPurchaseOrder || {
+          ...savedPurchaseOrder,
+          items: itemsToSave,
+        };
+
+        return this.refreshPurchaseOrderClient(purchaseOrderResult);
       });
 
       return {
@@ -863,7 +930,21 @@ export class PurchaseOrdersService {
     branchId: string,
     companyId: string | null,
   ) {
-    const { page, limit, search, status, shouldInvoice } = queryDto;
+    const {
+      page,
+      limit,
+      search,
+      clientName,
+      invoiceNumber,
+      status,
+      invoiceState,
+      paymentMethod,
+      shouldInvoice,
+      minTotal,
+      maxTotal,
+      dateFrom,
+      dateTo,
+    } = queryDto;
 
     const { skip, take } = PaginationUtil.getSkipAndTake({ page, limit });
 
@@ -878,8 +959,22 @@ export class PurchaseOrdersService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(po.orderNumber::text LIKE :search OR LOWER(client.firstName) LIKE LOWER(:search) OR LOWER(client.lastName) LIKE LOWER(:search))',
+        '(po.orderNumber::text LIKE :search OR LOWER(client.firstName) LIKE LOWER(:search) OR LOWER(client.lastName) LIKE LOWER(:search) OR client.documentNumber LIKE :search OR invoice.invoiceNumber LIKE :search OR invoice.accessKey LIKE :search)',
         { search: `%${search}%` },
+      );
+    }
+
+    if (clientName) {
+      queryBuilder.andWhere(
+        "LOWER(CONCAT(COALESCE(client.firstName, ''), ' ', COALESCE(client.lastName, ''))) LIKE LOWER(:clientName)",
+        { clientName: `%${clientName}%` },
+      );
+    }
+
+    if (invoiceNumber) {
+      queryBuilder.andWhere(
+        '(invoice.invoiceNumber LIKE :invoiceNumber OR invoice.accessKey LIKE :invoiceNumber OR invoice.externalInvoiceId::text LIKE :invoiceNumber)',
+        { invoiceNumber: `%${invoiceNumber}%` },
       );
     }
 
@@ -887,9 +982,76 @@ export class PurchaseOrdersService {
       queryBuilder.andWhere('po.status = :status', { status });
     }
 
+    if (invoiceState) {
+      queryBuilder.andWhere('invoice.state = :invoiceState', { invoiceState });
+    }
+
+    const normalizedPaymentMethod = paymentMethod
+      ? String(paymentMethod).trim()
+      : '';
+    const isFilteringByPaymentMethod = normalizedPaymentMethod.length > 0;
+
+    if (isFilteringByPaymentMethod) {
+      queryBuilder.andWhere(
+        "(invoice.paymentMethod = :paymentMethod OR LTRIM(invoice.paymentMethod, '0') = LTRIM(:paymentMethod, '0'))",
+        {
+          paymentMethod: normalizedPaymentMethod,
+        },
+      );
+    }
+
     if (shouldInvoice !== undefined) {
+      const effectiveShouldInvoice = isFilteringByPaymentMethod
+        ? true
+        : shouldInvoice;
+
       queryBuilder.andWhere('po.shouldInvoice = :shouldInvoice', {
-        shouldInvoice,
+        shouldInvoice: effectiveShouldInvoice,
+      });
+    }
+
+    if (minTotal !== undefined) {
+      queryBuilder.andWhere('po.totalAmount >= :minTotal', { minTotal });
+    }
+
+    if (maxTotal !== undefined) {
+      queryBuilder.andWhere('po.totalAmount <= :maxTotal', { maxTotal });
+    }
+
+    if (dateFrom) {
+      const dateFromStart = new Date(`${dateFrom}T00:00:00.000Z`);
+      if (Number.isNaN(dateFromStart.getTime())) {
+        throw new BadRequestException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'El filtro Fecha desde no es válido',
+            en: 'The Date from filter is invalid',
+          },
+        });
+      }
+
+      queryBuilder.andWhere('po.createdAt >= :dateFromStart', {
+        dateFromStart,
+      });
+    }
+
+    if (dateTo) {
+      const dateToStart = new Date(`${dateTo}T00:00:00.000Z`);
+      if (Number.isNaN(dateToStart.getTime())) {
+        throw new BadRequestException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'El filtro Fecha hasta no es válido',
+            en: 'The Date to filter is invalid',
+          },
+        });
+      }
+
+      const dateToExclusive = new Date(dateToStart);
+      dateToExclusive.setUTCDate(dateToExclusive.getUTCDate() + 1);
+
+      queryBuilder.andWhere('po.createdAt < :dateToExclusive', {
+        dateToExclusive,
       });
     }
 
@@ -905,7 +1067,11 @@ export class PurchaseOrdersService {
         es: 'Órdenes de pedido obtenidas correctamente',
         en: 'Purchase orders fetched successfully',
       },
-      result: purchaseOrders,
+      result: await Promise.all(
+        purchaseOrders.map((purchaseOrder) =>
+          this.refreshPurchaseOrderClient(purchaseOrder),
+        ),
+      ),
       totalCount: total,
       currentPage: page,
       pageSize: limit,
@@ -928,13 +1094,17 @@ export class PurchaseOrdersService {
       });
     }
 
+    const refreshedPurchaseOrder = await this.refreshPurchaseOrderClient(
+      purchaseOrder,
+    );
+
     return {
       messageKey: 'PURCHASE_ORDER.FETCHED',
       message: {
         es: 'Orden de pedido obtenida correctamente',
         en: 'Purchase order fetched successfully',
       },
-      data: purchaseOrder,
+      data: refreshedPurchaseOrder,
     };
   }
 
@@ -1026,9 +1196,30 @@ export class PurchaseOrdersService {
   }
 
   async getPurchaseOrderByLaboratoryOrderId(laboratoryOrderId: string) {
-    return this.purchaseOrderRepository.findOne({
+    console.log('[PurchaseOrdersService][getPurchaseOrderByLaboratoryOrderId] request', {
+      laboratoryOrderId,
+    });
+
+    const purchaseOrder = await this.purchaseOrderRepository.findOne({
       where: { laboratoryOrderId },
       relations: ['client', 'laboratoryOrder', 'items', 'invoice'],
     });
+
+    if (!purchaseOrder) {
+      console.log('[PurchaseOrdersService][getPurchaseOrderByLaboratoryOrderId] purchase order not found', {
+        laboratoryOrderId,
+      });
+      return null;
+    }
+
+    console.log('[PurchaseOrdersService][getPurchaseOrderByLaboratoryOrderId] loaded order before refresh', {
+      purchaseOrderId: purchaseOrder.id,
+      clientId: purchaseOrder.clientId,
+      clientAddress: purchaseOrder.client?.address || null,
+      companyId: purchaseOrder.companyId ?? null,
+      branchId: purchaseOrder.branchId,
+    });
+
+    return this.refreshPurchaseOrderClient(purchaseOrder);
   }
 }

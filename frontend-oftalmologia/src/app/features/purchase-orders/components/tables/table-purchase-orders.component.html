@@ -21,12 +21,12 @@
 
             <div class="d-flex gap-2">
               <button
-                *ngIf="sideFilterPanel?.hasActiveFilters()"
+                *ngIf="hasAnyActiveFilters()"
                 class="btn btn-outline-danger btn-sm filter-clear-btn"
                 type="button"
                 placement="top"
                 [ngbTooltip]="'WORDS.RESET' | translate"
-                (click)="sideFilterPanel.resetFilters()"
+                (click)="clearAllFilters()"
               >
                 <i class="ti ti-filter-off"></i>
               </button>
@@ -105,39 +105,67 @@
 </ng-template>
 
 <ng-template #statusTemplate let-row="row">
-  <span class="badge" [ngClass]="getStatusBadgeClass(row.status)">
-    {{
-      'PURCHASE_ORDERS.STATUS_' + (row.status || '').toUpperCase() | translate
-    }}
-  </span>
+  <div class="purchase-order-status-cell">
+    <span
+      class="badge common-badge badge-sm purchase-order-state-badge"
+      [ngClass]="getStatusBadgeClass(row.status)"
+    >
+      {{
+        'PURCHASE_ORDERS.STATUS_' + (row.status || '').toUpperCase() | translate
+      }}
+    </span>
+  </div>
 </ng-template>
 
 <ng-template #invoiceTemplate let-row="row">
-  <div class="d-flex flex-column gap-1">
+  <div class="purchase-order-invoice-cell d-flex flex-column gap-1">
     <span
-      class="badge"
+      class="badge common-badge badge-sm purchase-order-state-badge invoice-state-badge"
       [ngClass]="
         row.shouldInvoice
           ? getInvoiceBadgeClass(row.invoice?.state)
-          : 'bg-secondary'
+          : 'po-badge-secondary'
       "
     >
       {{ getInvoiceStateLabelKey(row) | translate }}
     </span>
-    <small class="text-body-secondary" *ngIf="row.invoice?.invoiceNumber">
+    <small class="purchase-order-invoice-meta" *ngIf="row.invoice?.invoiceNumber">
       {{ row.invoice?.invoiceNumber }}
     </small>
+    <small class="purchase-order-invoice-meta" *ngIf="row.invoice?.externalInvoiceId">
+      ID: {{ row.invoice?.externalInvoiceId }}
+    </small>
     <small
-      class="text-body-secondary"
+      class="purchase-order-invoice-meta"
       *ngIf="!row.invoice?.invoiceNumber && row.invoice?.accessKey"
     >
       {{ row.invoice?.accessKey }}
     </small>
     <small
-      class="text-danger"
+      class="purchase-order-invoice-error"
       *ngIf="row.invoice?.state === 'FAILED' && row.invoice?.errorMessage"
     >
       {{ row.invoice?.errorMessage }}
+    </small>
+  </div>
+</ng-template>
+
+<ng-template #paymentMethodTemplate let-row="row">
+  <div class="purchase-order-payment-cell d-flex flex-column gap-1">
+    <span
+      class="badge common-badge badge-sm purchase-order-state-badge payment-method-badge"
+      [ngClass]="getPaymentMethodBadgeClass(row)"
+    >
+      {{ getPaymentMethodDisplay(row) }}
+    </span>
+    <small
+      class="purchase-order-invoice-meta"
+      *ngIf="row.invoice?.taxPercent !== undefined && row.invoice?.taxPercent !== null"
+    >
+      {{ 'PURCHASE_ORDERS.FIELDS.TAX_PERCENT' | translate }}: {{ row.invoice?.taxPercent }}%
+    </small>
+    <small class="purchase-order-invoice-meta" *ngIf="row.invoice?.authorizationNumber">
+      {{ 'PURCHASE_ORDERS.FIELDS.AUTH_NUMBER' | translate }}: {{ row.invoice?.authorizationNumber }}
     </small>
   </div>
 </ng-template>
@@ -162,6 +190,7 @@
       [ngbTooltip]="'PURCHASE_ORDERS.BILLING.ACTION.ISSUE' | translate"
       (click)="issueInvoice(row)"
     >
+      <i class="ti ti-receipt"></i>
     </button>
 
     <button

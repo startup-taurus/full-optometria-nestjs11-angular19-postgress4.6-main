@@ -19,6 +19,7 @@ import {
   PurchaseOrderInvoiceLogAction,
 } from './entities/purchase-order-invoice-log.entity';
 import { BillingPaymentMethod } from './entities/billing-payment-method.entity';
+import { Client } from '../patients/entities/client.entity';
 import { CreatePurchaseOrderInvoiceDto } from './dtos/create-purchase-order-invoice.dto';
 import { RetryPurchaseOrderInvoiceDto } from './dtos/retry-purchase-order-invoice.dto';
 import {
@@ -31,6 +32,8 @@ export class PurchaseOrderBillingService {
   constructor(
     @InjectRepository(PurchaseOrder)
     private readonly purchaseOrderRepository: Repository<PurchaseOrder>,
+    @InjectRepository(Client)
+    private readonly clientRepository: Repository<Client>,
     @InjectRepository(PurchaseOrderInvoice)
     private readonly purchaseOrderInvoiceRepository: Repository<PurchaseOrderInvoice>,
     @InjectRepository(PurchaseOrderInvoiceLog)
@@ -752,7 +755,68 @@ export class PurchaseOrderBillingService {
       });
     }
 
-    return purchaseOrder;
+    return this.refreshPurchaseOrderClient(purchaseOrder);
+  }
+
+  private async refreshPurchaseOrderClient(
+    purchaseOrder: PurchaseOrder,
+  ): Promise<PurchaseOrder> {
+    if (!purchaseOrder?.clientId || !purchaseOrder.branchId) {
+      return purchaseOrder;
+    }
+
+    const queryBuilder = this.clientRepository
+      .createQueryBuilder('client')
+      .where('client.id = :clientId', { clientId: purchaseOrder.clientId })
+      .andWhere('client.branchId = :branchId', {
+        branchId: purchaseOrder.branchId,
+      });
+
+    if (purchaseOrder.companyId) {
+      queryBuilder.andWhere('client.companyId = :companyId', {
+        companyId: purchaseOrder.companyId,
+      });
+    } else {
+      queryBuilder.andWhere('client.companyId IS NULL');
+    }
+
+    const scopedClient = await queryBuilder.getOne();
+
+    if (scopedClient) {
+      return {
+        ...purchaseOrder,
+        client: scopedClient,
+      };
+    }
+
+    console.log('[PurchaseOrderBillingService][refreshPurchaseOrderClient] scoped client not found, trying fallback by id+branch', {
+      purchaseOrderId: purchaseOrder.id,
+      clientId: purchaseOrder.clientId,
+      branchId: purchaseOrder.branchId,
+      companyId: purchaseOrder.companyId ?? null,
+      currentClientAddress: purchaseOrder.client?.address || null,
+    });
+
+    const fallbackClient = await this.clientRepository.findOne({
+      where: {
+        id: purchaseOrder.clientId,
+        branchId: purchaseOrder.branchId,
+      },
+    });
+
+    if (fallbackClient) {
+      console.log('[PurchaseOrderBillingService][refreshPurchaseOrderClient] fallback client found', {
+        purchaseOrderId: purchaseOrder.id,
+        clientId: fallbackClient.id,
+        clientCompanyId: fallbackClient.companyId ?? null,
+        clientAddress: fallbackClient.address || null,
+      });
+    }
+
+    return {
+      ...purchaseOrder,
+      client: fallbackClient || purchaseOrder.client,
+    };
   }
 
   private async loadScopedInvoice(

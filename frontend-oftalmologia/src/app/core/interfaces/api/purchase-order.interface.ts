@@ -104,6 +104,14 @@ export interface PurchaseOrderQueryParams {
   page?: number
   limit?: number
   search?: string
+  clientName?: string
+  invoiceNumber?: string
   status?: PurchaseOrderStatus
+  invoiceState?: PurchaseOrderInvoiceState
+  paymentMethod?: string
   shouldInvoice?: boolean
+  minTotal?: number
+  maxTotal?: number
+  dateFrom?: string
+  dateTo?: string
 }

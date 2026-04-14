@@ -89,6 +89,8 @@ export class TablePurchaseOrdersComponent
   public statusTemplate?: TemplateRef<HTMLElement>
   @ViewChild('invoiceTemplate', { static: false })
   public invoiceTemplate?: TemplateRef<HTMLElement>
+  @ViewChild('paymentMethodTemplate', { static: false })
+  public paymentMethodTemplate?: TemplateRef<HTMLElement>
   @ViewChild('priceTemplate', { static: false })
   public priceTemplate?: TemplateRef<HTMLElement>
   @ViewChild('labOrderTemplate', { static: false })
@@ -208,6 +210,12 @@ export class TablePurchaseOrdersComponent
           sortable: false,
         },
         {
+          name: 'PURCHASE_ORDERS.TABLE.PAYMENT_METHOD',
+          cellTemplate: this.paymentMethodTemplate,
+          width: 180,
+          sortable: false,
+        },
+        {
           name: 'PURCHASE_ORDERS.TABLE.PRICE',
           cellTemplate: this.priceTemplate,
           width: 130,
@@ -283,6 +291,19 @@ export class TablePurchaseOrdersComponent
   }
 
   public onSideFilterCleared(): void {
+    this.reloadDatatable({})
+  }
+
+  public hasAnyActiveFilters(): boolean {
+    return this.countActiveFilters(this.filter) > 0
+  }
+
+  public clearAllFilters(): void {
+    if (this.sideFilterPanel) {
+      this.sideFilterPanel.resetFilters()
+      return
+    }
+
     this.reloadDatatable({})
   }
 
@@ -375,11 +396,11 @@ export class TablePurchaseOrdersComponent
   public getStatusBadgeClass(status: PurchaseOrderStatus): string {
     switch (status) {
       case PurchaseOrderStatus.INVOICED:
-        return 'bg-success'
+        return 'po-badge-success'
       case PurchaseOrderStatus.CANCELLED:
-        return 'bg-danger'
+        return 'po-badge-danger'
       default:
-        return 'bg-warning text-dark'
+        return 'po-badge-warning'
     }
   }
 
@@ -389,15 +410,46 @@ export class TablePurchaseOrdersComponent
     switch (state) {
       case PurchaseOrderInvoiceState.AUTHORIZED:
       case PurchaseOrderInvoiceState.APPROVED:
-        return 'bg-success'
+        return 'po-badge-success'
       case PurchaseOrderInvoiceState.FAILED:
       case PurchaseOrderInvoiceState.NOT_APPROVED:
       case PurchaseOrderInvoiceState.RETURNED:
-        return 'bg-danger'
+        return 'po-badge-danger'
       case PurchaseOrderInvoiceState.NEW:
       default:
-        return 'bg-warning text-dark'
+        return 'po-badge-warning'
     }
+  }
+
+  public getPaymentMethodDisplay(order: PurchaseOrder): string {
+    if (!order.shouldInvoice) {
+      return this.t('PURCHASE_ORDERS.BILLING.STATE.NOT_APPLICABLE')
+    }
+
+    const paymentMethodCode = String(order.invoice?.paymentMethod || '').trim()
+    if (!paymentMethodCode) {
+      return this.t('PURCHASE_ORDERS.BILLING.LABELS.NOT_ASSIGNED')
+    }
+
+    const key = this.getPaymentMethodTranslationKey(paymentMethodCode)
+    if (key) {
+      return this.t(key)
+    }
+
+    return paymentMethodCode
+  }
+
+  public getPaymentMethodBadgeClass(order: PurchaseOrder): string {
+    if (!order.shouldInvoice) {
+      return 'po-badge-secondary'
+    }
+
+    const paymentMethodCode = String(order.invoice?.paymentMethod || '').trim()
+    if (!paymentMethodCode) {
+      return 'po-badge-secondary'
+    }
+
+    return 'po-badge-info'
   }
 
   public getInvoiceStateLabelKey(order: PurchaseOrder): string {
@@ -503,7 +555,48 @@ export class TablePurchaseOrdersComponent
   }
 
   public async issueInvoice(order: PurchaseOrder): Promise<void> {
-    const missingFieldKeys = this.getMissingClientBillingFieldKeys(order)
+    console.log('[PurchaseOrdersTable][issueInvoice] start', {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      orderClientId: order.client?.id || null,
+      orderClientAddress: order.client?.address || null,
+      shouldInvoice: order.shouldInvoice,
+      status: order.status,
+    })
+
+    const latestOrder = await firstValueFrom(
+      this.purchaseOrdersService
+        .getById(order.id)
+        .pipe(
+          catchError((error) => {
+            console.log('[PurchaseOrdersTable][issueInvoice] getById failed, fallback to row order', {
+              orderId: order.id,
+              error,
+            })
+            return of(order)
+          })
+        )
+    )
+
+    const orderForValidation = latestOrder || order
+    console.log('[PurchaseOrdersTable][issueInvoice] latest order for validation', {
+      orderId: orderForValidation?.id,
+      clientId: orderForValidation?.client?.id || null,
+      clientAddress: orderForValidation?.client?.address || null,
+      clientEmail: orderForValidation?.client?.email || null,
+      clientMobilePhone: orderForValidation?.client?.mobilePhone || null,
+      clientHomePhone: orderForValidation?.client?.homePhone || null,
+    })
+
+    const missingFieldKeys = this.getMissingClientBillingFieldKeys(
+      orderForValidation
+    )
+
+    console.log('[PurchaseOrdersTable][issueInvoice] missing fields', {
+      orderId: orderForValidation?.id,
+      clientId: orderForValidation?.client?.id || null,
+      missingFieldKeys,
+    })
 
     if (missingFieldKeys.length > 0) {
       const missingFieldsHtml = missingFieldKeys
@@ -693,11 +786,24 @@ export class TablePurchaseOrdersComponent
 
           const xmlText = this.decodeBase64Xml(response.xmlBase64)
           const summary = this.extractXmlSummary(xmlText)
+          const paymentMethodLabel = this.getPaymentMethodDisplay(order)
+          const invoiceStateLabel = this.t(this.getInvoiceStateLabelKey(order))
+          const authorizationDate = this.formatDateTime(
+            order.invoice?.authorizationDate || null
+          )
 
           const result = await Swal.fire({
             title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.XML_PREVIEW_TITLE'),
             html: `
               <div style="text-align:left;display:grid;gap:8px;max-height:380px;overflow:auto;">
+                <div><strong>${this.t('PURCHASE_ORDERS.NUMBER')}:</strong> #${this.escapeHtml(String(order.orderNumber || '-'))}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.STATE')}:</strong> ${this.escapeHtml(invoiceStateLabel)}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.PAYMENT_METHOD')}:</strong> ${this.escapeHtml(paymentMethodLabel)}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.TAX_PERCENT')}:</strong> ${this.escapeHtml(String(order.invoice?.taxPercent ?? '-'))}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.EXTERNAL_ID')}:</strong> ${this.escapeHtml(String(order.invoice?.externalInvoiceId || '-'))}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.AUTH_NUMBER')}:</strong> ${this.escapeHtml(String(order.invoice?.authorizationNumber || '-'))}</div>
+                <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.AUTH_DATE')}:</strong> ${this.escapeHtml(authorizationDate)}</div>
+                <hr style="margin: 6px 0;" />
                 <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.INVOICE_NUMBER')}:</strong> ${this.escapeHtml(summary.invoiceNumber || '-')}</div>
                 <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.ACCESS_KEY')}:</strong> ${this.escapeHtml(summary.accessKey || '-')}</div>
                 <div><strong>${this.t('PURCHASE_ORDERS.BILLING.XML.LABELS.CUSTOMER')}:</strong> ${this.escapeHtml(summary.customerName || '-')}</div>
@@ -805,6 +911,9 @@ export class TablePurchaseOrdersComponent
   private getMissingClientBillingFieldKeys(order: PurchaseOrder): string[] {
     const client = order.client
     if (!client) {
+      console.log('[PurchaseOrdersTable][getMissingClientBillingFieldKeys] missing client relation', {
+        orderId: order.id,
+      })
       return ['PURCHASE_ORDERS.BILLING.MISSING.CLIENT']
     }
 
@@ -829,6 +938,17 @@ export class TablePurchaseOrdersComponent
     if (!hasPhone) {
       missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.PHONE')
     }
+
+    console.log('[PurchaseOrdersTable][getMissingClientBillingFieldKeys] client snapshot', {
+      orderId: order.id,
+      clientId: client.id,
+      documentNumber: client.documentNumber || null,
+      email: client.email || null,
+      address: client.address || null,
+      mobilePhone: client.mobilePhone || null,
+      homePhone: client.homePhone || null,
+      missingKeys,
+    })
 
     return missingKeys
   }
@@ -925,6 +1045,34 @@ export class TablePurchaseOrdersComponent
     return atob(base64Value)
   }
 
+  private formatDateTime(value?: string | null): string {
+    if (!value) {
+      return '-'
+    }
+
+    const parsedDate = new Date(value)
+    if (Number.isNaN(parsedDate.getTime())) {
+      return String(value)
+    }
+
+    return parsedDate.toLocaleString()
+  }
+
+  private getPaymentMethodTranslationKey(code: string): string | null {
+    switch (code) {
+      case '01':
+        return 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_01'
+      case '16':
+        return 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_16'
+      case '19':
+        return 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_19'
+      case '20':
+        return 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_20'
+      default:
+        return null
+    }
+  }
+
   private extractXmlSummary(xmlText: string): {
     invoiceNumber: string | null
     accessKey: string | null
@@ -1001,5 +1149,19 @@ export class TablePurchaseOrdersComponent
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;')
+  }
+
+  private countActiveFilters(filters: Partial<PurchaseOrderQueryParams>): number {
+    if (!filters) {
+      return 0
+    }
+
+    return Object.values(filters as Record<string, unknown>).filter((value) => {
+      if (typeof value === 'boolean') return true
+      if (typeof value === 'number') return true
+      if (typeof value === 'string') return value.trim().length > 0
+      if (Array.isArray(value)) return value.length > 0
+      return value !== null && value !== undefined
+    }).length
   }
 }

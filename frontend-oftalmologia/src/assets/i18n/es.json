@@ -1729,7 +1729,24 @@
     "SEARCH": "Buscar orden",
     "SEARCH_PLACEHOLDER": "Buscar por número de orden, cliente o documento",
     "FILTERS": {
-      "TITLE": "Filtros de órdenes"
+      "TITLE": "Filtros de órdenes",
+      "GENERAL_SEARCH": "Búsqueda general",
+      "CLIENT_NAME": "Nombre del cliente",
+      "CLIENT_NAME_PLACEHOLDER": "Buscar por nombre o apellido",
+      "INVOICE_NUMBER": "Número de factura",
+      "INVOICE_NUMBER_PLACEHOLDER": "Buscar por número, clave o id externo",
+      "INVOICE_STATE": "Estado de factura",
+      "PAYMENT_METHOD": "Método de pago",
+      "PAYMENT_METHOD_01": "01 - Efectivo",
+      "PAYMENT_METHOD_16": "16 - Tarjeta débito",
+      "PAYMENT_METHOD_19": "19 - Tarjeta crédito",
+      "PAYMENT_METHOD_20": "20 - Transferencia/cheque",
+      "MIN_TOTAL": "Monto mínimo",
+      "MIN_TOTAL_PLACEHOLDER": "Ej: 10.00",
+      "MAX_TOTAL": "Monto máximo",
+      "MAX_TOTAL_PLACEHOLDER": "Ej: 500.00",
+      "DATE_FROM": "Fecha desde",
+      "DATE_TO": "Fecha hasta"
     },
     "TABLE": {
       "ORDER": "Orden",
@@ -1737,6 +1754,7 @@
       "LAB_ORDER": "Orden laboratorio",
       "STATUS": "Estado",
       "INVOICE": "Facturación",
+      "PAYMENT_METHOD": "Método de pago",
       "PRICE": "Precio",
       "CREATED_AT": "Fecha de creación",
       "ACTIONS": "Acciones"
@@ -1754,6 +1772,16 @@
       "QUANTITY": "Cantidad",
       "UNIT_PRICE": "Precio unitario",
       "LINE_TOTAL": "Total línea",
+      "EMAIL": "Correo",
+      "ADDRESS": "Dirección",
+      "PHONE": "Teléfono",
+      "PAYMENT_METHOD": "Método de pago",
+      "INVOICE_NUMBER": "Número de factura",
+      "TAX_PERCENT": "Impuesto",
+      "EXTERNAL_ID": "ID externo",
+      "ACCESS_KEY": "Clave de acceso",
+      "AUTH_NUMBER": "Nro. autorización",
+      "AUTH_DATE": "Fecha autorización",
       "CREATED_AT": "Fecha de Creación",
       "UPDATED_AT": "Fecha de Actualización"
     },
@@ -1816,6 +1844,9 @@
         "ADDRESS": "Dirección",
         "PHONE": "Teléfono (móvil o fijo)"
       },
+      "LABELS": {
+        "NOT_ASSIGNED": "Sin método asignado"
+      },
       "DIALOG": {
         "TITLE": "Configurar factura",
         "PAYMENT_METHOD": "Método de pago",
@@ -1857,7 +1888,13 @@
           "CUSTOMER": "Cliente",
           "IDENTIFICATION": "Identificación",
           "DATE": "Fecha de emisión",
-          "TOTAL": "Total"
+          "TOTAL": "Total",
+          "STATE": "Estado",
+          "PAYMENT_METHOD": "Método de pago",
+          "TAX_PERCENT": "Impuesto",
+          "EXTERNAL_ID": "ID externo",
+          "AUTH_NUMBER": "Nro. autorización",
+          "AUTH_DATE": "Fecha autorización"
         }
       }
     }

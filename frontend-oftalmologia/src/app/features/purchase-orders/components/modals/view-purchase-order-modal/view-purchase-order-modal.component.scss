@@ -18,7 +18,45 @@
   font-weight: 500;
 }
 
+.detail-inline-list {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.83rem;
+}
+
+.invoice-detail-line {
+  font-size: 0.83rem;
+  word-break: break-word;
+}
+
+.badge {
+  font-weight: 600;
+  opacity: 1;
+}
+
+.badge.bg-warning,
+.badge.bg-warning.text-dark,
+.badge.bg-warning.text-white {
+  background-color: #9a6a00 !important;
+  color: #fff !important;
+}
+
 .table-bottom-total {
   border-top: 2px solid var(--bs-border-color);
   background-color: var(--bs-gray-100);
+}
+
+[data-bs-theme='dark'] {
+  .detail-block {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  .detail-label,
+  .text-body-secondary {
+    color: #c7d4ea !important;
+  }
+
+  .table-bottom-total {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
 }

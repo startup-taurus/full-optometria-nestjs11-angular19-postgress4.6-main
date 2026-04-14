@@ -1744,6 +1744,38 @@
     "INVOICE": "Invoicing",
     "SEARCH": "Search order",
     "SEARCH_PLACEHOLDER": "Search by order number, client or document",
+    "FILTERS": {
+      "TITLE": "Order filters",
+      "GENERAL_SEARCH": "General search",
+      "CLIENT_NAME": "Client name",
+      "CLIENT_NAME_PLACEHOLDER": "Search by first or last name",
+      "INVOICE_NUMBER": "Invoice number",
+      "INVOICE_NUMBER_PLACEHOLDER": "Search by number, access key or external id",
+      "INVOICE_STATE": "Invoice state",
+      "PAYMENT_METHOD": "Payment method",
+      "PAYMENT_METHOD_01": "01 - Cash",
+      "PAYMENT_METHOD_16": "16 - Debit card",
+      "PAYMENT_METHOD_19": "19 - Credit card",
+      "PAYMENT_METHOD_20": "20 - Transfer/check",
+      "MIN_TOTAL": "Minimum amount",
+      "MIN_TOTAL_PLACEHOLDER": "Eg: 10.00",
+      "MAX_TOTAL": "Maximum amount",
+      "MAX_TOTAL_PLACEHOLDER": "Eg: 500.00",
+      "DATE_FROM": "Date from",
+      "DATE_TO": "Date to"
+    },
+    "TABLE": {
+      "ORDER": "Order",
+      "CLIENT": "Client",
+      "LAB_ORDER": "Lab order",
+      "STATUS": "Status",
+      "INVOICE": "Invoicing",
+      "PAYMENT_METHOD": "Payment method",
+      "PRICE": "Price",
+      "CREATED_AT": "Created at",
+      "ACTIONS": "Actions"
+    },
+    "ITEMS_TITLE": "Product detail",
     "DETAIL": "Order Detail",
     "FIELDS": {
       "ORDER_NUMBER": "Order Number",
@@ -1752,6 +1784,20 @@
       "SHOULD_INVOICE": "Should Be Invoiced",
       "STATUS": "Status",
       "TOTAL_AMOUNT": "Total Amount",
+      "PRODUCT": "Product",
+      "QUANTITY": "Quantity",
+      "UNIT_PRICE": "Unit price",
+      "LINE_TOTAL": "Line total",
+      "EMAIL": "Email",
+      "ADDRESS": "Address",
+      "PHONE": "Phone",
+      "PAYMENT_METHOD": "Payment method",
+      "INVOICE_NUMBER": "Invoice number",
+      "TAX_PERCENT": "Tax",
+      "EXTERNAL_ID": "External ID",
+      "ACCESS_KEY": "Access key",
+      "AUTH_NUMBER": "Authorization no.",
+      "AUTH_DATE": "Authorization date",
       "CREATED_AT": "Creation Date",
       "UPDATED_AT": "Update Date"
     },
@@ -1814,6 +1860,9 @@
         "ADDRESS": "Address",
         "PHONE": "Phone (mobile or home)"
       },
+      "LABELS": {
+        "NOT_ASSIGNED": "No method assigned"
+      },
       "DIALOG": {
         "TITLE": "Configure invoice",
         "PAYMENT_METHOD": "Payment method",
@@ -1855,7 +1904,13 @@
           "CUSTOMER": "Customer",
           "IDENTIFICATION": "Identification",
           "DATE": "Issue date",
-          "TOTAL": "Total"
+          "TOTAL": "Total",
+          "STATE": "Status",
+          "PAYMENT_METHOD": "Payment method",
+          "TAX_PERCENT": "Tax",
+          "EXTERNAL_ID": "External ID",
+          "AUTH_NUMBER": "Authorization no.",
+          "AUTH_DATE": "Authorization date"
         }
       }
     }

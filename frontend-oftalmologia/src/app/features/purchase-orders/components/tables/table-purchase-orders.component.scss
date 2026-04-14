@@ -1,5 +1,16 @@
 :host {
   display: block;
+  --purchase-order-badge-text: #111827;
+  --purchase-order-badge-success-bg: #b8e6b5;
+  --purchase-order-badge-success-border: #95d28f;
+  --purchase-order-badge-danger-bg: #ffc1ad;
+  --purchase-order-badge-danger-border: #ff9a7d;
+  --purchase-order-badge-warning-bg: #edcf87;
+  --purchase-order-badge-warning-border: #d6b35f;
+  --purchase-order-badge-secondary-bg: #b8c9ee;
+  --purchase-order-badge-secondary-border: #98b1e3;
+  --purchase-order-badge-info-bg: #a9d8f6;
+  --purchase-order-badge-info-border: #86c5ed;
 }
 
 .common-datatable-card {
@@ -13,16 +24,130 @@
   font-size: 0.75rem;
 }
 
+.purchase-order-status-cell .badge,
+.purchase-order-invoice-cell .badge {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.purchase-order-state-badge,
+.purchase-order-state-badge * {
+  color: var(--purchase-order-badge-text) !important;
+}
+
+.purchase-order-state-badge {
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  min-height: 1.6rem;
+  line-height: 1.15;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.purchase-order-status-cell .purchase-order-state-badge,
+.purchase-order-invoice-cell .purchase-order-state-badge,
+.purchase-order-payment-cell .purchase-order-state-badge {
+  width: 100%;
+  max-width: 100%;
+}
+
+.purchase-order-state-badge.po-badge-success {
+  background-color: var(--purchase-order-badge-success-bg) !important;
+  border-color: var(--purchase-order-badge-success-border) !important;
+}
+
+.purchase-order-state-badge.po-badge-danger {
+  background-color: var(--purchase-order-badge-danger-bg) !important;
+  border-color: var(--purchase-order-badge-danger-border) !important;
+}
+
+.purchase-order-state-badge.po-badge-warning {
+  background-color: var(--purchase-order-badge-warning-bg) !important;
+  border-color: var(--purchase-order-badge-warning-border) !important;
+}
+
+.purchase-order-state-badge.po-badge-secondary {
+  background-color: var(--purchase-order-badge-secondary-bg) !important;
+  border-color: var(--purchase-order-badge-secondary-border) !important;
+}
+
+.purchase-order-state-badge.po-badge-info {
+  background-color: var(--purchase-order-badge-info-bg) !important;
+  border-color: var(--purchase-order-badge-info-border) !important;
+}
+
+.invoice-state-badge,
+.payment-method-badge {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.purchase-order-invoice-meta {
+  color: var(--bs-secondary-color);
+  line-height: 1.2;
+}
+
+.purchase-order-invoice-error {
+  color: var(--bs-danger-text-emphasis);
+  line-height: 1.2;
+}
+
 @media (max-width: 767.98px) {
   .card-header .d-flex {
     flex-direction: column;
     align-items: flex-start !important;
     gap: 0.75rem;
   }
+
+  .purchase-order-status-cell .badge,
+  .purchase-order-invoice-cell .badge {
+    font-size: 0.7rem;
+  }
 }
 
-[data-bs-theme='dark'] {
+:host-context([data-bs-theme='dark']) {
+  .purchase-order-state-badge,
+  .purchase-order-state-badge * {
+    color: #fff !important;
+  }
+
+  .purchase-order-state-badge.po-badge-success {
+    background-color: #4f965c !important;
+    border-color: #69b277 !important;
+  }
+
+  .purchase-order-state-badge.po-badge-danger {
+    background-color: #b85c56 !important;
+    border-color: #d87972 !important;
+  }
+
+  .purchase-order-state-badge.po-badge-warning {
+    background-color: #9f7a1f !important;
+    border-color: #c4962a !important;
+  }
+
+  .purchase-order-state-badge.po-badge-secondary {
+    background-color: #3f5f9e !important;
+    border-color: #5b7dc0 !important;
+  }
+
+  .purchase-order-state-badge.po-badge-info {
+    background-color: #2f6f9c !important;
+    border-color: #4f88b1 !important;
+  }
+
   .common-datatable-card {
     border-color: var(--bs-border-color) !important;
+  }
+
+  .purchase-order-invoice-meta {
+    color: #c7d4ea !important;
+  }
+
+  .purchase-order-invoice-error {
+    color: #ff9a9a !important;
   }
 }

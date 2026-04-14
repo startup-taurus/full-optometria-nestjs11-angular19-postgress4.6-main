@@ -29,6 +29,12 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
 
   public purchaseOrdersFilterForm?: FormGroup
   public purchaseOrderStatus = PurchaseOrderStatus
+  public billingPaymentMethods = [
+    { code: '01', labelKey: 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_01' },
+    { code: '16', labelKey: 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_16' },
+    { code: '19', labelKey: 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_19' },
+    { code: '20', labelKey: 'PURCHASE_ORDERS.FILTERS.PAYMENT_METHOD_20' },
+  ]
 
   private fb = inject(FormBuilder)
   private filterCommunicationService = inject(FilterCommunicationService)
@@ -46,9 +52,13 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     this.purchaseOrdersFilterForm = this.fb.group({
-      search: [''],
+      clientName: [''],
+      invoiceNumber: [''],
       status: [''],
+      paymentMethod: [''],
       shouldInvoice: [''],
+      minTotal: [''],
+      maxTotal: [''],
       dateFrom: [''],
       dateTo: [''],
     })
@@ -65,14 +75,18 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
 
         if (filter && Object.keys(filter).length > 0) {
           const formValue = {
-            search: filter['search'] || '',
+            clientName: filter['clientName'] || '',
+            invoiceNumber: filter['invoiceNumber'] || '',
             status: filter['status'] || '',
+            paymentMethod: filter['paymentMethod'] || '',
             shouldInvoice:
               filter['shouldInvoice'] !== undefined
                 ? filter['shouldInvoice']
                   ? 'true'
                   : 'false'
                 : '',
+            minTotal: filter['minTotal'] ?? '',
+            maxTotal: filter['maxTotal'] ?? '',
             dateFrom: filter['dateFrom'] || '',
             dateTo: filter['dateTo'] || '',
           }
@@ -106,16 +120,32 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
     const formValue = this.purchaseOrdersFilterForm.value
     const cleanedFilter: FilterValue = {}
 
-    if (formValue.search) {
-      cleanedFilter['search'] = formValue.search
+    if (formValue.clientName) {
+      cleanedFilter['clientName'] = formValue.clientName
+    }
+
+    if (formValue.invoiceNumber) {
+      cleanedFilter['invoiceNumber'] = formValue.invoiceNumber
     }
 
     if (formValue.status) {
       cleanedFilter['status'] = formValue.status
     }
 
+    if (formValue.paymentMethod) {
+      cleanedFilter['paymentMethod'] = formValue.paymentMethod
+    }
+
     if (formValue.shouldInvoice !== '') {
       cleanedFilter['shouldInvoice'] = formValue.shouldInvoice === 'true'
+    }
+
+    if (formValue.minTotal !== '' && formValue.minTotal !== null) {
+      cleanedFilter['minTotal'] = Number(formValue.minTotal)
+    }
+
+    if (formValue.maxTotal !== '' && formValue.maxTotal !== null) {
+      cleanedFilter['maxTotal'] = Number(formValue.maxTotal)
     }
 
     if (formValue.dateFrom) {

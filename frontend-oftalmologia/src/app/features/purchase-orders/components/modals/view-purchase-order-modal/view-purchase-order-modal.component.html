@@ -36,6 +36,20 @@
           {{ purchaseOrder.client?.firstName || '-' }} {{ purchaseOrder.client?.lastName || '' }}
         </p>
         <small class="text-body-secondary">{{ purchaseOrder.client?.documentNumber || '-' }}</small>
+        <div class="detail-inline-list mt-2">
+          <div>
+            <strong>{{ 'PURCHASE_ORDERS.FIELDS.EMAIL' | translate }}:</strong>
+            {{ purchaseOrder.client?.email || '-' }}
+          </div>
+          <div>
+            <strong>{{ 'PURCHASE_ORDERS.FIELDS.ADDRESS' | translate }}:</strong>
+            {{ purchaseOrder.client?.address || '-' }}
+          </div>
+          <div>
+            <strong>{{ 'PURCHASE_ORDERS.FIELDS.PHONE' | translate }}:</strong>
+            {{ purchaseOrder.client?.mobilePhone || purchaseOrder.client?.homePhone || '-' }}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -43,11 +57,7 @@
       <div class="detail-block">
         <label class="detail-label">{{ 'PURCHASE_ORDERS.SHOULD_INVOICE' | translate }}</label>
         <p class="detail-value">
-          <span
-            class="badge"
-            [class.bg-success]="purchaseOrder.shouldInvoice"
-            [class.bg-secondary]="!purchaseOrder.shouldInvoice"
-          >
+          <span class="badge" [ngClass]="getShouldInvoiceBadgeClass(purchaseOrder.shouldInvoice)">
             {{ (purchaseOrder.shouldInvoice ? 'COMMON.YES' : 'COMMON.NO') | translate }}
           </span>
         </p>
@@ -58,6 +68,76 @@
       <div class="detail-block">
         <label class="detail-label">{{ 'COMMON.CREATED_AT' | translate }}</label>
         <p class="detail-value">{{ purchaseOrder.createdAt | date: 'dd/MM/yyyy, HH:mm' }}</p>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.INVOICE' | translate }}</label>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <span
+              class="badge"
+              [ngClass]="
+                purchaseOrder.shouldInvoice
+                  ? getInvoiceBadgeClass(purchaseOrder.invoice?.state)
+                  : 'bg-secondary text-white'
+              "
+            >
+              {{ getInvoiceStateLabelKey(purchaseOrder) | translate }}
+            </span>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.PAYMENT_METHOD' | translate }}:</strong>
+              {{
+                purchaseOrder.shouldInvoice
+                  ? getPaymentMethodLabel(purchaseOrder.invoice?.paymentMethod)
+                  : ('PURCHASE_ORDERS.BILLING.STATE.NOT_APPLICABLE' | translate)
+              }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.TAX_PERCENT' | translate }}:</strong>
+              {{
+                purchaseOrder.invoice?.taxPercent === undefined || purchaseOrder.invoice?.taxPercent === null
+                  ? '-'
+                  : (purchaseOrder.invoice?.taxPercent + '%')
+              }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.INVOICE_NUMBER' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.invoiceNumber || '-' }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.EXTERNAL_ID' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.externalInvoiceId || '-' }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.ACCESS_KEY' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.accessKey || '-' }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.AUTH_NUMBER' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.authorizationNumber || '-' }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.AUTH_DATE' | translate }}:</strong>
+              {{ formatDateTime(purchaseOrder.invoice?.authorizationDate) }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
