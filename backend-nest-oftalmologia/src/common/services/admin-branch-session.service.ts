@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AdminBranchSessionService {
-
   private adminBranchSelection = new Map<string, string>();
 
   setAdminBranchSelection(userId: string, branchId: string): void {
