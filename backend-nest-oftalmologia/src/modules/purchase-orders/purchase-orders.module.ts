@@ -8,6 +8,7 @@ import { PurchaseOrderInvoice } from './entities/purchase-order-invoice.entity';
 import { PurchaseOrderInvoiceLog } from './entities/purchase-order-invoice-log.entity';
 import { BillingPaymentMethod } from './entities/billing-payment-method.entity';
 import { Client } from '../patients/entities/client.entity';
+import { Branch } from '../branches/entities/branch.entity';
 import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
 import { Product } from '../products/entities/product.entity';
 import { Company } from '../companies/entities/company.entity';
@@ -23,6 +24,7 @@ import { BillingApiProvider } from './providers/billing-api.provider';
       PurchaseOrderInvoiceLog,
       BillingPaymentMethod,
       Client,
+      Branch,
       LaboratoryOrder,
       Product,
       Company,

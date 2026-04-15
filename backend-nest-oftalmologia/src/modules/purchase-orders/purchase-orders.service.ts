@@ -12,7 +12,6 @@ import {
   In,
   EntityManager,
   FindOptionsWhere,
-  IsNull,
 } from 'typeorm';
 import {
   PurchaseOrder,
@@ -203,9 +202,15 @@ export class PurchaseOrdersService {
     where: FindOptionsWhere<T>,
     companyId: string | null,
   ): FindOptionsWhere<T> {
+    if (companyId !== null && companyId !== undefined) {
+      return {
+        ...where,
+        companyId,
+      } as FindOptionsWhere<T>;
+    }
+
     return {
       ...where,
-      companyId: companyId ?? IsNull(),
     } as FindOptionsWhere<T>;
   }
 
@@ -221,8 +226,6 @@ export class PurchaseOrdersService {
 
     if (companyId) {
       queryBuilder.andWhere('client.companyId = :companyId', { companyId });
-    } else {
-      queryBuilder.andWhere('client.companyId IS NULL');
     }
 
     return queryBuilder.getOne();
@@ -261,7 +264,7 @@ export class PurchaseOrdersService {
       branchId: purchaseOrder.branchId,
       ...(purchaseOrder.companyId
         ? { companyId: purchaseOrder.companyId }
-        : { companyId: IsNull() }),
+        : {}),
     };
 
     const fallbackClient = await this.clientRepository.findOne({

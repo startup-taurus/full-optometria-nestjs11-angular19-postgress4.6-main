@@ -190,6 +190,14 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       code: ['', [Validators.required, Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
       city: ['', [Validators.required, Validators.maxLength(50)]],
+      establishmentCode: [
+        '',
+        [Validators.maxLength(3), Validators.pattern(/^\d{3}$/)],
+      ],
+      emissionPointCode: [
+        '',
+        [Validators.maxLength(3), Validators.pattern(/^\d{3}$/)],
+      ],
       phone: ['', [Validators.required, Validators.maxLength(20)]],
       corporateEmail: ['', [Validators.required, Validators.email]],
     })
@@ -481,7 +489,11 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
     if (errors['minlength']) return 'VALIDATION.MIN_LENGTH'
     if (errors['maxlength']) return 'VALIDATION.MAX_LENGTH'
     if (errors['email']) return 'VALIDATION.EMAIL_INVALID'
-    if (errors['pattern']) return 'VALIDATION.PHONE_INVALID'
+    if (errors['pattern']) {
+      return fieldName === 'phone'
+        ? 'VALIDATION.PHONE_INVALID'
+        : 'VALIDATION.INVALID_FORMAT'
+    }
     if (errors['passwordMismatch']) return 'VALIDATION.PASSWORD_MISMATCH'
 
     return ''
@@ -652,6 +664,14 @@ export class CompanySetupModalComponent implements OnInit, OnDestroy {
       code: formValues.code,
       address: formValues.address,
       city: formValues.city,
+    }
+
+    if (formValues.establishmentCode && formValues.establishmentCode.trim()) {
+      branchData.establishmentCode = formValues.establishmentCode.trim()
+    }
+
+    if (formValues.emissionPointCode && formValues.emissionPointCode.trim()) {
+      branchData.emissionPointCode = formValues.emissionPointCode.trim()
     }
 
     if (formValues.phone && formValues.phone.trim()) {

@@ -34,6 +34,16 @@ export class CreateCompanyCompleteDto {
   @MaxLength(20)
   companyPhone?: string;
 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  billingApiKey?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  billingContributorId?: number | null;
+
   @IsNotEmpty()
   @IsString()
   @MinLength(1)
@@ -57,6 +67,18 @@ export class CreateCompanyCompleteDto {
   @MinLength(1)
   @MaxLength(50)
   branchCity: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(3)
+  @Matches(/^\d{3}$/)
+  branchEstablishmentCode?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(3)
+  @Matches(/^\d{3}$/)
+  branchEmissionPointCode?: string;
 
   @IsNotEmpty()
   @IsString()

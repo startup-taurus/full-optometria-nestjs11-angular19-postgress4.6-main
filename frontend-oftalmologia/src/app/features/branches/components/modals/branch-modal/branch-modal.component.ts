@@ -68,6 +68,8 @@ export class BranchModalComponent implements OnInit, OnDestroy {
       code: ['', [Validators.required, Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
       city: ['', [Validators.required, Validators.maxLength(50)]],
+      establishmentCode: ['', [Validators.maxLength(3), Validators.pattern(/^\d{3}$/)]],
+      emissionPointCode: ['', [Validators.maxLength(3), Validators.pattern(/^\d{3}$/)]],
       phone: ['', [Validators.required, Validators.maxLength(20)]],
       corporateEmail: ['', [Validators.required, Validators.email]],
     })
@@ -83,6 +85,8 @@ export class BranchModalComponent implements OnInit, OnDestroy {
       code: this.selectedBranch.code,
       address: this.selectedBranch.address,
       city: this.selectedBranch.city,
+      establishmentCode: this.selectedBranch.establishmentCode || '',
+      emissionPointCode: this.selectedBranch.emissionPointCode || '',
       phone: this.selectedBranch.phone || '',
       corporateEmail: this.selectedBranch.corporateEmail || '',
     })
@@ -111,6 +115,8 @@ export class BranchModalComponent implements OnInit, OnDestroy {
     const branchData: CreateBranchDto = {
       ...this.branchForm.value,
       openingHours: serializeBranchSchedule(this.getWeeklySchedule()),
+      establishmentCode: this.branchForm.value.establishmentCode || undefined,
+      emissionPointCode: this.branchForm.value.emissionPointCode || undefined,
     }
 
     this.branchesService
@@ -133,6 +139,8 @@ export class BranchModalComponent implements OnInit, OnDestroy {
     const branchData: UpdateBranchDto = {
       ...this.branchForm.value,
       openingHours: serializeBranchSchedule(this.getWeeklySchedule()),
+      establishmentCode: this.branchForm.value.establishmentCode || undefined,
+      emissionPointCode: this.branchForm.value.emissionPointCode || undefined,
     }
 
     this.branchesService
@@ -168,6 +176,9 @@ export class BranchModalComponent implements OnInit, OnDestroy {
     }
     if (errors['email']) {
       return 'VALIDATION.INVALID_EMAIL'
+    }
+    if (errors['pattern']) {
+      return 'VALIDATION.INVALID_FORMAT'
     }
 
     return ''

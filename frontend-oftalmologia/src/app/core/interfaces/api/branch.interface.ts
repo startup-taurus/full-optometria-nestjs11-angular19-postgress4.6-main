@@ -8,6 +8,8 @@ export interface Branch {
   city: string
   phone?: string
   corporateEmail?: string
+  establishmentCode?: string | null
+  emissionPointCode?: string | null
   openingHours?: string
   openingSchedule?: BranchOpeningScheduleDay[]
   isActive: boolean
@@ -33,6 +35,8 @@ export interface CreateBranchDto {
   city: string
   phone?: string
   corporateEmail?: string
+  establishmentCode?: string
+  emissionPointCode?: string
   openingHours?: string
   openingSchedule?: BranchOpeningScheduleDay[]
 }
@@ -44,6 +48,8 @@ export interface UpdateBranchDto {
   city?: string
   phone?: string
   corporateEmail?: string
+  establishmentCode?: string
+  emissionPointCode?: string
   openingHours?: string
   openingSchedule?: BranchOpeningScheduleDay[]
   isActive?: boolean

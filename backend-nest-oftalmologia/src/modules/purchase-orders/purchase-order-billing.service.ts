@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
+import { Branch } from '../branches/entities/branch.entity';
 import { Company } from '../companies/entities/company.entity';
 import {
   PurchaseOrder,
@@ -42,6 +43,8 @@ export class PurchaseOrderBillingService {
     private readonly billingPaymentMethodRepository: Repository<BillingPaymentMethod>,
     @InjectRepository(Company)
     private readonly companyRepository: Repository<Company>,
+    @InjectRepository(Branch)
+    private readonly branchRepository: Repository<Branch>,
     private readonly billingApiProvider: BillingApiProvider,
   ) {}
 
@@ -572,6 +575,10 @@ export class PurchaseOrderBillingService {
     const company = await this.loadCompanyBillingConfig(
       purchaseOrder.companyId,
     );
+    const branchBillingConfig = await this.loadBranchBillingConfig(
+      purchaseOrder.branchId,
+      purchaseOrder.companyId,
+    );
     const itemsResult = this.mapItemsAndTotals(purchaseOrder, taxPercent);
 
     const requestPayload: Record<string, unknown> = {
@@ -601,10 +608,21 @@ export class PurchaseOrderBillingService {
       requestPayload.contributor_id = Number(company.billingContributorId);
     }
 
+    if (branchBillingConfig?.establishmentCode) {
+      requestPayload.establishment_code = branchBillingConfig.establishmentCode;
+    }
+
+    if (branchBillingConfig?.emissionPointCode) {
+      requestPayload.emission_point_code = branchBillingConfig.emissionPointCode;
+    }
+
     console.log('[PurchaseOrderBillingService][createOrRetryInvoice] request payload', {
       purchaseOrderId,
       invoiceId: existingInvoice?.id || null,
       contributorId: requestPayload.contributor_id || null,
+      branchId: purchaseOrder.branchId || null,
+      establishmentCode: branchBillingConfig?.establishmentCode || null,
+      emissionPointCode: branchBillingConfig?.emissionPointCode || null,
       subtotal: itemsResult.subtotal,
       taxAmount: itemsResult.taxAmount,
       total: itemsResult.total,
@@ -907,6 +925,42 @@ export class PurchaseOrderBillingService {
     company.billingContributorId = normalizedContributorId;
 
     return company;
+  }
+
+  private async loadBranchBillingConfig(
+    branchId: string | null,
+    companyId: string | null,
+  ) {
+    if (!branchId) {
+      return null;
+    }
+
+    const queryBuilder = this.branchRepository
+      .createQueryBuilder('branch')
+      .where('branch.id = :branchId', { branchId });
+
+    if (companyId) {
+      queryBuilder.andWhere('branch.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.andWhere('branch.companyId IS NULL');
+    }
+
+    const branch = await queryBuilder.getOne();
+
+    if (!branch) {
+      throw new NotFoundException({
+        messageKey: 'ERROR.NOT_FOUND',
+        message: {
+          es: 'No se encontró la sucursal asociada para facturación',
+          en: 'Linked branch not found for billing',
+        },
+      });
+    }
+
+    return {
+      establishmentCode: this.normalizeString(branch.establishmentCode),
+      emissionPointCode: this.normalizeString(branch.emissionPointCode),
+    };
   }
 
   private mapItemsAndTotals(order: PurchaseOrder, taxPercent: number) {

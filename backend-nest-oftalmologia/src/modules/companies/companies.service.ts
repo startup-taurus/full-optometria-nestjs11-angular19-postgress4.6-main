@@ -105,11 +105,15 @@ export class CompaniesService {
   }
 
   async createComplete(createCompanyCompleteDto: CreateCompanyCompleteDto) {
+    const normalizedCreateCompanyCompleteDto =
+      this.normalizeBillingFields(createCompanyCompleteDto);
     const {
       name,
       code,
       companyEmail,
       companyPhone,
+      billingApiKey,
+      billingContributorId,
       slug,
       maxUsers,
       maxBranches,
@@ -117,6 +121,8 @@ export class CompaniesService {
       branchCode,
       branchAddress,
       branchCity,
+      branchEstablishmentCode,
+      branchEmissionPointCode,
       username,
       email,
       firstName,
@@ -124,7 +130,7 @@ export class CompaniesService {
       password,
       documentNumber,
       mobilePhone,
-    } = createCompanyCompleteDto;
+    } = normalizedCreateCompanyCompleteDto;
 
     const existingByName = await this.companyRepository.findOne({
       where: { name },
@@ -175,6 +181,8 @@ export class CompaniesService {
         slug,
         maxUsers: maxUsers ?? null,
         maxBranches: maxBranches ?? null,
+        billingApiKey: billingApiKey ?? null,
+        billingContributorId: billingContributorId ?? null,
       });
       savedCompany = await this.companyRepository.save(company);
 
@@ -197,6 +205,8 @@ export class CompaniesService {
             city: branchCity,
             phone: initialBranchPhone,
             corporateEmail: initialBranchEmail,
+            establishmentCode: branchEstablishmentCode || undefined,
+            emissionPointCode: branchEmissionPointCode || undefined,
           });
 
           try {

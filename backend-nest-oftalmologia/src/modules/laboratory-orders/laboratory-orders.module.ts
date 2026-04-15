@@ -6,6 +6,7 @@ import { LaboratoryOrder } from './entities/laboratory-order.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
 import { Product } from '../products/entities/product.entity';
 import { StockMovement } from '../products/entities/stock-movement.entity';
+import { Branch } from '../branches/entities/branch.entity';
 import { PurchaseOrdersModule } from '../purchase-orders/purchase-orders.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 
@@ -16,6 +17,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
       ClinicalHistory,
       Product,
       StockMovement,
+      Branch,
     ]),
     forwardRef(() => PurchaseOrdersModule),
     NotificationsModule,

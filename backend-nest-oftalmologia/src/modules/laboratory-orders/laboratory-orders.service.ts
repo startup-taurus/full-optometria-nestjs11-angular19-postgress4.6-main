@@ -19,6 +19,7 @@ import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 import { PurchaseOrdersService } from '../purchase-orders/purchase-orders.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { Branch } from '../branches/entities/branch.entity';
 
 @Injectable()
 export class LaboratoryOrdersService {
@@ -30,6 +31,8 @@ export class LaboratoryOrdersService {
     private clinicalHistoryRepository: Repository<ClinicalHistory>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Branch)
+    private branchRepository: Repository<Branch>,
     @Inject(forwardRef(() => PurchaseOrdersService))
     private purchaseOrdersService: PurchaseOrdersService,
     private notificationsService: NotificationsService,
@@ -43,11 +46,15 @@ export class LaboratoryOrdersService {
   ) {
     const maxRetries = 3;
     let lastError: any;
+    const effectiveCompanyId = await this.resolveEffectiveCompanyId(
+      branchId,
+      companyId ?? null,
+    );
     const normalizedCreateDto = this.normalizeProductSelection(createDto);
     const attendanceDate = await this.resolveAttendanceDate(
       normalizedCreateDto,
       branchId,
-      companyId
+      effectiveCompanyId,
     );
     const normalizedCreateDtoWithAttendance = {
       ...normalizedCreateDto,
@@ -129,7 +136,7 @@ export class LaboratoryOrdersService {
           .create({
           ...persistableCreateDto,
           branchId,
-          companyId,
+          companyId: effectiveCompanyId,
           createdByUserId: createdByUserId || null,
           orderNumber,
           productQuantities: normalizedLineItems,
@@ -158,7 +165,7 @@ export class LaboratoryOrdersService {
               const movement = queryRunner.manager
                 .getRepository(StockMovement)
                 .create({
-                  companyId: companyId || null,
+                  companyId: effectiveCompanyId || null,
                   branchId,
                   productId: lineItem.productId,
                   movementType: 'LABORATORY_ORDER_CREATE',
@@ -177,7 +184,7 @@ export class LaboratoryOrdersService {
         if (normalizedCreateDtoWithAttendance.clinicalHistoryId) {
           const whereCondition = CompanyFilterUtil.buildWhereCondition(
             { id: normalizedCreateDtoWithAttendance.clinicalHistoryId, branchId },
-            companyId
+            effectiveCompanyId
           );
           await queryRunner.manager.getRepository(ClinicalHistory).update(whereCondition, {
             isSent: true,
@@ -200,7 +207,7 @@ export class LaboratoryOrdersService {
             await this.purchaseOrdersService.createFromLaboratoryOrder(
               savedOrder.id,
               normalizedCreateDtoWithAttendance.clientId,
-              companyId || null,
+              effectiveCompanyId,
               branchId,
             );
           } catch (error) {
@@ -915,7 +922,7 @@ export class LaboratoryOrdersService {
   private async resolveAttendanceDate(
     dto: CreateLaboratoryOrderDto,
     branchId: string,
-    companyId?: string
+    companyId?: string | null
   ): Promise<string> {
     if (dto.attendanceDate) {
       return dto.attendanceDate;
@@ -938,6 +945,22 @@ export class LaboratoryOrdersService {
     }
 
     return this.toISODateOnly(new Date());
+  }
+
+  private async resolveEffectiveCompanyId(
+    branchId: string,
+    companyId: string | null,
+  ): Promise<string | null> {
+    if (companyId !== null && companyId !== undefined) {
+      return companyId;
+    }
+
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      select: ['id', 'companyId'],
+    });
+
+    return branch?.companyId ?? null;
   }
 
   private toISODateOnly(date: Date): string {

@@ -48,6 +48,8 @@ export interface CreateCompanyCompleteDto {
   code: string
   companyEmail?: string
   companyPhone?: string
+  billingApiKey?: string
+  billingContributorId?: number | null
   slug?: string
   maxUsers?: number | null
   maxBranches?: number | null
@@ -55,6 +57,8 @@ export interface CreateCompanyCompleteDto {
   branchCode: string
   branchAddress: string
   branchCity: string
+  branchEstablishmentCode?: string
+  branchEmissionPointCode?: string
   username: string
   email: string
   firstName: string

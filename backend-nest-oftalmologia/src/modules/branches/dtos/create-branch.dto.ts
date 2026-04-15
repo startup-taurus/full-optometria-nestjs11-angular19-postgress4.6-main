@@ -6,6 +6,7 @@ import {
   Length,
   MaxLength,
   IsUUID,
+  Matches,
 } from 'class-validator';
 
 export class CreateBranchDto {
@@ -46,4 +47,16 @@ export class CreateBranchDto {
   @IsString()
   @MaxLength(4000)
   openingHours?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(3)
+  @Matches(/^\d{3}$/)
+  establishmentCode?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(3)
+  @Matches(/^\d{3}$/)
+  emissionPointCode?: string;
 }
