@@ -30,6 +30,13 @@ import {
 
 @Injectable()
 export class PurchaseOrderBillingService {
+  private static readonly FINAL_CONSUMER_DOCUMENT = '9999999999999';
+  private static readonly FINAL_CONSUMER_NAME = 'Consumidor Final';
+  private static readonly FINAL_CONSUMER_EMAIL =
+    'consumidor.final@example.com';
+  private static readonly FINAL_CONSUMER_ADDRESS = 'CONSUMIDOR FINAL';
+  private static readonly FINAL_CONSUMER_PHONE = '0999999999';
+
   constructor(
     @InjectRepository(PurchaseOrder)
     private readonly purchaseOrderRepository: Repository<PurchaseOrder>,
@@ -582,17 +589,7 @@ export class PurchaseOrderBillingService {
     const itemsResult = this.mapItemsAndTotals(purchaseOrder, taxPercent);
 
     const requestPayload: Record<string, unknown> = {
-      customer: {
-        identification: purchaseOrder.client?.documentNumber || '',
-        business_name:
-          `${purchaseOrder.client?.firstName || ''} ${purchaseOrder.client?.lastName || ''}`.trim(),
-        email: purchaseOrder.client?.email || '',
-        address: purchaseOrder.client?.address || '',
-        phone:
-          purchaseOrder.client?.mobilePhone ||
-          purchaseOrder.client?.homePhone ||
-          '',
-      },
+      customer: this.buildBillingCustomer(purchaseOrder.client),
       items: itemsResult.items,
       payments: [
         {
@@ -993,6 +990,32 @@ export class PurchaseOrderBillingService {
       subtotal,
       taxAmount,
       total,
+    };
+  }
+
+  private buildBillingCustomer(client: Client | null | undefined) {
+    const identification =
+      this.normalizeString(client?.documentNumber) ||
+      PurchaseOrderBillingService.FINAL_CONSUMER_DOCUMENT;
+
+    const firstName = this.normalizeString(client?.firstName);
+    const lastName = this.normalizeString(client?.lastName);
+    const businessName = `${firstName || ''} ${lastName || ''}`.trim();
+
+    return {
+      identification,
+      business_name:
+        businessName || PurchaseOrderBillingService.FINAL_CONSUMER_NAME,
+      email:
+        this.normalizeString(client?.email) ||
+        PurchaseOrderBillingService.FINAL_CONSUMER_EMAIL,
+      address:
+        this.normalizeString(client?.address) ||
+        PurchaseOrderBillingService.FINAL_CONSUMER_ADDRESS,
+      phone:
+        this.normalizeString(client?.mobilePhone) ||
+        this.normalizeString(client?.homePhone) ||
+        PurchaseOrderBillingService.FINAL_CONSUMER_PHONE,
     };
   }
 

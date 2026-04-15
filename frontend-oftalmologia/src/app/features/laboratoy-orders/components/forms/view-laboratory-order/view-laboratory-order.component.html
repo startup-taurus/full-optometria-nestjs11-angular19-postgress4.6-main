@@ -94,27 +94,27 @@
             <div class="card-body">
               <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.FIRST_NAME' | translate }}:</strong>
-                <span>{{ order.client?.firstName || '-' }}</span>
+                <span>{{ getClientDisplayFirstName() }}</span>
               </div>
               <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.LAST_NAME' | translate }}:</strong>
-                <span>{{ order.client?.lastName || '-' }}</span>
+                <span>{{ getClientDisplayLastName() }}</span>
               </div>
               <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.DOCUMENT_NUMBER' | translate }}:</strong>
-                <span>{{ order.client?.documentNumber || '-' }}</span>
+                <span>{{ getClientDisplayDocument() }}</span>
               </div>
               <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.EMAIL' | translate }}:</strong>
-                <span>{{ order.client?.email || '-' }}</span>
+                <span>{{ getClientDisplayEmail() }}</span>
               </div>
               <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.MOBILE_PHONE' | translate }}:</strong>
-                <span>{{ order.client?.mobilePhone || '-' }}</span>
+                <span>{{ getClientDisplayMobilePhone() }}</span>
               </div>
               <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.HOME_PHONE' | translate }}:</strong>
-                <span>{{ order.client?.homePhone || '-' }}</span>
+                <span>{{ getClientDisplayHomePhone() }}</span>
               </div>
             </div>
           </div>

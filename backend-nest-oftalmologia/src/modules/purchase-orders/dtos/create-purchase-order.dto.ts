@@ -12,8 +12,8 @@ export class CreatePurchaseOrderDto {
   laboratoryOrderId: string;
 
   @IsUUID()
-  @IsNotEmpty()
-  clientId: string;
+  @IsOptional()
+  clientId?: string | null;
 
   @IsBoolean()
   @IsOptional()

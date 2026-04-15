@@ -616,6 +616,7 @@
     "ADDRESS": "Address",
     "SELECT_OR_CREATE": "Select or create client",
     "SELECT_PLACEHOLDER": "Select a client",
+    "EMPTY_MEANS_FINAL_CONSUMER": "If left empty, it will be treated as Final Consumer",
     "CREATE_NEW": "Create new client",
     "CREATED": "Client created successfully",
     "UPDATED": "Client updated successfully",

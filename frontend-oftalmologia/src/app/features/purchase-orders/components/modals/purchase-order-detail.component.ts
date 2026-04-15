@@ -1,4 +1,4 @@
-import { Component, Input, inject, OnInit } from '@angular/core';
+﻿import { Component, Input, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -37,9 +37,9 @@ import { PurchaseOrdersService } from '@core/services/api/purchase-orders.servic
             <div class="row mb-3">
               <div class="col-md-6">
                 <strong>{{ 'CLIENT.SINGULAR' | translate }}:</strong>
-                <p *ngIf="purchaseOrder.client">
-                  {{ purchaseOrder.client.firstName }} {{ purchaseOrder.client.lastName }}<br />
-                  <small class="text-muted">{{ purchaseOrder.client.documentNumber }}</small>
+                <p>
+                  {{ getDisplayClientName() }}<br />
+                  <small class="text-muted">{{ getDisplayClientDocument() }}</small>
                 </p>
               </div>
               <div class="col-md-6">
@@ -95,6 +95,9 @@ import { PurchaseOrdersService } from '@core/services/api/purchase-orders.servic
   `,
 })
 export class PurchaseOrderDetailComponent implements OnInit {
+  private static readonly FINAL_CONSUMER_NAME = 'Consumidor Final';
+  private static readonly FINAL_CONSUMER_DOCUMENT = '9999999999999';
+
   @Input() modalId = 'purchaseOrderDetailModal';
   @Input() purchaseOrderId?: string;
 
@@ -148,4 +151,20 @@ export class PurchaseOrderDetailComponent implements OnInit {
     };
     return statusClasses[status] || 'bg-secondary';
   }
+
+  getDisplayClientName(): string {
+    if (this.purchaseOrder?.client) {
+      return `${this.purchaseOrder.client.firstName || ''} ${this.purchaseOrder.client.lastName || ''}`.trim();
+    }
+
+    return PurchaseOrderDetailComponent.FINAL_CONSUMER_NAME;
+  }
+
+  getDisplayClientDocument(): string {
+    return (
+      this.purchaseOrder?.client?.documentNumber ||
+      PurchaseOrderDetailComponent.FINAL_CONSUMER_DOCUMENT
+    );
+  }
 }
+

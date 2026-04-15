@@ -13,6 +13,12 @@ import { LaboratoryOrder } from '@core/interfaces/api/laboratory-order.interface
   styleUrls: ['./view-laboratory-order.component.scss'],
 })
 export class ViewLaboratoryOrderComponent implements OnInit {
+  private static readonly FINAL_CONSUMER_FIRST_NAME = 'Consumidor'
+  private static readonly FINAL_CONSUMER_LAST_NAME = 'Final'
+  private static readonly FINAL_CONSUMER_DOCUMENT = '9999999999999'
+  private static readonly FINAL_CONSUMER_EMAIL = 'consumidor.final@example.com'
+  private static readonly FINAL_CONSUMER_PHONE = '0999999999'
+
   @Input() orderId: string | null = null
   @Input() order: LaboratoryOrder | null = null
 
@@ -233,5 +239,47 @@ export class ViewLaboratoryOrderComponent implements OnInit {
     const minutes = String(date.getMinutes()).padStart(2, '0')
 
     return `${day}/${month}/${year} ${hours}:${minutes}`
+  }
+
+  public getClientDisplayFirstName(): string {
+    return (
+      String(this.order?.client?.firstName || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_FIRST_NAME
+    )
+  }
+
+  public getClientDisplayLastName(): string {
+    return (
+      String(this.order?.client?.lastName || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_LAST_NAME
+    )
+  }
+
+  public getClientDisplayDocument(): string {
+    return (
+      String(this.order?.client?.documentNumber || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_DOCUMENT
+    )
+  }
+
+  public getClientDisplayEmail(): string {
+    return (
+      String(this.order?.client?.email || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_EMAIL
+    )
+  }
+
+  public getClientDisplayMobilePhone(): string {
+    return (
+      String(this.order?.client?.mobilePhone || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_PHONE
+    )
+  }
+
+  public getClientDisplayHomePhone(): string {
+    return (
+      String(this.order?.client?.homePhone || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_PHONE
+    )
   }
 }

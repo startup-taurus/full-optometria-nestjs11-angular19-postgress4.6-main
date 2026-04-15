@@ -44,8 +44,8 @@ export class PurchaseOrder {
   @Column({ name: 'order_number', nullable: true })
   orderNumber: number;
 
-  @Column({ name: 'client_id' })
-  clientId: string;
+  @Column({ name: 'client_id', nullable: true })
+  clientId: string | null;
 
   @Column({ name: 'laboratory_order_id', unique: true })
   laboratoryOrderId: string;
@@ -82,9 +82,9 @@ export class PurchaseOrder {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => Client)
+  @ManyToOne(() => Client, { nullable: true })
   @JoinColumn({ name: 'client_id' })
-  client: Client;
+  client: Client | null;
 
   @OneToOne(() => LaboratoryOrder)
   @JoinColumn({ name: 'laboratory_order_id' })

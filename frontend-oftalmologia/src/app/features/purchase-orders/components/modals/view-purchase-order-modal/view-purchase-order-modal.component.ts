@@ -18,6 +18,12 @@ import { PurchaseOrdersService } from '@core/services/api/purchase-orders.servic
   styleUrl: './view-purchase-order-modal.component.scss',
 })
 export class ViewPurchaseOrderModalComponent implements OnInit {
+  private static readonly FINAL_CONSUMER_NAME = 'Consumidor Final'
+  private static readonly FINAL_CONSUMER_DOCUMENT = '9999999999999'
+  private static readonly FINAL_CONSUMER_EMAIL = 'consumidor.final@example.com'
+  private static readonly FINAL_CONSUMER_ADDRESS = 'CONSUMIDOR FINAL'
+  private static readonly FINAL_CONSUMER_PHONE = '0999999999'
+
   @Input() orderId?: string
 
   public purchaseOrder: PurchaseOrder | null = null
@@ -152,6 +158,43 @@ export class ViewPurchaseOrderModalComponent implements OnInit {
     const quantity = Number(item.quantity || 0)
     const unitPrice = Number(item.unitPrice || 0)
     return Number((quantity * unitPrice).toFixed(2))
+  }
+
+  public getClientDisplayName(order: PurchaseOrder): string {
+    const firstName = String(order.client?.firstName || '').trim()
+    const lastName = String(order.client?.lastName || '').trim()
+    const fullName = `${firstName} ${lastName}`.trim()
+
+    return fullName || ViewPurchaseOrderModalComponent.FINAL_CONSUMER_NAME
+  }
+
+  public getClientDisplayDocument(order: PurchaseOrder): string {
+    return (
+      String(order.client?.documentNumber || '').trim() ||
+      ViewPurchaseOrderModalComponent.FINAL_CONSUMER_DOCUMENT
+    )
+  }
+
+  public getClientDisplayEmail(order: PurchaseOrder): string {
+    return (
+      String(order.client?.email || '').trim() ||
+      ViewPurchaseOrderModalComponent.FINAL_CONSUMER_EMAIL
+    )
+  }
+
+  public getClientDisplayAddress(order: PurchaseOrder): string {
+    return (
+      String(order.client?.address || '').trim() ||
+      ViewPurchaseOrderModalComponent.FINAL_CONSUMER_ADDRESS
+    )
+  }
+
+  public getClientDisplayPhone(order: PurchaseOrder): string {
+    return (
+      String(order.client?.mobilePhone || '').trim() ||
+      String(order.client?.homePhone || '').trim() ||
+      ViewPurchaseOrderModalComponent.FINAL_CONSUMER_PHONE
+    )
   }
 
   public formatCurrency(value?: number | string | null): string {

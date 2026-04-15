@@ -618,6 +618,7 @@
     "ADDRESS": "Dirección",
     "SELECT_OR_CREATE": "Seleccionar o crear cliente",
     "SELECT_PLACEHOLDER": "Seleccione un cliente",
+    "EMPTY_MEANS_FINAL_CONSUMER": "Si lo dejas en blanco, se tomará como Consumidor Final",
     "CREATE_NEW": "Crear nuevo cliente",
     "CREATED": "Cliente creado correctamente",
     "UPDATED": "Cliente actualizado correctamente",

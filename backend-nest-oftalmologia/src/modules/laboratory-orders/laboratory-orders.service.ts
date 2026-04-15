@@ -123,6 +123,9 @@ export class LaboratoryOrdersService {
           });
         }
 
+        const effectiveClientId =
+          normalizedCreateDtoWithAttendance.clientId ?? null;
+
         const orderNumber = await this.generateOrderNumber();
 
         const {
@@ -135,6 +138,7 @@ export class LaboratoryOrdersService {
           .getRepository(LaboratoryOrder)
           .create({
           ...persistableCreateDto,
+          clientId: effectiveClientId,
           branchId,
           companyId: effectiveCompanyId,
           createdByUserId: createdByUserId || null,
@@ -202,21 +206,19 @@ export class LaboratoryOrdersService {
 
         let purchaseOrderWarning: { es: string; en: string } | null = null;
 
-        if (normalizedCreateDtoWithAttendance.clientId) {
-          try {
-            await this.purchaseOrdersService.createFromLaboratoryOrder(
-              savedOrder.id,
-              normalizedCreateDtoWithAttendance.clientId,
-              effectiveCompanyId,
-              branchId,
-            );
-          } catch (error) {
-            purchaseOrderWarning = {
-              es: 'La orden de laboratorio fue creada, pero no se pudo crear la orden de pedido automáticamente',
-              en: 'Laboratory order was created, but purchase order could not be generated automatically',
-            };
-            console.error('Error creating purchase order:', error);
-          }
+        try {
+          await this.purchaseOrdersService.createFromLaboratoryOrder(
+            savedOrder.id,
+            effectiveClientId,
+            effectiveCompanyId,
+            branchId,
+          );
+        } catch (error) {
+          purchaseOrderWarning = {
+            es: 'La orden de laboratorio fue creada, pero no se pudo crear la orden de pedido automáticamente',
+            en: 'Laboratory order was created, but purchase order could not be generated automatically',
+          };
+          console.error('Error creating purchase order:', error);
         }
 
         const response = await this.formatResponse(orderWithRelations);

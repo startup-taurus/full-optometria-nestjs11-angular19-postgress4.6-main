@@ -836,7 +836,7 @@ export class PurchaseOrdersService {
 
   async createFromLaboratoryOrder(
     laboratoryOrderId: string,
-    clientId: string,
+    clientId: string | null,
     companyId: string | null,
     branchId: string,
   ) {
@@ -854,16 +854,18 @@ export class PurchaseOrdersService {
       });
     }
 
-    const client = await this.loadScopedClient(clientId, branchId, companyId);
+    if (clientId) {
+      const client = await this.loadScopedClient(clientId, branchId, companyId);
 
-    if (!client) {
-      throw new NotFoundException({
-        messageKey: 'ERROR.NOT_FOUND',
-        message: {
-          es: 'Cliente no encontrado',
-          en: 'Client not found',
-        },
-      });
+      if (!client) {
+        throw new NotFoundException({
+          messageKey: 'ERROR.NOT_FOUND',
+          message: {
+            es: 'Cliente no encontrado',
+            en: 'Client not found',
+          },
+        });
+      }
     }
 
     const existingPurchaseOrder = await this.purchaseOrderRepository.findOne({
@@ -901,7 +903,7 @@ export class PurchaseOrdersService {
         const purchaseOrder = purchaseOrderRepository.create({
           orderNumber,
           laboratoryOrderId,
-          clientId,
+          clientId: clientId ?? null,
           companyId,
           branchId,
           shouldInvoice: false,

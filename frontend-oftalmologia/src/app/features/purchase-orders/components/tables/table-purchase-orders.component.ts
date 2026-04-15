@@ -77,6 +77,17 @@ import { PurchaseOrdersSummaryComponent } from '../purchase-orders-summary/purch
 export class TablePurchaseOrdersComponent
   implements OnInit, OnDestroy, AfterViewInit
 {
+  private static readonly FINAL_CONSUMER_NAME = 'Consumidor Final'
+  private static readonly FINAL_CONSUMER_DOCUMENT = '9999999999999'
+  private static readonly FINAL_CONSUMER_EMAIL = 'consumidor.final@example.com'
+  private static readonly FINAL_CONSUMER_ADDRESS = 'CONSUMIDOR FINAL'
+  private static readonly FINAL_CONSUMER_PHONE = '0999999999'
+
+  private static readonly FINAL_CONSUMER_DOCUMENTS = new Set([
+    '9999999999999',
+    '9999999999',
+  ])
+
   private pagination = DEFAULT_NGX_DATATABLE_PAGINATION
 
   public sideFilterComponent = FilterPurchaseOrdersComponent
@@ -880,6 +891,43 @@ export class TablePurchaseOrdersComponent
     return `$${amount.toFixed(2)}`
   }
 
+  public getClientDisplayName(order: PurchaseOrder): string {
+    const firstName = String(order.client?.firstName || '').trim()
+    const lastName = String(order.client?.lastName || '').trim()
+    const fullName = `${firstName} ${lastName}`.trim()
+
+    return fullName || TablePurchaseOrdersComponent.FINAL_CONSUMER_NAME
+  }
+
+  public getClientDisplayDocument(order: PurchaseOrder): string {
+    return (
+      String(order.client?.documentNumber || '').trim() ||
+      TablePurchaseOrdersComponent.FINAL_CONSUMER_DOCUMENT
+    )
+  }
+
+  public getClientDisplayEmail(order: PurchaseOrder): string {
+    return (
+      String(order.client?.email || '').trim() ||
+      TablePurchaseOrdersComponent.FINAL_CONSUMER_EMAIL
+    )
+  }
+
+  public getClientDisplayAddress(order: PurchaseOrder): string {
+    return (
+      String(order.client?.address || '').trim() ||
+      TablePurchaseOrdersComponent.FINAL_CONSUMER_ADDRESS
+    )
+  }
+
+  public getClientDisplayPhone(order: PurchaseOrder): string {
+    return (
+      String(order.client?.mobilePhone || '').trim() ||
+      String(order.client?.homePhone || '').trim() ||
+      TablePurchaseOrdersComponent.FINAL_CONSUMER_PHONE
+    )
+  }
+
   public hasActiveFilters(): boolean {
     return Object.keys(this.filter).length > 0
   }
@@ -910,24 +958,38 @@ export class TablePurchaseOrdersComponent
 
   private getMissingClientBillingFieldKeys(order: PurchaseOrder): string[] {
     const client = order.client
+    const hasClientId = String(order.clientId || '').trim().length > 0
+
     if (!client) {
+      if (!hasClientId) {
+        console.log('[PurchaseOrdersTable][getMissingClientBillingFieldKeys] implicit final consumer detected', {
+          orderId: order.id,
+          clientId: order.clientId,
+        })
+        return []
+      }
+
       console.log('[PurchaseOrdersTable][getMissingClientBillingFieldKeys] missing client relation', {
         orderId: order.id,
+        clientId: order.clientId,
       })
       return ['PURCHASE_ORDERS.BILLING.MISSING.CLIENT']
     }
 
     const missingKeys: string[] = []
+    const isFinalConsumerDocument = this.isFinalConsumerDocument(
+      client.documentNumber
+    )
 
     if (!String(client.documentNumber || '').trim()) {
       missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.DOCUMENT')
     }
 
-    if (!String(client.email || '').trim()) {
+    if (!isFinalConsumerDocument && !String(client.email || '').trim()) {
       missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.EMAIL')
     }
 
-    if (!String(client.address || '').trim()) {
+    if (!isFinalConsumerDocument && !String(client.address || '').trim()) {
       missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.ADDRESS')
     }
 
@@ -935,7 +997,7 @@ export class TablePurchaseOrdersComponent
       String(client.mobilePhone || '').trim().length > 0 ||
       String(client.homePhone || '').trim().length > 0
 
-    if (!hasPhone) {
+    if (!isFinalConsumerDocument && !hasPhone) {
       missingKeys.push('PURCHASE_ORDERS.BILLING.MISSING.PHONE')
     }
 
@@ -951,6 +1013,13 @@ export class TablePurchaseOrdersComponent
     })
 
     return missingKeys
+  }
+
+  private isFinalConsumerDocument(documentNumber?: string | null): boolean {
+    const normalizedDocument = String(documentNumber || '').trim()
+    return TablePurchaseOrdersComponent.FINAL_CONSUMER_DOCUMENTS.has(
+      normalizedDocument
+    )
   }
 
   private async openBillingConfigPrompt(

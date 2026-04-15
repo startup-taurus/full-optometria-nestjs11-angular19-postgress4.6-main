@@ -48,7 +48,7 @@ export interface BillingPaymentMethod {
 export interface PurchaseOrder {
   id: string
   orderNumber?: number
-  clientId: string
+  clientId: string | null
   laboratoryOrderId: string
   companyId?: string
   branchId?: string
@@ -79,7 +79,7 @@ export interface PurchaseOrderItem {
 
 export interface CreatePurchaseOrderDto {
   laboratoryOrderId: string
-  clientId: string
+  clientId?: string | null
   shouldInvoice?: boolean
   totalAmount?: number
 }

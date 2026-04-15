@@ -16,6 +16,11 @@ import { PaginationUtil } from '../../common/utils/pagination.util';
 
 @Injectable()
 export class ClientsService {
+  private static readonly FINAL_CONSUMER_DOCUMENTS = [
+    '9999999999999',
+    '9999999999',
+  ];
+
   constructor(
     @InjectRepository(Client)
     private clientRepository: Repository<Client>,
@@ -30,6 +35,14 @@ export class ClientsService {
     if (companyId) {
       queryBuilder.andWhere('client.companyId = :companyId', { companyId });
     }
+  }
+
+  private applyFinalConsumerExclusion(
+    queryBuilder: SelectQueryBuilder<Client>,
+  ): void {
+    queryBuilder.andWhere('client.documentNumber NOT IN (:...excludedDocuments)', {
+      excludedDocuments: ClientsService.FINAL_CONSUMER_DOCUMENTS,
+    });
   }
 
   private applyPatientCompanyScope(
@@ -297,6 +310,7 @@ export class ClientsService {
       .andWhere('client.isActive = :isActive', { isActive: true });
 
     this.applyCompanyScope(queryBuilder, companyId);
+    this.applyFinalConsumerExclusion(queryBuilder);
 
     if (search) {
       queryBuilder.andWhere(
@@ -378,6 +392,7 @@ export class ClientsService {
       .andWhere('client.isActive = :isActive', { isActive: true });
 
     this.applyCompanyScope(queryBuilder, companyId);
+    this.applyFinalConsumerExclusion(queryBuilder);
 
     if (search) {
       queryBuilder.andWhere(
@@ -718,6 +733,7 @@ export class ClientsService {
       .take(5);
 
     this.applyCompanyScope(queryBuilder, companyId);
+    this.applyFinalConsumerExclusion(queryBuilder);
 
     const clients = await queryBuilder.getMany();
 
@@ -747,6 +763,7 @@ export class ClientsService {
       .take(10);
 
     this.applyCompanyScope(queryBuilder, companyId);
+    this.applyFinalConsumerExclusion(queryBuilder);
 
     const clients = await queryBuilder.getMany();
 

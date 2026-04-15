@@ -33,21 +33,21 @@
       <div class="detail-block">
         <label class="detail-label">{{ 'CLIENT.SINGULAR' | translate }}</label>
         <p class="detail-value">
-          {{ purchaseOrder.client?.firstName || '-' }} {{ purchaseOrder.client?.lastName || '' }}
+          {{ getClientDisplayName(purchaseOrder) }}
         </p>
-        <small class="text-body-secondary">{{ purchaseOrder.client?.documentNumber || '-' }}</small>
+        <small class="text-body-secondary">{{ getClientDisplayDocument(purchaseOrder) }}</small>
         <div class="detail-inline-list mt-2">
           <div>
             <strong>{{ 'PURCHASE_ORDERS.FIELDS.EMAIL' | translate }}:</strong>
-            {{ purchaseOrder.client?.email || '-' }}
+            {{ getClientDisplayEmail(purchaseOrder) }}
           </div>
           <div>
             <strong>{{ 'PURCHASE_ORDERS.FIELDS.ADDRESS' | translate }}:</strong>
-            {{ purchaseOrder.client?.address || '-' }}
+            {{ getClientDisplayAddress(purchaseOrder) }}
           </div>
           <div>
             <strong>{{ 'PURCHASE_ORDERS.FIELDS.PHONE' | translate }}:</strong>
-            {{ purchaseOrder.client?.mobilePhone || purchaseOrder.client?.homePhone || '-' }}
+            {{ getClientDisplayPhone(purchaseOrder) }}
           </div>
         </div>
       </div>

@@ -83,11 +83,9 @@
 <ng-template #clientTemplate let-row="row">
   <div class="d-flex flex-column">
     <span class="fw-medium">
-      {{ row.client?.firstName || '-' }} {{ row.client?.lastName || '' }}
+      {{ getClientDisplayName(row) }}
     </span>
-    <small class="text-body-secondary">{{
-      row.client?.documentNumber || '-'
-    }}</small>
+    <small class="text-body-secondary">{{ getClientDisplayDocument(row) }}</small>
   </div>
 </ng-template>
 
