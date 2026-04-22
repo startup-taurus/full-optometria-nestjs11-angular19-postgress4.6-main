@@ -86,14 +86,92 @@
               {{ 'PATIENT.FORM.DATE_OF_BIRTH' | translate }}
               <span class="text-danger">*</span>
             </label>
-            <input
-              type="date"
-              class="form-control form-control-lg"
-              formControlName="dateOfBirth"
-              [class.is-invalid]="isFieldInvalid('dateOfBirth')"
-            />
-            <div class="invalid-feedback" *ngIf="isFieldInvalid('dateOfBirth')">
-              {{ getFieldError('dateOfBirth') | translate }}
+            <div class="patient-date-field">
+              <div class="patient-date-mobile d-md-none">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <select
+                      class="form-select form-control-lg"
+                      [class.is-invalid]="isFieldInvalid('dateOfBirth')"
+                      [value]="mobileBirthDay"
+                      (change)="onMobileDatePartChange('day', $any($event.target).value)"
+                    >
+                      <option value="">Día</option>
+                      <option *ngFor="let day of mobileBirthDays" [value]="day">
+                        {{ day }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="col-4">
+                    <select
+                      class="form-select form-control-lg"
+                      [class.is-invalid]="isFieldInvalid('dateOfBirth')"
+                      [value]="mobileBirthMonth"
+                      (change)="onMobileDatePartChange('month', $any($event.target).value)"
+                    >
+                      <option value="">Mes</option>
+                      <option *ngFor="let month of mobileBirthMonths" [value]="month">
+                        {{ month }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="col-4">
+                    <select
+                      class="form-select form-control-lg"
+                      [class.is-invalid]="isFieldInvalid('dateOfBirth')"
+                      [value]="mobileBirthYear"
+                      (change)="onMobileDatePartChange('year', $any($event.target).value)"
+                    >
+                      <option value="">Año</option>
+                      <option *ngFor="let year of mobileBirthYears" [value]="year">
+                        {{ year }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="patient-date-input-shell d-none d-md-block">
+                <input
+                  type="text"
+                  class="form-control form-control-lg patient-date-input"
+                  formControlName="dateOfBirth"
+                  [class.is-invalid]="isFieldInvalid('dateOfBirth')"
+                  placeholder="DD/MM/AAAA"
+                  inputmode="numeric"
+                  autocomplete="bday"
+                  mask="00/00/0000"
+                  [dropSpecialCharacters]="false"
+                />
+                <button
+                  type="button"
+                  class="patient-date-icon-btn"
+                  aria-label="Abrir calendario"
+                  (click)="openDesktopDatePicker($event)"
+                >
+                  <i class="ti ti-calendar patient-date-icon"></i>
+                </button>
+              </div>
+
+              <input
+                #nativeDatePicker
+                type="date"
+                class="patient-native-date-input"
+                (change)="onNativeDateSelected(nativeDatePicker.value)"
+              />
+
+              <small
+                class="patient-date-help"
+                [class.text-danger]="isFieldInvalid('dateOfBirth')"
+              >
+                {{
+                  isFieldInvalid('dateOfBirth')
+                    ? (getFieldError('dateOfBirth') | translate)
+                    : ('PATIENT.FORM.DATE_OF_BIRTH_HELP' | translate)
+                }}
+              </small>
             </div>
           </div>
 

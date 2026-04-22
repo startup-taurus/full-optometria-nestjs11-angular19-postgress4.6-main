@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'
 import {
   Component,
   EventEmitter,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -10,9 +11,11 @@ import {
   ElementRef,
 } from '@angular/core'
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms'
 import { HttpClient } from '@angular/common/http'
@@ -30,16 +33,18 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
 import { Subject, takeUntil, firstValueFrom } from 'rxjs'
 import { ClientModalComponent } from '../../../laboratoy-orders/components/modals/client-modal/client-modal.component'
+import { NgxMaskDirective } from 'ngx-mask'
 
 @Component({
   selector: 'app-patient-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule, NgxMaskDirective],
   templateUrl: './patient-form-modal.component.html',
   styleUrls: ['./patient-form-modal.component.scss'],
 })
 export class PatientFormModalComponent implements OnInit, OnDestroy {
   @ViewChild('photoInput') photoInput!: ElementRef
+  @ViewChild('nativeDatePicker') nativeDatePicker?: ElementRef<HTMLInputElement>
   @Output() patientCreated = new EventEmitter<Patient>()
   @Output() patientUpdated = new EventEmitter<Patient>()
 
@@ -56,6 +61,17 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   public photoMarkedForDeletion = false
   public clients: Client[] = []
   public clientsLoading = false
+  public useMobileDateDropdown = false
+  public mobileBirthDay = ''
+  public mobileBirthMonth = ''
+  public mobileBirthYear = ''
+  public readonly mobileBirthDays = Array.from({ length: 31 }, (_, index) =>
+    String(index + 1).padStart(2, '0')
+  )
+  public readonly mobileBirthMonths = Array.from({ length: 12 }, (_, index) =>
+    String(index + 1).padStart(2, '0')
+  )
+  public mobileBirthYears: string[] = []
   private fileBaseUrl: string = environment.fileBaseUrl
 
   private unsubscribe$ = new Subject<void>()
@@ -74,7 +90,9 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   private _http = inject(HttpClient)
 
   ngOnInit(): void {
+    this.generateBirthYearOptions()
     this.initializeForm()
+    this.updateDateInputMode()
     this.setModalTitle()
 
     this._bsModalService
@@ -84,6 +102,11 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
         this.setModalData(data)
       })
   }
+
+    @HostListener('window:resize')
+    onWindowResize(): void {
+      this.updateDateInputMode()
+    }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next()
@@ -108,6 +131,8 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
       this.hasClientChanges = false
       this.loading = false
     }
+
+    this.syncMobileDatePartsFromControl()
 
     this.setModalTitle()
   }
@@ -134,7 +159,7 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       documentNumber: ['', [Validators.required, Validators.minLength(1)]],
-      dateOfBirth: ['', [Validators.required]],
+      dateOfBirth: ['', [Validators.required, this.dateOfBirthValidator]],
       mobilePhone: ['', [Validators.pattern(/^\+?[0-9]{10,15}$/)]],
       homePhone: [''],
       address: [''],
@@ -145,19 +170,14 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     }
 
     this.patientForm = this._formBuilder.group(baseFormConfig)
+    this.clearMobileDateParts()
   }
 
   private populateForm(): void {
     if (this.selectedPatient) {
-      let dateOfBirthForInput = ''
-      if (this.selectedPatient.dateOfBirth) {
-        try {
-          const date = new Date(this.selectedPatient.dateOfBirth)
-          if (!isNaN(date.getTime())) {
-            dateOfBirthForInput = date.toISOString().split('T')[0]
-          }
-        } catch (error) {}
-      }
+      const dateOfBirthForInput = this.formatDateForInput(
+        this.selectedPatient.dateOfBirth
+      )
 
       // Cargar foto de perfil si existe
       if (this.selectedPatient.profilePhoto) {
@@ -181,7 +201,65 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
       }
 
       this.patientForm.patchValue(formData)
+      this.syncMobileDatePartsFromControl()
     }
+  }
+
+  public openDesktopDatePicker(event?: Event): void {
+    event?.preventDefault()
+
+    if (this.useMobileDateDropdown) {
+      return
+    }
+
+    const picker = this.nativeDatePicker?.nativeElement
+    if (!picker) {
+      return
+    }
+
+    const currentValue = this.patientForm.get('dateOfBirth')?.value
+    const parsedCurrentDate = this.parseDateInputValue(currentValue)
+    picker.value = parsedCurrentDate ? this.toIsoDate(parsedCurrentDate) : ''
+
+    if (typeof picker.showPicker === 'function') {
+      picker.showPicker()
+      return
+    }
+
+    picker.focus()
+    picker.click()
+  }
+
+  public onNativeDateSelected(value: string): void {
+    if (!value) {
+      return
+    }
+
+    const parsedDate = this.parseDateInputValue(value)
+    if (!parsedDate) {
+      return
+    }
+
+    const control = this.patientForm.get('dateOfBirth')
+    if (!control) {
+      return
+    }
+
+    control.setValue(this.formatDateForInput(parsedDate))
+    control.markAsDirty()
+    control.markAsTouched()
+    this.syncMobileDatePartsFromDate(parsedDate)
+  }
+
+  public onMobileDatePartChange(
+    part: 'day' | 'month' | 'year',
+    value: string
+  ): void {
+    if (part === 'day') this.mobileBirthDay = value
+    if (part === 'month') this.mobileBirthMonth = value
+    if (part === 'year') this.mobileBirthYear = value
+
+    this.updateDateOfBirthFromMobileParts()
   }
 
   private resetPhotoState(): void {
@@ -225,24 +303,12 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
         formValue.dateOfBirth.trim() !== ''
       ) {
         try {
-          let isoString: string
+          const parsedDate = this.parseDateInputValue(formValue.dateOfBirth)
 
-          if (/^\d{4}-\d{2}-\d{2}$/.test(formValue.dateOfBirth)) {
-            const [year, month, day] = formValue.dateOfBirth
-              .split('-')
-              .map((n: string) => parseInt(n, 10))
-            const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0))
-
-            if (!isNaN(date.getTime())) {
-              isoString = date.toISOString()
-              formValue.dateOfBirth = isoString
-            }
+          if (parsedDate) {
+            formValue.dateOfBirth = parsedDate.toISOString()
           } else {
-            const date = new Date(formValue.dateOfBirth)
-            if (!isNaN(date.getTime())) {
-              isoString = date.toISOString()
-              formValue.dateOfBirth = isoString
-            }
+            delete formValue.dateOfBirth
           }
         } catch (error) {}
       } else if (
@@ -360,6 +426,12 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     if (field.hasError('required')) return 'VALIDATION.REQUIRED'
     if (field.hasError('email')) return 'VALIDATION.EMAIL_INVALID'
     if (field.hasError('minlength')) return 'VALIDATION.MIN_LENGTH'
+    if (
+      fieldName === 'dateOfBirth' &&
+      (field.hasError('invalidDate') || field.hasError('pattern'))
+    ) {
+      return 'PATIENT.FORM.DATE_OF_BIRTH_INVALID'
+    }
     if (field.hasError('pattern')) return 'VALIDATION.PHONE_INVALID'
 
     return null
@@ -561,5 +633,151 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     return (
       this.fileBaseUrl + '/' + cleanUrl.replace(/ /g, '%20').replace(/\\/g, '/')
     )
+  }
+
+  private dateOfBirthValidator = (
+    control: AbstractControl
+  ): ValidationErrors | null => {
+    const value = control.value
+
+    if (value === null || value === undefined || value === '') {
+      return null
+    }
+
+    if (typeof value !== 'string') {
+      return { invalidDate: true }
+    }
+
+    return this.parseDateInputValue(value) ? null : { invalidDate: true }
+  }
+
+  private formatDateForInput(dateValue?: string | Date | null): string {
+    const parsedDate = this.parseDateInputValue(dateValue)
+    if (!parsedDate) return ''
+
+    const day = String(parsedDate.getUTCDate()).padStart(2, '0')
+    const month = String(parsedDate.getUTCMonth() + 1).padStart(2, '0')
+    const year = parsedDate.getUTCFullYear()
+
+    return `${day}/${month}/${year}`
+  }
+
+  private parseDateInputValue(
+    value: string | Date | null | undefined
+  ): Date | null {
+    if (!value) return null
+
+    if (value instanceof Date) {
+      return isNaN(value.getTime()) ? null : value
+    }
+
+    const trimmedValue = value.trim()
+    if (!trimmedValue) return null
+
+    const maskedMatch = trimmedValue.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+    if (maskedMatch) {
+      const day = Number.parseInt(maskedMatch[1], 10)
+      const month = Number.parseInt(maskedMatch[2], 10)
+      const year = Number.parseInt(maskedMatch[3], 10)
+      return this.buildUtcDate(year, month, day)
+    }
+
+    const isoMatch = trimmedValue.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+    if (isoMatch) {
+      const year = Number.parseInt(isoMatch[1], 10)
+      const month = Number.parseInt(isoMatch[2], 10)
+      const day = Number.parseInt(isoMatch[3], 10)
+      return this.buildUtcDate(year, month, day)
+    }
+
+    const parsedDate = new Date(trimmedValue)
+    return isNaN(parsedDate.getTime()) ? null : parsedDate
+  }
+
+  private buildUtcDate(
+    year: number,
+    month: number,
+    day: number
+  ): Date | null {
+    if (!year || !month || !day) {
+      return null
+    }
+
+    const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0))
+
+    if (
+      date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month - 1 ||
+      date.getUTCDate() !== day
+    ) {
+      return null
+    }
+
+    return date
+  }
+
+  private updateDateInputMode(): void {
+    this.useMobileDateDropdown = window.innerWidth < 768
+
+    if (this.useMobileDateDropdown) {
+      this.syncMobileDatePartsFromControl()
+    }
+  }
+
+  private updateDateOfBirthFromMobileParts(): void {
+    const control = this.patientForm.get('dateOfBirth')
+    if (!control) {
+      return
+    }
+
+    if (!this.mobileBirthDay || !this.mobileBirthMonth || !this.mobileBirthYear) {
+      control.setValue('')
+      return
+    }
+
+    const combinedValue = `${this.mobileBirthDay}/${this.mobileBirthMonth}/${this.mobileBirthYear}`
+    control.setValue(combinedValue)
+    control.markAsDirty()
+    control.markAsTouched()
+  }
+
+  private syncMobileDatePartsFromControl(): void {
+    const controlValue = this.patientForm.get('dateOfBirth')?.value
+    const parsedDate = this.parseDateInputValue(controlValue)
+    this.syncMobileDatePartsFromDate(parsedDate)
+  }
+
+  private syncMobileDatePartsFromDate(date: Date | null): void {
+    if (!date) {
+      this.clearMobileDateParts()
+      return
+    }
+
+    this.mobileBirthDay = String(date.getUTCDate()).padStart(2, '0')
+    this.mobileBirthMonth = String(date.getUTCMonth() + 1).padStart(2, '0')
+    this.mobileBirthYear = String(date.getUTCFullYear())
+  }
+
+  private clearMobileDateParts(): void {
+    this.mobileBirthDay = ''
+    this.mobileBirthMonth = ''
+    this.mobileBirthYear = ''
+  }
+
+  private generateBirthYearOptions(): void {
+    const currentYear = new Date().getFullYear()
+    const totalYears = 121
+
+    this.mobileBirthYears = Array.from(
+      { length: totalYears },
+      (_, index) => String(currentYear - index)
+    )
+  }
+
+  private toIsoDate(date: Date): string {
+    const year = date.getUTCFullYear()
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 }

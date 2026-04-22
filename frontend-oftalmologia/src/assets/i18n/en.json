@@ -541,6 +541,8 @@
       "BRANCH": "Branch",
       "BRANCH_PLACEHOLDER": "Select branch...",
       "DATE_OF_BIRTH": "Date of birth",
+      "DATE_OF_BIRTH_HELP": "Suggested format: DD/MM/YYYY",
+      "DATE_OF_BIRTH_INVALID": "Enter a valid date",
       "ADDRESS": "Address",
       "ADDRESS_PLACEHOLDER": "Enter address...",
       "HOME_PHONE": "Home phone",

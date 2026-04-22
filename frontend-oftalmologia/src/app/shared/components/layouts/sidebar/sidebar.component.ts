@@ -30,7 +30,13 @@ import { PermissionsService } from '@core/services/api/permissions.service'
   ],
   templateUrl: './sidebar.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  styles: ``,
+  styles: `
+    :host ::ng-deep .side-nav-item.menu-divider-after {
+      border-bottom: 1px solid var(--bs-border-color, #dbe2ea);
+      margin-bottom: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+  `,
 })
 export class SidebarComponent implements OnInit {
   menuItems: MenuItemType[] = []

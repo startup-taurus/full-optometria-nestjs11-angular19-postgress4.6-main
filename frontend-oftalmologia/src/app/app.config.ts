@@ -19,6 +19,7 @@ import { EffectsModule } from '@ngrx/effects'
 import { StoreModule } from '@ngrx/store'
 import { StoreDevtoolsModule } from '@ngrx/store-devtools'
 import { ToastrModule } from 'ngx-toastr'
+import { provideNgxMask } from 'ngx-mask'
 
 import { HttpClient } from '@angular/common/http'
 import { AUTH_TOKEN_INTERCEPTOR_PROVIDERS } from '@core/interceptors/auth-token.interceptor'
@@ -86,5 +87,6 @@ export const appConfig: ApplicationConfig = {
     ERROR_INTERCEPTOR_PROVIDERS,
     provideRouter(routes),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    provideNgxMask(),
   ],
 }

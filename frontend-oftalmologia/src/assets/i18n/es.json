@@ -543,6 +543,8 @@
       "BRANCH": "Sucursal",
       "BRANCH_PLACEHOLDER": "Seleccione sucursal...",
       "DATE_OF_BIRTH": "Fecha de nacimiento",
+      "DATE_OF_BIRTH_HELP": "Formato sugerido: DD/MM/AAAA",
+      "DATE_OF_BIRTH_INVALID": "Ingresa una fecha válida",
       "ADDRESS": "Dirección",
       "ADDRESS_PLACEHOLDER": "Ingrese dirección...",
       "HOME_PHONE": "Teléfono fijo",
