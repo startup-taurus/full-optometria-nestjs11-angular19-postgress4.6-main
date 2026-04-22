@@ -95,6 +95,7 @@
     "PURCHASE_ORDERS": "Órdenes de Pedido",
     "MEDICAL_HISTORY_CONFIGURATION": "Configuración Clínica",
     "CLINICAL_MANAGEMENT": "Gestión Clínica",
+    "COMMUNICATION": "Comunicación",
     "COMPANIES": "Compañias",
     "PATIENTS": "Pacientes",
     "CLIENTS": "Clientes",
@@ -104,6 +105,9 @@
   },
   "TOPBAR": {
     "SEARCH": "Busca algo...",
+    "CALENDAR": "Calendario",
+    "NEW_PATIENT": "Nuevo paciente",
+    "MORE_ACTIONS": "Más acciones",
     "NOTIFICATIONS": "Notificaciones",
     "SETTINGS": "Ajustes",
     "SUPPORT": "Apoyo",

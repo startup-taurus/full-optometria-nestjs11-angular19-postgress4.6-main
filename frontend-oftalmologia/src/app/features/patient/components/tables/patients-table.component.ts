@@ -34,6 +34,7 @@ import { AppState } from '@core/states'
 import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
 import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
   BehaviorSubject,
   catchError,
@@ -111,10 +112,13 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   private _bsModalService = inject(BootstrapModalService)
   private _modal = inject(NgbModal)
   private _store = inject(Store<AppState>)
+  private _route = inject(ActivatedRoute)
+  private _router = inject(Router)
 
   ngOnInit(): void {
     this.suscribeToFilter()
     this.subscribeToBranchChanges()
+    this.subscribeToOpenModalFromQueryParams()
     this.config$ = this.setConfigDatatable()
     this.reloadDatatable()
   }
@@ -348,6 +352,32 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
         })
       }
     }
+  }
+
+  private subscribeToOpenModalFromQueryParams(): void {
+    this._route.queryParamMap.pipe(takeUntil(this.unsubscribe$)).subscribe({
+      next: (queryParams) => {
+        if (queryParams.get('openPatientModal') !== 'create') {
+          return
+        }
+
+        this.openModal(BUTTON_ACTIONS.ADD)
+        this.clearOpenModalQueryParams()
+      },
+      error: () => {},
+    })
+  }
+
+  private clearOpenModalQueryParams(): void {
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+      queryParams: {
+        openPatientModal: null,
+        modalTs: null,
+      },
+    })
   }
 
   public onSideFilterApplied(filters: FilterValue): void {

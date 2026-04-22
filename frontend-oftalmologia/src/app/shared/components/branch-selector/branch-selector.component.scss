@@ -326,6 +326,29 @@
   }
 }
 
+@media (max-width: 576px) {
+  .branch-selector-topbar {
+    .branch-select-minimal {
+      min-width: 84px;
+      max-width: 104px;
+
+      .ng-select.ng-select-single .ng-select-container {
+        min-height: 36px;
+        padding: 0 6px;
+      }
+
+      .selected-branch-label {
+        .label-text {
+          max-width: 44px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
 [data-bs-theme='dark'] {
   .branch-selector-topbar {
     .branch-select-minimal {

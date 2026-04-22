@@ -96,6 +96,19 @@ Topbar CSS
   color: var(--#{$prefix}topbar-item-color);
 }
 
+.topbar-right-actions {
+  min-width: 0;
+  gap: 0.5rem !important;
+
+  .topbar-item {
+    min-width: 0;
+  }
+
+  .topbar-link {
+    white-space: nowrap;
+  }
+}
+
 // Topbar light/Dark Mode icon
 html[data-bs-theme='dark'] {
   #light-dark-mode {
@@ -219,12 +232,27 @@ html[data-bs-theme='dark'] {
 
     .dropdown {
       position: static;
+    }
 
+    .nav-user {
       .dropdown-menu {
-        width: 100%;
-        left: 10px !important;
-        right: 10px !important;
+        position: absolute;
+        width: max-content;
+        min-width: 220px;
+        max-width: calc(100vw - 1rem);
+        right: 0 !important;
+        left: auto !important;
       }
+    }
+  }
+
+  .topbar-right-actions {
+    gap: 0.25rem !important;
+
+    .topbar-link {
+      min-width: 36px;
+      min-height: 36px;
+      padding: 0.25rem;
     }
   }
 }
