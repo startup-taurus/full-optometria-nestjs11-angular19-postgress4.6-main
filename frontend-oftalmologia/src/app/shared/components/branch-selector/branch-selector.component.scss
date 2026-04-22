@@ -132,6 +132,7 @@
 
 .branch-selector-topbar {
   .branch-select-minimal {
+    width: clamp(140px, 24vw, 220px);
     min-width: 180px;
     max-width: 220px;
 
@@ -154,10 +155,12 @@
 
           .ng-value-container {
             padding-left: 0;
+            min-width: 0;
 
             .ng-value {
               color: #fff;
               opacity: 1;
+              max-width: 100%;
             }
 
             .ng-placeholder {
@@ -210,17 +213,25 @@
     .selected-branch-label {
       display: flex;
       align-items: center;
+      min-width: 0;
+      width: 100%;
       font-size: 0.9rem;
       font-weight: 600;
       color: #fff;
       opacity: 1;
 
       .label-text {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         color: #fff;
         opacity: 1;
       }
 
       .ti {
+        flex-shrink: 0;
         font-size: 1.1rem;
         color: #fff;
         opacity: 1;
@@ -249,6 +260,7 @@
       .branch-option {
         display: flex;
         align-items: center;
+        min-width: 0;
         padding: 10px 16px;
         font-size: 0.9rem;
         transition: all 0.2s ease;
@@ -260,6 +272,11 @@
         }
 
         span {
+          display: block;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
           font-weight: 500;
         }
       }
@@ -313,6 +330,7 @@
 @media (max-width: 768px) {
   .branch-selector-topbar {
     .branch-select-minimal {
+      width: clamp(110px, 30vw, 150px);
       min-width: 120px;
       max-width: 150px;
 
@@ -329,8 +347,9 @@
 @media (max-width: 576px) {
   .branch-selector-topbar {
     .branch-select-minimal {
+      width: clamp(86px, 32vw, 120px);
       min-width: 84px;
-      max-width: 104px;
+      max-width: 120px;
 
       .ng-select.ng-select-single .ng-select-container {
         min-height: 36px;
@@ -339,10 +358,7 @@
 
       .selected-branch-label {
         .label-text {
-          max-width: 44px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          max-width: 100%;
         }
       }
     }
