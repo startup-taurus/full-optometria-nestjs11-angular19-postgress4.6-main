@@ -59,6 +59,7 @@ interface PatientWithFullName extends Patient {
 export class ShiftModalComponent implements OnInit, OnDestroy {
   @Input() editMode = false
   @Input() selectedShift: Shift | null = null
+  @Input() preSelectedPatientId?: string
 
   private destroy$ = new Subject<void>()
   private patientSearch$ = new Subject<string>()
@@ -211,7 +212,49 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
           ...patient,
           fullName: `${patient.firstName} ${patient.lastName}`,
         }))
+        this.applyPreSelectedPatient()
         this.patientsLoading = false
+      })
+  }
+
+  private applyPreSelectedPatient(): void {
+    if (this.editMode || !this.preSelectedPatientId) {
+      return
+    }
+
+    const selected =
+      this.patients.find((patient) => patient.id === this.preSelectedPatientId) ||
+      null
+
+    if (selected) {
+      this.selectedPatient = selected
+      this.shiftForm.patchValue({ patientId: selected.id })
+      return
+    }
+
+    this.patientService
+      .getPatientById(this.preSelectedPatientId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          const patient = response.data
+          if (!patient?.id) {
+            return
+          }
+
+          const mappedPatient: PatientWithFullName = {
+            ...patient,
+            fullName: `${patient.firstName} ${patient.lastName}`,
+          }
+
+          this.patients = [
+            mappedPatient,
+            ...this.patients.filter((item) => item.id !== mappedPatient.id),
+          ]
+          this.selectedPatient = mappedPatient
+          this.shiftForm.patchValue({ patientId: mappedPatient.id })
+        },
+        error: () => {},
       })
   }
 

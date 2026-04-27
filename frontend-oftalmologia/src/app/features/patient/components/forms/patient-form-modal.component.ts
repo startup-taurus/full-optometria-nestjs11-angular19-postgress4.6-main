@@ -33,12 +33,14 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
 import { Subject, takeUntil, firstValueFrom } from 'rxjs'
 import { ClientModalComponent } from '../../../laboratoy-orders/components/modals/client-modal/client-modal.component'
-import { NgxMaskDirective } from 'ngx-mask'
+import Swal from 'sweetalert2'
+import { ClinicalHistoryUpsertModalComponent } from '../../../medical-history/components/modals/clinical-history-upsert-modal.component'
+import { ShiftModalComponent } from '../../../shift-management/components/modals/shift-modal/shift-modal.component'
 
 @Component({
   selector: 'app-patient-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './patient-form-modal.component.html',
   styleUrls: ['./patient-form-modal.component.scss'],
 })
@@ -54,6 +56,16 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   public loading = false
   public isEditMode = false
   public modalTitle = ''
+  public readonly commonEmailDomains = [
+    '@gmail.com',
+    '@hotmail.com',
+    '@outlook.com',
+    '@yahoo.com',
+    '@live.com',
+    '@icloud.com',
+    '@protonmail.com',
+  ]
+  public readonly manualEmailDomainValue = 'manual'
 
   public selectedPhotoFile: File | null = null
   public photoPreviewUrl: string | null = null
@@ -157,9 +169,11 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     const baseFormConfig: any = {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      documentNumber: ['', [Validators.required, Validators.minLength(1)]],
-      dateOfBirth: ['', [Validators.required, this.dateOfBirthValidator]],
+      emailLocalPart: [''],
+      emailDomain: ['@gmail.com'],
+      emailCustomDomain: [''],
+      documentNumber: [''],
+      age: [null, [Validators.min(0), Validators.max(120)]],
       mobilePhone: ['', [Validators.pattern(/^\+?[0-9]{10,15}$/)]],
       homePhone: [''],
       address: [''],
@@ -175,11 +189,8 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
 
   private populateForm(): void {
     if (this.selectedPatient) {
-      const dateOfBirthForInput = this.formatDateForInput(
-        this.selectedPatient.dateOfBirth
-      )
+      const emailParts = this.parseEmailForForm(this.selectedPatient.email)
 
-      // Cargar foto de perfil si existe
       if (this.selectedPatient.profilePhoto) {
         this.photoPreviewUrl = this.formatUrl(this.selectedPatient.profilePhoto)
         this.uploadedPhotoFileId = this.selectedPatient.profilePhoto
@@ -191,9 +202,11 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
       const formData = {
         firstName: this.selectedPatient.firstName,
         lastName: this.selectedPatient.lastName,
-        email: this.selectedPatient.email || '',
+        emailLocalPart: emailParts.localPart,
+        emailDomain: emailParts.domain,
+        emailCustomDomain: emailParts.customDomain,
         documentNumber: this.selectedPatient.documentNumber || '',
-        dateOfBirth: dateOfBirthForInput,
+        age: this.getEstimatedAge(this.selectedPatient.dateOfBirth),
         address: this.selectedPatient.address || '',
         homePhone: this.selectedPatient.homePhone || '',
         mobilePhone: this.selectedPatient.mobilePhone || '',
@@ -291,36 +304,22 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
 
   private prepareFormData(): any {
     const formValue = { ...this.patientForm.value }
+    const ageValue = this.parseAgeValue(formValue.age)
+    const builtEmail = this.buildEmailFromForm(formValue)
 
-    // Remover isActive en creación (solo permitirlo en edición)
     if (!this.isEditMode) {
       delete formValue.isActive
     }
 
-    if (formValue.dateOfBirth) {
-      if (
-        typeof formValue.dateOfBirth === 'string' &&
-        formValue.dateOfBirth.trim() !== ''
-      ) {
-        try {
-          const parsedDate = this.parseDateInputValue(formValue.dateOfBirth)
+    delete formValue.emailLocalPart
+    delete formValue.emailDomain
+    delete formValue.emailCustomDomain
+    delete formValue.age
 
-          if (parsedDate) {
-            formValue.dateOfBirth = parsedDate.toISOString()
-          } else {
-            delete formValue.dateOfBirth
-          }
-        } catch (error) {}
-      } else if (
-        formValue.dateOfBirth === '' ||
-        formValue.dateOfBirth === null ||
-        formValue.dateOfBirth === undefined
-      ) {
-        delete formValue.dateOfBirth
-      }
-    }
+    formValue.email = builtEmail
+    formValue.dateOfBirth =
+      ageValue === null ? undefined : this.estimateBirthDateFromAge(ageValue)
 
-    // Limpiar campos vacíos
     Object.keys(formValue).forEach((key) => {
       if (
         formValue[key] === '' ||
@@ -363,6 +362,10 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
             this.loadClients()
             this.openCreateClientModal()
             return
+          }
+
+          if (createdPatient?.id) {
+            await this.handlePostCreateFlow(createdPatient)
           }
 
           this._activeModal.close('created')
@@ -426,11 +429,8 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     if (field.hasError('required')) return 'VALIDATION.REQUIRED'
     if (field.hasError('email')) return 'VALIDATION.EMAIL_INVALID'
     if (field.hasError('minlength')) return 'VALIDATION.MIN_LENGTH'
-    if (
-      fieldName === 'dateOfBirth' &&
-      (field.hasError('invalidDate') || field.hasError('pattern'))
-    ) {
-      return 'PATIENT.FORM.DATE_OF_BIRTH_INVALID'
+    if (fieldName === 'age' && (field.hasError('min') || field.hasError('max'))) {
+      return 'Edad inválida'
     }
     if (field.hasError('pattern')) return 'VALIDATION.PHONE_INVALID'
 
@@ -779,5 +779,159 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     const month = String(date.getUTCMonth() + 1).padStart(2, '0')
     const day = String(date.getUTCDate()).padStart(2, '0')
     return `${year}-${month}-${day}`
+  }
+
+  public isManualEmailDomain(): boolean {
+    return this.patientForm.get('emailDomain')?.value === this.manualEmailDomainValue
+  }
+
+  public onEmailDomainChange(): void {
+    if (!this.isManualEmailDomain()) {
+      this.patientForm.get('emailCustomDomain')?.setValue('')
+    }
+  }
+
+  private buildEmailFromForm(formValue: any): string | undefined {
+    const localPart = (formValue.emailLocalPart || '').trim()
+    if (!localPart) {
+      return undefined
+    }
+
+    const selectedDomain = (formValue.emailDomain || '').trim()
+    if (!selectedDomain) {
+      return undefined
+    }
+
+    if (selectedDomain === this.manualEmailDomainValue) {
+      const customDomain = (formValue.emailCustomDomain || '').trim()
+      if (!customDomain) {
+        return undefined
+      }
+      const normalizedDomain = customDomain.startsWith('@')
+        ? customDomain.toLowerCase()
+        : `@${customDomain.toLowerCase()}`
+      return `${localPart.toLowerCase()}${normalizedDomain}`
+    }
+
+    return `${localPart.toLowerCase()}${selectedDomain.toLowerCase()}`
+  }
+
+  private parseEmailForForm(email?: string): {
+    localPart: string
+    domain: string
+    customDomain: string
+  } {
+    if (!email || !email.includes('@')) {
+      return {
+        localPart: '',
+        domain: '@gmail.com',
+        customDomain: '',
+      }
+    }
+
+    const [localPart, ...domainParts] = email.split('@')
+    const domain = `@${domainParts.join('@').toLowerCase()}`
+    const knownDomain = this.commonEmailDomains.find((item) => item === domain)
+
+    if (knownDomain) {
+      return {
+        localPart,
+        domain: knownDomain,
+        customDomain: '',
+      }
+    }
+
+    return {
+      localPart,
+      domain: this.manualEmailDomainValue,
+      customDomain: domain,
+    }
+  }
+
+  private parseAgeValue(rawAge: unknown): number | null {
+    if (rawAge === null || rawAge === undefined || rawAge === '') {
+      return null
+    }
+
+    const parsed = Number(rawAge)
+    if (!Number.isFinite(parsed)) {
+      return null
+    }
+
+    const normalizedAge = Math.floor(parsed)
+    if (normalizedAge < 0 || normalizedAge > 120) {
+      return null
+    }
+
+    return normalizedAge
+  }
+
+  private estimateBirthDateFromAge(age: number): string {
+    const estimatedYear = new Date().getFullYear() - age
+    const estimatedDate = new Date(Date.UTC(estimatedYear, 0, 1, 0, 0, 0, 0))
+    return estimatedDate.toISOString()
+  }
+
+  private getEstimatedAge(dateOfBirth?: Date | string): number | null {
+    const parsedDate = this.parseDateInputValue(dateOfBirth)
+    if (!parsedDate) {
+      return null
+    }
+
+    const currentYear = new Date().getFullYear()
+    const estimatedAge = currentYear - parsedDate.getUTCFullYear()
+    if (estimatedAge < 0 || estimatedAge > 120) {
+      return null
+    }
+
+    return estimatedAge
+  }
+
+  private async handlePostCreateFlow(patient: Patient): Promise<void> {
+    const result = await Swal.fire({
+      title: 'Paciente creado',
+      text: '¿Qué deseas hacer ahora?',
+      icon: 'success',
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: 'Crear historial clínico',
+      denyButtonText: 'Crear cita',
+      cancelButtonText: 'Cerrar',
+      reverseButtons: true,
+    })
+
+    if (result.isConfirmed && patient.id) {
+      this.openCreateMedicalHistoryModal(patient.id)
+      return
+    }
+
+    if (result.isDenied && patient.id) {
+      this.openCreateShiftModal(patient.id)
+    }
+  }
+
+  private openCreateMedicalHistoryModal(patientId: string): void {
+    const modalRef = this._modalService.open(ClinicalHistoryUpsertModalComponent, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static',
+      keyboard: true,
+    })
+
+    modalRef.componentInstance.editMode = false
+    modalRef.componentInstance.preSelectedPatientId = patientId
+  }
+
+  private openCreateShiftModal(patientId: string): void {
+    const modalRef = this._modalService.open(ShiftModalComponent, {
+      size: 'lg',
+      centered: true,
+      backdrop: 'static',
+      keyboard: true,
+    })
+
+    modalRef.componentInstance.editMode = false
+    modalRef.componentInstance.selectedShift = null
+    modalRef.componentInstance.preSelectedPatientId = patientId
   }
 }

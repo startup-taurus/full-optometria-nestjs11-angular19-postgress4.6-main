@@ -62,7 +62,6 @@
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
               {{ 'PATIENT.FORM.DOCUMENT_NUMBER' | translate }}
-              <span class="text-danger">*</span>
             </label>
             <input
               type="text"
@@ -83,112 +82,56 @@
 
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
-              {{ 'PATIENT.FORM.DATE_OF_BIRTH' | translate }}
-              <span class="text-danger">*</span>
+              Edad
             </label>
-            <div class="patient-date-field">
-              <div class="patient-date-mobile d-md-none">
-                <div class="row g-2">
-                  <div class="col-4">
-                    <select
-                      class="form-select form-control-lg"
-                      [class.is-invalid]="isFieldInvalid('dateOfBirth')"
-                      [value]="mobileBirthDay"
-                      (change)="onMobileDatePartChange('day', $any($event.target).value)"
-                    >
-                      <option value="">Día</option>
-                      <option *ngFor="let day of mobileBirthDays" [value]="day">
-                        {{ day }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div class="col-4">
-                    <select
-                      class="form-select form-control-lg"
-                      [class.is-invalid]="isFieldInvalid('dateOfBirth')"
-                      [value]="mobileBirthMonth"
-                      (change)="onMobileDatePartChange('month', $any($event.target).value)"
-                    >
-                      <option value="">Mes</option>
-                      <option *ngFor="let month of mobileBirthMonths" [value]="month">
-                        {{ month }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div class="col-4">
-                    <select
-                      class="form-select form-control-lg"
-                      [class.is-invalid]="isFieldInvalid('dateOfBirth')"
-                      [value]="mobileBirthYear"
-                      (change)="onMobileDatePartChange('year', $any($event.target).value)"
-                    >
-                      <option value="">Año</option>
-                      <option *ngFor="let year of mobileBirthYears" [value]="year">
-                        {{ year }}
-                      </option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="patient-date-input-shell d-none d-md-block">
-                <input
-                  type="text"
-                  class="form-control form-control-lg patient-date-input"
-                  formControlName="dateOfBirth"
-                  [class.is-invalid]="isFieldInvalid('dateOfBirth')"
-                  placeholder="DD/MM/AAAA"
-                  inputmode="numeric"
-                  autocomplete="bday"
-                  mask="00/00/0000"
-                  [dropSpecialCharacters]="false"
-                />
-                <button
-                  type="button"
-                  class="patient-date-icon-btn"
-                  aria-label="Abrir calendario"
-                  (click)="openDesktopDatePicker($event)"
-                >
-                  <i class="ti ti-calendar patient-date-icon"></i>
-                </button>
-              </div>
-
-              <input
-                #nativeDatePicker
-                type="date"
-                class="patient-native-date-input"
-                (change)="onNativeDateSelected(nativeDatePicker.value)"
-              />
-
-              <small
-                class="patient-date-help"
-                [class.text-danger]="isFieldInvalid('dateOfBirth')"
-              >
-                {{
-                  isFieldInvalid('dateOfBirth')
-                    ? (getFieldError('dateOfBirth') | translate)
-                    : ('PATIENT.FORM.DATE_OF_BIRTH_HELP' | translate)
-                }}
-              </small>
+            <input
+              type="number"
+              class="form-control form-control-lg"
+              formControlName="age"
+              [class.is-invalid]="isFieldInvalid('age')"
+              placeholder="Edad estimada"
+              min="0"
+              max="120"
+              step="1"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('age')">
+              {{ getFieldError('age') }}
             </div>
           </div>
 
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
               {{ 'PATIENT.FORM.EMAIL' | translate }}
-              <span class="text-danger">*</span>
             </label>
-            <input
-              type="email"
-              class="form-control form-control-lg"
-              formControlName="email"
-              [class.is-invalid]="isFieldInvalid('email')"
-              [placeholder]="'PATIENT.FORM.EMAIL_PLACEHOLDER' | translate"
-            />
-            <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
-              {{ getFieldError('email') | translate }}
+            <div class="row g-2 align-items-start">
+              <div class="col-12 col-md-5">
+                <input
+                  type="text"
+                  class="form-control form-control-lg"
+                  formControlName="emailLocalPart"
+                  placeholder="usuario"
+                />
+              </div>
+              <div class="col-12 col-md-7">
+                <select
+                  class="form-select form-control-lg"
+                  formControlName="emailDomain"
+                  (change)="onEmailDomainChange()"
+                >
+                  <option *ngFor="let domain of commonEmailDomains" [value]="domain">
+                    {{ domain }}
+                  </option>
+                  <option [value]="manualEmailDomainValue">Ingresar manualmente</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-2" *ngIf="isManualEmailDomain()">
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                formControlName="emailCustomDomain"
+                placeholder="@dominio-personalizado.com"
+              />
             </div>
           </div>
 

@@ -131,41 +131,54 @@ export class PatientsService {
       ...patientData
     } = createPatientDto;
 
-    const existingPatient = await this.patientRepository.findOne({
-      where: { email: email.toLowerCase() },
-    });
+    const normalizedEmail =
+      typeof email === 'string' && email.trim().length > 0
+        ? email.toLowerCase().trim()
+        : null;
+    const normalizedDocumentNumber =
+      typeof documentNumber === 'string' && documentNumber.trim().length > 0
+        ? documentNumber.trim()
+        : null;
 
-    if (existingPatient) {
-      throw new ConflictException({
-        messageKey: 'ERROR.VALIDATION',
-        message: {
-          es: 'El correo electrónico ya existe',
-          en: 'Email already exists',
-        },
+    if (normalizedEmail) {
+      const existingPatient = await this.patientRepository.findOne({
+        where: { email: normalizedEmail },
       });
+
+      if (existingPatient) {
+        throw new ConflictException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'El correo electrónico ya existe',
+            en: 'Email already exists',
+          },
+        });
+      }
     }
 
     const resolvedCompanyId = companyId;
-    const existingDocument = await this.patientRepository.findOne({
-      where: {
-        documentNumber,
-        companyId: resolvedCompanyId,
-      },
-    });
-
-    if (existingDocument) {
-      throw new ConflictException({
-        messageKey: 'ERROR.VALIDATION',
-        message: {
-          es: 'El número de documento ya existe en esta compañía',
-          en: 'Document number already exists in this company',
+    if (normalizedDocumentNumber) {
+      const existingDocument = await this.patientRepository.findOne({
+        where: {
+          documentNumber: normalizedDocumentNumber,
+          companyId: resolvedCompanyId,
         },
       });
+
+      if (existingDocument) {
+        throw new ConflictException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'El número de documento ya existe en esta compañía',
+            en: 'Document number already exists in this company',
+          },
+        });
+      }
     }
 
     const patient = this.patientRepository.create({
-      email: email.toLowerCase(),
-      documentNumber,
+      email: normalizedEmail,
+      documentNumber: normalizedDocumentNumber,
       companyId: resolvedCompanyId,
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       ...patientData,
@@ -389,9 +402,25 @@ export class PatientsService {
     const { email, documentNumber, dateOfBirth, ...updateData } =
       updatePatientDto;
 
-    if (email && email.toLowerCase() !== patient.email) {
+    const normalizedEmail =
+      typeof email === 'string'
+        ? email.trim().length > 0
+          ? email.toLowerCase().trim()
+          : null
+        : email;
+    const normalizedDocumentNumber =
+      typeof documentNumber === 'string'
+        ? documentNumber.trim().length > 0
+          ? documentNumber.trim()
+          : null
+        : documentNumber;
+
+    if (
+      typeof normalizedEmail === 'string' &&
+      normalizedEmail !== (patient.email ?? '').toLowerCase()
+    ) {
       const existingPatient = await this.patientRepository.findOne({
-        where: { email: email.toLowerCase() },
+        where: { email: normalizedEmail },
       });
       if (existingPatient) {
         throw new ConflictException({
@@ -404,10 +433,13 @@ export class PatientsService {
       }
     }
 
-    if (documentNumber && documentNumber !== patient.documentNumber) {
+    if (
+      typeof normalizedDocumentNumber === 'string' &&
+      normalizedDocumentNumber !== patient.documentNumber
+    ) {
       const existingPatient = await this.patientRepository.findOne({
         where: {
-          documentNumber,
+          documentNumber: normalizedDocumentNumber,
           companyId: patient.companyId,
         },
       });
@@ -423,9 +455,14 @@ export class PatientsService {
     }
 
     const updateDataMapped = {
-      email: email ? email.toLowerCase() : undefined,
-      documentNumber,
-      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+      email: normalizedEmail,
+      documentNumber: normalizedDocumentNumber,
+      dateOfBirth:
+        typeof dateOfBirth === 'string'
+          ? new Date(dateOfBirth)
+          : dateOfBirth === null
+          ? null
+          : undefined,
       ...updateData,
     };
 

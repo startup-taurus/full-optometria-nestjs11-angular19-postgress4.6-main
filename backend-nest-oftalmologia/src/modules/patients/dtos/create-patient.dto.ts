@@ -25,14 +25,14 @@ export class CreatePatientDto {
   lastName: string;
 
   @IsEmail()
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }) => value?.toLowerCase().trim())
-  email: string;
+  email?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }) => value?.trim())
-  documentNumber: string;
+  documentNumber?: string;
 
   @IsString()
   @IsOptional()
