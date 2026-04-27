@@ -2,9 +2,12 @@ import { CommonModule } from '@angular/common'
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  Input,
   inject,
   OnDestroy,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
 } from '@angular/core'
@@ -79,6 +82,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   private PAGINATION = DEFAULT_NGX_DATATABLE_PAGINATION
 
   public sideFilterComponent = FilterMedicalHistoryComponent
+  @Input() patientId: string | null = null
 
   @ViewChild('statusTemplate', { static: true })
   public statusTemplate?: TemplateRef<HTMLElement>
@@ -93,6 +97,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   private filter: ClinicalHistoryQueryParams = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
   private isInitialLoad = true
+  private isReady = false
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _clinicalHistoriesService = inject(ClinicalHistoriesService)
@@ -102,6 +107,16 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeSubscriptions()
     this.config$ = this.setConfigDatatable()
+    this.isReady = true
+    this.reloadDatatable(this.filter)
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.isReady || !changes['patientId']) {
+      return
+    }
+
+    this.reloadDatatable(this.filter)
   }
 
   ngOnDestroy(): void {
@@ -241,6 +256,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
 
     const queryParams: ClinicalHistoryQueryParams = {
       ...filter,
+      ...(this.patientId ? { patientFilterId: this.patientId } : {}),
       page: this.config$.value.page || this.PAGINATION.PAGE,
       limit: this.config$.value.limit || this.PAGINATION.LIMIT,
     }
@@ -298,7 +314,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
     record?: MedicalHistoryRecord
   ): void {
     if (buttonAction === BUTTON_ACTIONS.ADD) {
-      this.openUpsertModal(null, false)
+      this.openUpsertModal(null, false, undefined, this.patientId || undefined)
     } else if (buttonAction === BUTTON_ACTIONS.EDIT && record) {
       this.openUpsertModal(null, false, record.originalRecord.id)
     } else if (buttonAction === BUTTON_ACTIONS.VIEW && record) {
@@ -308,10 +324,22 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  public duplicateRecord(record: MedicalHistoryRecord): void {
+    this.openUpsertModal(
+      record.originalRecord,
+      false,
+      undefined,
+      record.originalRecord.patientId,
+      true
+    )
+  }
+
   private openUpsertModal(
     clinicalHistory: Partial<ClinicalHistory> | null,
     isViewOnly: boolean = false,
-    recordId?: string
+    recordId?: string,
+    preSelectedPatientId?: string,
+    duplicateMode: boolean = false
   ): void {
     const modalRef = this._modal.open(ClinicalHistoryUpsertModalComponent, {
       size: 'xl',
@@ -324,6 +352,9 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.selectedRecord =
       clinicalHistory as ClinicalHistory
     modalRef.componentInstance.recordId = recordId
+    modalRef.componentInstance.preSelectedPatientId =
+      preSelectedPatientId || undefined
+    modalRef.componentInstance.duplicateMode = duplicateMode
 
     modalRef.result
       .then((result: any) => {

@@ -171,6 +171,7 @@ export interface ClinicalHistoryQueryParams {
   page?: number
   limit?: number
   patientId?: string
+  patientFilterId?: string
   isSent?: boolean
   startDate?: string
   endDate?: string

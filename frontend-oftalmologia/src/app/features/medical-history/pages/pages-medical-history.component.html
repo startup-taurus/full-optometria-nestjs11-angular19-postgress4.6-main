@@ -1,1 +1,12 @@
-<table-medical-history></table-medical-history>
+<div class="container-fluid mb-3" *ngIf="patientId">
+	<div class="alert alert-info d-flex align-items-center justify-content-between mb-0">
+		<div>
+			<strong>Filtro activo:</strong> se muestran solo los historiales de este paciente.
+		</div>
+		<button type="button" class="btn btn-sm btn-outline-info" (click)="clearPatientFilter()">
+			Limpiar filtro
+		</button>
+	</div>
+</div>
+
+<table-medical-history [patientId]="patientId"></table-medical-history>

@@ -128,6 +128,16 @@
       <i class="ti ti-edit"></i>
     </button>
     <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      (click)="duplicateRecord(row)"
+      [attr.aria-label]="'Duplicar historia clínica'"
+      [ngbTooltip]="'Duplicar historia clínica'"
+      placement="left"
+    >
+      <i class="ti ti-copy"></i>
+    </button>
+    <button
       *ngIf="row.status !== 'cancelado'"
       type="button"
       class="btn btn-sm btn-outline-danger"

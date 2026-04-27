@@ -58,7 +58,6 @@ import { PatientFilterComponent } from '../filter/patient-filter.component'
 import { PatientFormModalComponent } from '../forms/patient-form-modal.component'
 import { PatientDetailsModalComponent } from '../modals/patient-details-modal.component'
 import { ClinicalHistoryUpsertModalComponent } from '../../../medical-history/components/modals/clinical-history-upsert-modal.component'
-import { ViewMedicalHistoryComponent } from '../../../medical-history/components/forms/view-medical-history/view-medical-history/view-medical-history.component'
 import { Client } from '@core/interfaces/api/client.interface'
 import { ClientModalComponent } from '../../../laboratoy-orders/components/modals/client-modal/client-modal.component'
 
@@ -573,8 +572,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   }
 
   public canShowViewMedicalHistoryButton(patientId: string): boolean {
-    if (!this.medicalHistoryCache.has(patientId)) return false
-    return this.medicalHistoryCache.get(patientId) !== null
+    return true
   }
 
   public viewMedicalHistory(patient: Patient): void {
@@ -582,12 +580,11 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       return
     }
 
-    const clinicalHistory = this.medicalHistoryCache.get(patient.id)
-    if (!clinicalHistory?.id) {
-      return
-    }
-
-    this.openViewMedicalHistoryModal(clinicalHistory.id)
+    this._router.navigate(['/medical-history'], {
+      queryParams: {
+        patientId: patient.id,
+      },
+    })
   }
 
   private prefetchMedicalHistoryStatus(patients: Patient[]): void {
@@ -691,16 +688,4 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       .catch(() => {})
   }
 
-  private openViewMedicalHistoryModal(clinicalHistoryId: string): void {
-    const modalRef = this._modal.open(ViewMedicalHistoryComponent, {
-      size: 'xl',
-      centered: true,
-      backdrop: 'static',
-      keyboard: true,
-    })
-
-    modalRef.componentInstance.clinicalHistoryId = clinicalHistoryId
-
-    modalRef.result.then(() => {}).catch(() => {})
-  }
 }

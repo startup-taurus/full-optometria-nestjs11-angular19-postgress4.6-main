@@ -36,6 +36,7 @@ export class ClinicalHistoryStep1Component implements OnInit, OnDestroy {
   @Input() formGroup!: FormGroup
   @Input() fieldsConfig: FieldsConfig | null = null
   @Input() preSelectedPatientId?: string
+  @Input() duplicateMode = false
 
   private destroy$ = new Subject<void>()
   public patientSearch$ = new Subject<string>()

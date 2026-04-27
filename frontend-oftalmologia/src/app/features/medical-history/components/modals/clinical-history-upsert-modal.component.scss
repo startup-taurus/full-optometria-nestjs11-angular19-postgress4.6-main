@@ -144,6 +144,40 @@
   overflow-y: auto;
 }
 
+:host.duplicate-mode ::ng-deep input.form-control,
+:host.duplicate-mode ::ng-deep textarea.form-control,
+:host.duplicate-mode ::ng-deep .form-select,
+:host.duplicate-mode ::ng-deep ng-select .ng-select-container {
+  color: #6c757d;
+}
+
+:host.duplicate-mode ::ng-deep input.form-control.ng-dirty,
+:host.duplicate-mode ::ng-deep textarea.form-control.ng-dirty,
+:host.duplicate-mode ::ng-deep .form-select.ng-dirty,
+:host.duplicate-mode ::ng-deep ng-select.ng-dirty .ng-select-container,
+:host.duplicate-mode ::ng-deep ng-select.ng-dirty .ng-value,
+:host.duplicate-mode ::ng-deep input[type='radio'].ng-dirty + .form-check-label,
+:host.duplicate-mode ::ng-deep input[type='checkbox'].ng-dirty + .toggle-label .toggle-text {
+  color: #198754;
+}
+
+:host.duplicate-mode ::ng-deep input.form-control.ng-dirty,
+:host.duplicate-mode ::ng-deep textarea.form-control.ng-dirty,
+:host.duplicate-mode ::ng-deep .form-select.ng-dirty,
+:host.duplicate-mode ::ng-deep ng-select.ng-dirty .ng-select-container {
+  border-color: rgba(25, 135, 84, 0.45);
+  background-color: rgba(25, 135, 84, 0.04);
+}
+
+:host.duplicate-mode ::ng-deep input.form-control:not(.ng-dirty),
+:host.duplicate-mode ::ng-deep textarea.form-control:not(.ng-dirty),
+:host.duplicate-mode ::ng-deep .form-select:not(.ng-dirty),
+:host.duplicate-mode ::ng-deep ng-select:not(.ng-dirty) .ng-select-container,
+:host.duplicate-mode ::ng-deep input[type='radio']:not(.ng-dirty) + .form-check-label,
+:host.duplicate-mode ::ng-deep input[type='checkbox']:not(.ng-dirty) + .toggle-label .toggle-text {
+  color: #6c757d;
+}
+
 /* Step content styling */
 .step-content {
   min-height: 400px;

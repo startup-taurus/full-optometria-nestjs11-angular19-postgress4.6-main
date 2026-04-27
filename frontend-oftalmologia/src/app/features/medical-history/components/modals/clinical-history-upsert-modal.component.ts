@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, Input, inject } from '@angular/core'
+﻿import { Component, OnInit, OnDestroy, Input, inject, HostBinding } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
   ReactiveFormsModule,
@@ -47,8 +47,14 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   @Input() selectedRecord: ClinicalHistory | null = null
   @Input() recordId?: string
   @Input() preSelectedPatientId?: string
+  @Input() duplicateMode = false
   @Input() fromShiftFlow = false
   @Input() sourceShiftId?: string
+
+  @HostBinding('class.duplicate-mode')
+  get isDuplicateModeClass(): boolean {
+    return this.duplicateMode
+  }
 
   private destroySilentlyContinue = new Subject<void>()
 
@@ -231,7 +237,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   }
 
   private loadExistingData(): void {
-    if (this.editMode) {
+    if (this.editMode || this.duplicateMode) {
       if (this.selectedRecord) {
 
         this.populateFormFromRecord(this.selectedRecord)
@@ -395,6 +401,9 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
         additionalTreatmentsArray.push(this._formBuilder.control(treatment))
       })
     }
+
+    this.clinicalForm.markAsPristine()
+    this.clinicalForm.markAsUntouched()
   }
 
   public canGoToNextStep(): boolean {
