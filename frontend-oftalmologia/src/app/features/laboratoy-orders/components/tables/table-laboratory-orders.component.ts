@@ -82,6 +82,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
   private isInitialLoad = true
   private currentBranchId: string | null = null
+  private loadRequestToken = 0
 
   @ViewChild('sideFilterPanel', { static: false })
   public sideFilterPanel?: SideFilterPanelComponent
@@ -135,11 +136,12 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   }
 
   private resetAndLoad(): void {
+    const requestToken = ++this.loadRequestToken
     this.currentPage = 1
     this.laboratoryOrders = []
     this.filteredOrders = []
     this.hasMore = true
-    this.loadLaboratoryOrders(this.currentFilters)
+    this.loadLaboratoryOrders(this.currentFilters, requestToken)
   }
 
   public reloadData(): void {
@@ -156,8 +158,11 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     this.resetAndLoad()
   }
 
-  private loadLaboratoryOrders(filters: any = {}): void {
-    if (this.isLoading || !this.hasMore) {
+  private loadLaboratoryOrders(
+    filters: any = {},
+    requestToken: number = this.loadRequestToken
+  ): void {
+    if (!this.hasMore) {
       return
     }
 
@@ -171,6 +176,10 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
     this._laboratoryOrdersService.getAllWithFilters(queryParams).subscribe({
       next: (response: any) => {
+        if (requestToken !== this.loadRequestToken) {
+          return
+        }
+
         const items =
           response?.data?.result || response?.data || response?.items || []
 
@@ -188,6 +197,10 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
         this.isInitialLoad = false
       },
       error: (error: any) => {
+        if (requestToken !== this.loadRequestToken) {
+          return
+        }
+
         this.isLoading = false
         this.isInitialLoad = false
         this.hasMore = false
@@ -198,7 +211,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   public onScrollEnd(): void {
     if (!this.isLoading && this.hasMore) {
       this.currentPage++
-      this.loadLaboratoryOrders(this.currentFilters)
+      this.loadLaboratoryOrders(this.currentFilters, this.loadRequestToken)
     }
   }
 

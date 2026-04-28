@@ -15,13 +15,20 @@
     <div class="row">
       <div class="col-12">
         <div class="steps-container">
-          <div *ngFor="let title of stepTitles; let i = index" class="step-item">
+          <div
+            *ngFor="let title of stepTitles; let i = index"
+            class="step-item"
+            [class.clickable]="true"
+            role="button"
+            tabindex="0"
+            (click)="goToStep(i + 1)"
+            (keydown.enter)="goToStep(i + 1)"
+            (keydown.space)="goToStep(i + 1)"
+          >
             <div
               class="step-circle"
               [class.active]="currentStep === i + 1"
               [class.completed]="currentStep > i + 1"
-              [class.clickable]="true"
-              (click)="goToStep(i + 1)"
             >
               <span *ngIf="currentStep > i + 1">✓</span>
               <span *ngIf="currentStep <= i + 1">{{ i + 1 }}</span>

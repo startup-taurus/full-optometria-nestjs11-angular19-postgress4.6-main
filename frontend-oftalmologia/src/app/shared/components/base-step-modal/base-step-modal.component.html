@@ -15,12 +15,18 @@
       <div class="col-12">
         <div class="steps-container">
           @for (step of [].constructor(totalSteps); track $index) {
-            <div class="step-item">
+            <div
+              class="step-item"
+              [class.clickable]="isStepClickable($index + 1)"
+              [attr.role]="isStepClickable($index + 1) ? 'button' : 'presentation'"
+              [attr.tabindex]="isStepClickable($index + 1) ? 0 : -1"
+              (click)="onStepClick($index + 1)"
+              (keydown.enter)="onStepClick($index + 1)"
+              (keydown.space)="onStepClick($index + 1)"
+            >
               <div
                 class="step-circle"
                 [class]="getStepClasses($index + 1)"
-                [class.clickable]="isStepClickable($index + 1)"
-                (click)="onStepClick($index + 1)"
               >
                 @if ($index + 1 < currentStep) {
                   ✓

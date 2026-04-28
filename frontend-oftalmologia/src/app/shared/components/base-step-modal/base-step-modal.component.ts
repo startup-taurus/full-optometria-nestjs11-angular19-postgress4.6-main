@@ -58,6 +58,8 @@ export class BaseStepModalComponent implements OnInit {
       classes.push('current')
     } else if (step < this.currentStep) {
       classes.push('completed')
+    } else {
+      classes.push('inactive')
     }
 
     return classes.join(' ')
