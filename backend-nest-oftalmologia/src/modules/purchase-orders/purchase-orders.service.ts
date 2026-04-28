@@ -906,7 +906,7 @@ export class PurchaseOrdersService {
           clientId: clientId ?? null,
           companyId,
           branchId,
-          shouldInvoice: false,
+          shouldInvoice: true,
           status: PurchaseOrderStatus.PENDING,
           totalAmount,
         });

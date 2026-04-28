@@ -46,6 +46,11 @@ import {
 import { ClinicalHistoryUpsertModalComponent } from '../modals/clinical-history-upsert-modal.component'
 import { ViewMedicalHistoryComponent } from '../forms/view-medical-history/view-medical-history/view-medical-history.component'
 import { LaboratoryOrderUpsertModalComponent } from '../../../laboratoy-orders/components/laboratory-order-upsert-modal/laboratory-order-upsert-modal.component'
+import { LaboratoryOrdersService } from '@core/services/api/laboratory-orders.service'
+import {
+  LaboratoryOrder,
+  LaboratoryOrderStatus,
+} from '@core/interfaces/api/laboratory-order.interface'
 import Swal from 'sweetalert2'
 import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } from '@core/helpers/ui/ui.constants'
 
@@ -101,6 +106,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _clinicalHistoriesService = inject(ClinicalHistoriesService)
+  private _laboratoryOrdersService = inject(LaboratoryOrdersService)
   private _modal = inject(NgbModal)
   private _store = inject(Store<AppState>)
 
@@ -467,6 +473,67 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   // }
 
   public createLaboratoryOrder(record: MedicalHistoryRecord): void {
+    const clinicalHistoryId = record.originalRecord.id
+    const patientFilterId = record.originalRecord.patientId
+
+    this._laboratoryOrdersService
+      .getAllWithFilters({
+        page: 1,
+        limit: 1000,
+        ...(patientFilterId ? { patientFilterId } : {}),
+      })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          const orders = response?.data || []
+          const hasActiveOrder = this.hasActiveLaboratoryOrderForHistory(
+            orders,
+            clinicalHistoryId
+          )
+
+          if (hasActiveOrder) {
+            Swal.fire({
+              ...SWAL_ERROR_CONFIG,
+              title: 'Orden activa existente',
+              text: 'Esta historia clínica ya tiene una orden de laboratorio activa. Si se cancela la orden actual, podrá crear una nueva.',
+            })
+            return
+          }
+
+          this.openLaboratoryOrderModal(clinicalHistoryId)
+        },
+        error: () => {
+          this.openLaboratoryOrderModal(clinicalHistoryId)
+        },
+      })
+  }
+
+  private hasActiveLaboratoryOrderForHistory(
+    orders: LaboratoryOrder[],
+    clinicalHistoryId: string
+  ): boolean {
+    return orders.some((order) => {
+      if (order.clinicalHistoryId !== clinicalHistoryId) {
+        return false
+      }
+
+      return this.normalizeLaboratoryOrderStatus(order) !== LaboratoryOrderStatus.CANCELLED
+    })
+  }
+
+  private normalizeLaboratoryOrderStatus(
+    order: LaboratoryOrder
+  ): LaboratoryOrderStatus {
+    if (order.status) {
+      return order.status
+    }
+
+    return order.isConfirmed
+      ? LaboratoryOrderStatus.RECEIVED
+      : LaboratoryOrderStatus.PENDING
+  }
+
+  private openLaboratoryOrderModal(clinicalHistoryId: string): void {
     const modalRef = this._modal.open(LaboratoryOrderUpsertModalComponent, {
       size: 'xl',
       centered: true,
@@ -475,7 +542,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
     })
 
     modalRef.componentInstance.mode = 'create'
-    modalRef.componentInstance.clinicalHistoryId = record.originalRecord.id
+    modalRef.componentInstance.clinicalHistoryId = clinicalHistoryId
 
     modalRef.result.then(
       (result) => {

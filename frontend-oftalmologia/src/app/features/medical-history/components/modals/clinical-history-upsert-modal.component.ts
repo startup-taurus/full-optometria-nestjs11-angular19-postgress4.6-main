@@ -71,6 +71,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
   public currentStep = 1
   public totalSteps = 3
+  public originalFormValue: Record<string, any> | null = null
 
   public stepTitles: string[] = []
 
@@ -404,6 +405,10 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
     this.clinicalForm.markAsPristine()
     this.clinicalForm.markAsUntouched()
+
+    if (this.duplicateMode) {
+      this.originalFormValue = this.clinicalForm.getRawValue()
+    }
   }
 
   public canGoToNextStep(): boolean {

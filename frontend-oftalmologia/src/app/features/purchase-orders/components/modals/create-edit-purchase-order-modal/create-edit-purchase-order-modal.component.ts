@@ -45,7 +45,7 @@ export class CreateEditPurchaseOrderModalComponent implements OnInit {
   private initializeForm(): void {
     this.form = this.fb.group({
       status: [this.purchaseOrder?.status || PurchaseOrderStatus.PENDING, Validators.required],
-      shouldInvoice: [this.purchaseOrder?.shouldInvoice ?? false],
+      shouldInvoice: [this.purchaseOrder?.shouldInvoice ?? true],
     })
   }
 

@@ -125,9 +125,19 @@
       <div class="card-body" [formGroup]="formGroup">
         <div class="row">
           <div class="col-md-6 mb-3" *ngIf="shouldShowField('occupation')">
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.OCCUPATION' | translate
-            }}</label>
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.OCCUPATION' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('occupation')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('occupation')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('occupation') }})</small
+              >
+            </label>
             <input
               type="text"
               class="form-control"
@@ -142,9 +152,19 @@
             class="col-md-6 mb-3"
             *ngIf="shouldShowField('lastVisualExamDate')"
           >
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.LAST_VISUAL_EXAM_DATE' | translate
-            }}</label>
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.LAST_VISUAL_EXAM_DATE' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('lastVisualExamDate')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('lastVisualExamDate')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('lastVisualExamDate') }})</small
+              >
+            </label>
             <div class="toggle-switch mb-3">
               <input
                 type="checkbox"
@@ -176,9 +196,19 @@
           </div>
 
           <div class="col-md-6 mb-3" *ngIf="shouldShowField('visionProblems')">
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.VISUAL_COMPLAINTS' | translate
-            }}</label>
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.VISUAL_COMPLAINTS' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('visionProblems')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('visionProblems')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('visionProblems') }})</small
+              >
+            </label>
             <textarea
               class="form-control"
               rows="3"
@@ -190,9 +220,19 @@
           </div>
 
           <div class="col-md-6 mb-3" *ngIf="shouldShowField('generalHealth')">
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.GENERAL_HEALTH' | translate
-            }}</label>
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.GENERAL_HEALTH' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('generalHealth')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('generalHealth')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('generalHealth') }})</small
+              >
+            </label>
             <textarea
               class="form-control"
               rows="3"
@@ -207,9 +247,19 @@
             class="col-md-6 mb-3"
             *ngIf="shouldShowField('otherHealthProblems')"
           >
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.OTHER_HEALTH_PROBLEMS' | translate
-            }}</label>
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.OTHER_HEALTH_PROBLEMS' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('otherHealthProblems')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('otherHealthProblems')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('otherHealthProblems') }})</small
+              >
+            </label>
             <textarea
               class="form-control"
               rows="3"

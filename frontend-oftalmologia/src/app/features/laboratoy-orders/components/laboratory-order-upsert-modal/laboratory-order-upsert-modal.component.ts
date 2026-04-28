@@ -23,6 +23,7 @@ import {
 } from '@core/interfaces/api/laboratory-order.interface'
 import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf.interface'
 import { Branch } from '@core/interfaces/api/user.interface'
+import { LaboratoryOrderStatus } from '@core/interfaces/api/laboratory-order.interface'
 
 import { LaboratoryOrderStep1Component } from '../steps/laboratory-order-step1/laboratory-order-step1.component'
 import { LaboratoryOrderStep2Component } from '../steps/laboratory-order-step2/laboratory-order-step2.component'
@@ -328,11 +329,80 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
         return
       }
 
-      this.createOrder(formValue)
+      if (!formValue.clinicalHistoryId) {
+        this.createOrder(formValue)
+        return
+      }
+
+      this.preventActiveDuplicateOrder(formValue)
+      return
+
     } else {
       const formValue = this.buildFormData() as UpdateLaboratoryOrderDto
       this.updateOrder(formValue)
     }
+  }
+
+  private preventActiveDuplicateOrder(data: CreateLaboratoryOrderDto): void {
+    if (!data.patientId) {
+      this.isSaving = false
+      return
+    }
+
+    const queryParams = {
+      page: 1,
+      limit: 1000,
+      patientFilterId: data.patientId,
+    }
+
+    this._laboratoryOrdersService.getAllWithFilters(queryParams).subscribe({
+      next: (response) => {
+        const orders = response?.data || []
+        const hasActiveOrder = orders.some((order) => {
+          if (order.clinicalHistoryId !== data.clinicalHistoryId) {
+            return false
+          }
+
+          return this.normalizeOrderStatus(order) !== LaboratoryOrderStatus.CANCELLED
+        })
+
+        if (hasActiveOrder) {
+          this.isSaving = false
+          this._notificationService.showNotification({
+            type: 'error',
+            message: {
+              es: 'Esta historia clínica ya tiene una orden de laboratorio activa. Cancela la orden actual para crear una nueva.',
+              en: 'This clinical history already has an active laboratory order. Cancel the current order to create a new one.',
+            },
+            title: 'LABORATORY_ORDERS_MODULE.TITLE',
+          })
+          return
+        }
+
+        this.createOrder(data)
+      },
+      error: () => {
+        this.isSaving = false
+        this._notificationService.showNotification({
+          type: 'warning',
+          message: {
+            es: 'No se pudo validar si ya existe una orden activa. Intenta nuevamente.',
+            en: 'Could not validate whether an active order already exists. Please try again.',
+          },
+          title: 'LABORATORY_ORDERS_MODULE.TITLE',
+        })
+      },
+    })
+  }
+
+  private normalizeOrderStatus(order: LaboratoryOrder): LaboratoryOrderStatus {
+    if (order.status) {
+      return order.status
+    }
+
+    return order.isConfirmed
+      ? LaboratoryOrderStatus.RECEIVED
+      : LaboratoryOrderStatus.PENDING
   }
 
   private buildFormData(): CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto {

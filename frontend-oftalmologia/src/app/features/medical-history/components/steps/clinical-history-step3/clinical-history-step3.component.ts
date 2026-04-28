@@ -14,6 +14,8 @@ import { FieldsConfig } from '@core/interfaces/api/clinical-form-config.interfac
 export class ClinicalHistoryStep3Component {
   @Input({ required: true }) formGroup!: FormGroup
   @Input() fieldsConfig: FieldsConfig | null = null
+  @Input() duplicateMode = false
+  @Input() originalFormValue: Record<string, any> | null = null
 
   ngOnInit(): void {
   }
@@ -29,5 +31,69 @@ export class ClinicalHistoryStep3Component {
     const section = this.fieldsConfig.sections[sectionKey]
     if (!section || !section.visible) return false
     return section.fields[fieldName] ?? true
+  }
+
+  public shouldShowOriginalValue(path: string): boolean {
+    if (!this.duplicateMode) {
+      return false
+    }
+
+    return this.getOriginalValue(path) !== null
+  }
+
+  public getOriginalValue(path: string): string | null {
+    return this.normalizeValue(this.getValueByPath(this.originalFormValue, path))
+  }
+
+  public isOriginalValueModified(path: string): boolean {
+    if (!this.duplicateMode) {
+      return false
+    }
+
+    const originalRaw = this.getValueByPath(this.originalFormValue, path)
+    const normalizedOriginal = this.normalizeValue(originalRaw)
+    if (normalizedOriginal === null) {
+      return false
+    }
+
+    const currentValue = this.formGroup.get(path)?.value
+    return !this.areValuesEqual(currentValue, originalRaw)
+  }
+
+  private getValueByPath(source: any, path: string): any {
+    if (!source || !path) {
+      return undefined
+    }
+
+    return path.split('.').reduce((acc, key) => acc?.[key], source)
+  }
+
+  private normalizeValue(value: any): string | null {
+    if (value === null || value === undefined) {
+      return null
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value.join(', ') : null
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      return trimmed.length > 0 ? trimmed : null
+    }
+
+    if (typeof value === 'number') {
+      return String(value)
+    }
+
+    if (typeof value === 'boolean') {
+      return value ? 'Si' : 'No'
+    }
+
+    return String(value)
+  }
+
+  private areValuesEqual(currentValue: any, originalValue: any): boolean {
+    return JSON.stringify(currentValue ?? null) === JSON.stringify(originalValue ?? null)
   }
 }

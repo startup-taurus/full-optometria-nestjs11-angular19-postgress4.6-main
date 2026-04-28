@@ -17,7 +17,7 @@ export class CreatePurchaseOrderDto {
 
   @IsBoolean()
   @IsOptional()
-  shouldInvoice?: boolean = false;
+  shouldInvoice?: boolean = true;
 
   @IsDecimal()
   @IsOptional()

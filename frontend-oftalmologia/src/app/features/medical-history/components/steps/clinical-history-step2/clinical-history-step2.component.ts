@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { AfterViewInit, Component, Input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
 import {
@@ -16,9 +16,14 @@ import { FieldsConfig } from '@core/interfaces/api/clinical-form-config.interfac
   templateUrl: './clinical-history-step2.component.html',
   styleUrl: './clinical-history-step2.component.scss',
 })
-export class ClinicalHistoryStep2Component {
+export class ClinicalHistoryStep2Component implements AfterViewInit {
   @Input({ required: true }) formGroup!: FormGroup
   @Input() fieldsConfig: FieldsConfig | null = null
+  @Input() duplicateMode = false
+  @Input() originalFormValue: Record<string, any> | null = null
+
+  private initialLensTypes = new Set<string>()
+  private initialAdditionalTreatments = new Set<string>()
 
   // Datos estáticos - NO MODIFICARR (opciones para seleccionar)
   public motorTestOptions = ['OD', 'OI', 'A.O.']
@@ -39,6 +44,17 @@ export class ClinicalHistoryStep2Component {
   ]
 
   ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    this.captureInitialSelections()
+  }
+
+  private captureInitialSelections(): void {
+    this.initialLensTypes = new Set(this.lensTypesArray.value || [])
+    this.initialAdditionalTreatments = new Set(
+      this.additionalTreatmentsArray.value || []
+    )
+  }
 
   shouldShowSection(sectionKey: string): boolean {
     if (!this.fieldsConfig) {
@@ -89,6 +105,8 @@ export class ClinicalHistoryStep2Component {
     currentTypes.forEach((lensType) => {
       this.lensTypesArray.push(new FormControl(lensType))
     })
+    this.lensTypesArray.markAsDirty()
+    this.lensTypesArray.updateValueAndValidity({ emitEvent: false })
   }
 
   get additionalTreatmentsArray(): FormArray {
@@ -113,5 +131,90 @@ export class ClinicalHistoryStep2Component {
     currentTreatments.forEach((treat) => {
       this.additionalTreatmentsArray.push(new FormControl(treat))
     })
+    this.additionalTreatmentsArray.markAsDirty()
+    this.additionalTreatmentsArray.updateValueAndValidity({ emitEvent: false })
+  }
+
+  public isLensTypeModified(type: string): boolean {
+    if (!this.duplicateMode) {
+      return false
+    }
+
+    return this.initialLensTypes.has(type) !== this.isLensTypeSelected(type)
+  }
+
+  public isAdditionalTreatmentModified(treatment: string): boolean {
+    if (!this.duplicateMode) {
+      return false
+    }
+
+    return (
+      this.initialAdditionalTreatments.has(treatment) !==
+      this.isAdditionalTreatmentSelected(treatment)
+    )
+  }
+
+  public shouldShowOriginalValue(path: string): boolean {
+    if (!this.duplicateMode) {
+      return false
+    }
+
+    return this.getOriginalValue(path) !== null
+  }
+
+  public getOriginalValue(path: string): string | null {
+    return this.normalizeValue(this.getValueByPath(this.originalFormValue, path))
+  }
+
+  public isOriginalValueModified(path: string): boolean {
+    if (!this.duplicateMode) {
+      return false
+    }
+
+    const originalRaw = this.getValueByPath(this.originalFormValue, path)
+    const normalizedOriginal = this.normalizeValue(originalRaw)
+    if (normalizedOriginal === null) {
+      return false
+    }
+
+    const currentValue = this.formGroup.get(path)?.value
+    return !this.areValuesEqual(currentValue, originalRaw)
+  }
+
+  private getValueByPath(source: any, path: string): any {
+    if (!source || !path) {
+      return undefined
+    }
+
+    return path.split('.').reduce((acc, key) => acc?.[key], source)
+  }
+
+  private normalizeValue(value: any): string | null {
+    if (value === null || value === undefined) {
+      return null
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value.join(', ') : null
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      return trimmed.length > 0 ? trimmed : null
+    }
+
+    if (typeof value === 'number') {
+      return String(value)
+    }
+
+    if (typeof value === 'boolean') {
+      return value ? 'Si' : 'No'
+    }
+
+    return String(value)
+  }
+
+  private areValuesEqual(currentValue: any, originalValue: any): boolean {
+    return JSON.stringify(currentValue ?? null) === JSON.stringify(originalValue ?? null)
   }
 }
