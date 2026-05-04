@@ -11,6 +11,7 @@ import {
   Min,
   IsBoolean,
   Allow,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { FrameType } from '../entities/laboratory-order.entity';
@@ -26,6 +27,13 @@ export class LaboratoryOrderLineItemDto {
   @IsInt()
   @Min(1)
   quantity: number;
+
+  @IsOptional()
+  @Allow()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  discount?: number;
 }
 
 export class CreateLaboratoryOrderDto {

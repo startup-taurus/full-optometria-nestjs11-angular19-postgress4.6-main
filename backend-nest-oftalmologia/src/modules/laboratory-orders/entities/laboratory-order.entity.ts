@@ -152,7 +152,12 @@ export class LaboratoryOrder {
   productIds: string[];
 
   @Column({ name: 'product_quantities', type: 'jsonb', nullable: true })
-  productQuantities: Array<{ productId: string; quantity: number }>;
+  productQuantities: Array<{
+    productId: string;
+    quantity: number;
+    unitPrice?: number;
+    discount?: number;
+  }>;
 
   @Column({
     type: 'enum',

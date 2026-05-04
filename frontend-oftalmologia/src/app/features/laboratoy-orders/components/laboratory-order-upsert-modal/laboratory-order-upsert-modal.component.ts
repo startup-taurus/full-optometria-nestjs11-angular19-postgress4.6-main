@@ -261,7 +261,13 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
           : order.productId
             ? [order.productId]
             : [],
-      lineItems: Array.isArray(order.lineItems) ? order.lineItems : [],
+      lineItems: Array.isArray(order.lineItems)
+        ? order.lineItems.map((lineItem: LaboratoryOrderLineItem) => ({
+            productId: lineItem.productId,
+            quantity: Number(lineItem.quantity || 1),
+            discount: Number(lineItem.discount || 0),
+          }))
+        : [],
       frameType: order.frameType,
       frameTypeDescription: order.frameTypeDescription,
       frameBrand: order.frameBrand,

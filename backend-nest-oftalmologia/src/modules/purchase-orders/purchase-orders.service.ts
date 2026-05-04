@@ -66,11 +66,10 @@ export class PurchaseOrdersService {
     return [];
   }
 
-  private getLaboratoryOrderQuantityMap(
+  private getLaboratoryOrderLineItems(
     laboratoryOrder: LaboratoryOrder,
-  ): Map<string, number> {
+  ): Array<{ productId: string; quantity: number; unitPrice?: number; discount?: number }> {
     const orderAny = laboratoryOrder as any;
-    const quantityMap = new Map<string, number>();
 
     const persistedLines = Array.isArray(orderAny.productQuantities)
       ? orderAny.productQuantities
@@ -78,25 +77,52 @@ export class PurchaseOrdersService {
         ? orderAny.lineItems
         : [];
 
-    persistedLines.forEach((line: any) => {
-      if (!line || typeof line.productId !== 'string') {
-        return;
-      }
+    const normalized = persistedLines
+      .map((line: any) => {
+        if (!line || typeof line.productId !== 'string') {
+          return null;
+        }
 
-      const qty = Number(line.quantity);
-      quantityMap.set(
-        line.productId,
-        Number.isFinite(qty) && qty > 0 ? qty : 1,
-      );
-    });
+        const quantity = Number(line.quantity);
+        const unitPrice = Number(line.unitPrice || 0);
+        const discount = Number(line.discount || 0);
 
-    if (!quantityMap.size) {
-      this.extractLaboratoryOrderProductIds(laboratoryOrder).forEach(
-        (productId) => {
-          quantityMap.set(productId, 1);
-        },
-      );
+        return {
+          productId: line.productId,
+          quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+          unitPrice: Number.isFinite(unitPrice) && unitPrice > 0 ? unitPrice : 0,
+          discount: Number.isFinite(discount) && discount > 0 ? Number(discount.toFixed(2)) : 0,
+        };
+      })
+      .filter(Boolean) as Array<{
+      productId: string;
+      quantity: number;
+      unitPrice?: number;
+      discount?: number;
+    }>;
+
+    if (normalized.length > 0) {
+      return normalized;
     }
+
+    return this.extractLaboratoryOrderProductIds(laboratoryOrder).map(
+      (productId) => ({
+        productId,
+        quantity: 1,
+        unitPrice: 0,
+        discount: 0,
+      }),
+    );
+  }
+
+  private getLaboratoryOrderQuantityMap(
+    laboratoryOrder: LaboratoryOrder,
+  ): Map<string, number> {
+    const quantityMap = new Map<string, number>();
+
+    this.getLaboratoryOrderLineItems(laboratoryOrder).forEach((lineItem) => {
+      quantityMap.set(lineItem.productId, lineItem.quantity);
+    });
 
     return quantityMap;
   }
@@ -107,8 +133,8 @@ export class PurchaseOrdersService {
     manager: EntityManager,
     strict = true,
   ): Promise<PurchaseOrderItem[]> {
-    const quantityMap = this.getLaboratoryOrderQuantityMap(laboratoryOrder);
-    const productIds = Array.from(quantityMap.keys());
+    const lineItems = this.getLaboratoryOrderLineItems(laboratoryOrder);
+    const productIds = lineItems.map((line) => line.productId);
 
     if (!productIds.length) {
       return [];
@@ -135,18 +161,27 @@ export class PurchaseOrdersService {
 
     const snapshots: PurchaseOrderItem[] = [];
 
-    quantityMap.forEach((quantity, productId) => {
-      const product = productMap.get(productId);
-      const unitPrice = Number(product?.unitPrice || 0);
-      const lineTotal = Number((unitPrice * quantity).toFixed(2));
+    lineItems.forEach((lineItem) => {
+      const product = productMap.get(lineItem.productId);
+      const unitPrice = Number(
+        (typeof lineItem.unitPrice === 'number' && lineItem.unitPrice > 0
+          ? lineItem.unitPrice
+          : product?.unitPrice) || 0,
+      );
+      const grossTotal = Number((unitPrice * lineItem.quantity).toFixed(2));
+      const discount = Math.min(
+        Math.max(Number(lineItem.discount || 0), 0),
+        grossTotal,
+      );
+      const lineTotal = Number((grossTotal - discount).toFixed(2));
 
       snapshots.push(
         this.purchaseOrderItemRepository.create({
-          productId,
-          productCode: product?.code || productId,
+          productId: lineItem.productId,
+          productCode: product?.code || lineItem.productId,
           productName: product?.name || '-',
           productBrand: product?.brand || null,
-          quantity,
+          quantity: lineItem.quantity,
           unitPrice,
           lineTotal,
         }),

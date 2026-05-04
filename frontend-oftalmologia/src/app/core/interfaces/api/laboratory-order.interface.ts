@@ -15,12 +15,15 @@ export enum LaboratoryOrderStatus {
 export interface LaboratoryOrderLineItem {
   productId: string
   quantity: number
+  discount?: number
+  unitPrice?: number
   product?: {
     id: string
     code: string
     name: string
     brand: string
     quantity?: number
+    unitPrice?: number
   }
 }
 

@@ -160,6 +160,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
     brand: string
     stock: number | null
     quantity: number
+    unitPrice: number
+    discount: number
+    total: number
   }> {
     if (!this.order) return []
 
@@ -174,6 +177,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
             ? lineItem.product.quantity
             : null,
         quantity: Number(lineItem.quantity || 1),
+        unitPrice: this.getLineUnitPrice(lineItem),
+        discount: this.getLineDiscount(lineItem),
+        total: this.getLineTotal(lineItem),
       }))
     }
 
@@ -188,6 +194,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
             ? (product as any).quantity
             : null,
         quantity: 1,
+        unitPrice: Number((product as any).unitPrice || 0),
+        discount: 0,
+        total: Number((product as any).unitPrice || 0),
       }))
     }
 
@@ -202,6 +211,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
               ? (this.order.product as any).quantity
               : null,
           quantity: 1,
+            unitPrice: Number((this.order.product as any).unitPrice || 0),
+            discount: 0,
+            total: Number((this.order.product as any).unitPrice || 0),
         },
       ]
     }
@@ -280,6 +292,50 @@ export class ViewLaboratoryOrderComponent implements OnInit {
     return (
       String(this.order?.client?.homePhone || '').trim() ||
       ViewLaboratoryOrderComponent.FINAL_CONSUMER_PHONE
+    )
+  }
+
+  public getSubtotal(): number {
+    return Number(
+      (this.order?.lineItems || []).reduce(
+        (sum, lineItem) => sum + this.getLineGrossTotal(lineItem),
+        0
+      ).toFixed(2)
+    )
+  }
+
+  public getTotalDiscount(): number {
+    return Number(
+      (this.order?.lineItems || []).reduce(
+        (sum, lineItem) => sum + this.getLineDiscount(lineItem),
+        0
+      ).toFixed(2)
+    )
+  }
+
+  public getTotal(): number {
+    return Number((this.getSubtotal() - this.getTotalDiscount()).toFixed(2))
+  }
+
+  private getLineUnitPrice(lineItem: any): number {
+    const unitPrice = Number(lineItem?.unitPrice || lineItem?.product?.unitPrice || 0)
+    return Number.isFinite(unitPrice) ? unitPrice : 0
+  }
+
+  private getLineDiscount(lineItem: any): number {
+    const discount = Number(lineItem?.discount || 0)
+    return Number.isFinite(discount) ? discount : 0
+  }
+
+  private getLineGrossTotal(lineItem: any): number {
+    return Number(
+      (this.getLineUnitPrice(lineItem) * Number(lineItem?.quantity || 1)).toFixed(2)
+    )
+  }
+
+  private getLineTotal(lineItem: any): number {
+    return Number(
+      Math.max(this.getLineGrossTotal(lineItem) - this.getLineDiscount(lineItem), 0).toFixed(2)
     )
   }
 }

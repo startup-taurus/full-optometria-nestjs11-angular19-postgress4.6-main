@@ -76,7 +76,7 @@ export class LaboratoryOrdersService {
         const products = productIds.length
           ? await queryRunner.manager.getRepository(Product).find({
               where: { id: In(productIds), branchId },
-              select: ['id', 'code', 'name', 'quantity'],
+              select: ['id', 'code', 'name', 'quantity', 'unitPrice'],
             })
           : [];
 
@@ -127,6 +127,10 @@ export class LaboratoryOrdersService {
           normalizedCreateDtoWithAttendance.clientId ?? null;
 
         const orderNumber = await this.generateOrderNumber();
+        const persistedLineItems = this.buildPersistedLineItems(
+          normalizedLineItems,
+          productMap
+        );
 
         const {
           lineItems: _lineItems,
@@ -143,7 +147,7 @@ export class LaboratoryOrdersService {
           companyId: effectiveCompanyId,
           createdByUserId: createdByUserId || null,
           orderNumber,
-          productQuantities: normalizedLineItems,
+          productQuantities: persistedLineItems,
           status: LaboratoryOrderStatus.PENDING,
         });
 
@@ -405,7 +409,18 @@ export class LaboratoryOrdersService {
     };
 
     if (Object.prototype.hasOwnProperty.call(normalizedUpdateDto, 'lineItems')) {
-      updatePayload.productQuantities = normalizedLineItems;
+      const productIds = normalizedLineItems.map((line) => line.productId);
+      const products = productIds.length
+        ? await this.productRepository.find({
+            where: { id: In(productIds), branchId },
+            select: ['id', 'unitPrice'],
+          })
+        : [];
+      const productMap = new Map(products.map((product) => [product.id, product]));
+      updatePayload.productQuantities = this.buildPersistedLineItems(
+        normalizedLineItems,
+        productMap
+      );
     }
 
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
@@ -721,7 +736,7 @@ export class LaboratoryOrdersService {
 
     const products = await this.productRepository.find({
       where: { id: In(productIds) },
-      select: ['id', 'code', 'name', 'brand', 'quantity'],
+      select: ['id', 'code', 'name', 'brand', 'quantity', 'unitPrice'],
     });
 
     const productsById = new Map(products.map((product) => [product.id, product]));
@@ -735,6 +750,7 @@ export class LaboratoryOrdersService {
         name: product.name,
         brand: product.brand,
         quantity: product.quantity,
+        unitPrice: product.unitPrice,
       }));
   }
 
@@ -825,7 +841,7 @@ export class LaboratoryOrdersService {
 
   private normalizeLineItems(
     dto: Partial<CreateLaboratoryOrderDto>
-  ): Array<{ productId: string; quantity: number }> {
+  ): Array<{ productId: string; quantity: number; discount: number }> {
     const sourceItems = Array.isArray(dto.lineItems) ? dto.lineItems : [];
 
     if (!sourceItems.length) {
@@ -839,10 +855,14 @@ export class LaboratoryOrdersService {
         )
       );
 
-      return normalizedIds.map((productId) => ({ productId, quantity: 1 }));
+      return normalizedIds.map((productId) => ({
+        productId,
+        quantity: 1,
+        discount: 0,
+      }));
     }
 
-    const grouped = new Map<string, number>();
+    const grouped = new Map<string, { quantity: number; discount: number }>();
 
     sourceItems.forEach((lineItem) => {
       if (!lineItem || typeof lineItem.productId !== 'string') {
@@ -859,56 +879,109 @@ export class LaboratoryOrdersService {
         ? Math.max(1, Math.floor(parsedQuantity))
         : 1;
 
-      grouped.set(productId, (grouped.get(productId) || 0) + quantity);
+      const parsedDiscount = Number(lineItem.discount || 0);
+      const discount = Number.isFinite(parsedDiscount) && parsedDiscount > 0
+        ? Number(parsedDiscount.toFixed(2))
+        : 0;
+
+      const current = grouped.get(productId) || { quantity: 0, discount: 0 };
+      grouped.set(productId, {
+        quantity: current.quantity + quantity,
+        discount: discount > 0 ? discount : current.discount,
+      });
     });
 
-    return Array.from(grouped.entries()).map(([productId, quantity]) => ({
+    return Array.from(grouped.entries()).map(([productId, value]) => ({
       productId,
-      quantity,
+      quantity: value.quantity,
+      discount: value.discount,
     }));
   }
 
   private buildResponseLineItems(laboratoryOrder: any, products: any[]) {
-    const quantityMap = this.getProductQuantityMap(laboratoryOrder);
+    const persistedLineItems = this.getPersistedLineItems(laboratoryOrder);
+    const lineItemMap = new Map(
+      persistedLineItems.map((line) => [line.productId, line])
+    );
 
     if (products.length > 0) {
       return products.map((product) => ({
         productId: product.id,
-        quantity: quantityMap.get(product.id) || 1,
+        quantity: lineItemMap.get(product.id)?.quantity || 1,
+        discount: lineItemMap.get(product.id)?.discount || 0,
+        unitPrice: lineItemMap.get(product.id)?.unitPrice || product.unitPrice || 0,
         product,
       }));
     }
 
-    return Array.from(quantityMap.entries()).map(([productId, quantity]) => ({
-      productId,
-      quantity,
-    }));
+    return persistedLineItems.map((line) => ({ ...line }));
   }
 
-  private getProductQuantityMap(laboratoryOrder: any): Map<string, number> {
-    const map = new Map<string, number>();
+  private getPersistedLineItems(laboratoryOrder: any): Array<{
+    productId: string;
+    quantity: number;
+    discount: number;
+    unitPrice: number;
+  }> {
     const persisted = Array.isArray(laboratoryOrder?.productQuantities)
       ? laboratoryOrder.productQuantities
       : Array.isArray(laboratoryOrder?.lineItems)
         ? laboratoryOrder.lineItems
         : [];
 
-    persisted.forEach((line: any) => {
-      if (!line || typeof line.productId !== 'string') {
-        return;
-      }
+    const normalized = persisted
+      .map((line: any) => {
+        if (!line || typeof line.productId !== 'string') {
+          return null;
+        }
 
-      const quantity = Number(line.quantity);
-      map.set(line.productId, Number.isFinite(quantity) && quantity > 0 ? quantity : 1);
-    });
+        const quantity = Number(line.quantity);
+        const unitPrice = Number(line.unitPrice || 0);
+        const discount = Number(line.discount || 0);
 
-    if (!map.size) {
-      this.extractProductIds(laboratoryOrder).forEach((productId) => {
-        map.set(productId, 1);
-      });
+        return {
+          productId: line.productId,
+          quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+          unitPrice: Number.isFinite(unitPrice) && unitPrice > 0 ? unitPrice : 0,
+          discount: Number.isFinite(discount) && discount > 0 ? Number(discount.toFixed(2)) : 0,
+        };
+      })
+      .filter(Boolean) as Array<{
+      productId: string;
+      quantity: number;
+      discount: number;
+      unitPrice: number;
+    }>;
+
+    if (normalized.length) {
+      return normalized;
     }
 
-    return map;
+    return this.extractProductIds(laboratoryOrder).map((productId) => ({
+      productId,
+      quantity: 1,
+      discount: 0,
+      unitPrice: 0,
+    }));
+  }
+
+  private buildPersistedLineItems(
+    normalizedLineItems: Array<{ productId: string; quantity: number; discount: number }>,
+    productMap: Map<string, any>
+  ): Array<{ productId: string; quantity: number; unitPrice: number; discount: number }> {
+    return normalizedLineItems.map((line) => {
+      const product = productMap.get(line.productId);
+      const unitPrice = Number(product?.unitPrice || 0);
+      const grossTotal = Number((unitPrice * line.quantity).toFixed(2));
+      const normalizedDiscount = Math.min(Math.max(Number(line.discount || 0), 0), grossTotal);
+
+      return {
+        productId: line.productId,
+        quantity: line.quantity,
+        unitPrice,
+        discount: Number(normalizedDiscount.toFixed(2)),
+      };
+    });
   }
 
   private async generateOrderNumber(): Promise<number> {

@@ -511,14 +511,18 @@ export class LaboratoryOrderPdfService {
     const order = data.order
     const productSectionTitle = this.getProductSectionTitle(order)
     const productRows = this.getProductRows(order)
+    const hasProducts = productRows.length > 0
     const productTableBody =
-      productRows.length > 0
+      hasProducts
         ? [
             [
               { text: 'Código', bold: true, fillColor: '#E3F2FD' },
               { text: 'Producto', bold: true, fillColor: '#E3F2FD' },
               { text: 'Marca', bold: true, fillColor: '#E3F2FD' },
               { text: 'Cant.', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
+              { text: 'P. Unit.', bold: true, alignment: 'right', fillColor: '#E3F2FD' },
+              { text: 'Desc.', bold: true, alignment: 'right', fillColor: '#E3F2FD' },
+              { text: 'Total', bold: true, alignment: 'right', fillColor: '#E3F2FD' },
             ],
             ...productRows,
           ]
@@ -526,16 +530,18 @@ export class LaboratoryOrderPdfService {
             [
               {
                 text: 'Sin productos',
-                colSpan: 4,
+                colSpan: 7,
                 alignment: 'center',
                 margin: [0, 4, 0, 4],
               },
               {},
               {},
               {},
+              {},
+              {},
+              {},
             ],
           ]
-            const hasProducts = productRows.length > 0
 
     return {
       stack: [
@@ -545,13 +551,15 @@ export class LaboratoryOrderPdfService {
         },
         {
           table: {
-            widths: ['25%', '35%', '20%', '20%'],
+            widths: ['16%', '28%', '18%', '8%', '10%', '10%', '10%'],
             headerRows: hasProducts ? 1 : 0,
             dontBreakRows: true,
             body: productTableBody,
           },
           layout: 'lightHorizontalLines',
         },
+        { text: '', margin: [0, 8, 0, 4] },
+        this.buildTotalsTable(order),
         { text: '', margin: [0, 6, 0, 6] },
         {
           table: {
@@ -709,6 +717,7 @@ export class LaboratoryOrderPdfService {
     name?: string
     brand?: string
     code?: string
+    unitPrice?: number
   }> {
     if (Array.isArray(order?.products) && order.products.length > 0) {
       return order.products
@@ -734,6 +743,21 @@ export class LaboratoryOrderPdfService {
           alignment: 'center',
           margin: [0, 2, 0, 2],
         },
+        {
+          text: this.formatMoney(this.getLineUnitPrice(lineItem)),
+          alignment: 'right',
+          margin: [0, 2, 0, 2],
+        },
+        {
+          text: this.formatMoney(this.getLineDiscount(lineItem)),
+          alignment: 'right',
+          margin: [0, 2, 0, 2],
+        },
+        {
+          text: this.formatMoney(this.getLineNetTotal(lineItem)),
+          alignment: 'right',
+          margin: [0, 2, 0, 2],
+        },
       ])
     }
 
@@ -745,10 +769,55 @@ export class LaboratoryOrderPdfService {
         { text: product.name || '-', margin: [0, 2, 0, 2] },
         { text: product.brand || '-', margin: [0, 2, 0, 2] },
         { text: '1', alignment: 'center', margin: [0, 2, 0, 2] },
+        { text: this.formatMoney(product.unitPrice || 0), alignment: 'right', margin: [0, 2, 0, 2] },
+        { text: this.formatMoney(0), alignment: 'right', margin: [0, 2, 0, 2] },
+        { text: this.formatMoney(product.unitPrice || 0), alignment: 'right', margin: [0, 2, 0, 2] },
       ])
     }
 
     return []
+  }
+
+  private buildTotalsTable(order: any): Content {
+    const subtotal = this.getSubtotal(order)
+    const totalDiscount = this.getTotalDiscount(order)
+    const total = this.getTotal(order)
+
+    return {
+      table: {
+        widths: ['50%', '50%'],
+        body: [
+          [
+            {
+              text: 'Subtotal',
+              bold: true,
+              alignment: 'right',
+              fillColor: '#F5F5F5',
+            },
+            { text: this.formatMoney(subtotal), alignment: 'right' },
+          ],
+          [
+            {
+              text: 'Descuento',
+              bold: true,
+              alignment: 'right',
+              fillColor: '#F5F5F5',
+            },
+            { text: `-${this.formatMoney(totalDiscount)}`, alignment: 'right' },
+          ],
+          [
+            {
+              text: 'Total',
+              bold: true,
+              alignment: 'right',
+              fillColor: '#E3F2FD',
+            },
+            { text: this.formatMoney(total), alignment: 'right', bold: true },
+          ],
+        ],
+      },
+      layout: 'lightHorizontalLines',
+    }
   }
 
   private getProductSectionTitle(order: any): string {
@@ -760,4 +829,48 @@ export class LaboratoryOrderPdfService {
         : 'PDF.LABORATORY_ORDER.PRODUCT_DATA'
     )
   }
+
+    private getLineUnitPrice(lineItem: any): number {
+      const unitPrice = Number(lineItem?.unitPrice || lineItem?.product?.unitPrice || 0)
+      return Number.isFinite(unitPrice) ? unitPrice : 0
+    }
+
+    private getLineDiscount(lineItem: any): number {
+      const discount = Number(lineItem?.discount || 0)
+      return Number.isFinite(discount) ? discount : 0
+    }
+
+    private getLineGrossTotal(lineItem: any): number {
+      return Number(
+        (this.getLineUnitPrice(lineItem) * Number(lineItem?.quantity || 1)).toFixed(2)
+      )
+    }
+
+    private getLineNetTotal(lineItem: any): number {
+      return Number(
+        Math.max(this.getLineGrossTotal(lineItem) - this.getLineDiscount(lineItem), 0).toFixed(2)
+      )
+    }
+
+    private getSubtotal(order: any): number {
+      const lineItems = Array.isArray(order?.lineItems) ? order.lineItems : []
+      return Number(
+        lineItems.reduce((sum: number, lineItem: any) => sum + this.getLineGrossTotal(lineItem), 0).toFixed(2)
+      )
+    }
+
+    private getTotalDiscount(order: any): number {
+      const lineItems = Array.isArray(order?.lineItems) ? order.lineItems : []
+      return Number(
+        lineItems.reduce((sum: number, lineItem: any) => sum + this.getLineDiscount(lineItem), 0).toFixed(2)
+      )
+    }
+
+    private getTotal(order: any): number {
+      return Number((this.getSubtotal(order) - this.getTotalDiscount(order)).toFixed(2))
+    }
+
+    private formatMoney(value: number): string {
+      return Number(value || 0).toFixed(2)
+    }
 }

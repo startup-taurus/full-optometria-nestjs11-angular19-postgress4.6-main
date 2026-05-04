@@ -284,6 +284,9 @@
                       <th>Producto</th>
                       <th>Marca</th>
                       <th class="text-center">Cant.</th>
+                      <th class="text-end">P. Unit.</th>
+                      <th class="text-end">Desc.</th>
+                      <th class="text-end">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -292,12 +295,27 @@
                       <td>{{ row.name }}</td>
                       <td>{{ row.brand }}</td>
                       <td class="text-center">{{ row.quantity }}</td>
+                      <td class="text-end">${{ row.unitPrice | number:'1.2-2' }}</td>
+                      <td class="text-end text-danger">-${{ row.discount | number:'1.2-2' }}</td>
+                      <td class="text-end fw-semibold">${{ row.total | number:'1.2-2' }}</td>
                     </tr>
                     <tr *ngIf="getOrderProductRows().length === 0">
-                      <td colspan="4" class="text-center text-muted">-</td>
+                      <td colspan="7" class="text-center text-muted">-</td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              <div class="row mt-3" *ngIf="getOrderProductRows().length > 0">
+                <div class="col-md-4 mb-2">
+                  <div class="data-field"><strong>Subtotal:</strong> <span>${{ getSubtotal() | number:'1.2-2' }}</span></div>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <div class="data-field"><strong>Descuento total:</strong> <span class="text-danger">-${{ getTotalDiscount() | number:'1.2-2' }}</span></div>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <div class="data-field"><strong>Total:</strong> <span class="fw-semibold">${{ getTotal() | number:'1.2-2' }}</span></div>
+                </div>
               </div>
 
               <div class="row mt-3">

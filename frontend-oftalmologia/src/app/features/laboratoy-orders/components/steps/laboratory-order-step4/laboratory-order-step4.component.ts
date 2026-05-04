@@ -115,13 +115,25 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
 
     const currentLineItems = this.getCurrentLineItemsByProductId()
     this.lineItems = this.selectedProducts.map((product) => {
-      const currentQuantity = currentLineItems.get(product.id)
+      const currentLineItem = currentLineItems.get(product.id)
       return {
         productId: product.id,
         quantity:
-          typeof currentQuantity === 'number' && currentQuantity > 0
-            ? currentQuantity
+          typeof currentLineItem?.quantity === 'number' &&
+          currentLineItem.quantity > 0
+            ? currentLineItem.quantity
             : 1,
+        discount: this.normalizeDiscountValue(
+          product.id,
+          typeof currentLineItem?.discount === 'number'
+            ? currentLineItem.discount
+            : 0,
+          typeof currentLineItem?.quantity === 'number' &&
+            currentLineItem.quantity > 0
+            ? currentLineItem.quantity
+            : 1
+        ),
+        unitPrice: Number(product.unitPrice || 0),
       }
     })
 
@@ -138,7 +150,7 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
 
     this.formGroup.patchValue(
       {
-        lineItems: this.lineItems,
+        lineItems: this.toFormLineItems(this.lineItems),
         frameBrand: productBrands.join(', '),
         frameModel: productNames.join(', '),
       },
@@ -146,9 +158,12 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
     )
   }
 
-  private getCurrentLineItemsByProductId(): Map<string, number> {
+  private getCurrentLineItemsByProductId(): Map<
+    string,
+    { quantity: number; discount: number }
+  > {
     const current = this.formGroup.get('lineItems')?.value
-    const map = new Map<string, number>()
+    const map = new Map<string, { quantity: number; discount: number }>()
 
     if (!Array.isArray(current)) {
       return map
@@ -160,7 +175,14 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
         typeof line.productId === 'string' &&
         Number.isFinite(Number(line.quantity))
       ) {
-        map.set(line.productId, Math.max(1, Number(line.quantity)))
+        map.set(line.productId, {
+          quantity: Math.max(1, Number(line.quantity)),
+          discount: this.normalizeDiscountValue(
+            line.productId,
+            Number(line.discount || 0),
+            Math.max(1, Number(line.quantity))
+          ),
+        })
       }
     })
 
@@ -186,12 +208,23 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
     const normalized = Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1
 
     this.lineItems = this.lineItems.map((line) =>
-      line.productId === productId ? { ...line, quantity: normalized } : line
+      line.productId === productId
+        ? {
+            ...line,
+            quantity: normalized,
+            discount: this.normalizeDiscountValue(
+              productId,
+              Number(line.discount || 0),
+              normalized
+            ),
+            unitPrice: this.getLineItemUnitPrice(productId),
+          }
+        : line
     )
 
     this.formGroup.patchValue(
       {
-        lineItems: this.lineItems,
+        lineItems: this.toFormLineItems(this.lineItems),
       },
       { emitEvent: false }
     )
@@ -221,6 +254,81 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
     return Number(lineItem?.quantity || 1)
   }
 
+  public getLineItemUnitPrice(productId: string): number {
+    const lineItem = this.lineItems.find((item) => item.productId === productId)
+    if (typeof lineItem?.unitPrice === 'number') {
+      return Number(lineItem.unitPrice || 0)
+    }
+
+    const product = this.getLineItemProduct(productId)
+    return Number(product?.unitPrice || 0)
+  }
+
+  public getLineItemGrossTotal(productId: string): number {
+    return Number(
+      (this.getLineItemUnitPrice(productId) * this.getLineItemQuantity(productId)).toFixed(2)
+    )
+  }
+
+  public getLineItemDiscount(productId: string): number {
+    const lineItem = this.lineItems.find((item) => item.productId === productId)
+    return Number(lineItem?.discount || 0)
+  }
+
+  public getLineItemNetTotal(productId: string): number {
+    return Number(
+      Math.max(
+        this.getLineItemGrossTotal(productId) - this.getLineItemDiscount(productId),
+        0
+      ).toFixed(2)
+    )
+  }
+
+  public getSubtotal(): number {
+    return Number(
+      this.lineItems
+        .reduce((sum, line) => sum + this.getLineItemGrossTotal(line.productId), 0)
+        .toFixed(2)
+    )
+  }
+
+  public getTotalDiscount(): number {
+    return Number(
+      this.lineItems
+        .reduce((sum, line) => sum + this.getLineItemDiscount(line.productId), 0)
+        .toFixed(2)
+    )
+  }
+
+  public getTotal(): number {
+    return Number((this.getSubtotal() - this.getTotalDiscount()).toFixed(2))
+  }
+
+  public onDiscountChange(productId: string, value: string): void {
+    const normalizedDiscount = this.normalizeDiscountValue(
+      productId,
+      Number(value),
+      this.getLineItemQuantity(productId)
+    )
+
+    this.lineItems = this.lineItems.map((line) =>
+      line.productId === productId
+        ? {
+            ...line,
+            discount: normalizedDiscount,
+            unitPrice: this.getLineItemUnitPrice(productId),
+          }
+        : line
+    )
+
+    this.formGroup.patchValue(
+      {
+        lineItems: this.toFormLineItems(this.lineItems),
+      },
+      { emitEvent: false }
+    )
+  }
+
   public canIncrementQuantity(productId: string): boolean {
     const stock = this.getProductStock(productId)
     return stock <= 0 || this.getLineItemQuantity(productId) < stock
@@ -236,7 +344,7 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
 
     this.formGroup.patchValue({
       productIds: nextProductIds,
-      lineItems: nextLineItems,
+      lineItems: this.toFormLineItems(nextLineItems),
     })
   }
 
@@ -295,5 +403,34 @@ export class LaboratoryOrderStep4Component implements OnInit, OnDestroy {
 
   public isFrameTypeSelected(value: string): boolean {
     return this.selectedFrameType === value
+  }
+
+  private normalizeDiscountValue(
+    productId: string,
+    value: number,
+    quantity: number
+  ): number {
+    const parsed = Number(value)
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return 0
+    }
+
+    const grossTotal = Number(
+      (this.getLineItemUnitPrice(productId) * Math.max(1, quantity)).toFixed(2)
+    )
+
+    return Number(Math.min(parsed, grossTotal).toFixed(2))
+  }
+
+  private toFormLineItems(lineItems: LaboratoryOrderLineItem[]): Array<{
+    productId: string
+    quantity: number
+    discount?: number
+  }> {
+    return lineItems.map((line) => ({
+      productId: line.productId,
+      quantity: Number(line.quantity || 1),
+      discount: Number(line.discount || 0),
+    }))
   }
 }
