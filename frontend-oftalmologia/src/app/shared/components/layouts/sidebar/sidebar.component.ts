@@ -242,9 +242,7 @@ export class SidebarComponent implements OnInit {
           ]
 
           this.activeMenuItems = matchingObjs
-          this.filteredMenuItems.forEach((menu: MenuItemType) => {
-            menu.collapsed = !matchingObjs.includes(menu.key!)
-          })
+   
         }
       }
     }
