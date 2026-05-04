@@ -35,20 +35,25 @@
     </div>
 
     <div class="mb-3" *ngIf="session?.qrCode && hasValidImageQr">
-      <label class="form-label">{{ 'NOTIFICATIONS.SESSION.QR_LABEL' | translate }}</label>
-      <img [src]="session?.qrCode || ''"
-           [alt]="'NOTIFICATIONS.SESSION.QR_LABEL' | translate"
-           class="img-fluid border rounded-3 p-2 qr-preview"
-           (load)="onQrLoad()"
-           (error)="onQrError($event)" />
-      <small class="text-muted d-block mt-2">{{ 'PROFILE.WHATSAPP.SCAN_QR' | translate }}</small>
-      <small class="text-muted d-block">{{ 'PROFILE.WHATSAPP.QR_AUTO_REFRESH' | translate }}</small>
-      <small class="d-block" [ngClass]="isQrLikelyStale ? 'text-warning' : 'text-muted'" *ngIf="session?.updatedAt">
-        {{ 'PROFILE.WHATSAPP.QR_LAST_UPDATED' | translate:{ time: (session?.updatedAt | date:'shortTime') } }}
-      </small>
-      <small class="text-warning d-block" *ngIf="isQrLikelyStale">
-        {{ 'PROFILE.WHATSAPP.QR_STALE_HINT' | translate }}
-      </small>
+      <div class="qr-container">
+        <img
+          [src]="session?.qrCode || ''"
+          [alt]="'NOTIFICATIONS.SESSION.QR_LABEL' | translate"
+          class="qr-preview qr-large"
+          (load)="onQrLoad()"
+          (error)="onQrError($event)" />
+      </div>
+
+      <div class="mt-2 text-center small qr-hints">
+        <span class="text-muted d-block">{{ 'PROFILE.WHATSAPP.SCAN_QR' | translate }}</span>
+        <span class="text-muted d-block">{{ 'PROFILE.WHATSAPP.QR_AUTO_REFRESH' | translate }}</span>
+        <small class="d-block" [ngClass]="isQrLikelyStale ? 'text-warning' : 'text-muted'" *ngIf="session?.updatedAt">
+          {{ 'PROFILE.WHATSAPP.QR_LAST_UPDATED' | translate:{ time: (session?.updatedAt | date:'shortTime') } }}
+        </small>
+        <small class="text-warning d-block" *ngIf="isQrLikelyStale">
+          {{ 'PROFILE.WHATSAPP.QR_STALE_HINT' | translate }}
+        </small>
+      </div>
     </div>
 
     <div class="mb-3" *ngIf="session?.status === 'qr_ready' && session?.qrCode && !hasValidImageQr">
