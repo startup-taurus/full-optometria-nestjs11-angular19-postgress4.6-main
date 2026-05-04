@@ -1021,8 +1021,11 @@ export class PurchaseOrdersService {
       .leftJoinAndSelect('po.laboratoryOrder', 'laboratoryOrder')
       .leftJoinAndSelect('po.items', 'items')
       .leftJoinAndSelect('po.invoice', 'invoice')
-      .where('po.branchId = :branchId', { branchId })
-      .andWhere('po.companyId = :companyId', { companyId });
+      .where('po.branchId = :branchId', { branchId });
+
+    if (companyId !== null && companyId !== undefined) {
+      queryBuilder.andWhere('po.companyId = :companyId', { companyId });
+    }
 
     if (search) {
       queryBuilder.andWhere(
@@ -1146,8 +1149,13 @@ export class PurchaseOrdersService {
   }
 
   async findOne(id: string, branchId: string, companyId: string | null) {
+    const where = this.withCompanyScope<PurchaseOrder>(
+      { id, branchId },
+      companyId,
+    );
+
     const purchaseOrder = await this.purchaseOrderRepository.findOne({
-      where: { id, branchId, companyId },
+      where,
       relations: ['client', 'laboratoryOrder', 'items', 'invoice'],
     });
 
