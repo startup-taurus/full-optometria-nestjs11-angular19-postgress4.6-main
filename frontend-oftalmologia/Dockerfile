@@ -10,6 +10,13 @@ RUN sed -i "s|apiBaseUrl: '.*'|apiBaseUrl: '${FRONTEND_API_BASE_URL}'|" src/envi
 	sed -i "s|fileBaseUrl: '.*'|fileBaseUrl: '${FRONTEND_FILE_BASE_URL}'|" src/environments/environment.prod.ts
 RUN npm run build
 
+RUN find /app/dist/osen/browser \
+	-type f \
+	\( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.svg" \
+	   -o -name "*.json" -o -name "*.txt" -o -name "*.xml" -o -name "*.map" \) \
+	-size +1k \
+	-exec gzip -9 -k {} \;
+
 # Nginx stage
 FROM nginx:1.25-alpine
 RUN rm -rf /usr/share/nginx/html/*
