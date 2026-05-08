@@ -36,6 +36,8 @@ type SessionRuntime = {
   updatedAt: number;
   lastEventAt: number;
   lastRecreateAt: number;
+  lastSendAt: number;
+  idleShutdownTimer: NodeJS.Timeout | null;
 };
 
 @Injectable()
@@ -52,6 +54,9 @@ export class WhatsAppWebJsProvider
   private readonly freshQrMs = 60000;
   private readonly bootingTimeoutMs = 90000;
   private readonly recreateCooldownMs = 20000;
+  private readonly idleShutdownMs = this.resolveIdleShutdownMs();
+  private readonly maxConcurrentRuntimes = this.resolveMaxConcurrentRuntimes();
+  private readonly cacheRetentionMs = 7 * 24 * 60 * 60 * 1000;
   private readonly authBasePath = this.resolveAuthBasePath();
   private readonly legacyAuthBasePath = path.resolve(
     process.cwd(),
@@ -65,6 +70,7 @@ export class WhatsAppWebJsProvider
 
   async onApplicationShutdown(): Promise<void> {
     await this.destroyAll();
+    await this.cleanupOldCacheEntries();
   }
 
   async ensureRuntime(sessionKey: string): Promise<WhatsAppSessionSnapshot> {
@@ -228,13 +234,33 @@ export class WhatsAppWebJsProvider
     return snapshot.connected || snapshot.state === 'ready';
   }
 
+  async hasAuthOnDisk(sessionKey: string): Promise<boolean> {
+    const candidates = [
+      path.join(this.authBasePath, `session-${sessionKey}`),
+      path.join(this.authBasePath, sessionKey),
+      path.join(this.authBasePath, '.wwebjs_auth', `session-${sessionKey}`),
+      path.join(this.legacyAuthBasePath, `session-${sessionKey}`),
+    ];
+
+    for (const candidate of candidates) {
+      try {
+        await fs.access(candidate);
+        return true;
+      } catch {
+        continue;
+      }
+    }
+
+    return false;
+  }
+
   async sendMessage(
     sessionKey: string,
     phone: string,
     message: string,
   ): Promise<SendMessageResult> {
     await this.ensureRuntime(sessionKey);
-    await this.waitForState(sessionKey, ['ready'], 15000);
+    await this.waitForState(sessionKey, ['ready'], 30000);
 
     const runtime = this.sessions.get(sessionKey);
     if (!runtime || !runtime.connected) {
@@ -243,6 +269,9 @@ export class WhatsAppWebJsProvider
 
     const jid = this.toWhatsAppJid(phone);
     const sent = await runtime.client.sendMessage(jid, message);
+
+    runtime.lastSendAt = Date.now();
+    this.scheduleIdleShutdown(sessionKey, runtime);
 
     return {
       providerMessageId: sent?.id?._serialized || `${Date.now()}`,
@@ -324,6 +353,8 @@ export class WhatsAppWebJsProvider
 
     const nextAttempt = (existing?.attempt ?? 0) + 1;
 
+    await this.evictLruRuntimeIfNeeded(sessionKey);
+
     await fs.mkdir(this.authBasePath, { recursive: true });
     await this.cleanupChromiumProfileLocks(sessionKey);
 
@@ -352,7 +383,30 @@ export class WhatsAppWebJsProvider
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
-          '--window-size=1366,768',
+          '--window-size=800,600',
+          '--disable-extensions',
+          '--disable-component-extensions-with-background-pages',
+          '--disable-default-apps',
+          '--disable-background-timer-throttling',
+          '--disable-background-networking',
+          '--disable-breakpad',
+          '--disable-component-update',
+          '--disable-domain-reliability',
+          '--disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process,Translate,BackForwardCache',
+          '--disable-hang-monitor',
+          '--disable-ipc-flooding-protection',
+          '--disable-popup-blocking',
+          '--disable-prompt-on-repost',
+          '--disable-renderer-backgrounding',
+          '--disable-sync',
+          '--metrics-recording-only',
+          '--mute-audio',
+          '--no-first-run',
+          '--no-default-browser-check',
+          '--no-pings',
+          '--password-store=basic',
+          '--use-mock-keychain',
+          '--memory-pressure-off',
         ],
         timeout: 120000,
         executablePath: this.getPuppeteerExecutablePath(),
@@ -377,6 +431,8 @@ export class WhatsAppWebJsProvider
       updatedAt: Date.now(),
       lastEventAt: Date.now(),
       lastRecreateAt: Date.now(),
+      lastSendAt: Date.now(),
+      idleShutdownTimer: null,
     };
 
     this.sessions.set(sessionKey, runtime);
@@ -423,6 +479,7 @@ export class WhatsAppWebJsProvider
       });
       this.logger.log(`Sesión ${sessionKey} conectada en WhatsApp Web`);
       console.log(`[WA_READY] sessionKey=${sessionKey}, runtimeId=${runtime.runtimeId.slice(0, 8)}`);
+      this.scheduleIdleShutdown(sessionKey, runtime);
     });
 
     client.on('authenticated', () => {
@@ -532,6 +589,11 @@ export class WhatsAppWebJsProvider
     runtime: SessionRuntime,
     keepSessionSlot: boolean,
   ): Promise<void> {
+    if (runtime.idleShutdownTimer) {
+      clearTimeout(runtime.idleShutdownTimer);
+      runtime.idleShutdownTimer = null;
+    }
+
     this.rejectStateWaiters(
       runtime,
       new Error(`Runtime cerrado para sesión ${sessionKey}`),
@@ -893,6 +955,127 @@ export class WhatsAppWebJsProvider
     });
 
     WhatsAppWebJsProvider.unhandledRejectionGuardApplied = true;
+  }
+
+  private scheduleIdleShutdown(
+    sessionKey: string,
+    runtime: SessionRuntime,
+  ): void {
+    if (runtime.idleShutdownTimer) {
+      clearTimeout(runtime.idleShutdownTimer);
+      runtime.idleShutdownTimer = null;
+    }
+
+    if (!runtime.connected || runtime.state !== 'ready') {
+      return;
+    }
+
+    if (this.idleShutdownMs <= 0) {
+      return;
+    }
+
+    runtime.idleShutdownTimer = setTimeout(() => {
+      void this.withSessionLock(sessionKey, 'idle_shutdown', async () => {
+        const current = this.sessions.get(sessionKey);
+        if (!current || current.runtimeId !== runtime.runtimeId) {
+          return;
+        }
+
+        const idleMs = Date.now() - current.lastSendAt;
+        if (idleMs < this.idleShutdownMs) {
+          this.scheduleIdleShutdown(sessionKey, current);
+          return;
+        }
+
+        console.log(
+          `[WA_IDLE_SHUTDOWN] sessionKey=${sessionKey}, runtimeId=${current.runtimeId.slice(0, 8)}, idleMs=${idleMs}`,
+        );
+        this.logger.log(
+          `Cerrando Chromium por inactividad: sesión ${sessionKey} (idle ${Math.round(idleMs / 1000)}s)`,
+        );
+        await this.destroyRuntime(sessionKey, current, false);
+      });
+    }, this.idleShutdownMs);
+
+    if (typeof runtime.idleShutdownTimer.unref === 'function') {
+      runtime.idleShutdownTimer.unref();
+    }
+  }
+
+  private async evictLruRuntimeIfNeeded(incomingSessionKey: string): Promise<void> {
+    if (this.maxConcurrentRuntimes <= 0) {
+      return;
+    }
+
+    if (this.sessions.size < this.maxConcurrentRuntimes) {
+      return;
+    }
+
+    let oldestKey: string | null = null;
+    let oldestRuntime: SessionRuntime | null = null;
+
+    for (const [key, runtime] of this.sessions.entries()) {
+      if (key === incomingSessionKey) {
+        continue;
+      }
+
+      if (!oldestRuntime || runtime.lastEventAt < oldestRuntime.lastEventAt) {
+        oldestKey = key;
+        oldestRuntime = runtime;
+      }
+    }
+
+    if (!oldestKey || !oldestRuntime) {
+      return;
+    }
+
+    this.logger.warn(
+      `LRU eviction WhatsApp runtime: ${oldestKey} (cap=${this.maxConcurrentRuntimes})`,
+    );
+    await this.destroyRuntime(oldestKey, oldestRuntime, false);
+  }
+
+  private async cleanupOldCacheEntries(): Promise<void> {
+    const cachePath = path.join(this.authBasePath, '.wwebjs_cache');
+    let entries: string[] = [];
+
+    try {
+      entries = await fs.readdir(cachePath);
+    } catch {
+      return;
+    }
+
+    const cutoff = Date.now() - this.cacheRetentionMs;
+
+    for (const entry of entries) {
+      const entryPath = path.join(cachePath, entry);
+      try {
+        const stat = await fs.stat(entryPath);
+        if (stat.mtimeMs < cutoff) {
+          await fs.rm(entryPath, { recursive: true, force: true });
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  private resolveIdleShutdownMs(): number {
+    const raw = Number(process.env.WHATSAPP_IDLE_SHUTDOWN_MS);
+    if (Number.isFinite(raw) && raw >= 60000) {
+      return Math.trunc(raw);
+    }
+
+    return 20 * 60 * 1000;
+  }
+
+  private resolveMaxConcurrentRuntimes(): number {
+    const raw = Number(process.env.WHATSAPP_MAX_RUNTIMES);
+    if (Number.isFinite(raw) && raw >= 1) {
+      return Math.trunc(raw);
+    }
+
+    return 25;
   }
 
   private formatErrorMessage(error: unknown): string {

@@ -54,6 +54,7 @@ export interface WhatsAppProvider {
   startSession(sessionKey: string): Promise<StartSessionResult>;
   refreshQr(sessionKey: string): Promise<string>;
   isSessionConnected(sessionKey: string): Promise<boolean>;
+  hasAuthOnDisk(sessionKey: string): Promise<boolean>;
   sendMessage(
     sessionKey: string,
     phone: string,

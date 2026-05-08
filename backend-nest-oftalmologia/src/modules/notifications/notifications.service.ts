@@ -433,7 +433,7 @@ export class NotificationsService {
     }
   }
 
-  @Cron('* * * * *')
+  @Cron('0 8 * * *')
   async processAutomaticAppointmentReminders() {
     if (this.appointmentReminderCronRunning) {
       this.logger.warn('Se omite ejecución de recordatorios automáticos por solapamiento');
@@ -441,21 +441,21 @@ export class NotificationsService {
     }
 
     this.appointmentReminderCronRunning = true;
-    const toleranceMs = 2 * 60 * 1000;
     const runStartedAt = new Date();
-    const runStartedAtMs = runStartedAt.getTime();
-    const previousRunAtMs = this.appointmentReminderLastRunAt?.getTime();
-    const windowBaseStartMs = previousRunAtMs
-      ? previousRunAtMs - toleranceMs
-      : runStartedAtMs - toleranceMs;
-    const windowBaseEndMs = runStartedAtMs + toleranceMs;
+    const startedAtMs = Date.now();
 
     let sessionsEvaluated = 0;
     let shiftsEvaluated = 0;
     let shiftsDispatched = 0;
-    const startedAtMs = Date.now();
 
     try {
+      const tomorrowStart = new Date(runStartedAt);
+      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+      tomorrowStart.setHours(0, 0, 0, 0);
+
+      const tomorrowEnd = new Date(tomorrowStart);
+      tomorrowEnd.setHours(23, 59, 59, 999);
+
       const connectedSessions = await this.whatsappSessionRepository.find({
         where: {
           status: WhatsAppSessionStatus.CONNECTED,
@@ -463,69 +463,192 @@ export class NotificationsService {
         take: 200,
       });
 
-      for (const session of connectedSessions) {
-        sessionsEvaluated += 1;
-        if (!session.branchId || !session.userId) {
+      const eligibleSessions = connectedSessions.filter(
+        (s) => s.branchId && s.userId,
+      );
+
+      if (!eligibleSessions.length) {
+        this.logger.log('No hay sesiones conectadas elegibles para recordatorios');
+        return;
+      }
+
+      const branchIds = Array.from(
+        new Set(eligibleSessions.map((s) => s.branchId)),
+      );
+      const userIds = Array.from(
+        new Set(eligibleSessions.map((s) => s.userId)),
+      );
+
+      const shifts = await this.shiftRepository.find({
+        where: {
+          branchId: In(branchIds),
+          createdByUserId: In(userIds),
+          appointmentDate: Between(tomorrowStart, tomorrowEnd),
+        },
+        relations: ['patient'],
+        order: {
+          appointmentDate: 'ASC',
+          id: 'ASC',
+        },
+      });
+
+      shiftsEvaluated = shifts.length;
+
+      if (!shifts.length) {
+        this.logger.log(
+          `Recordatorios automáticos: sin citas para ${tomorrowStart.toISOString().slice(0, 10)}`,
+        );
+        return;
+      }
+
+      const patientIds = Array.from(
+        new Set(shifts.map((s) => s.patientId).filter(Boolean) as string[]),
+      );
+
+      const preferences = patientIds.length
+        ? await this.patientContactPreferenceRepository.find({
+            where: {
+              branchId: In(branchIds),
+              patientId: In(patientIds),
+            },
+          })
+        : [];
+
+      const preferenceMap = new Map<string, PatientContactPreference>();
+      for (const pref of preferences) {
+        preferenceMap.set(`${pref.branchId}:${pref.patientId}`, pref);
+      }
+
+      const dispatchTolerance = 30 * 60 * 1000;
+      const recentLogsLowerBound = new Date(tomorrowStart.getTime() - dispatchTolerance);
+      const recentLogsUpperBound = new Date(tomorrowEnd.getTime() + dispatchTolerance);
+
+      const recentLogs = patientIds.length
+        ? await this.messageDispatchLogRepository.find({
+            where: {
+              branchId: In(branchIds),
+              patientId: In(patientIds),
+              channel: 'whatsapp',
+              status: In([
+                DispatchStatus.PENDING,
+                DispatchStatus.PROCESSING,
+                DispatchStatus.SENT,
+              ]),
+              scheduledAt: Between(recentLogsLowerBound, recentLogsUpperBound),
+            },
+            select: ['branchId', 'patientId', 'scheduledAt'],
+          })
+        : [];
+
+      const dispatchedKeys = new Set<string>();
+      for (const log of recentLogs) {
+        dispatchedKeys.add(`${log.branchId}:${log.patientId}`);
+      }
+
+      const inferredPhoneCache = new Map<string, string | null>();
+
+      const sessionsByKey = new Map<string, WhatsAppSession>();
+      for (const session of eligibleSessions) {
+        sessionsByKey.set(`${session.branchId}:${session.userId}`, session);
+      }
+
+      const ruleCache = new Map<string, ReminderRule>();
+      const quietBranches = new Set<string>();
+
+      for (const shift of shifts) {
+        if (!shift.patientId || !shift.patient || !shift.createdByUserId) {
           continue;
         }
 
-        const rule = await this.getOrCreateReminderRule(
-          session.branchId,
-          session.companyId || null,
+        const session = sessionsByKey.get(`${shift.branchId}:${shift.createdByUserId}`);
+        if (!session) {
+          continue;
+        }
+
+        sessionsEvaluated += 1;
+
+        const ruleKey = `${session.branchId}:${session.companyId || ''}`;
+        let rule = ruleCache.get(ruleKey);
+        if (!rule) {
+          rule = await this.getOrCreateReminderRule(
+            session.branchId,
+            session.companyId || null,
+          );
+          ruleCache.set(ruleKey, rule);
+        }
+
+        if (!rule.isActive) {
+          continue;
+        }
+
+        if (this.isQuietHour(rule)) {
+          if (!quietBranches.has(session.branchId)) {
+            quietBranches.add(session.branchId);
+            this.logger.log(
+              `Sucursal ${session.branchId} en quiet hours; se omite envío`,
+            );
+          }
+          continue;
+        }
+
+        const dedupeKey = `${shift.branchId}:${shift.patientId}`;
+        if (dispatchedKeys.has(dedupeKey)) {
+          continue;
+        }
+
+        const preference = preferenceMap.get(dedupeKey);
+        if (preference && !preference.whatsappOptIn) {
+          continue;
+        }
+
+        const inferredCacheKey = `${session.branchId}:${session.companyId || ''}`;
+        let inferredConnectedPhone = inferredPhoneCache.get(inferredCacheKey);
+        if (inferredConnectedPhone === undefined) {
+          inferredConnectedPhone = await this.inferConnectedPhoneFromRecentSuccessfulLogs(
+            session.branchId,
+            session.companyId || null,
+          );
+          inferredPhoneCache.set(inferredCacheKey, inferredConnectedPhone);
+        }
+
+        const phone = this.resolvePatientPhone(
+          shift.patient,
+          preference?.preferredPhone,
+          session.connectedPhone,
+          inferredConnectedPhone,
         );
 
-        if (!rule.isActive || this.isQuietHour(rule)) {
+        if (!phone) {
           continue;
         }
 
         const reminderHours = Number(rule.appointmentReminderHoursBefore || 24);
-        const reminderMs = reminderHours * 60 * 60 * 1000;
-        const windowStart = new Date(windowBaseStartMs + reminderMs);
-        const windowEnd = new Date(windowBaseEndMs + reminderMs);
-
-        const where: any = {
-          branchId: session.branchId,
-          createdByUserId: session.userId,
-          appointmentDate: Between(windowStart, windowEnd),
-        };
-
-        if (session.companyId) {
-          where.companyId = session.companyId;
-        } else {
-          where.companyId = IsNull();
-        }
-
-        const shifts = await this.shiftRepository.find({
-          where,
-          relations: ['patient'],
-          order: {
-            appointmentDate: 'ASC',
-            id: 'ASC',
-          },
-        });
-
-        shiftsEvaluated += shifts.length;
-
-        const inferredConnectedPhone =
-          await this.inferConnectedPhoneFromRecentSuccessfulLogs(
-            session.branchId,
-            session.companyId || null,
-          );
-
-        for (const shift of shifts) {
-          const dispatched = await this.dispatchAppointmentReminder(
-            shift,
-          session.branchId,
-          session.companyId || null,
-            session.userId,
-            reminderHours,
-            inferredConnectedPhone,
+        const scheduledAt = new Date(
+          shift.appointmentDate.getTime() - reminderHours * 60 * 60 * 1000,
         );
 
-          if (dispatched) {
-            shiftsDispatched += 1;
-          }
-        }
+        const content = this.interpolateTemplate(
+          'Hola {{nombre}}, te recordamos que tienes una cita medica manana a las {{hora}}.',
+          {
+            nombre: `${shift.patient.firstName} ${shift.patient.lastName}`.trim(),
+            hora: this.toHourString(shift.appointmentDate),
+          },
+        );
+
+        await this.dispatchAutomaticMessage({
+          branchId: session.branchId,
+          companyId: session.companyId || null,
+          patientId: shift.patientId,
+          phone,
+          content,
+          sessionKey: session.sessionKey,
+          scheduledAt,
+          useThrottle: true,
+          source: 'appointment_reminder',
+        });
+
+        dispatchedKeys.add(dedupeKey);
+        shiftsDispatched += 1;
       }
 
       this.logger.log(
@@ -659,95 +782,6 @@ export class NotificationsService {
     return session;
   }
 
-  private async dispatchAppointmentReminder(
-    shift: Shift,
-    branchId: string,
-    companyId: string | null,
-    senderUserId: string,
-    reminderHours: number,
-    inferredConnectedPhone?: string | null,
-  ): Promise<boolean> {
-    if (!shift.patientId || !shift.patient || !shift.createdByUserId) {
-      return false;
-    }
-
-    if (shift.createdByUserId !== senderUserId) {
-      return false;
-    }
-
-    const scheduledAt = new Date(
-      shift.appointmentDate.getTime() - reminderHours * 60 * 60 * 1000,
-    );
-
-    const alreadyDispatched = await this.hasRecentDispatch(
-      shift.patientId,
-      branchId,
-      companyId,
-      scheduledAt,
-    );
-
-    if (alreadyDispatched) {
-      return false;
-    }
-
-    const preference = await this.patientContactPreferenceRepository.findOne({
-      where: CompanyFilterUtil.buildWhereCondition(
-        {
-          branchId,
-          patientId: shift.patientId,
-        },
-        companyId,
-      ),
-    });
-
-    if (preference && !preference.whatsappOptIn) {
-      return false;
-    }
-
-    const session = await this.getConnectedSessionForSender(
-      branchId,
-      companyId,
-      senderUserId,
-    );
-
-    if (!session) {
-      return false;
-    }
-
-    const phone = this.resolvePatientPhone(
-      shift.patient,
-      preference?.preferredPhone,
-      session.connectedPhone,
-      inferredConnectedPhone,
-    );
-
-    if (!phone) {
-      return false;
-    }
-
-    const content = this.interpolateTemplate(
-      'Hola {{nombre}}, te recordamos que tienes una cita medica manana a las {{hora}}.',
-      {
-        nombre: `${shift.patient.firstName} ${shift.patient.lastName}`.trim(),
-        hora: this.toHourString(shift.appointmentDate),
-      },
-    );
-
-    await this.dispatchAutomaticMessage({
-      branchId,
-      companyId,
-      patientId: shift.patientId,
-      phone,
-      content,
-      sessionKey: session.sessionKey,
-      scheduledAt,
-      useThrottle: true,
-      source: 'appointment_reminder',
-    });
-
-    return true;
-  }
-
   private async getConnectedSessionForSender(
     branchId: string,
     companyId: string | null,
@@ -784,36 +818,6 @@ export class NotificationsService {
     }
 
     return session;
-  }
-
-  private async hasRecentDispatch(
-    patientId: string,
-    branchId: string,
-    companyId: string | null,
-    scheduledAt: Date,
-  ): Promise<boolean> {
-    const toleranceMs = 60000;
-    const scheduledStart = new Date(scheduledAt.getTime() - toleranceMs);
-    const scheduledEnd = new Date(scheduledAt.getTime() + toleranceMs);
-
-    const count = await this.messageDispatchLogRepository.count({
-      where: CompanyFilterUtil.buildWhereCondition(
-        {
-          branchId,
-          patientId,
-          channel: 'whatsapp',
-          status: In([
-            DispatchStatus.PENDING,
-            DispatchStatus.PROCESSING,
-            DispatchStatus.SENT,
-          ]),
-          scheduledAt: Between(scheduledStart, scheduledEnd),
-        },
-        companyId,
-      ),
-    });
-
-    return count > 0;
   }
 
   private async dispatchAutomaticMessage(params: {
@@ -916,15 +920,21 @@ export class NotificationsService {
   }
 
   private async ensureValidQrForSession(session: WhatsAppSession): Promise<WhatsAppSession> {
+    if (session.status === WhatsAppSessionStatus.CONNECTED) {
+      const authExists = await this.whatsappProvider.hasAuthOnDisk(session.sessionKey);
+      if (authExists) {
+        return session;
+      }
+    }
+
     const snapshot = await this.withTimeout<WhatsAppSessionSnapshot | null>(
-      this.whatsappProvider.ensureRuntime(session.sessionKey),
+      this.whatsappProvider.getSessionSnapshot(session.sessionKey),
       this.sessionNormalizationTimeoutMs,
-      `ensureRuntime(${session.sessionKey})`,
+      `getSessionSnapshot(${session.sessionKey})`,
       () => null,
     );
 
     if (!snapshot) {
-
       return session;
     }
 
@@ -936,9 +946,6 @@ export class NotificationsService {
       return this.applySnapshotToSession(session, snapshot);
     }
 
-    // Durante reinicios/despliegues el runtime puede quedar en estados transitorios
-    // sin QR todavía. En ese caso conservamos el estado persistido para evitar
-    // desconexiones falsas en la UI y en la base de datos.
     if (snapshot.state === 'booting' || snapshot.state === 'authenticated') {
       return session;
     }
