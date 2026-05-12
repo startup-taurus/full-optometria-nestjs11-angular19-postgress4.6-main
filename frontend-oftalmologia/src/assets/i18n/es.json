@@ -608,6 +608,7 @@
       "BIRTH_DAY": "Día",
       "BIRTH_MONTH": "Mes",
       "BIRTH_YEAR": "Año",
+      "BIRTH_PLACEHOLDER": "Selecciona la fecha",
       "AGE": "Edad"
     },
     "MODAL": {
@@ -965,6 +966,7 @@
     "SAVE": "Guardar",
     "UPDATE": "Actualizar",
     "CANCEL": "Cancelar",
+    "DONE": "Listo",
     "CLOSE": "Cerrar",
     "ACTIVE": "Activo",
     "INACTIVE": "Inactivo",

@@ -161,91 +161,125 @@
           </div>
 
           <ng-container *ngIf="patientForm.get('birthMode')?.value === 'exact'">
-            <div class="row g-2">
-              <div class="col-4">
-                <input
-                  type="text"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  class="form-control form-control-lg"
-                  formControlName="birthDay"
-                  list="birthDayOptionsList"
-                  maxlength="2"
-                  [placeholder]="'PATIENT.FORM.BIRTH_DAY' | translate"
-                  [attr.aria-label]="'PATIENT.FORM.BIRTH_DAY' | translate"
-                  (input)="onBirthPartInput('birthDay', $event)"
-                  (blur)="onBirthPartBlur('birthDay')"
-                />
-                <datalist id="birthDayOptionsList">
-                  <option *ngFor="let day of birthDayOptions" [value]="day"></option>
-                </datalist>
+            <ng-container *ngIf="!isMobile">
+              <div class="row g-2">
+                <div class="col-4">
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="form-control form-control-lg"
+                    formControlName="birthDay"
+                    list="birthDayOptionsList"
+                    maxlength="2"
+                    [placeholder]="'PATIENT.FORM.BIRTH_DAY' | translate"
+                    [attr.aria-label]="'PATIENT.FORM.BIRTH_DAY' | translate"
+                    (input)="onBirthPartInput('birthDay', $event)"
+                    (blur)="onBirthPartBlur('birthDay')"
+                  />
+                  <datalist id="birthDayOptionsList">
+                    <option *ngFor="let day of birthDayOptions" [value]="day"></option>
+                  </datalist>
+                </div>
+                <div class="col-4">
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="form-control form-control-lg"
+                    formControlName="birthMonth"
+                    list="birthMonthOptionsList"
+                    maxlength="2"
+                    [placeholder]="'PATIENT.FORM.BIRTH_MONTH' | translate"
+                    [attr.aria-label]="'PATIENT.FORM.BIRTH_MONTH' | translate"
+                    (input)="onBirthPartInput('birthMonth', $event)"
+                    (blur)="onBirthPartBlur('birthMonth')"
+                  />
+                  <datalist id="birthMonthOptionsList">
+                    <option
+                      *ngFor="let month of birthMonthOptions"
+                      [value]="month.value"
+                      [attr.label]="month.labelKey | translate"
+                    >
+                      {{ month.labelKey | translate }}
+                    </option>
+                  </datalist>
+                </div>
+                <div class="col-4">
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="form-control form-control-lg"
+                    formControlName="birthYear"
+                    list="birthYearOptionsList"
+                    maxlength="4"
+                    [placeholder]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                    [attr.aria-label]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                    (input)="onBirthPartInput('birthYear', $event)"
+                    (blur)="onBirthPartBlur('birthYear')"
+                  />
+                  <datalist id="birthYearOptionsList">
+                    <option *ngFor="let year of birthYearOptions" [value]="year"></option>
+                  </datalist>
+                </div>
               </div>
-              <div class="col-4">
-                <input
-                  type="text"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  class="form-control form-control-lg"
-                  formControlName="birthMonth"
-                  list="birthMonthOptionsList"
-                  maxlength="2"
-                  [placeholder]="'PATIENT.FORM.BIRTH_MONTH' | translate"
-                  [attr.aria-label]="'PATIENT.FORM.BIRTH_MONTH' | translate"
-                  (input)="onBirthPartInput('birthMonth', $event)"
-                  (blur)="onBirthPartBlur('birthMonth')"
-                />
-                <datalist id="birthMonthOptionsList">
-                  <option
-                    *ngFor="let month of birthMonthOptions"
-                    [value]="month.value"
-                    [attr.label]="month.labelKey | translate"
-                  >
-                    {{ month.labelKey | translate }}
-                  </option>
-                </datalist>
-              </div>
-              <div class="col-4">
-                <input
-                  type="text"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  class="form-control form-control-lg"
-                  formControlName="birthYear"
-                  list="birthYearOptionsList"
-                  maxlength="4"
-                  [placeholder]="'PATIENT.FORM.BIRTH_YEAR' | translate"
-                  [attr.aria-label]="'PATIENT.FORM.BIRTH_YEAR' | translate"
-                  (input)="onBirthPartInput('birthYear', $event)"
-                  (blur)="onBirthPartBlur('birthYear')"
-                />
-                <datalist id="birthYearOptionsList">
-                  <option *ngFor="let year of birthYearOptions" [value]="year"></option>
-                </datalist>
-              </div>
-            </div>
+            </ng-container>
+
+            <button
+              *ngIf="isMobile"
+              type="button"
+              class="birth-wheel-trigger form-control form-control-lg text-start"
+              (click)="openBirthWheelPicker()"
+            >
+              <span *ngIf="getFormattedExactBirth()">
+                {{ getFormattedExactBirth() }}
+              </span>
+              <span *ngIf="!getFormattedExactBirth()" class="text-muted">
+                {{ 'PATIENT.FORM.BIRTH_PLACEHOLDER' | translate }}
+              </span>
+              <i class="ti ti-calendar ms-auto"></i>
+            </button>
           </ng-container>
 
           <ng-container *ngIf="patientForm.get('birthMode')?.value === 'yearOnly'">
-            <div class="row g-2">
-              <div class="col-12 col-md-6">
-                <input
-                  type="text"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  class="form-control form-control-lg"
-                  formControlName="birthYearOnly"
-                  list="birthYearOnlyOptionsList"
-                  maxlength="4"
-                  [placeholder]="'PATIENT.FORM.BIRTH_YEAR' | translate"
-                  [attr.aria-label]="'PATIENT.FORM.BIRTH_YEAR' | translate"
-                  (input)="onBirthPartInput('birthYearOnly', $event)"
-                  (blur)="onBirthPartBlur('birthYearOnly')"
-                />
-                <datalist id="birthYearOnlyOptionsList">
-                  <option *ngFor="let year of birthYearOptions" [value]="year"></option>
-                </datalist>
+            <ng-container *ngIf="!isMobile">
+              <div class="row g-2">
+                <div class="col-12 col-md-6">
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="form-control form-control-lg"
+                    formControlName="birthYearOnly"
+                    list="birthYearOnlyOptionsList"
+                    maxlength="4"
+                    [placeholder]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                    [attr.aria-label]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                    (input)="onBirthPartInput('birthYearOnly', $event)"
+                    (blur)="onBirthPartBlur('birthYearOnly')"
+                  />
+                  <datalist id="birthYearOnlyOptionsList">
+                    <option *ngFor="let year of birthYearOptions" [value]="year"></option>
+                  </datalist>
+                </div>
               </div>
-            </div>
+            </ng-container>
+
+            <button
+              *ngIf="isMobile"
+              type="button"
+              class="birth-wheel-trigger form-control form-control-lg text-start"
+              (click)="openBirthWheelPicker()"
+            >
+              <span *ngIf="patientForm.get('birthYearOnly')?.value">
+                {{ patientForm.get('birthYearOnly')?.value }}
+              </span>
+              <span *ngIf="!patientForm.get('birthYearOnly')?.value" class="text-muted">
+                {{ 'PATIENT.FORM.BIRTH_PLACEHOLDER' | translate }}
+              </span>
+              <i class="ti ti-calendar ms-auto"></i>
+            </button>
           </ng-container>
 
           <small class="text-muted d-block mt-2" *ngIf="getDisplayAge()">
@@ -518,3 +552,99 @@
     </span>
   </button>
 </div>
+
+<ng-template #wheelPickerTpl>
+  <div class="birth-wheel-sheet">
+    <div class="birth-wheel-header">
+      <button
+        type="button"
+        class="btn btn-link birth-wheel-action"
+        (click)="closeBirthWheelPicker()"
+      >
+        {{ 'WORDS.CANCEL' | translate }}
+      </button>
+      <span class="birth-wheel-title">
+        {{ 'PATIENT.FORM.BIRTH_INFO' | translate }}
+      </span>
+      <button
+        type="button"
+        class="btn btn-link birth-wheel-action birth-wheel-confirm"
+        (click)="confirmBirthWheelPicker()"
+      >
+        {{ 'WORDS.DONE' | translate }}
+      </button>
+    </div>
+
+    <div class="birth-wheel-body">
+      <div class="birth-wheel-center-indicator" aria-hidden="true"></div>
+
+      <ng-container *ngIf="wheelPickerMode === 'exact'">
+        <div
+          #wheelDayCol
+          class="birth-wheel-column"
+          (scroll)="onWheelScroll('day', $event)"
+        >
+          <div class="birth-wheel-spacer"></div>
+          <div
+            class="birth-wheel-item"
+            *ngFor="let day of getWheelDayOptions()"
+            [class.active]="day === wheelTempDay"
+          >
+            {{ day }}
+          </div>
+          <div class="birth-wheel-spacer"></div>
+        </div>
+
+        <div
+          #wheelMonthCol
+          class="birth-wheel-column"
+          (scroll)="onWheelScroll('month', $event)"
+        >
+          <div class="birth-wheel-spacer"></div>
+          <div
+            class="birth-wheel-item"
+            *ngFor="let month of birthMonthOptions"
+            [class.active]="month.value === wheelTempMonth"
+          >
+            {{ month.labelKey | translate }}
+          </div>
+          <div class="birth-wheel-spacer"></div>
+        </div>
+
+        <div
+          #wheelYearCol
+          class="birth-wheel-column"
+          (scroll)="onWheelScroll('year', $event)"
+        >
+          <div class="birth-wheel-spacer"></div>
+          <div
+            class="birth-wheel-item"
+            *ngFor="let year of birthYearOptions"
+            [class.active]="year === wheelTempYear"
+          >
+            {{ year }}
+          </div>
+          <div class="birth-wheel-spacer"></div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="wheelPickerMode === 'yearOnly'">
+        <div
+          #wheelYearOnlyCol
+          class="birth-wheel-column birth-wheel-column-full"
+          (scroll)="onWheelScroll('yearOnly', $event)"
+        >
+          <div class="birth-wheel-spacer"></div>
+          <div
+            class="birth-wheel-item"
+            *ngFor="let year of birthYearOptions"
+            [class.active]="year === wheelTempYearOnly"
+          >
+            {{ year }}
+          </div>
+          <div class="birth-wheel-spacer"></div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

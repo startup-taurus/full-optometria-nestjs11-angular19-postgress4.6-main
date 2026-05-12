@@ -7,6 +7,19 @@
 @import 'quill/dist/quill.bubble.css';
 @import 'ngx-toastr/toastr';
 
+.cdk-overlay-container {
+  z-index: 1090;
+}
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-pane {
+  z-index: 1090;
+}
+
+.cdk-overlay-backdrop.birth-wheel-backdrop {
+  z-index: 1090;
+}
+
 .toast-container .ngx-toastr:before {
   display: none !important;
 }

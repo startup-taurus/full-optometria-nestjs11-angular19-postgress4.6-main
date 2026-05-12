@@ -606,6 +606,7 @@
       "BIRTH_DAY": "Day",
       "BIRTH_MONTH": "Month",
       "BIRTH_YEAR": "Year",
+      "BIRTH_PLACEHOLDER": "Pick the date",
       "AGE": "Age"
     },
     "MODAL": {
@@ -957,6 +958,7 @@
     "SAVE": "Save",
     "UPDATE": "Update",
     "CANCEL": "Cancel",
+    "DONE": "Done",
     "CLOSE": "Close",
     "ACTIVE": "Active",
     "INACTIVE": "Inactive",

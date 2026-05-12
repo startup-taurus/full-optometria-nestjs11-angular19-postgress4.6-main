@@ -2,13 +2,18 @@ import { CommonModule } from '@angular/common'
 import {
   Component,
   EventEmitter,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
   Output,
+  TemplateRef,
   ViewChild,
+  ViewContainerRef,
   ElementRef,
 } from '@angular/core'
+import { Overlay, OverlayRef } from '@angular/cdk/overlay'
+import { TemplatePortal } from '@angular/cdk/portal'
 import {
   FormBuilder,
   FormGroup,
@@ -87,7 +92,31 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     { value: '12', labelKey: 'CALENDAR.MONTHS.DECEMBER' },
   ]
   public birthYearOptions: string[] = []
+  public isMobile = false
+  public wheelPickerOpen = false
+  public wheelPickerMode: 'exact' | 'yearOnly' = 'exact'
+  public wheelTempDay = ''
+  public wheelTempMonth = ''
+  public wheelTempYear = ''
+  public wheelTempYearOnly = ''
+  public readonly WHEEL_ITEM_HEIGHT = 44
+
+  @ViewChild('wheelDayCol') wheelDayCol?: ElementRef<HTMLDivElement>
+  @ViewChild('wheelMonthCol') wheelMonthCol?: ElementRef<HTMLDivElement>
+  @ViewChild('wheelYearCol') wheelYearCol?: ElementRef<HTMLDivElement>
+  @ViewChild('wheelYearOnlyCol') wheelYearOnlyCol?: ElementRef<HTMLDivElement>
+  @ViewChild('wheelPickerTpl') wheelPickerTpl?: TemplateRef<unknown>
+
   private fileBaseUrl: string = environment.fileBaseUrl
+  private wheelScrollTimers: Record<string, ReturnType<typeof setTimeout> | null> = {
+    day: null,
+    month: null,
+    year: null,
+    yearOnly: null,
+  }
+  private wheelOverlayRef: OverlayRef | null = null
+  private _overlay = inject(Overlay)
+  private _viewContainerRef = inject(ViewContainerRef)
 
   private unsubscribe$ = new Subject<void>()
   private openClientAfterCreate = false
@@ -107,6 +136,7 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.generateBirthYearOptions()
     this.initializeForm()
+    this.updateMobileFlag()
     this.setModalTitle()
 
     this._bsModalService
@@ -120,6 +150,22 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next()
     this.unsubscribe$.complete()
+    if (this.wheelOverlayRef) {
+      this.wheelOverlayRef.dispose()
+      this.wheelOverlayRef = null
+    }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateMobileFlag()
+  }
+
+  private updateMobileFlag(): void {
+    this.isMobile = window.innerWidth < 768
+    if (!this.isMobile && this.wheelPickerOpen) {
+      this.wheelPickerOpen = false
+    }
   }
 
   public setModalData(data: ModalWithAction<Patient>): void {
@@ -277,6 +323,202 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  public openBirthWheelPicker(): void {
+    if (!this.wheelPickerTpl) return
+    const mode = this.patientForm.get('birthMode')?.value as 'exact' | 'yearOnly'
+    this.wheelPickerMode = mode
+    const fallbackYear = String(new Date().getFullYear() - 25)
+    const defaultMonth = this.birthMonthOptions[0]?.value ?? '01'
+    const defaultDay = this.birthDayOptions[0] ?? '01'
+
+    if (mode === 'exact') {
+      this.wheelTempDay = this.patientForm.get('birthDay')?.value || defaultDay
+      this.wheelTempMonth = this.patientForm.get('birthMonth')?.value || defaultMonth
+      this.wheelTempYear = this.patientForm.get('birthYear')?.value || fallbackYear
+      this.wheelTempDay = this.clampDayToMonth(
+        this.wheelTempDay,
+        this.wheelTempMonth,
+        this.wheelTempYear
+      )
+    } else {
+      this.wheelTempYearOnly =
+        this.patientForm.get('birthYearOnly')?.value || fallbackYear
+    }
+
+    this.wheelPickerOpen = true
+
+    this.wheelOverlayRef = this._overlay.create({
+      hasBackdrop: true,
+      backdropClass: 'birth-wheel-backdrop',
+      panelClass: 'birth-wheel-panel',
+      positionStrategy: this._overlay
+        .position()
+        .global()
+        .centerHorizontally()
+        .bottom('0'),
+      scrollStrategy: this._overlay.scrollStrategies.block(),
+      width: '100%',
+      maxWidth: '520px',
+    })
+
+    const portal = new TemplatePortal(
+      this.wheelPickerTpl,
+      this._viewContainerRef
+    )
+    this.wheelOverlayRef.attach(portal)
+    this.wheelOverlayRef.backdropClick().subscribe(() => this.closeBirthWheelPicker())
+
+    setTimeout(() => this.scrollWheelsToValues(), 80)
+  }
+
+  public closeBirthWheelPicker(): void {
+    this.wheelPickerOpen = false
+    if (this.wheelOverlayRef) {
+      this.wheelOverlayRef.dispose()
+      this.wheelOverlayRef = null
+    }
+  }
+
+  public confirmBirthWheelPicker(): void {
+    if (this.wheelPickerMode === 'exact') {
+      const safeDay = this.clampDayToMonth(
+        this.wheelTempDay,
+        this.wheelTempMonth,
+        this.wheelTempYear
+      )
+      this.patientForm.patchValue({
+        birthDay: safeDay,
+        birthMonth: this.wheelTempMonth,
+        birthYear: this.wheelTempYear,
+      })
+    } else {
+      this.patientForm.patchValue({ birthYearOnly: this.wheelTempYearOnly })
+    }
+    this.closeBirthWheelPicker()
+  }
+
+  public onWheelScroll(
+    part: 'day' | 'month' | 'year' | 'yearOnly',
+    event: Event
+  ): void {
+    const target = event.target as HTMLDivElement
+    if (this.wheelScrollTimers[part]) {
+      clearTimeout(this.wheelScrollTimers[part] as ReturnType<typeof setTimeout>)
+    }
+    this.wheelScrollTimers[part] = setTimeout(() => {
+      const idx = Math.round(target.scrollTop / this.WHEEL_ITEM_HEIGHT)
+      if (part === 'day') {
+        const days = this.getDaysForMonth(this.wheelTempMonth, this.wheelTempYear)
+        this.wheelTempDay = days[idx] || days[days.length - 1] || ''
+      } else if (part === 'month') {
+        this.wheelTempMonth = this.birthMonthOptions[idx]?.value || ''
+        this.wheelTempDay = this.clampDayToMonth(
+          this.wheelTempDay,
+          this.wheelTempMonth,
+          this.wheelTempYear
+        )
+        this.realignDayWheelIfNeeded()
+      } else if (part === 'year') {
+        this.wheelTempYear = this.birthYearOptions[idx] || ''
+        this.wheelTempDay = this.clampDayToMonth(
+          this.wheelTempDay,
+          this.wheelTempMonth,
+          this.wheelTempYear
+        )
+        this.realignDayWheelIfNeeded()
+      } else {
+        this.wheelTempYearOnly = this.birthYearOptions[idx] || ''
+      }
+    }, 80)
+  }
+
+  public getWheelDayOptions(): string[] {
+    return this.getDaysForMonth(this.wheelTempMonth, this.wheelTempYear)
+  }
+
+  private getDaysForMonth(month: string, year: string): string[] {
+    const max = this.getMaxDaysInMonth(month, year)
+    return Array.from({ length: max }, (_, i) =>
+      String(i + 1).padStart(2, '0')
+    )
+  }
+
+  private getMaxDaysInMonth(month: string, year: string): number {
+    const m = Number(month)
+    const y = Number(year)
+    if (!m || m < 1 || m > 12) return 31
+    if (m === 2) {
+      const leap = !!y && y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)
+      return leap ? 29 : 28
+    }
+    return [4, 6, 9, 11].includes(m) ? 30 : 31
+  }
+
+  private clampDayToMonth(day: string, month: string, year: string): string {
+    if (!day) return day
+    const dayNum = Number(day)
+    if (!dayNum) return day
+    const max = this.getMaxDaysInMonth(month, year)
+    const clamped = Math.min(dayNum, max)
+    return String(clamped).padStart(2, '0')
+  }
+
+  private realignDayWheelIfNeeded(): void {
+    if (!this.wheelDayCol) return
+    const days = this.getDaysForMonth(this.wheelTempMonth, this.wheelTempYear)
+    const idx = Math.max(0, days.indexOf(this.wheelTempDay))
+    const target = idx * this.WHEEL_ITEM_HEIGHT
+    if (Math.abs(this.wheelDayCol.nativeElement.scrollTop - target) > 4) {
+      this.wheelDayCol.nativeElement.scrollTo({ top: target, behavior: 'smooth' })
+    }
+  }
+
+  public getFormattedExactBirth(): string {
+    const day = this.patientForm.get('birthDay')?.value
+    const month = this.patientForm.get('birthMonth')?.value
+    const year = this.patientForm.get('birthYear')?.value
+    if (!day || !month || !year) return ''
+    return `${day}/${month}/${year}`
+  }
+
+  public getMonthLabelKey(monthValue: string): string {
+    return (
+      this.birthMonthOptions.find((m) => m.value === monthValue)?.labelKey || ''
+    )
+  }
+
+  private scrollWheelsToValues(): void {
+    if (this.wheelPickerMode === 'exact') {
+      const dayOptions = this.getDaysForMonth(
+        this.wheelTempMonth,
+        this.wheelTempYear
+      )
+      this.scrollWheelToValue(this.wheelDayCol, dayOptions, this.wheelTempDay)
+      this.scrollWheelToValue(
+        this.wheelMonthCol,
+        this.birthMonthOptions.map((m) => m.value),
+        this.wheelTempMonth
+      )
+      this.scrollWheelToValue(this.wheelYearCol, this.birthYearOptions, this.wheelTempYear)
+    } else {
+      this.scrollWheelToValue(
+        this.wheelYearOnlyCol,
+        this.birthYearOptions,
+        this.wheelTempYearOnly
+      )
+    }
+  }
+
+  private scrollWheelToValue(
+    col: ElementRef<HTMLDivElement> | undefined,
+    options: string[],
+    value: string
+  ): void {
+    if (!col) return
+    const idx = Math.max(0, options.indexOf(value))
+    col.nativeElement.scrollTop = idx * this.WHEEL_ITEM_HEIGHT
+  }
+
   public onBirthPartInput(
     controlName: 'birthDay' | 'birthMonth' | 'birthYear' | 'birthYearOnly',
     event: Event
@@ -310,7 +552,10 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
 
     let normalized = raw
     if (controlName === 'birthDay') {
-      const clamped = Math.min(31, Math.max(1, parsed))
+      const month = this.patientForm.get('birthMonth')?.value || ''
+      const year = this.patientForm.get('birthYear')?.value || ''
+      const maxDay = this.getMaxDaysInMonth(month, year)
+      const clamped = Math.min(maxDay, Math.max(1, parsed))
       normalized = String(clamped).padStart(2, '0')
     } else if (controlName === 'birthMonth') {
       const clamped = Math.min(12, Math.max(1, parsed))
@@ -322,6 +567,23 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
     }
 
     control.setValue(normalized, { emitEvent: false })
+
+    if (controlName === 'birthMonth' || controlName === 'birthYear') {
+      this.reclampDesktopDay()
+    }
+  }
+
+  private reclampDesktopDay(): void {
+    const dayCtrl = this.patientForm.get('birthDay')
+    if (!dayCtrl) return
+    const current = String(dayCtrl.value ?? '').trim()
+    if (!current) return
+    const month = this.patientForm.get('birthMonth')?.value || ''
+    const year = this.patientForm.get('birthYear')?.value || ''
+    const clamped = this.clampDayToMonth(current, month, year)
+    if (clamped !== current) {
+      dayCtrl.setValue(clamped, { emitEvent: false })
+    }
   }
 
   public getDisplayAge(): string {
@@ -456,11 +718,16 @@ export class PatientFormModalComponent implements OnInit, OnDestroy {
   } {
     const mode = formValue.birthMode
     if (mode === 'exact') {
-      const day = Number(formValue.birthDay)
-      const month = Number(formValue.birthMonth)
-      const year = Number(formValue.birthYear)
-      if (day && month && year) {
-        const date = this.buildUtcDate(year, month, day)
+      const rawMonth = Number(formValue.birthMonth)
+      const rawYear = Number(formValue.birthYear)
+      const rawDay = Number(formValue.birthDay)
+      if (rawDay && rawMonth && rawYear) {
+        const maxDay = this.getMaxDaysInMonth(
+          formValue.birthMonth,
+          formValue.birthYear
+        )
+        const safeDay = Math.min(rawDay, maxDay)
+        const date = this.buildUtcDate(rawYear, rawMonth, safeDay)
         if (date) {
           return { dateOfBirth: date.toISOString(), birthYear: null }
         }

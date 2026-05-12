@@ -53,7 +53,8 @@
               "node_modules/@swimlane/ngx-datatable/index.css",
               "node_modules/@swimlane/ngx-datatable/themes/material.css",
               "node_modules/@swimlane/ngx-datatable/assets/icons.css",
-              "node_modules/@ng-select/ng-select/themes/default.theme.css"
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/@angular/cdk/overlay-prebuilt.css"
             ],
             "scripts": ["node_modules/jsvectormap/dist/js/jsvectormap.min.js"],
             "allowedCommonJsDependencies": [
