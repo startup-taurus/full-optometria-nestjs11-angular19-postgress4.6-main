@@ -140,6 +140,13 @@ export class ViewMedicalHistoryComponent implements OnInit {
       .join(', ')
   }
 
+  public getAdditionalTreatmentsDisplay(treatments: string[]): string {
+    if (!treatments || treatments.length === 0) return 'No seleccionados'
+    return treatments
+      .map((type) => type.charAt(0).toUpperCase() + type.slice(1))
+      .join(', ')
+  }
+
   public getPupillaryReflexDisplay(reflexes: any): string[] {
     if (!reflexes) return []
 

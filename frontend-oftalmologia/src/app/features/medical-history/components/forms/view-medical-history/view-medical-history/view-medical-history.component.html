@@ -345,12 +345,12 @@
       <div class="col-lg-6 mb-4">
         <div class="info-card">
           <div class="card-header">
-            <h6>{{ 'MEDICAL_HISTORY.FIELDS.VISUAL_ACUITY' | translate }}</h6>
+            <h6>
+              {{ 'MEDICAL_HISTORY.FIELDS.VISUAL_ACUITY' | translate }}
+              {{ 'MEDICAL_HISTORY.FIELDS.WITHOUT_RX' | translate }}
+            </h6>
           </div>
           <div class="card-body">
-            <div class="subsection-title">
-              {{ 'MEDICAL_HISTORY.FIELDS.WITHOUT_RX' | translate }}
-            </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="data-field">
@@ -404,68 +404,6 @@
                   >
                   <span>{{
                     clinicalHistory.visualAcuityOiVp ||
-                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-                  }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="subsection-title mt-3">
-              {{ 'MEDICAL_HISTORY.FIELDS.CORRECTED' | translate }}
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="data-field">
-                  <strong
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}
-                    VL:</strong
-                  >
-                  <span>{{
-                    clinicalHistory.correctedAvOdVl ||
-                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-                  }}</span>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="data-field">
-                  <strong
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}
-                    VP:</strong
-                  >
-                  <span>{{
-                    clinicalHistory.correctedAvOdVp ||
-                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-                  }}</span>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="data-field">
-                  <strong
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate
-                    }}
-                    VL:</strong
-                  >
-                  <span>{{
-                    clinicalHistory.correctedAvOiVl ||
-                      ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-                  }}</span>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="data-field">
-                  <strong
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate
-                    }}
-                    VP:</strong
-                  >
-                  <span>{{
-                    clinicalHistory.correctedAvOiVp ||
                       ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
                   }}</span>
                 </div>
@@ -526,18 +464,154 @@
       </div>
     </div>
 
-    <div class="info-card mb-4">
-      <div class="card-header">
-        <h6>{{ 'MEDICAL_HISTORY.FIELDS.LENS_TYPES' | translate }}</h6>
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="info-card">
+          <div class="card-header">
+            <h6>
+              {{ 'MEDICAL_HISTORY.PUPILLARY_REFLEXES.TITLE' | translate }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <div
+              *ngIf="
+                getPupillaryReflexDisplay(clinicalHistory.pupillaryReflexes)
+                  .length > 0;
+                else noPupillaryReflexes
+              "
+            >
+              <div
+                *ngFor="
+                  let reflex of getPupillaryReflexDisplay(
+                    clinicalHistory.pupillaryReflexes
+                  )
+                "
+                class="data-field"
+              >
+                <span>• {{ reflex }}</span>
+              </div>
+            </div>
+            <ng-template #noPupillaryReflexes>
+              <div class="data-field">
+                <span>{{
+                  'MEDICAL_HISTORY.PUPILLARY_REFLEXES.NO_REGISTERED' | translate
+                }}</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="data-field">
-          <span>{{ getLensTypesDisplay(clinicalHistory.lensTypes) }}</span>
+
+      <div class="col-lg-6 mb-4">
+        <div class="info-card">
+          <div class="card-header">
+            <h6>{{ 'MEDICAL_HISTORY.FIELDS.OPHTHALMOSCOPY' | translate }}</h6>
+          </div>
+          <div class="card-body">
+            <div class="data-field">
+              <strong
+                >{{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:</strong
+              >
+              <span>{{
+                clinicalHistory.ophthalmoscopyOd ||
+                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+              }}</span>
+            </div>
+            <div class="data-field">
+              <strong
+                >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</strong
+              >
+              <span>{{
+                clinicalHistory.ophthalmoscopyOi ||
+                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+              }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
+    <div class="info-card mb-4">
+      <div class="card-header">
+        <h6>{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.TITLE' | translate }}</h6>
+      </div>
+      <div class="card-body">
+        <div
+          *ngIf="
+            getRefractiveTestsDisplay(clinicalHistory.refractiveTests).length >
+              0;
+            else noRefractiveTests
+          "
+        >
+          <div
+            *ngFor="
+              let test of getRefractiveTestsDisplay(
+                clinicalHistory.refractiveTests
+              )
+            "
+            class="data-field"
+          >
+            <span>• {{ test }}</span>
+          </div>
+        </div>
+        <ng-template #noRefractiveTests>
+          <div class="data-field">
+            <span>{{
+              'MEDICAL_HISTORY.REFRACTIVE_TESTS.NO_REGISTERED' | translate
+            }}</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
     <div class="info-card">
+      <div class="card-header">
+        <h6>{{ 'MEDICAL_HISTORY.FIELDS.OTHER_EXAMS' | translate }}</h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="data-field">
+              <strong
+                >{{ 'MEDICAL_HISTORY.FIELDS.STEREOPSIS' | translate }}:</strong
+              >
+              <span>{{
+                clinicalHistory.stereopsis ||
+                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+              }}</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="data-field">
+              <strong
+                >{{ 'MEDICAL_HISTORY.FIELDS.WORTH_TEST' | translate }}:</strong
+              >
+              <span>{{
+                clinicalHistory.worthTest ||
+                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+              }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="data-field">
+          <strong
+            >{{ 'MEDICAL_HISTORY.FIELDS.OTHER_NOTES' | translate }}:</strong
+          >
+          <span>{{
+            clinicalHistory.otherNotes ||
+              ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+          }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="currentStep === 3">
+    <h5 class="section-title">
+      {{ 'MEDICAL_HISTORY.DIAGNOSIS_AND_EXAMS' | translate }}
+    </h5>
+
+    <div class="info-card mb-4">
       <div class="card-header">
         <h6>{{ 'MEDICAL_HISTORY.FIELDS.FINAL_RX' | translate }}</h6>
       </div>
@@ -681,7 +755,75 @@
       </div>
     </div>
 
-    <div class="info-card mt-3">
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="info-card">
+          <div class="card-header">
+            <h6>{{ 'MEDICAL_HISTORY.FIELDS.LENS_TYPES' | translate }}</h6>
+          </div>
+          <div class="card-body">
+            <div class="data-field">
+              <span>{{ getLensTypesDisplay(clinicalHistory.lensTypes) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="info-card">
+          <div class="card-header">
+            <h6>
+              {{ 'MEDICAL_HISTORY.FIELDS.ADDITIONAL_TREATMENTS' | translate }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="data-field">
+              <span>{{
+                getAdditionalTreatmentsDisplay(
+                  clinicalHistory.additionalTreatments
+                )
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="info-card h-100">
+          <div class="card-header">
+            <h6>{{ 'MEDICAL_HISTORY.FIELDS.DIAGNOSIS' | translate }}</h6>
+          </div>
+          <div class="card-body">
+            <div class="data-field">
+              <span>{{
+                clinicalHistory.diagnosis ||
+                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="info-card h-100">
+          <div class="card-header">
+            <h6>{{ 'MEDICAL_HISTORY.FIELDS.DISPOSITION' | translate }}</h6>
+          </div>
+          <div class="card-body">
+            <div class="data-field">
+              <span>{{
+                clinicalHistory.disposition ||
+                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card mb-4">
       <div class="card-header">
         <h6>{{ 'MEDICAL_HISTORY.FIELDS.PROFESSIONAL' | translate }}</h6>
       </div>
@@ -691,187 +833,6 @@
             clinicalHistory.professionalName ||
               ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
           }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="currentStep === 3">
-    <h5 class="section-title">
-      {{ 'MEDICAL_HISTORY.DIAGNOSIS_AND_EXAMS' | translate }}
-    </h5>
-
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <div class="info-card">
-          <div class="card-header">
-            <h6>
-              {{ 'MEDICAL_HISTORY.PUPILLARY_REFLEXES.TITLE' | translate }}
-            </h6>
-          </div>
-          <div class="card-body">
-            <div
-              *ngIf="
-                getPupillaryReflexDisplay(clinicalHistory.pupillaryReflexes)
-                  .length > 0;
-                else noPupillaryReflexes
-              "
-            >
-              <div
-                *ngFor="
-                  let reflex of getPupillaryReflexDisplay(
-                    clinicalHistory.pupillaryReflexes
-                  )
-                "
-                class="data-field"
-              >
-                <span>• {{ reflex }}</span>
-              </div>
-            </div>
-            <ng-template #noPupillaryReflexes>
-              <div class="data-field">
-                <span>{{
-                  'MEDICAL_HISTORY.PUPILLARY_REFLEXES.NO_REGISTERED' | translate
-                }}</span>
-              </div>
-            </ng-template>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-6 mb-4">
-        <div class="info-card">
-          <div class="card-header">
-            <h6>{{ 'MEDICAL_HISTORY.FIELDS.OPHTHALMOSCOPY' | translate }}</h6>
-          </div>
-          <div class="card-body">
-            <div class="data-field">
-              <strong
-                >{{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:</strong
-              >
-              <span>{{
-                clinicalHistory.ophthalmoscopyOd ||
-                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-              }}</span>
-            </div>
-            <div class="data-field">
-              <strong
-                >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</strong
-              >
-              <span>{{
-                clinicalHistory.ophthalmoscopyOi ||
-                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-              }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="info-card mb-4">
-      <div class="card-header">
-        <h6>{{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.TITLE' | translate }}</h6>
-      </div>
-      <div class="card-body">
-        <div
-          *ngIf="
-            getRefractiveTestsDisplay(clinicalHistory.refractiveTests).length >
-              0;
-            else noRefractiveTests
-          "
-        >
-          <div
-            *ngFor="
-              let test of getRefractiveTestsDisplay(
-                clinicalHistory.refractiveTests
-              )
-            "
-            class="data-field"
-          >
-            <span>• {{ test }}</span>
-          </div>
-        </div>
-        <ng-template #noRefractiveTests>
-          <div class="data-field">
-            <span>{{
-              'MEDICAL_HISTORY.REFRACTIVE_TESTS.NO_REGISTERED' | translate
-            }}</span>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-
-    <div class="info-card mb-4">
-      <div class="card-header">
-        <h6>{{ 'MEDICAL_HISTORY.FIELDS.OTHER_EXAMS' | translate }}</h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="data-field">
-              <strong
-                >{{ 'MEDICAL_HISTORY.FIELDS.STEREOPSIS' | translate }}:</strong
-              >
-              <span>{{
-                clinicalHistory.stereopsis ||
-                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-              }}</span>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="data-field">
-              <strong
-                >{{ 'MEDICAL_HISTORY.FIELDS.WORTH_TEST' | translate }}:</strong
-              >
-              <span>{{
-                clinicalHistory.worthTest ||
-                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-              }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="data-field">
-          <strong
-            >{{ 'MEDICAL_HISTORY.FIELDS.OTHER_NOTES' | translate }}:</strong
-          >
-          <span>{{
-            clinicalHistory.otherNotes ||
-              ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-          }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="info-card mb-4">
-      <div class="card-header">
-        <h6>
-          {{ 'MEDICAL_HISTORY.FIELDS.DIAGNOSIS_AND_DISPOSITION' | translate }}
-        </h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="data-field">
-              <strong
-                >{{ 'MEDICAL_HISTORY.FIELDS.DIAGNOSIS' | translate }}:</strong
-              >
-              <span>{{
-                clinicalHistory.diagnosis ||
-                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-              }}</span>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="data-field">
-              <strong
-                >{{ 'MEDICAL_HISTORY.FIELDS.DISPOSITION' | translate }}:</strong
-              >
-              <span>{{
-                clinicalHistory.disposition ||
-                  ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-              }}</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

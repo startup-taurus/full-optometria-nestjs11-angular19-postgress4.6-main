@@ -144,8 +144,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       previousRxOd: [''],
       previousAddOd: [''],
+      previousOdVl: [''],
+      previousOdVp: [''],
       previousRxOi: [''],
       previousAddOi: [''],
+      previousOiVl: [''],
+      previousOiVp: [''],
+      previousAo: [''],
 
       visualAcuityOdVl: [''],
       visualAcuityOdVp: [''],
@@ -304,8 +309,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       previousRxOd: record.previousRxOd || '',
       previousAddOd: record.previousAddOd || '',
+      previousOdVl: record.previousOdVl || '',
+      previousOdVp: record.previousOdVp || '',
       previousRxOi: record.previousRxOi || '',
       previousAddOi: record.previousAddOi || '',
+      previousOiVl: record.previousOiVl || '',
+      previousOiVp: record.previousOiVp || '',
+      previousAo: record.previousAo || '',
 
       visualAcuityOdVl: record.visualAcuityOdVl || '',
       visualAcuityOdVp: record.visualAcuityOdVp || '',
@@ -591,8 +601,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       previousRxOd: formData.previousRxOd,
       previousAddOd: formData.previousAddOd,
+      previousOdVl: formData.previousOdVl,
+      previousOdVp: formData.previousOdVp,
       previousRxOi: formData.previousRxOi,
       previousAddOi: formData.previousAddOi,
+      previousOiVl: formData.previousOiVl,
+      previousOiVp: formData.previousOiVp,
+      previousAo: formData.previousAo,
 
       visualAcuityOdVl: formData.visualAcuityOdVl,
       visualAcuityOdVp: formData.visualAcuityOdVp,
