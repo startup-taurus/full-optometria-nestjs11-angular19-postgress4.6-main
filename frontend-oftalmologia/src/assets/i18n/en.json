@@ -599,7 +599,14 @@
       "IS_ACTIVE": "Active patient",
       "IS_ACTIVE_HELP": "Determines if the patient is active in the system",
       "SAVE_PATIENT_FIRST_FOR_CLIENTS": "Save the patient first to add related clients",
-      "CREATE_AND_ADD_CLIENT": "Create and add client"
+      "CREATE_AND_ADD_CLIENT": "Create and add client",
+      "BIRTH_INFO": "Date of birth",
+      "BIRTH_MODE_EXACT": "Exact date",
+      "BIRTH_MODE_YEAR_ONLY": "Only year known",
+      "BIRTH_DAY": "Day",
+      "BIRTH_MONTH": "Month",
+      "BIRTH_YEAR": "Year",
+      "AGE": "Age"
     },
     "MODAL": {
       "CREATE_TITLE": "Create Patient",

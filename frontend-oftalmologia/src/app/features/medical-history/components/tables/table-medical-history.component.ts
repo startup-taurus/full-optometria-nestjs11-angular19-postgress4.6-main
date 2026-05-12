@@ -111,10 +111,9 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   private _store = inject(Store<AppState>)
 
   ngOnInit(): void {
-    this.initializeSubscriptions()
     this.config$ = this.setConfigDatatable()
     this.isReady = true
-    this.reloadDatatable(this.filter)
+    this.initializeSubscriptions()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -150,8 +149,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
           if (!branchId) {
             return
           }
-          this.isInitialLoad = true
-          this.reloadDatatable()
+          this.reloadDatatable(this.filter)
         },
         error: (error) => {},
       })

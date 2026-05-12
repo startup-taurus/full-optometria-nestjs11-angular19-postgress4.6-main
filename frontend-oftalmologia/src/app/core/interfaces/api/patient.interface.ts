@@ -6,7 +6,8 @@ export interface Patient {
   lastName: string
   email?: string
   documentNumber?: string
-  dateOfBirth?: Date | string
+  dateOfBirth?: Date | string | null
+  birthYear?: number | null
   address?: string
   homePhone?: string
   mobilePhone?: string
@@ -25,7 +26,8 @@ export interface CreatePatientDto {
   lastName: string
   email?: string
   documentNumber?: string
-  dateOfBirth?: Date | string
+  dateOfBirth?: Date | string | null
+  birthYear?: number | null
   address?: string
   homePhone?: string
   mobilePhone?: string
@@ -37,7 +39,8 @@ export interface UpdatePatientDto {
   lastName?: string
   email?: string
   documentNumber?: string
-  dateOfBirth?: Date | string
+  dateOfBirth?: Date | string | null
+  birthYear?: number | null
   address?: string
   homePhone?: string
   mobilePhone?: string

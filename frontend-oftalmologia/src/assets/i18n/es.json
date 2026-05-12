@@ -601,7 +601,14 @@
       "IS_ACTIVE": "Paciente activo",
       "IS_ACTIVE_HELP": "Determina si el paciente está activo en el sistema",
       "SAVE_PATIENT_FIRST_FOR_CLIENTS": "Primero guarde el paciente para poder agregar clientes relacionados",
-      "CREATE_AND_ADD_CLIENT": "Crear y agregar cliente"
+      "CREATE_AND_ADD_CLIENT": "Crear y agregar cliente",
+      "BIRTH_INFO": "Fecha de nacimiento",
+      "BIRTH_MODE_EXACT": "Fecha exacta",
+      "BIRTH_MODE_YEAR_ONLY": "Solo año conocido",
+      "BIRTH_DAY": "Día",
+      "BIRTH_MONTH": "Mes",
+      "BIRTH_YEAR": "Año",
+      "AGE": "Edad"
     },
     "MODAL": {
       "CREATE_TITLE": "Crear Paciente",

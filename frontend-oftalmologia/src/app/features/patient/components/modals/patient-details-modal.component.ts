@@ -162,13 +162,24 @@ export class PatientDetailsModalComponent implements OnInit, OnDestroy {
     this._activeModal.dismiss('close')
   }
 
-  public formatDate(date: Date | string | undefined): string {
+  public formatDate(date: Date | string | undefined | null): string {
     if (!date) return 'N/A'
     return new Date(date).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     })
+  }
+
+  public formatBirthDisplay(patient?: Patient): string {
+    if (!patient) return 'N/A'
+    if (patient.dateOfBirth) {
+      return this.formatDate(patient.dateOfBirth)
+    }
+    if (patient.birthYear) {
+      return String(patient.birthYear)
+    }
+    return 'N/A'
   }
 
   public formatDateTime(date: Date | string | undefined): string {

@@ -82,25 +82,6 @@
 
           <div class="col">
             <label class="form-label text-secondary-emphasis small fw-medium">
-              Edad
-            </label>
-            <input
-              type="number"
-              class="form-control form-control-lg"
-              formControlName="age"
-              [class.is-invalid]="isFieldInvalid('age')"
-              placeholder="Edad estimada"
-              min="0"
-              max="120"
-              step="1"
-            />
-            <div class="invalid-feedback" *ngIf="isFieldInvalid('age')">
-              {{ getFieldError('age') }}
-            </div>
-          </div>
-
-          <div class="col">
-            <label class="form-label text-secondary-emphasis small fw-medium">
               {{ 'PATIENT.FORM.EMAIL' | translate }}
             </label>
             <div class="row g-2 align-items-start">
@@ -150,6 +131,126 @@
               {{ getFieldError('address') | translate }}
             </div>
           </div>
+        </div>
+
+        <div class="birth-section mt-4">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <label class="form-label text-secondary-emphasis small fw-medium mb-0">
+              {{ 'PATIENT.FORM.BIRTH_INFO' | translate }}
+            </label>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Birth mode">
+              <button
+                type="button"
+                class="btn"
+                [class.btn-primary]="patientForm.get('birthMode')?.value === 'exact'"
+                [class.btn-outline-primary]="patientForm.get('birthMode')?.value !== 'exact'"
+                (click)="onBirthModeChange('exact')"
+              >
+                {{ 'PATIENT.FORM.BIRTH_MODE_EXACT' | translate }}
+              </button>
+              <button
+                type="button"
+                class="btn"
+                [class.btn-primary]="patientForm.get('birthMode')?.value === 'yearOnly'"
+                [class.btn-outline-primary]="patientForm.get('birthMode')?.value !== 'yearOnly'"
+                (click)="onBirthModeChange('yearOnly')"
+              >
+                {{ 'PATIENT.FORM.BIRTH_MODE_YEAR_ONLY' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <ng-container *ngIf="patientForm.get('birthMode')?.value === 'exact'">
+            <div class="row g-2">
+              <div class="col-4">
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  class="form-control form-control-lg"
+                  formControlName="birthDay"
+                  list="birthDayOptionsList"
+                  maxlength="2"
+                  [placeholder]="'PATIENT.FORM.BIRTH_DAY' | translate"
+                  [attr.aria-label]="'PATIENT.FORM.BIRTH_DAY' | translate"
+                  (input)="onBirthPartInput('birthDay', $event)"
+                  (blur)="onBirthPartBlur('birthDay')"
+                />
+                <datalist id="birthDayOptionsList">
+                  <option *ngFor="let day of birthDayOptions" [value]="day"></option>
+                </datalist>
+              </div>
+              <div class="col-4">
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  class="form-control form-control-lg"
+                  formControlName="birthMonth"
+                  list="birthMonthOptionsList"
+                  maxlength="2"
+                  [placeholder]="'PATIENT.FORM.BIRTH_MONTH' | translate"
+                  [attr.aria-label]="'PATIENT.FORM.BIRTH_MONTH' | translate"
+                  (input)="onBirthPartInput('birthMonth', $event)"
+                  (blur)="onBirthPartBlur('birthMonth')"
+                />
+                <datalist id="birthMonthOptionsList">
+                  <option
+                    *ngFor="let month of birthMonthOptions"
+                    [value]="month.value"
+                    [attr.label]="month.labelKey | translate"
+                  >
+                    {{ month.labelKey | translate }}
+                  </option>
+                </datalist>
+              </div>
+              <div class="col-4">
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  class="form-control form-control-lg"
+                  formControlName="birthYear"
+                  list="birthYearOptionsList"
+                  maxlength="4"
+                  [placeholder]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                  [attr.aria-label]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                  (input)="onBirthPartInput('birthYear', $event)"
+                  (blur)="onBirthPartBlur('birthYear')"
+                />
+                <datalist id="birthYearOptionsList">
+                  <option *ngFor="let year of birthYearOptions" [value]="year"></option>
+                </datalist>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="patientForm.get('birthMode')?.value === 'yearOnly'">
+            <div class="row g-2">
+              <div class="col-12 col-md-6">
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  class="form-control form-control-lg"
+                  formControlName="birthYearOnly"
+                  list="birthYearOnlyOptionsList"
+                  maxlength="4"
+                  [placeholder]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                  [attr.aria-label]="'PATIENT.FORM.BIRTH_YEAR' | translate"
+                  (input)="onBirthPartInput('birthYearOnly', $event)"
+                  (blur)="onBirthPartBlur('birthYearOnly')"
+                />
+                <datalist id="birthYearOnlyOptionsList">
+                  <option *ngFor="let year of birthYearOptions" [value]="year"></option>
+                </datalist>
+              </div>
+            </div>
+          </ng-container>
+
+          <small class="text-muted d-block mt-2" *ngIf="getDisplayAge()">
+            {{ 'PATIENT.FORM.AGE' | translate }}: {{ getDisplayAge() }}
+          </small>
         </div>
       </div>
     </div>

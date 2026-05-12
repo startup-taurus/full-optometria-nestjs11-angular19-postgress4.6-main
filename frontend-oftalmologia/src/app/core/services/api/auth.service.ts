@@ -26,6 +26,7 @@ export class AuthenticationService {
   public url: string
   private _currentUser$ = new BehaviorSubject<User | null>(null)
   private _getMeUserCache$: Observable<ApiResponse<User>> | null = null
+  private _getMyQuotaCache$: Observable<ApiResponse<PlanQuota>> | null = null
 
   public currentUser$ = this._currentUser$.asObservable()
 
@@ -76,7 +77,26 @@ export class AuthenticationService {
   }
 
   public getMyQuota(): Observable<ApiResponse<PlanQuota>> {
-    return this._http.get<ApiResponse<PlanQuota>>(`${this.url}/my-quota`)
+    if (this._getMyQuotaCache$) {
+      return this._getMyQuotaCache$
+    }
+
+    this._getMyQuotaCache$ = this._http
+      .get<ApiResponse<PlanQuota>>(`${this.url}/my-quota`)
+      .pipe(
+        tap(() => {
+          setTimeout(() => {
+            this._getMyQuotaCache$ = null
+          }, 2500)
+        }),
+        shareReplay(1)
+      )
+
+    return this._getMyQuotaCache$
+  }
+
+  public invalidateMyQuotaCache(): void {
+    this._getMyQuotaCache$ = null
   }
 
   public getMeUser(): Observable<ApiResponse<User>> {
@@ -133,6 +153,7 @@ export class AuthenticationService {
 
     this._currentUser$.next(null)
     this._getMeUserCache$ = null
+    this._getMyQuotaCache$ = null
 
     this.router.navigate([`/auth/login`])
   }
