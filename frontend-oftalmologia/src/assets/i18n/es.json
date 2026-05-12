@@ -1217,8 +1217,8 @@
     "EDIT_MEDICAL_HISTORY": "Editar Historial Clínico",
     "DELETE_MEDICAL_HISTORY": "Eliminar Historial Clínico",
     "PATIENT_GENERAL_DATA": "Datos Generales del Paciente",
-    "MEASUREMENTS_AND_RX": "Mediciones y RX",
-    "DIAGNOSIS_AND_EXAMS": "Diagnóstico y Exámenes",
+    "MEASUREMENTS_AND_RX": "Exámenes y Mediciones",
+    "DIAGNOSIS_AND_EXAMS": "RX, Tratamientos y Diagnóstico",
     "STEP": "Paso",
     "LOADING": "Cargando historial clínico...",
     "NO_DATA": "No se pudo cargar el historial clínico",
@@ -1335,8 +1335,11 @@
       "HEALTH_PROBLEMS": "Problemas de salud",
       "VISUAL_COMPLAINTS": "Motivo de consulta",
       "SELECT_LENS_TYPES": "Seleccione los tipos de lentes",
-      "ADDITIONAL_TREATMENTS": "Agudeza Visual Corregida",
-      "SELECT_ADDITIONAL_TREATMENTS": "Seleccione los tratamientos adicionales"
+      "ADDITIONAL_TREATMENTS": "Tratamientos",
+      "SELECT_ADDITIONAL_TREATMENTS": "Seleccione los tratamientos"
+    },
+    "HELPERS": {
+      "PROFESSIONAL_AUTOFILLED": "Se autocompleta con el usuario que crea el registro."
     },
     "MOTOR_TESTS": {
       "EXOPHORIA": "Exoforia",
@@ -1390,8 +1393,8 @@
     },
     "FORM": {
       "STEP1_TITLE": "Paso 1 — Datos y antecedentes",
-      "STEP2_TITLE": "Paso 2 — Medidas, test motor y RX",
-      "STEP3_TITLE": "Paso 3 — Diagnóstico y exámenes",
+      "STEP2_TITLE": "Paso 2 — Exámenes y mediciones",
+      "STEP3_TITLE": "Paso 3 — RX, tratamientos y diagnóstico",
       "PATIENT_INFORMATION": "Información del Paciente",
       "PREVIOUS_RX_LENSOMETRY": "LENSOMETRÍA RX ANTERIOR",
       "VISUAL_ACUITY_WITHOUT_RX": "Agudeza visual sin RX",

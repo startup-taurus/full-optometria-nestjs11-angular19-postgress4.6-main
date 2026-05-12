@@ -14,7 +14,11 @@ import { Subject, takeUntil } from 'rxjs'
 import { ToastrService } from 'ngx-toastr'
 import { ClinicalHistoriesService } from '@core/services/api/clinical-histories.service'
 import { FieldVisibilityService } from '@core/services/ui/field-visibility.service'
-import { FieldsConfig } from '@core/interfaces/api/clinical-form-config.interface'
+import { AuthenticationService } from '@core/services/api/auth.service'
+import {
+  DEFAULT_CLINICAL_FORM_STRUCTURE,
+  FieldsConfig,
+} from '@core/interfaces/api/clinical-form-config.interface'
 import { BaseStepModalComponent } from '../../../../shared/components/base-step-modal/base-step-modal.component'
 import { ClinicalHistoryStep1Component } from '../steps/clinical-history-step1/clinical-history-step1.component'
 import { ClinicalHistoryStep2Component } from '../steps/clinical-history-step2/clinical-history-step2.component'
@@ -63,11 +67,12 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   private _formBuilder = inject(FormBuilder)
   private _translateService = inject(TranslateService)
   private _fieldVisibilityService = inject(FieldVisibilityService)
+  private _authService = inject(AuthenticationService)
   private _toastr = inject(ToastrService)
 
   public clinicalForm!: FormGroup
   public saving = false
-  public fieldsConfig: FieldsConfig | null = null
+  public fieldsConfig: FieldsConfig | null = DEFAULT_CLINICAL_FORM_STRUCTURE
 
   public currentStep = 1
   public totalSteps = 3
@@ -80,6 +85,23 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
     this.initializeForm()
     this.loadFieldsConfiguration()
     this.loadExistingData()
+    this.applyDefaultProfessionalName()
+  }
+
+  private applyDefaultProfessionalName(): void {
+    if (this.editMode || this.duplicateMode) {
+      return
+    }
+
+    const currentUser = this._authService.getCurrentUser()
+    if (!currentUser) {
+      return
+    }
+
+    const fullName = `${currentUser.firstName ?? ''} ${currentUser.lastName ?? ''}`.trim()
+    if (fullName) {
+      this.clinicalForm.get('professionalName')?.setValue(fullName)
+    }
   }
 
   ngOnDestroy(): void {

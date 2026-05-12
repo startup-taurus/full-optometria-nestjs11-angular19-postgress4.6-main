@@ -1205,8 +1205,8 @@
     "EDIT_MEDICAL_HISTORY": "Edit Medical History",
     "DELETE_MEDICAL_HISTORY": "Delete Medical History",
     "PATIENT_GENERAL_DATA": "Patient General Data",
-    "MEASUREMENTS_AND_RX": "Measurements and RX",
-    "DIAGNOSIS_AND_EXAMS": "Diagnosis and Exams",
+    "MEASUREMENTS_AND_RX": "Exams and Measurements",
+    "DIAGNOSIS_AND_EXAMS": "RX, Treatments and Diagnosis",
     "STEP": "Step",
     "LOADING": "Loading medical history...",
     "NO_DATA": "Could not load medical history",
@@ -1323,8 +1323,11 @@
       "HEALTH_PROBLEMS": "Health problems",
       "VISUAL_COMPLAINTS": "Reason for Consultation",
       "SELECT_LENS_TYPES": "Select lens types",
-      "ADDITIONAL_TREATMENTS": "Corrected Visual Acuity",
-      "SELECT_ADDITIONAL_TREATMENTS": "Select additional treatments"
+      "ADDITIONAL_TREATMENTS": "Treatments",
+      "SELECT_ADDITIONAL_TREATMENTS": "Select treatments"
+    },
+    "HELPERS": {
+      "PROFESSIONAL_AUTOFILLED": "Auto-filled with the user who creates the record."
     },
     "MOTOR_TESTS": {
       "EXOPHORIA": "Exophoria",
@@ -1378,8 +1381,8 @@
     },
     "FORM": {
       "STEP1_TITLE": "Step 1 — Data and background",
-      "STEP2_TITLE": "Step 2 — Measurements, motor tests and RX",
-      "STEP3_TITLE": "Step 3 — Diagnosis and exams",
+      "STEP2_TITLE": "Step 2 — Exams and measurements",
+      "STEP3_TITLE": "Step 3 — RX, treatments and diagnosis",
       "PATIENT_INFORMATION": "Patient Information",
       "PREVIOUS_RX_LENSOMETRY": "PREVIOUS RX LENSOMETRY",
       "VISUAL_ACUITY_WITHOUT_RX": "Visual acuity without RX",

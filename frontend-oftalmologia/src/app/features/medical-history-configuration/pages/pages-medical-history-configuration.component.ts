@@ -56,11 +56,29 @@ export class PagesMedicalHistoryConfigurationComponent
   public loading = false
   public saving = false
 
-  public accordionState = {
-    step1: true,
-    step2: true,
-    step3: true,
-  }
+  public activeTab: 'step1' | 'step2' | 'step3' = 'step1'
+
+  public readonly stepTabs: ReadonlyArray<{
+    key: 'step1' | 'step2' | 'step3'
+    icon: string
+    translateKey: string
+  }> = [
+    {
+      key: 'step1',
+      icon: 'ti-user',
+      translateKey: 'MEDICAL_HISTORY_CONFIG.STEP1_TITLE',
+    },
+    {
+      key: 'step2',
+      icon: 'ti-eye',
+      translateKey: 'MEDICAL_HISTORY_CONFIG.STEP2_TITLE',
+    },
+    {
+      key: 'step3',
+      icon: 'ti-stethoscope',
+      translateKey: 'MEDICAL_HISTORY_CONFIG.STEP3_TITLE',
+    },
+  ]
 
   public readonly LABELS = CLINICAL_FORM_LABELS
   public readonly DEFAULT_STRUCTURE = DEFAULT_CLINICAL_FORM_STRUCTURE
@@ -165,7 +183,7 @@ export class PagesMedicalHistoryConfigurationComponent
     }
   }
 
-  private resetFormToDefault(): void {
+  public resetFormToDefault(): void {
     this.configForm.patchValue({
       fieldsConfig: DEFAULT_CLINICAL_FORM_STRUCTURE,
     })
@@ -353,11 +371,32 @@ export class PagesMedicalHistoryConfigurationComponent
     )
   }
 
-  public toggleAccordion(step: 'step1' | 'step2' | 'step3'): void {
-    this.accordionState[step] = !this.accordionState[step]
+  public setActiveTab(tab: 'step1' | 'step2' | 'step3'): void {
+    this.activeTab = tab
   }
 
-  public isAccordionOpen(step: 'step1' | 'step2' | 'step3'): boolean {
-    return this.accordionState[step]
+  public getSectionsByActiveTab(): string[] {
+    return this.getSectionsByStep(this.activeTab)
+  }
+
+  public getEnabledSectionCount(step: 'step1' | 'step2' | 'step3'): number {
+    return this.getSectionsByStep(step).filter((key) =>
+      this.isSectionVisible(key)
+    ).length
+  }
+
+  public getTotalSectionCount(step: 'step1' | 'step2' | 'step3'): number {
+    return this.getSectionsByStep(step).length
+  }
+
+  private getSectionsByStep(step: 'step1' | 'step2' | 'step3'): string[] {
+    switch (step) {
+      case 'step1':
+        return this.getStep1Sections()
+      case 'step2':
+        return this.getStep2Sections()
+      case 'step3':
+        return this.getStep3Sections()
+    }
   }
 }
