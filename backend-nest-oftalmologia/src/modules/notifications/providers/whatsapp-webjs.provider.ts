@@ -2,6 +2,7 @@ import { Injectable, Logger, OnApplicationShutdown } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as QRCode from 'qrcode';
+import { defer, Observable, ReplaySubject, concat, of } from 'rxjs';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import {
   RequestQrRefreshReason,
@@ -50,6 +51,7 @@ export class WhatsAppWebJsProvider
   private readonly logger = new Logger(WhatsAppWebJsProvider.name);
   private readonly sessions = new Map<string, SessionRuntime>();
   private readonly operationChains = new Map<string, Promise<void>>();
+  private readonly sessionSubjects = new Map<string, ReplaySubject<WhatsAppSessionSnapshot>>();
   private readonly staleRuntimeMs = 120000;
   private readonly freshQrMs = 60000;
   private readonly bootingTimeoutMs = 90000;
@@ -71,6 +73,10 @@ export class WhatsAppWebJsProvider
   async onApplicationShutdown(): Promise<void> {
     await this.destroyAll();
     await this.cleanupOldCacheEntries();
+    for (const subject of this.sessionSubjects.values()) {
+      subject.complete();
+    }
+    this.sessionSubjects.clear();
   }
 
   async ensureRuntime(sessionKey: string): Promise<WhatsAppSessionSnapshot> {
@@ -254,6 +260,25 @@ export class WhatsAppWebJsProvider
     return false;
   }
 
+  getSessionStream(sessionKey: string): Observable<WhatsAppSessionSnapshot> {
+    return defer(() => {
+      const subject = this.getOrCreateSessionSubject(sessionKey);
+      const seed = of(this.getSnapshotFor(sessionKey));
+      return concat(seed, subject.asObservable());
+    });
+  }
+
+  private getOrCreateSessionSubject(
+    sessionKey: string,
+  ): ReplaySubject<WhatsAppSessionSnapshot> {
+    let subject = this.sessionSubjects.get(sessionKey);
+    if (!subject) {
+      subject = new ReplaySubject<WhatsAppSessionSnapshot>(1);
+      this.sessionSubjects.set(sessionKey, subject);
+    }
+    return subject;
+  }
+
   async sendMessage(
     sessionKey: string,
     phone: string,
@@ -297,6 +322,7 @@ export class WhatsAppWebJsProvider
       }
 
       await this.clearAuthState(sessionKey);
+      this.sessionSubjects.get(sessionKey)?.next(this.getSnapshotFor(sessionKey));
     });
   }
 
@@ -695,6 +721,8 @@ export class WhatsAppWebJsProvider
       this.removeStateWaiter(runtime, waiter);
       waiter.resolve(snapshot);
     }
+
+    this.sessionSubjects.get(sessionKey)?.next(snapshot);
   }
 
   private removeStateWaiter(runtime: SessionRuntime, waiter: StateWaiter): void {

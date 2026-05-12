@@ -1,0 +1,43 @@
+<div class="tpl-editor">
+  <div class="tpl-editor__header">
+    <h5 class="m-0">{{ 'NOTIFICATIONS.TEMPLATE.MODAL_TITLE' | translate }}</h5>
+    <p class="text-muted small mb-0">{{ 'NOTIFICATIONS.TEMPLATE.MODAL_DESCRIPTION' | translate }}</p>
+  </div>
+
+  <div class="tpl-editor__variables">
+    <span class="tpl-editor__variables-label">
+      <i class="ri-magic-line text-success me-1"></i>
+      {{ 'NOTIFICATIONS.TEMPLATE.INSERT_VARIABLE' | translate }}
+    </span>
+    @for (variable of variables; track variable.key) {
+      <button
+        type="button"
+        class="tpl-chip"
+        (click)="insertVariable(variable.key)"
+        [ngbTooltip]="'NOTIFICATIONS.TEMPLATE.TOOLTIP_INSERT' | translate"
+        container="body"
+      >
+        <code>{{ formatVariable(variable.key) }}</code>
+      </button>
+    }
+  </div>
+
+  <textarea
+    #textarea
+    class="form-control tpl-editor__textarea"
+    rows="6"
+    [ngModel]="draft()"
+    (ngModelChange)="onChange($event)"
+    [placeholder]="'NOTIFICATIONS.TEMPLATE.PLACEHOLDER' | translate"
+  ></textarea>
+
+  <div class="tpl-editor__preview">
+    <div class="tpl-editor__preview-header">
+      <i class="ri-eye-line text-success"></i>
+      <span>{{ 'NOTIFICATIONS.TEMPLATE.PREVIEW' | translate }}</span>
+    </div>
+    <div class="tpl-bubble">
+      <p>{{ preview() || ('NOTIFICATIONS.TEMPLATE.PREVIEW_EMPTY' | translate) }}</p>
+    </div>
+  </div>
+</div>

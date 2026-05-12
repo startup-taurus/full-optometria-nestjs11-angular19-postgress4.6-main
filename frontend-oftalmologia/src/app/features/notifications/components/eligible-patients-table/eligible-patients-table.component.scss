@@ -1,0 +1,143 @@
+:host {
+  display: block;
+  --ept-bg: #ffffff;
+  --ept-border: rgba(229, 231, 235, 0.7);
+  --ept-text: #111827;
+  --ept-muted: #6b7280;
+  --ept-input-bg: #f9fafb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host:not([data-bs-theme='light']) {
+    --ept-bg: #1f2937;
+    --ept-border: rgba(75, 85, 99, 0.4);
+    --ept-text: #f9fafb;
+    --ept-muted: #9ca3af;
+    --ept-input-bg: #111827;
+  }
+}
+
+[data-bs-theme='dark'] :host {
+  --ept-bg: #1f2937;
+  --ept-border: rgba(75, 85, 99, 0.4);
+  --ept-text: #f9fafb;
+  --ept-muted: #9ca3af;
+  --ept-input-bg: #111827;
+}
+
+.ept {
+  background: var(--ept-bg);
+  border: 1px solid var(--ept-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--ept-text);
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  &__search {
+    position: relative;
+    flex: 1 1 240px;
+    max-width: 360px;
+
+    i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ept-muted);
+    }
+
+    input {
+      padding-left: 2.4rem;
+      background: var(--ept-input-bg);
+      border-color: var(--ept-border);
+      color: var(--ept-text);
+      border-radius: 10px;
+
+      &:focus {
+        border-color: #25d366;
+        box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15);
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__selection-info {
+    font-size: 0.85rem;
+    color: var(--ept-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  &__patient {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__patient-name {
+    font-weight: 600;
+    color: var(--ept-text);
+  }
+
+  &__days {
+    font-weight: 700;
+    color: var(--ept-text);
+
+    &.is-soon {
+      color: #ef4444;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--ept-muted);
+
+    i {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .ept {
+    padding: 1rem;
+
+    &__toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__search {
+      max-width: 100%;
+    }
+
+    &__actions {
+      justify-content: flex-end;
+    }
+  }
+}

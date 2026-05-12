@@ -1,0 +1,138 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="rules-form" novalidate>
+  <div class="rules-form__header">
+    <div>
+      <h5 class="m-0">{{ 'NOTIFICATIONS.RULE.TITLE' | translate }}</h5>
+      <p class="text-muted mb-0 small">{{ 'NOTIFICATIONS.RULE.TOOLTIP_GENERAL' | translate }}</p>
+    </div>
+
+    <div class="form-check form-switch rules-form__switch">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="ruleActive"
+        formControlName="isActive"
+      />
+      <label class="form-check-label" for="ruleActive">
+        <span>{{ 'NOTIFICATIONS.RULE.ACTIVE' | translate }}</span>
+        <i
+          class="ri-question-line ms-1 text-muted"
+          [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_ACTIVE' | translate"
+          container="body"
+          tabindex="0"
+        ></i>
+      </label>
+    </div>
+  </div>
+
+  <div class="rules-form__grid">
+    <div class="rules-field">
+      <label class="form-label">
+        <i class="ri-calendar-event-line text-success"></i>
+        {{ 'NOTIFICATIONS.RULE.HOURS_BEFORE' | translate }}
+        <i
+          class="ri-question-line text-muted ms-1"
+          [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_HOURS_BEFORE' | translate"
+          container="body"
+          tabindex="0"
+        ></i>
+      </label>
+      <div class="rules-field__input">
+        <input
+          class="form-control"
+          type="number"
+          min="1"
+          max="168"
+          formControlName="appointmentReminderHoursBefore"
+        />
+        <span class="rules-field__suffix">{{ 'NOTIFICATIONS.RULE.UNIT_HOURS' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="rules-field">
+      <label class="form-label">
+        <i class="ri-refresh-line text-success"></i>
+        {{ 'NOTIFICATIONS.RULE.RENEWAL_AFTER_DAYS' | translate }}
+        <i
+          class="ri-question-line text-muted ms-1"
+          [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_RENEWAL_AFTER' | translate"
+          container="body"
+          tabindex="0"
+        ></i>
+      </label>
+      <div class="rules-field__input">
+        <input
+          class="form-control"
+          type="number"
+          min="30"
+          max="3650"
+          formControlName="renewalAfterDays"
+        />
+        <span class="rules-field__suffix">{{ 'NOTIFICATIONS.RULE.UNIT_DAYS' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="rules-field">
+      <label class="form-label">
+        <i class="ri-notification-3-line text-success"></i>
+        {{ 'NOTIFICATIONS.RULE.NOTIFY_BEFORE_DAYS' | translate }}
+        <i
+          class="ri-question-line text-muted ms-1"
+          [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_NOTIFY_BEFORE' | translate"
+          container="body"
+          tabindex="0"
+        ></i>
+      </label>
+      <div class="rules-field__input">
+        <input
+          class="form-control"
+          type="number"
+          min="1"
+          max="180"
+          formControlName="renewalNotifyBeforeDays"
+        />
+        <span class="rules-field__suffix">{{ 'NOTIFICATIONS.RULE.UNIT_DAYS' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="rules-field rules-field--quiet">
+      <label class="form-label">
+        <i class="ri-moon-line text-success"></i>
+        {{ 'NOTIFICATIONS.RULE.QUIET_HOURS' | translate }}
+        <i
+          class="ri-question-line text-muted ms-1"
+          [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS_START' | translate"
+          container="body"
+          tabindex="0"
+        ></i>
+      </label>
+      <div class="rules-field__quiet-row">
+        <input
+          class="form-control"
+          type="time"
+          formControlName="quietHoursStart"
+        />
+        <span class="rules-field__quiet-arrow">→</span>
+        <input
+          class="form-control"
+          type="time"
+          formControlName="quietHoursEnd"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="rules-form__footer">
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="saving || form.invalid"
+    >
+      @if (saving) {
+        <span class="spinner-border spinner-border-sm me-1"></span>
+      }
+      <i class="ri-save-line me-1" *ngIf="!saving"></i>
+      {{ 'NOTIFICATIONS.RULE.SAVE' | translate }}
+    </button>
+  </div>
+</form>

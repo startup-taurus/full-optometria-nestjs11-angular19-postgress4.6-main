@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, MessageEvent, Patch, Post, Query, Sse, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Observable } from 'rxjs';
 import { BranchContext } from '../../common/decorators/branch-context.decorator';
 import { CompanyId } from '../../common/decorators/company-id.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -30,6 +31,15 @@ export class NotificationsController {
     @CurrentUser() user: any,
   ) {
     return this.notificationsService.getWhatsAppSession(branchId, companyId, user.id);
+  }
+
+  @Sse('whatsapp/session/stream')
+  streamWhatsAppSession(
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null,
+    @CurrentUser() user: any,
+  ): Observable<MessageEvent> {
+    return this.notificationsService.streamWhatsAppSession(branchId, companyId, user.id);
   }
 
   @Post('whatsapp/session/refresh-qr')

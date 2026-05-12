@@ -1,0 +1,57 @@
+:host {
+  display: inline-block;
+  --wa-green: #25d366;
+  --wa-green-soft: rgba(37, 211, 102, 0.18);
+  --wa-yellow: #f59e0b;
+  --wa-yellow-soft: rgba(245, 158, 11, 0.18);
+  --wa-gray: #6b7280;
+  --wa-gray-soft: rgba(107, 114, 128, 0.18);
+}
+
+.wa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--wa-gray-soft);
+  color: var(--wa-gray);
+  transition: background 0.3s ease, color 0.3s ease;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: 0 0 auto;
+
+    &.is-connected {
+      animation: badgePulse 1.8s ease-in-out infinite;
+    }
+  }
+
+  &[data-status='connected'] {
+    background: var(--wa-green-soft);
+    color: var(--wa-green);
+  }
+
+  &[data-status='qr_ready'],
+  &[data-status='loading'] {
+    background: var(--wa-yellow-soft);
+    color: var(--wa-yellow);
+  }
+}
+
+@keyframes badgePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6);
+    opacity: 1;
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(37, 211, 102, 0);
+    opacity: 0.7;
+  }
+}

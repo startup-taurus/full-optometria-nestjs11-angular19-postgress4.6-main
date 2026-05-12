@@ -29,6 +29,7 @@
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/list": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@ng-bootstrap/ng-bootstrap": "^17.0.1",
     "@ng-select/ng-select": "^14.2.0",
     "@ngrx/effects": "^18.1.1",

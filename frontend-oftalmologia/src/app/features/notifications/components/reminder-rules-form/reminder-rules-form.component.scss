@@ -1,0 +1,149 @@
+:host {
+  display: block;
+  --rf-bg: #ffffff;
+  --rf-border: rgba(229, 231, 235, 0.7);
+  --rf-text: #111827;
+  --rf-muted: #6b7280;
+  --rf-suffix-bg: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host:not([data-bs-theme='light']) {
+    --rf-bg: #1f2937;
+    --rf-border: rgba(75, 85, 99, 0.4);
+    --rf-text: #f9fafb;
+    --rf-muted: #9ca3af;
+    --rf-suffix-bg: #111827;
+  }
+}
+
+[data-bs-theme='dark'] :host {
+  --rf-bg: #1f2937;
+  --rf-border: rgba(75, 85, 99, 0.4);
+  --rf-text: #f9fafb;
+  --rf-muted: #9ca3af;
+  --rf-suffix-bg: #111827;
+}
+
+.rules-form {
+  background: var(--rf-bg);
+  border: 1px solid var(--rf-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  color: var(--rf-text);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__switch {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .form-check-input {
+      cursor: pointer;
+      width: 2.5em;
+      height: 1.25em;
+    }
+
+    label {
+      cursor: pointer;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.rules-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  .form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--rf-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+
+  &__input {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--rf-border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+
+    &:focus-within {
+      border-color: #25d366;
+      box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15);
+    }
+
+    .form-control {
+      border: none;
+      background: transparent;
+      color: var(--rf-text);
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+  &__suffix {
+    background: var(--rf-suffix-bg);
+    color: var(--rf-muted);
+    padding: 0 1rem;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  &--quiet {
+    grid-column: 1 / -1;
+  }
+
+  &__quiet-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .form-control {
+      max-width: 140px;
+    }
+  }
+
+  &__quiet-arrow {
+    color: var(--rf-muted);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+}

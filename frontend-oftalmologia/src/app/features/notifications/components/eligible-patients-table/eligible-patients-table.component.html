@@ -1,0 +1,69 @@
+<div class="ept">
+  <div class="ept__toolbar">
+    <div class="ept__search">
+      <i class="ri-search-line"></i>
+      <input
+        type="search"
+        class="form-control"
+        [placeholder]="'NOTIFICATIONS.ELIGIBLE.SEARCH' | translate"
+        [ngModel]="searchValue"
+        (ngModelChange)="onSearch($event)"
+      />
+    </div>
+
+    <div class="ept__actions">
+      @if (selectedIds().size > 0) {
+        <span class="ept__selection-info">
+          <i class="ri-checkbox-multiple-line text-success"></i>
+          {{ selectedIds().size }} {{ 'NOTIFICATIONS.ELIGIBLE.SELECTED' | translate }}
+        </span>
+        <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()">
+          <i class="ri-close-line"></i>
+        </button>
+      }
+      <button class="btn btn-sm btn-outline-primary" (click)="onRefresh()">
+        <i class="ri-refresh-line me-1"></i>
+        {{ 'NOTIFICATIONS.ELIGIBLE.REFRESH' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <ng-template #checkboxTpl let-row="row">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      [checked]="isSelected(row.patientId)"
+      (change)="toggleOne(row.patientId, $any($event.target).checked)"
+    />
+  </ng-template>
+
+  <ng-template #patientTpl let-row="row">
+    <div class="ept__patient">
+      <span class="ept__patient-name">{{ row.firstName }} {{ row.lastName }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template #daysTpl let-row="row">
+    <span class="ept__days" [class.is-soon]="row.isDueSoon">
+      {{ row.daysUntilRenewal }}
+    </span>
+  </ng-template>
+
+  <ng-template #dueSoonTpl let-row="row">
+    <span class="badge rounded-pill" [class.text-bg-success]="row.isDueSoon" [class.text-bg-secondary]="!row.isDueSoon">
+      {{ row.isDueSoon ? ('NOTIFICATIONS.ELIGIBLE.DUE_SOON_YES' | translate) : ('NOTIFICATIONS.ELIGIBLE.DUE_SOON_NO' | translate) }}
+    </span>
+  </ng-template>
+
+  <shared-ngx-datatable
+    [data]="_patients()"
+    [config]="tableConfig()"
+  ></shared-ngx-datatable>
+
+  @if (!_patients().length && !loading) {
+    <div class="ept__empty">
+      <i class="ri-inbox-line"></i>
+      <p>{{ 'NOTIFICATIONS.ELIGIBLE.EMPTY' | translate }}</p>
+    </div>
+  }
+</div>

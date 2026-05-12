@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { environment } from '@environment/environment'
 import { ApiData, ApiResponse } from '@core/interfaces/api/api-response.interface'
 import {
@@ -10,15 +10,55 @@ import {
 } from '@core/interfaces/api/notifications.interface'
 import { Observable } from 'rxjs'
 import { tap, catchError } from 'rxjs/operators'
-import { throwError } from 'rxjs'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { StorageService } from '@core/services/ui/storage.service'
+import { USER_SESSION } from '@core/helpers/global/global.constants'
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationsService {
   private readonly API_URL = `${environment.apiBaseUrl}/notifications`
+  private readonly storageService = inject(StorageService)
 
   constructor(private readonly http: HttpClient) {}
+
+  streamSession(): Observable<WhatsAppSession> {
+    return new Observable<WhatsAppSession>((subscriber) => {
+      const ctrl = new AbortController()
+      const session = JSON.parse(
+        this.storageService.secureStorage.getItem(USER_SESSION) || 'null'
+      )
+      const token = session?.accessToken
+      const headers: Record<string, string> = { Accept: 'text/event-stream' }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      fetchEventSource(`${this.API_URL}/whatsapp/session/stream`, {
+        signal: ctrl.signal,
+        headers,
+        openWhenHidden: true,
+        onmessage: (ev) => {
+          if (!ev.data) return
+          try {
+            subscriber.next(JSON.parse(ev.data))
+          } catch (err) {
+            console.error('[SSE] parse error', err)
+          }
+        },
+        onerror: (err) => {
+          console.warn('[SSE] error', err)
+        },
+      }).catch((err) => {
+        if (!ctrl.signal.aborted) {
+          subscriber.error(err)
+        }
+      })
+
+      return () => ctrl.abort()
+    })
+  }
 
   getWhatsAppSession(): Observable<ApiResponse<WhatsAppSession>> {
     return this.http.get<ApiResponse<WhatsAppSession>>(

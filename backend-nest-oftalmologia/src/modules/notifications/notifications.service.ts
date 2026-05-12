@@ -1,7 +1,9 @@
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, MessageEvent } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron } from '@nestjs/schedule';
 import { randomUUID } from 'crypto';
+import { defer, from, Observable, switchMap } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Between, In, IsNull, QueryFailedError, Repository } from 'typeorm';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 import { PaginationUtil } from '../../common/utils/pagination.util';
@@ -116,6 +118,25 @@ export class NotificationsService {
       messageKey: 'NOTIFICATIONS.WHATSAPP_SESSION_FOUND',
       data: normalizedSession,
     };
+  }
+
+  streamWhatsAppSession(
+    branchId: string,
+    companyId: string | null,
+    userId: string,
+  ): Observable<MessageEvent> {
+    return defer(() =>
+      from(this.getOrCreateSession(branchId, companyId, userId)),
+    ).pipe(
+      switchMap((session) =>
+        this.whatsappProvider.getSessionStream(session.sessionKey).pipe(
+          switchMap((snapshot) =>
+            from(this.applySnapshotToSession(session, snapshot)),
+          ),
+          map((updatedSession) => ({ data: updatedSession }) as MessageEvent),
+        ),
+      ),
+    );
   }
 
   async refreshWhatsAppQr(branchId: string, companyId: string | null, userId: string) {
@@ -983,6 +1004,18 @@ export class NotificationsService {
 
     if (snapshot.state === 'booting' || snapshot.state === 'authenticated') {
       return session;
+    }
+
+    if (
+      snapshot.state === 'idle' &&
+      session.status === WhatsAppSessionStatus.CONNECTED
+    ) {
+      const authExists = await this.whatsappProvider.hasAuthOnDisk(
+        session.sessionKey,
+      );
+      if (authExists) {
+        return session;
+      }
     }
 
     if (
