@@ -14,6 +14,8 @@ import { Subject } from 'rxjs'
 export class LaboratoryOrderStep3Component implements OnInit, OnDestroy {
   @Input() formGroup!: FormGroup
 
+  public digitalParamsExpanded = false
+
   private destroy$ = new Subject<void>()
 
   ngOnInit(): void {
@@ -22,5 +24,9 @@ export class LaboratoryOrderStep3Component implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  public toggleDigitalParams(): void {
+    this.digitalParamsExpanded = !this.digitalParamsExpanded
   }
 }

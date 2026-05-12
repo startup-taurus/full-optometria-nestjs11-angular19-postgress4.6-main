@@ -501,6 +501,76 @@ export class LaboratoryOrderPdfService {
         },
         { text: '', margin: [0, 5, 0, 5] },
         {
+          text: this._translateService.instant(
+            'PDF.LABORATORY_ORDER.DIGITAL_PARAMETERS'
+          ),
+          style: 'sectionTitle',
+        },
+        {
+          table: {
+            widths: ['20%', '20%', '20%', '20%', '20%'],
+            headerRows: 1,
+            body: [
+              [
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.D_VERTEX'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.PANTOS'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.PANORA'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.DIST_VP'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.ENGRAVING'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+              ],
+              [
+                { text: order.dVertex || '-', alignment: 'center' },
+                { text: order.pantos || '-', alignment: 'center' },
+                { text: order.panora || '-', alignment: 'center' },
+                { text: order.distVp || '-', alignment: 'center' },
+                { text: order.engraving || '-', alignment: 'center' },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#CCCCCC',
+            vLineColor: () => '#CCCCCC',
+          },
+        },
+        { text: '', margin: [0, 5, 0, 5] },
+        {
           table: {
             widths: ['*'],
             body: [
