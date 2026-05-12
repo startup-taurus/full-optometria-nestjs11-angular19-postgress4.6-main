@@ -129,6 +129,18 @@
   }
 }
 
+:host-context([data-bs-theme='dark']) {
+  .ept__status-badge--soon {
+    background-color: #b45309;
+    color: #fef3c7;
+  }
+
+  .ept__status-badge--ok {
+    background-color: #374151;
+    color: #e5e7eb;
+  }
+}
+
 @media (max-width: 576px) {
   .ept {
     padding: 1rem;
