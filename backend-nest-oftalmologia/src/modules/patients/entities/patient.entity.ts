@@ -38,7 +38,10 @@ export class Patient {
   branchId: string;
 
   @Column({ name: 'date_of_birth', nullable: true })
-  dateOfBirth: Date;
+  dateOfBirth: Date | null;
+
+  @Column({ name: 'birth_year', type: 'smallint', nullable: true })
+  birthYear: number | null;
 
   @Column({ name: 'address', nullable: true })
   address: string;

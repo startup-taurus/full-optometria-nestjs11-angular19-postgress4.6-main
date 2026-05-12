@@ -6,8 +6,13 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export class CreatePatientDto {
   @IsString()
@@ -44,7 +49,16 @@ export class CreatePatientDto {
 
   @IsDateString()
   @IsOptional()
-  dateOfBirth?: string;
+  dateOfBirth?: string | null;
+
+  @IsInt()
+  @IsOptional()
+  @Min(1900)
+  @Max(CURRENT_YEAR)
+  @Transform(({ value }) =>
+    value === null || value === undefined || value === '' ? null : Number(value)
+  )
+  birthYear?: number | null;
 
   @IsString()
   @IsOptional()

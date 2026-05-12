@@ -126,6 +126,7 @@ export class PatientsService {
       email,
       documentNumber,
       dateOfBirth,
+      birthYear,
       companyId: _,
       branchId: __,
       ...patientData
@@ -176,11 +177,17 @@ export class PatientsService {
       }
     }
 
+    const resolvedDateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
+    const resolvedBirthYear = resolvedDateOfBirth
+      ? null
+      : birthYear ?? null;
+
     const patient = this.patientRepository.create({
       email: normalizedEmail,
       documentNumber: normalizedDocumentNumber,
       companyId: resolvedCompanyId,
-      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+      dateOfBirth: resolvedDateOfBirth,
+      birthYear: resolvedBirthYear,
       ...patientData,
       branchId,
     });
@@ -262,6 +269,7 @@ export class PatientsService {
         'patient.email',
         'patient.documentNumber',
         'patient.dateOfBirth',
+        'patient.birthYear',
         'patient.address',
         'patient.homePhone',
         'patient.mobilePhone',
@@ -399,7 +407,7 @@ export class PatientsService {
       });
     }
 
-    const { email, documentNumber, dateOfBirth, ...updateData } =
+    const { email, documentNumber, dateOfBirth, birthYear, ...updateData } =
       updatePatientDto;
 
     const normalizedEmail =
@@ -454,17 +462,31 @@ export class PatientsService {
       }
     }
 
-    const updateDataMapped = {
+    const updateDataMapped: any = {
       email: normalizedEmail,
       documentNumber: normalizedDocumentNumber,
-      dateOfBirth:
-        typeof dateOfBirth === 'string'
-          ? new Date(dateOfBirth)
-          : dateOfBirth === null
-          ? null
-          : undefined,
       ...updateData,
     };
+
+    if (dateOfBirth !== undefined) {
+      const parsedDate =
+        typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : null;
+      updateDataMapped.dateOfBirth = parsedDate;
+      if (parsedDate) {
+        updateDataMapped.birthYear = null;
+      }
+    }
+
+    if (birthYear !== undefined && dateOfBirth === undefined) {
+      const parsedYear =
+        birthYear === null || birthYear === undefined
+          ? null
+          : Number(birthYear);
+      updateDataMapped.birthYear = parsedYear;
+      if (parsedYear !== null) {
+        updateDataMapped.dateOfBirth = null;
+      }
+    }
 
     delete (updateDataMapped as any).companyId;
     delete (updateDataMapped as any).branchId;
