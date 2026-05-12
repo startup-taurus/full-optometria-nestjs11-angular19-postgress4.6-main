@@ -19,7 +19,7 @@
     <div class="connected-header">
       <div class="connected-header__left">
         <div class="connected-header__icon">
-          <i class="ri-whatsapp-line"></i>
+          <i class="ti ti-brand-whatsapp"></i>
         </div>
         <div>
           <h5 class="m-0">{{ 'NOTIFICATIONS.TITLE' | translate }}</h5>
@@ -38,7 +38,7 @@
           class="btn btn-sm btn-outline-danger"
           (click)="onDisconnect()"
         >
-          <i class="ri-logout-circle-line me-1"></i>
+          <i class="ti ti-logout me-1"></i>
           {{ 'NOTIFICATIONS.SESSION.LOGOUT' | translate }}
         </button>
       </div>
@@ -47,7 +47,7 @@
     <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav nav-pills notifications-tabs">
       <li [ngbNavItem]="1">
         <a ngbNavLink>
-          <i class="ri-user-add-line me-1"></i>
+          <i class="ti ti-user-plus me-1"></i>
           {{ 'NOTIFICATIONS.TABS.RENEWALS' | translate }}
         </a>
         <ng-template ngbNavContent>
@@ -62,7 +62,7 @@
 
           <div class="send-bar">
             <div class="send-bar__info">
-              <i class="ri-send-plane-line text-success"></i>
+              <i class="ti ti-send text-success"></i>
               <span>
                 @if (selectedPatientIds().length) {
                   {{ selectedPatientIds().length }} {{ 'NOTIFICATIONS.ELIGIBLE.SELECTED' | translate }}
@@ -80,7 +80,7 @@
               @if (sendingManual()) {
                 <span class="spinner-border spinner-border-sm me-1"></span>
               } @else {
-                <i class="ri-send-plane-line me-1"></i>
+                <i class="ti ti-send me-1"></i>
               }
               {{ 'NOTIFICATIONS.ELIGIBLE.SEND_MANUAL' | translate }}
             </button>
@@ -90,7 +90,7 @@
 
       <li [ngbNavItem]="2">
         <a ngbNavLink>
-          <i class="ri-settings-3-line me-1"></i>
+          <i class="ti ti-settings me-1"></i>
           {{ 'NOTIFICATIONS.TABS.RULES' | translate }}
         </a>
         <ng-template ngbNavContent>
@@ -104,7 +104,7 @@
 
       <li [ngbNavItem]="3">
         <a ngbNavLink>
-          <i class="ri-message-3-line me-1"></i>
+          <i class="ti ti-message me-1"></i>
           {{ 'NOTIFICATIONS.TABS.TEMPLATE' | translate }}
         </a>
         <ng-template ngbNavContent>
