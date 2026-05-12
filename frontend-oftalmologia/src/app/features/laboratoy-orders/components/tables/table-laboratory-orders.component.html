@@ -19,6 +19,12 @@
           <i class="ti ti-filter-off"></i>
         </button>
       }
+      <table-export-buttons
+        [columns]="exportColumns"
+        [rows]="filteredOrders"
+        filenameBase="ordenes-laboratorio"
+        [title]="'LABORATORY_ORDERS_MODULE.TITLE' | translate"
+      ></table-export-buttons>
       <!-- <button
         type="button"
         class="btn btn-outline-secondary btn-sm"

@@ -44,6 +44,8 @@ import { DEFAULT_NGX_DATATABLE_PAGINATION } from '@core/helpers/ui/ngx-datatable
 import { ClientFilterComponent } from '../filters/client-filter.component'
 import { ClientDetailsModalComponent } from '../modals/client-details-modal.component'
 import { ClientModalComponent } from '../../../laboratoy-orders/components/modals/client-modal/client-modal.component'
+import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
+import { ExportColumn } from '@core/services/ui/table-export.service'
 
 @Component({
   selector: 'app-clients-table',
@@ -54,6 +56,7 @@ import { ClientModalComponent } from '../../../laboratoy-orders/components/modal
     NgbModule,
     SideFilterPanelComponent,
     NgxDatatableComponent,
+    TableExportButtonsComponent,
   ],
   templateUrl: './clients-table.component.html',
   styleUrls: ['./clients-table.component.scss'],
@@ -79,6 +82,8 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
   public sideFilterComponent = ClientFilterComponent
   public config$ = new BehaviorSubject<Partial<NgxDatatableConfig>>({})
   public data$: Observable<Client[]> = of([])
+  public latestRows: Client[] = []
+  public exportColumns: ExportColumn<Client>[] = []
 
   public filter: ClientQueryParams = {}
   private _destroy$ = new Subject<void>()
@@ -93,6 +98,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.config$ = this.setConfigDatatable()
+    this.exportColumns = this.buildExportColumns()
     this.subscribeToBranchChanges()
 
     this._filterCommunicationService.currentFilter
@@ -103,6 +109,35 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
       })
 
     this._filterCommunicationService.resetFilter()
+  }
+
+  private buildExportColumns(): ExportColumn<Client>[] {
+    const translate = this._translate
+    return [
+      {
+        label: translate.instant('CLIENT.SINGULAR'),
+        formatter: (row) =>
+          `${row.firstName || ''} ${row.lastName || ''}`.trim() || '-',
+      },
+      {
+        label: translate.instant('CLIENT.DOCUMENT_NUMBER'),
+        key: 'documentNumber',
+      },
+      { label: translate.instant('CLIENT.EMAIL'), key: 'email' },
+      {
+        label: translate.instant('WORDS.PHONE'),
+        formatter: (row) => row.mobilePhone || row.homePhone || '-',
+      },
+      {
+        label: translate.instant('CLIENT.PATIENT_LINK'),
+        formatter: (row) => this.getPatientLabel(row),
+      },
+      {
+        label: translate.instant('COMMON.STATUS'),
+        formatter: (row) =>
+          translate.instant(row.isActive ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE'),
+      },
+    ]
   }
 
   private subscribeToBranchChanges(): void {
@@ -178,6 +213,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
 
     return this._clientsService.getAllGlobal(queryParams).pipe(
       tap((response) => {
+        this.latestRows = response.data || []
         this.config$.next({
           ...this.config$.value,
           loadingIndicator: false,

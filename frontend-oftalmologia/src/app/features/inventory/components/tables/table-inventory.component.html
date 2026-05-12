@@ -40,6 +40,14 @@
                 <i class="ti ti-barcode"></i>
               </button>
 
+              <table-export-buttons
+                [columns]="exportColumns"
+                [rows]="latestRows"
+                filenameBase="inventario"
+                [title]="'INVENTORY.TITLE' | translate"
+                [showPdf]="false"
+              ></table-export-buttons>
+
               <button
                 class="btn btn-outline-danger btn-sm"
                 type="button"

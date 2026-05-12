@@ -60,6 +60,9 @@ import { PatientDetailsModalComponent } from '../modals/patient-details-modal.co
 import { ClinicalHistoryUpsertModalComponent } from '../../../medical-history/components/modals/clinical-history-upsert-modal.component'
 import { Client } from '@core/interfaces/api/client.interface'
 import { ClientModalComponent } from '../../../laboratoy-orders/components/modals/client-modal/client-modal.component'
+import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
+import { ExportColumn } from '@core/services/ui/table-export.service'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-patients-table',
@@ -71,6 +74,7 @@ import { ClientModalComponent } from '../../../laboratoy-orders/components/modal
     NgbModule,
     NgxDatatableComponent,
     SideFilterPanelComponent,
+    TableExportButtonsComponent,
   ],
   templateUrl: './patients-table.component.html',
   styleUrls: ['./patients-table.component.scss'],
@@ -100,6 +104,8 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   public data$: Observable<Patient[]> = of([])
   public medicalHistoryLoadingIds = new Set<string>()
   public medicalHistoryCache = new Map<string, ClinicalHistory | null>()
+  public latestRows: Patient[] = []
+  public exportColumns: ExportColumn<Patient>[] = []
 
   private filter: object = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
@@ -113,13 +119,62 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   private _store = inject(Store<AppState>)
   private _route = inject(ActivatedRoute)
   private _router = inject(Router)
+  private _translateService = inject(TranslateService)
 
   ngOnInit(): void {
     this.suscribeToFilter()
     this.subscribeToBranchChanges()
     this.subscribeToOpenModalFromQueryParams()
     this.config$ = this.setConfigDatatable()
+    this.exportColumns = this.buildExportColumns()
     this.reloadDatatable()
+  }
+
+  private buildExportColumns(): ExportColumn<Patient>[] {
+    const translate = this._translateService
+    return [
+      { label: translate.instant('PATIENT.TABLE.FIRST_NAME'), key: 'firstName' },
+      { label: translate.instant('PATIENT.TABLE.LAST_NAME'), key: 'lastName' },
+      {
+        label: translate.instant('PATIENT.TABLE.DOCUMENT_NUMBER'),
+        key: 'documentNumber',
+      },
+      { label: translate.instant('PATIENT.TABLE.EMAIL'), key: 'email' },
+      {
+        label: translate.instant('PATIENT.TABLE.MOBILE_PHONE'),
+        key: 'mobilePhone',
+      },
+      { label: translate.instant('PATIENT.TABLE.ADDRESS'), key: 'address' },
+      {
+        label: translate.instant('PATIENT.TABLE.BRANCH'),
+        formatter: (row) => row.branch?.name || '-',
+      },
+      {
+        label: translate.instant('PATIENT.TABLE.STATUS'),
+        formatter: (row) =>
+          translate.instant(
+            row.isActive ? 'PATIENT.STATUS.ACTIVE' : 'PATIENT.STATUS.INACTIVE'
+          ),
+      },
+      {
+        label: translate.instant('PATIENT.TABLE.CREATED_AT'),
+        formatter: (row) => this.formatDate(row.createdAt),
+      },
+    ]
+  }
+
+  private formatDate(value?: string | Date | null): string {
+    if (!value) {
+      return '-'
+    }
+    const date = value instanceof Date ? value : new Date(value)
+    if (Number.isNaN(date.getTime())) {
+      return '-'
+    }
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
   }
 
   ngOnDestroy(): void {
@@ -235,6 +290,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       tap((res) => {
         const patients = res.data.result || []
         this.prefetchMedicalHistoryStatus(patients)
+        this.latestRows = patients
 
         this.config$.next({
           ...this.config$.value,

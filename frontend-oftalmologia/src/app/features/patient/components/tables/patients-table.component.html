@@ -32,6 +32,13 @@
                 <i class="ti ti-refresh"></i>
               </button>
 
+              <table-export-buttons
+                [columns]="exportColumns"
+                [rows]="latestRows"
+                filenameBase="pacientes"
+                [title]="'PATIENT.TITLE' | translate"
+              ></table-export-buttons>
+
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"

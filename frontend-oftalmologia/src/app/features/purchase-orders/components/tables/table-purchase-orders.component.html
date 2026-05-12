@@ -40,6 +40,13 @@
               >
                 <i class="ti ti-refresh"></i>
               </button>
+
+              <table-export-buttons
+                [columns]="exportColumns"
+                [rows]="latestRows"
+                filenameBase="ordenes-pedido"
+                [title]="'PURCHASE_ORDERS.LIST' | translate"
+              ></table-export-buttons>
             </div>
           </div>
         </div>

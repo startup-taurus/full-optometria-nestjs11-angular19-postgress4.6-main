@@ -2,12 +2,7 @@ import { Injectable, inject } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 import pdfMake from 'pdfmake/build/pdfmake'
 import * as pdfFonts from 'pdfmake/build/vfs_fonts'
-import {
-  Content,
-  ContentTable,
-  TDocumentDefinitions,
-  TableCell,
-} from 'pdfmake/interfaces'
+import { Content, TDocumentDefinitions } from 'pdfmake/interfaces'
 import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf.interface'
 import { FrameType } from '@core/interfaces/api/laboratory-order.interface'
 import { Branch } from '@core/interfaces/api/branch.interface'
@@ -63,25 +58,29 @@ export class LaboratoryOrderPdfService {
     }
   }
 
-  public async generatePdf(data: LaboratoryOrderPdfData): Promise<void> {
+  public async generatePdf(
+    data: LaboratoryOrderPdfData,
+    pageSize: 'A4' | 'A5' = 'A4'
+  ): Promise<void> {
     if (!this.logoBase64) {
       await this.loadLogo()
       await new Promise((resolve) => setTimeout(resolve, 500))
     }
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).open()
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).open()
     }
   }
 
   public async downloadPdf(
     data: LaboratoryOrderPdfData,
-    filename?: string
+    filename?: string,
+    pageSize: 'A4' | 'A5' = 'A4'
   ): Promise<void> {
     if (!this.logoBase64) {
       await this.loadLogo()
@@ -91,45 +90,58 @@ export class LaboratoryOrderPdfService {
     const pdfFileName = filename || `orden_laboratorio_${data.orderNumber}.pdf`
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).download(pdfFileName)
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).download(pdfFileName)
     }
   }
 
   private buildDocumentDefinition(
-    data: LaboratoryOrderPdfData
+    data: LaboratoryOrderPdfData,
+    pageSize: 'A4' | 'A5'
   ): TDocumentDefinitions {
+    const isCompact = pageSize === 'A5'
+    const margins: [number, number, number, number] = isCompact
+      ? [24, 24, 24, 24]
+      : [40, 40, 40, 40]
+    const sectionGap = isCompact ? 5 : 10
+    const signatureGap = isCompact ? 8 : 15
+    const fontSize = isCompact ? 8 : 10
+
     return {
-      pageSize: 'A4',
-      pageMargins: [40, 40, 40, 40],
+      pageSize,
+      pageMargins: margins,
       content: [
-        this.buildHeader(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        this.buildHeader(data, isCompact),
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildCustomerSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildProductSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildDesignParametersSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildFrameDataSection(data),
-        { text: '', margin: [0, 15, 0, 0] },
-        this.buildSignatureSection(),
+        { text: '', margin: [0, signatureGap, 0, 0] },
+        this.buildSignatureSection(isCompact),
       ],
-      styles: this.getStyles(),
+      styles: this.getStyles(isCompact),
       defaultStyle: {
         font: 'Roboto',
-        fontSize: 10,
+        fontSize,
       },
     }
   }
 
-  private buildHeader(data: LaboratoryOrderPdfData): Content {
+  private buildHeader(
+    data: LaboratoryOrderPdfData,
+    isCompact: boolean = false
+  ): Content {
     const branch = data.branch
     const orderNumber = data.orderNumber
+    const logoWidth = isCompact ? 80 : 120
 
     return {
       columns: [
@@ -169,7 +181,7 @@ export class LaboratoryOrderPdfService {
             this.logoBase64
               ? {
                   image: this.logoBase64,
-                  width: 120,
+                  width: logoWidth,
                   alignment: 'right',
                   margin: [0, 0, 0, 10],
                 }
@@ -520,9 +532,6 @@ export class LaboratoryOrderPdfService {
               { text: 'Producto', bold: true, fillColor: '#E3F2FD' },
               { text: 'Marca', bold: true, fillColor: '#E3F2FD' },
               { text: 'Cant.', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
-              { text: 'P. Unit.', bold: true, alignment: 'right', fillColor: '#E3F2FD' },
-              { text: 'Desc.', bold: true, alignment: 'right', fillColor: '#E3F2FD' },
-              { text: 'Total', bold: true, alignment: 'right', fillColor: '#E3F2FD' },
             ],
             ...productRows,
           ]
@@ -530,13 +539,10 @@ export class LaboratoryOrderPdfService {
             [
               {
                 text: 'Sin productos',
-                colSpan: 7,
+                colSpan: 4,
                 alignment: 'center',
                 margin: [0, 4, 0, 4],
               },
-              {},
-              {},
-              {},
               {},
               {},
               {},
@@ -551,7 +557,7 @@ export class LaboratoryOrderPdfService {
         },
         {
           table: {
-            widths: ['16%', '28%', '18%', '8%', '10%', '10%', '10%'],
+            widths: ['20%', '40%', '25%', '15%'],
             headerRows: hasProducts ? 1 : 0,
             dontBreakRows: true,
             body: productTableBody,
@@ -559,8 +565,6 @@ export class LaboratoryOrderPdfService {
           layout: 'lightHorizontalLines',
         },
         { text: '', margin: [0, 8, 0, 4] },
-        this.buildTotalsTable(order),
-        { text: '', margin: [0, 6, 0, 6] },
         {
           table: {
             widths: ['50%', '50%'],
@@ -594,20 +598,23 @@ export class LaboratoryOrderPdfService {
     }
   }
 
-  private buildSignatureSection(): Content {
+  private buildSignatureSection(isCompact: boolean = false): Content {
+    const lineLength = isCompact ? 150 : 200
+    const topGap = isCompact ? 14 : 20
+
     return {
       columns: [
         {
           width: '50%',
           stack: [
-            { text: '', margin: [0, 20, 0, 0] },
+            { text: '', margin: [0, topGap, 0, 0] },
             {
               canvas: [
                 {
                   type: 'line',
                   x1: 0,
                   y1: 0,
-                  x2: 200,
+                  x2: lineLength,
                   y2: 0,
                   lineWidth: 1,
                 },
@@ -626,14 +633,14 @@ export class LaboratoryOrderPdfService {
         {
           width: '50%',
           stack: [
-            { text: '', margin: [0, 20, 0, 0] },
+            { text: '', margin: [0, topGap, 0, 0] },
             {
               canvas: [
                 {
                   type: 'line',
                   x1: 0,
                   y1: 0,
-                  x2: 200,
+                  x2: lineLength,
                   y2: 0,
                   lineWidth: 1,
                 },
@@ -653,35 +660,35 @@ export class LaboratoryOrderPdfService {
     }
   }
 
-  private getStyles(): any {
+  private getStyles(isCompact: boolean = false): any {
     return {
       branchName: {
-        fontSize: 12,
+        fontSize: isCompact ? 10 : 12,
         bold: true,
         margin: [0, 0, 0, 3],
       },
       branchInfo: {
-        fontSize: 9,
+        fontSize: isCompact ? 7 : 9,
         margin: [0, 1, 0, 1],
       },
       orderTitle: {
-        fontSize: 11,
+        fontSize: isCompact ? 9 : 11,
         bold: true,
         color: '#1976D2',
       },
       orderNumber: {
-        fontSize: 16,
+        fontSize: isCompact ? 13 : 16,
         bold: true,
         color: '#D32F2F',
       },
       sectionTitle: {
-        fontSize: 12,
+        fontSize: isCompact ? 10 : 12,
         bold: true,
-        margin: [0, 5, 0, 10],
+        margin: [0, 5, 0, 8],
         color: '#1976D2',
       },
       noLogo: {
-        fontSize: 10,
+        fontSize: isCompact ? 8 : 10,
         italics: true,
         color: '#999999',
       },
@@ -743,21 +750,6 @@ export class LaboratoryOrderPdfService {
           alignment: 'center',
           margin: [0, 2, 0, 2],
         },
-        {
-          text: this.formatMoney(this.getLineUnitPrice(lineItem)),
-          alignment: 'right',
-          margin: [0, 2, 0, 2],
-        },
-        {
-          text: this.formatMoney(this.getLineDiscount(lineItem)),
-          alignment: 'right',
-          margin: [0, 2, 0, 2],
-        },
-        {
-          text: this.formatMoney(this.getLineNetTotal(lineItem)),
-          alignment: 'right',
-          margin: [0, 2, 0, 2],
-        },
       ])
     }
 
@@ -769,55 +761,10 @@ export class LaboratoryOrderPdfService {
         { text: product.name || '-', margin: [0, 2, 0, 2] },
         { text: product.brand || '-', margin: [0, 2, 0, 2] },
         { text: '1', alignment: 'center', margin: [0, 2, 0, 2] },
-        { text: this.formatMoney(product.unitPrice || 0), alignment: 'right', margin: [0, 2, 0, 2] },
-        { text: this.formatMoney(0), alignment: 'right', margin: [0, 2, 0, 2] },
-        { text: this.formatMoney(product.unitPrice || 0), alignment: 'right', margin: [0, 2, 0, 2] },
       ])
     }
 
     return []
-  }
-
-  private buildTotalsTable(order: any): Content {
-    const subtotal = this.getSubtotal(order)
-    const totalDiscount = this.getTotalDiscount(order)
-    const total = this.getTotal(order)
-
-    return {
-      table: {
-        widths: ['50%', '50%'],
-        body: [
-          [
-            {
-              text: 'Subtotal',
-              bold: true,
-              alignment: 'right',
-              fillColor: '#F5F5F5',
-            },
-            { text: this.formatMoney(subtotal), alignment: 'right' },
-          ],
-          [
-            {
-              text: 'Descuento',
-              bold: true,
-              alignment: 'right',
-              fillColor: '#F5F5F5',
-            },
-            { text: `-${this.formatMoney(totalDiscount)}`, alignment: 'right' },
-          ],
-          [
-            {
-              text: 'Total',
-              bold: true,
-              alignment: 'right',
-              fillColor: '#E3F2FD',
-            },
-            { text: this.formatMoney(total), alignment: 'right', bold: true },
-          ],
-        ],
-      },
-      layout: 'lightHorizontalLines',
-    }
   }
 
   private getProductSectionTitle(order: any): string {
@@ -829,48 +776,4 @@ export class LaboratoryOrderPdfService {
         : 'PDF.LABORATORY_ORDER.PRODUCT_DATA'
     )
   }
-
-    private getLineUnitPrice(lineItem: any): number {
-      const unitPrice = Number(lineItem?.unitPrice || lineItem?.product?.unitPrice || 0)
-      return Number.isFinite(unitPrice) ? unitPrice : 0
-    }
-
-    private getLineDiscount(lineItem: any): number {
-      const discount = Number(lineItem?.discount || 0)
-      return Number.isFinite(discount) ? discount : 0
-    }
-
-    private getLineGrossTotal(lineItem: any): number {
-      return Number(
-        (this.getLineUnitPrice(lineItem) * Number(lineItem?.quantity || 1)).toFixed(2)
-      )
-    }
-
-    private getLineNetTotal(lineItem: any): number {
-      return Number(
-        Math.max(this.getLineGrossTotal(lineItem) - this.getLineDiscount(lineItem), 0).toFixed(2)
-      )
-    }
-
-    private getSubtotal(order: any): number {
-      const lineItems = Array.isArray(order?.lineItems) ? order.lineItems : []
-      return Number(
-        lineItems.reduce((sum: number, lineItem: any) => sum + this.getLineGrossTotal(lineItem), 0).toFixed(2)
-      )
-    }
-
-    private getTotalDiscount(order: any): number {
-      const lineItems = Array.isArray(order?.lineItems) ? order.lineItems : []
-      return Number(
-        lineItems.reduce((sum: number, lineItem: any) => sum + this.getLineDiscount(lineItem), 0).toFixed(2)
-      )
-    }
-
-    private getTotal(order: any): number {
-      return Number((this.getSubtotal(order) - this.getTotalDiscount(order)).toFixed(2))
-    }
-
-    private formatMoney(value: number): string {
-      return Number(value || 0).toFixed(2)
-    }
 }

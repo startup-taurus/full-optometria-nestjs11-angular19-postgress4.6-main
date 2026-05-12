@@ -43,6 +43,8 @@ import {
   SWAL_SUCCESS_CONFIG,
   SWAL_ERROR_CONFIG,
 } from '@core/helpers/ui/ui.constants'
+import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
+import { ExportColumn } from '@core/services/ui/table-export.service'
 
 @Component({
   selector: 'table-laboratory-orders',
@@ -54,6 +56,7 @@ import {
     NgbModule,
     SideFilterPanelComponent,
     InfiniteScrollDirective,
+    TableExportButtonsComponent,
   ],
   templateUrl: './table-laboratory-orders.component.html',
   styleUrl: './table-laboratory-orders.component.scss',
@@ -71,6 +74,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
   public laboratoryOrders: LaboratoryOrder[] = []
   public filteredOrders: LaboratoryOrder[] = []
+  public exportColumns: ExportColumn<LaboratoryOrder>[] = []
   public sideFilterComponent = FilterLaboratoryOrdersComponent
   public isLoading = false
   public showFloatingMenu: string | null = null
@@ -88,7 +92,52 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   public sideFilterPanel?: SideFilterPanelComponent
 
   ngOnInit(): void {
+    this.exportColumns = this.buildExportColumns()
     this.initializeSubscriptions()
+  }
+
+  private buildExportColumns(): ExportColumn<LaboratoryOrder>[] {
+    const translate = this._translateService
+    return [
+      {
+        label: 'N° Orden',
+        formatter: (row) =>
+          row.orderNumber
+            ? String(row.orderNumber).padStart(9, '0')
+            : '-',
+      },
+      {
+        label: translate.instant('PATIENT.SINGULAR') || 'Paciente',
+        formatter: (row) =>
+          `${row.patient?.firstName || ''} ${row.patient?.lastName || ''}`
+            .trim() || '-',
+      },
+      {
+        label: translate.instant('WORDS.CEDULA') || 'Cédula',
+        formatter: (row) => row.patient?.documentNumber || '-',
+      },
+      {
+        label: translate.instant('LABORATORY_ORDERS_MODULE.DATE') || 'Fecha',
+        formatter: (row) => this.formatDate(row.deliveryDate),
+      },
+      {
+        label: 'Productos',
+        formatter: (row) => this.getOrderProductsText(row),
+      },
+      {
+        label: translate.instant('WORDS.PHONE') || 'Teléfono',
+        formatter: (row) =>
+          row.patient?.mobilePhone || row.patient?.homePhone || '-',
+      },
+      {
+        label: translate.instant('WORDS.EMAIL') || 'Email',
+        formatter: (row) => row.patient?.email || '-',
+      },
+      {
+        label: translate.instant('COMMON.STATUS') || 'Estado',
+        formatter: (row) => translate.instant(this.getStatusText(row)),
+      },
+    ]
   }
 
   ngOnDestroy(): void {
@@ -690,6 +739,12 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   }
 
   public async onPrintOrder(order: LaboratoryOrder): Promise<void> {
+    const pageSize = await this.askPdfPageSize()
+
+    if (!pageSize) {
+      return
+    }
+
     try {
       const branchState = await firstValueFrom(
         this._branchService.getBranchFilterState()
@@ -717,7 +772,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
         orderNumber: orderNumber,
       }
 
-      await this._pdfService.generatePdf(pdfData)
+      await this._pdfService.generatePdf(pdfData, pageSize)
 
       this.showFloatingMenu = null
     } catch (error) {
@@ -729,6 +784,33 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
         ),
       })
     }
+  }
+
+  private async askPdfPageSize(): Promise<'A4' | 'A5' | null> {
+    const result = await Swal.fire({
+      title: 'Tamaño del PDF',
+      text: 'Selecciona el tamaño de impresión de la orden',
+      icon: 'question',
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: 'Hoja completa (A4)',
+      denyButtonText: 'Media hoja (A5)',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      confirmButtonColor: '#1976D2',
+      denyButtonColor: '#198754',
+      cancelButtonColor: '#6c757d',
+    })
+
+    if (result.isConfirmed) {
+      return 'A4'
+    }
+
+    if (result.isDenied) {
+      return 'A5'
+    }
+
+    return null
   }
 
   private formatOrderNumber(orderNumber: number): string {

@@ -57,6 +57,8 @@ import { ViewPurchaseOrderModalComponent } from '../modals/view-purchase-order-m
 import { CreateEditPurchaseOrderModalComponent } from '../modals/create-edit-purchase-order-modal/create-edit-purchase-order-modal.component'
 import { ViewLaboratoryOrderComponent } from '../../../laboratoy-orders/components/forms/view-laboratory-order/view-laboratory-order.component'
 import { PurchaseOrdersSummaryComponent } from '../purchase-orders-summary/purchase-orders-summary.component'
+import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
+import { ExportColumn } from '@core/services/ui/table-export.service'
 
 @Component({
   selector: 'table-purchase-orders',
@@ -69,6 +71,7 @@ import { PurchaseOrdersSummaryComponent } from '../purchase-orders-summary/purch
     PurchaseOrdersSummaryComponent,
     NgxDatatableComponent,
     SideFilterPanelComponent,
+    TableExportButtonsComponent,
   ],
   templateUrl: './table-purchase-orders.component.html',
   styleUrl: './table-purchase-orders.component.scss',
@@ -115,6 +118,8 @@ export class TablePurchaseOrdersComponent
 
   public config$ = new BehaviorSubject<Partial<NgxDatatableConfig>>({})
   public data$: Observable<PurchaseOrder[]> = of([])
+  public latestRows: PurchaseOrder[] = []
+  public exportColumns: ExportColumn<PurchaseOrder>[] = []
 
   public filter: Partial<PurchaseOrderQueryParams> = {}
   private unsubscribe$ = new Subject<void>()
@@ -132,8 +137,65 @@ export class TablePurchaseOrdersComponent
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.config$ = this.setConfigDatatable()
+      this.exportColumns = this.buildExportColumns()
       this.reloadDatatable(this.filter)
     }, 0)
+  }
+
+  private buildExportColumns(): ExportColumn<PurchaseOrder>[] {
+    return [
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.ORDER'),
+        formatter: (row) => `#${row.orderNumber ?? '-'}`,
+      },
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.CLIENT'),
+        formatter: (row) =>
+          `${this.getClientDisplayName(row)} (${this.getClientDisplayDocument(row)})`,
+      },
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.LAB_ORDER'),
+        formatter: (row) => row.laboratoryOrder?.orderNumber?.toString() || '-',
+      },
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.STATUS'),
+        formatter: (row) =>
+          this.t(
+            'PURCHASE_ORDERS.STATUS_' + (row.status || '').toUpperCase()
+          ),
+      },
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.INVOICE'),
+        formatter: (row) => {
+          const stateLabel = this.t(this.getInvoiceStateLabelKey(row))
+          const invoiceNumber = row.invoice?.invoiceNumber
+          return invoiceNumber ? `${stateLabel} - ${invoiceNumber}` : stateLabel
+        },
+      },
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.PAYMENT_METHOD'),
+        formatter: (row) => this.getPaymentMethodDisplay(row),
+      },
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.PRICE'),
+        formatter: (row) => this.formatPrice(row.totalAmount),
+      },
+      {
+        label: this.t('PURCHASE_ORDERS.TABLE.CREATED_AT'),
+        formatter: (row) => this.formatDate(row.createdAt),
+      },
+    ]
+  }
+
+  private formatDate(value?: string | Date | null): string {
+    if (!value) {
+      return '-'
+    }
+    const date = value instanceof Date ? value : new Date(value)
+    if (Number.isNaN(date.getTime())) {
+      return '-'
+    }
+    return date.toLocaleString()
   }
 
   ngOnDestroy(): void {
@@ -259,6 +321,7 @@ export class TablePurchaseOrdersComponent
 
     return this.purchaseOrdersService.getPaginated(queryParams).pipe(
       tap((response) => {
+        this.latestRows = response.data || []
         this.config$.next({
           ...this.config$.value,
           loadingIndicator: false,
