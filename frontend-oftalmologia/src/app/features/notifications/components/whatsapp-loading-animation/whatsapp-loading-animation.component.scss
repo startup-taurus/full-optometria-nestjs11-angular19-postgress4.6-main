@@ -9,16 +9,7 @@
   display: block;
 }
 
-@media (prefers-color-scheme: dark) {
-  :host:not([data-bs-theme='light']) {
-    --wa-text: #e5e7eb;
-    --wa-muted: #6b7280;
-    --wa-skeleton-bg: #f9fafb;
-    --wa-skeleton-cell: #d1d5db;
-  }
-}
-
-[data-bs-theme='dark'] :host {
+:host-context([data-bs-theme='dark']) {
   --wa-text: #e5e7eb;
   --wa-muted: #6b7280;
 }

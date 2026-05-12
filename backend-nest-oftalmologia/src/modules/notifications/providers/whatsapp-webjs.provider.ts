@@ -504,7 +504,10 @@ export class WhatsAppWebJsProvider
         reason: 'ready_event',
       });
       this.logger.log(`Sesión ${sessionKey} conectada en WhatsApp Web`);
-      console.log(`[WA_READY] sessionKey=${sessionKey}, runtimeId=${runtime.runtimeId.slice(0, 8)}`);
+      const __readySubject = this.sessionSubjects.get(sessionKey);
+      console.log(
+        `[WA_READY] sessionKey=${sessionKey} runtimeId=${runtime.runtimeId.slice(0, 8)} subjectExists=${!!__readySubject} subjectObservers=${(__readySubject as any)?.observers?.length ?? 0}`,
+      );
       this.scheduleIdleShutdown(sessionKey, runtime);
     });
 
@@ -722,7 +725,14 @@ export class WhatsAppWebJsProvider
       waiter.resolve(snapshot);
     }
 
-    this.sessionSubjects.get(sessionKey)?.next(snapshot);
+    const __subj = this.sessionSubjects.get(sessionKey);
+    console.log(
+      `[WA_TRANSITION] sessionKey=${sessionKey} nextState=${nextState} connected=${runtime.connected} subjectExists=${!!__subj} waitersCount=${pending.length}`,
+    );
+    __subj?.next(snapshot);
+    console.log(
+      `[WA_TRANSITION_EMITTED] sessionKey=${sessionKey} nextState=${nextState} emittedTo=${!!__subj}`,
+    );
   }
 
   private removeStateWaiter(runtime: SessionRuntime, waiter: StateWaiter): void {

@@ -7,17 +7,7 @@
   --rf-suffix-bg: #f3f4f6;
 }
 
-@media (prefers-color-scheme: dark) {
-  :host:not([data-bs-theme='light']) {
-    --rf-bg: #1f2937;
-    --rf-border: rgba(75, 85, 99, 0.4);
-    --rf-text: #f9fafb;
-    --rf-muted: #9ca3af;
-    --rf-suffix-bg: #111827;
-  }
-}
-
-[data-bs-theme='dark'] :host {
+:host-context([data-bs-theme='dark']) {
   --rf-bg: #1f2937;
   --rf-border: rgba(75, 85, 99, 0.4);
   --rf-text: #f9fafb;

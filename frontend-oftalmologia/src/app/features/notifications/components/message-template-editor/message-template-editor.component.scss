@@ -10,20 +10,7 @@
   --tpl-chip-hover: #e5e7eb;
 }
 
-@media (prefers-color-scheme: dark) {
-  :host:not([data-bs-theme='light']) {
-    --tpl-bg: #1f2937;
-    --tpl-border: rgba(75, 85, 99, 0.4);
-    --tpl-text: #f9fafb;
-    --tpl-muted: #9ca3af;
-    --tpl-bubble-bg: #2a4a32;
-    --tpl-bubble-text: #f9fafb;
-    --tpl-chip-bg: #111827;
-    --tpl-chip-hover: #374151;
-  }
-}
-
-[data-bs-theme='dark'] :host {
+:host-context([data-bs-theme='dark']) {
   --tpl-bg: #1f2937;
   --tpl-border: rgba(75, 85, 99, 0.4);
   --tpl-text: #f9fafb;

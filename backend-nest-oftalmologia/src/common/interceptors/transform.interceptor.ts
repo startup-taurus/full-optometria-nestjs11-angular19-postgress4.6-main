@@ -30,6 +30,14 @@ export class TransformInterceptor<T>
 
     return next.handle().pipe(
       map((data) => {
+        const contentType = response?.getHeader?.('Content-Type');
+        if (
+          typeof contentType === 'string' &&
+          contentType.includes('text/event-stream')
+        ) {
+          return data;
+        }
+
         const statusCode = response.statusCode || 200;
         let messageKey = data?.messageKey || 'SUCCESS';
         let responseData = data;

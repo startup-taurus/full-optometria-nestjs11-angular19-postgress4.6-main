@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms'
 import { NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { finalize } from 'rxjs'
+import { distinctUntilChanged } from 'rxjs/operators'
 import { PageTitleComponent } from '@/app/shared/components/layouts/page-title/page-title.component'
 import { NotificationsService } from '@core/services/api/notifications.service'
 import {
@@ -67,17 +68,43 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeDefaultTemplate()
+    this.loadInitialSession()
     this.subscribeSessionStream()
     this.loadRule()
     this.loadEligible()
   }
 
+  private loadInitialSession(): void {
+    this.notificationsService
+      .getWhatsAppSession()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          if (response?.data && !this.session()) {
+            this.session.set(response.data)
+          }
+        },
+        error: () => {},
+      })
+  }
+
   private subscribeSessionStream(): void {
     this.notificationsService
       .streamSession()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        distinctUntilChanged(
+          (a, b) =>
+            a?.status === b?.status &&
+            a?.qrCode === b?.qrCode &&
+            a?.connectedPhone === b?.connectedPhone
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (session) => {
+          console.log(
+            `[FE_SESSION_SET] status=${session?.status} qrCodeLen=${session?.qrCode?.length || 0} ts=${Date.now()}`
+          )
           this.session.set(session)
           this.initLoading.set(false)
         },

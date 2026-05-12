@@ -133,7 +133,12 @@ export class NotificationsService {
           switchMap((snapshot) =>
             from(this.applySnapshotToSession(session, snapshot)),
           ),
-          map((updatedSession) => ({ data: updatedSession }) as MessageEvent),
+          map((updatedSession) => {
+            console.log(
+              `[SVC_SSE_EMIT] sessionKey=${updatedSession.sessionKey} status=${updatedSession.status} qrPresent=${!!updatedSession.qrCode} ts=${Date.now()}`,
+            );
+            return { data: updatedSession } as MessageEvent;
+          }),
         ),
       ),
     );
@@ -989,20 +994,36 @@ export class NotificationsService {
     session: WhatsAppSession,
     snapshot: WhatsAppSessionSnapshot,
   ): Promise<WhatsAppSession> {
+    const __statusBefore = session.status;
+    console.log(
+      `[SVC_APPLY_IN] sessionKey=${session.sessionKey} snapshotState=${snapshot.state} snapshotConnected=${snapshot.connected} sessionStatusBefore=${__statusBefore}`,
+    );
+
     if (snapshot.connected || snapshot.state === 'ready') {
       session.status = WhatsAppSessionStatus.CONNECTED;
       session.qrCode = null;
       session.lastConnectedAt = new Date();
-      return this.whatsappSessionRepository.save(session);
+      const saved = await this.whatsappSessionRepository.save(session);
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=1 sessionStatusAfter=${saved.status} saved=true`,
+      );
+      return saved;
     }
 
     if (this.hasValidImageQr(snapshot.qrCode)) {
       session.status = WhatsAppSessionStatus.QR_READY;
       session.qrCode = snapshot.qrCode;
-      return this.whatsappSessionRepository.save(session);
+      const saved = await this.whatsappSessionRepository.save(session);
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=2 sessionStatusAfter=${saved.status} saved=true`,
+      );
+      return saved;
     }
 
     if (snapshot.state === 'booting' || snapshot.state === 'authenticated') {
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=3 sessionStatusAfter=${session.status} saved=false`,
+      );
       return session;
     }
 
@@ -1014,6 +1035,9 @@ export class NotificationsService {
         session.sessionKey,
       );
       if (authExists) {
+        console.log(
+          `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=4 sessionStatusAfter=${session.status} saved=false`,
+        );
         return session;
       }
     }
@@ -1023,13 +1047,20 @@ export class NotificationsService {
       session.status === WhatsAppSessionStatus.QR_READY &&
       !this.isQrExpired(session)
     ) {
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=5 sessionStatusAfter=${session.status} saved=false`,
+      );
       return session;
     }
 
     session.status = WhatsAppSessionStatus.DISCONNECTED;
     session.qrCode = null;
     session.connectedPhone = null;
-    return this.whatsappSessionRepository.save(session);
+    const saved = await this.whatsappSessionRepository.save(session);
+    console.log(
+      `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=6 sessionStatusAfter=${saved.status} saved=true`,
+    );
+    return saved;
   }
 
   private fireAndForgetQrRefresh(

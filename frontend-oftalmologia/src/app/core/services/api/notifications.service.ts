@@ -41,10 +41,27 @@ export class NotificationsService {
         openWhenHidden: true,
         onmessage: (ev) => {
           if (!ev.data) return
+          console.log(
+            `[FE_SSE_RAW] len=${ev.data.length} sample=${ev.data.slice(0, 120)}`
+          )
           try {
-            subscriber.next(JSON.parse(ev.data))
-          } catch (err) {
-            console.error('[SSE] parse error', err)
+            const parsed = JSON.parse(ev.data)
+            const session =
+              parsed &&
+              typeof parsed === 'object' &&
+              parsed.data &&
+              typeof parsed.data === 'object' &&
+              'status' in parsed.data
+                ? parsed.data
+                : parsed
+            console.log(
+              `[FE_SSE_PARSED] status=${session?.status} qrCodeLen=${session?.qrCode?.length || 0} ts=${Date.now()}`
+            )
+            subscriber.next(session)
+          } catch (err: any) {
+            console.error(
+              `[FE_SSE_PARSE_ERR] msg=${err?.message} rawSample=${ev.data.slice(0, 200)}`
+            )
           }
         },
         onerror: (err) => {

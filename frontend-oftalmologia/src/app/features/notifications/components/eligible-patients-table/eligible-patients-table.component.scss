@@ -7,17 +7,7 @@
   --ept-input-bg: #f9fafb;
 }
 
-@media (prefers-color-scheme: dark) {
-  :host:not([data-bs-theme='light']) {
-    --ept-bg: #1f2937;
-    --ept-border: rgba(75, 85, 99, 0.4);
-    --ept-text: #f9fafb;
-    --ept-muted: #9ca3af;
-    --ept-input-bg: #111827;
-  }
-}
-
-[data-bs-theme='dark'] :host {
+:host-context([data-bs-theme='dark']) {
   --ept-bg: #1f2937;
   --ept-border: rgba(75, 85, 99, 0.4);
   --ept-text: #f9fafb;
@@ -101,6 +91,22 @@
 
     &.is-soon {
       color: #ef4444;
+    }
+  }
+
+  &__status-badge {
+    font-weight: 600;
+    padding: 0.4rem 0.7rem;
+    letter-spacing: 0.01em;
+
+    &--soon {
+      background-color: #f59e0b;
+      color: #1f2937;
+    }
+
+    &--ok {
+      background-color: #e5e7eb;
+      color: #374151;
     }
   }
 
