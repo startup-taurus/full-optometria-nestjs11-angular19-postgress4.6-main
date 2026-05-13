@@ -1953,7 +1953,10 @@
         "XML_NOT_AVAILABLE_TITLE": "Sin XML",
         "XML_NOT_AVAILABLE_TEXT": "La factura no tiene XML disponible.",
         "XML_ERROR_TITLE": "Error de descarga",
-        "XML_ERROR_TEXT": "No se pudo descargar el XML."
+        "XML_ERROR_TEXT": "No se pudo descargar el XML.",
+        "BILLING_NOT_ENABLED_TITLE": "Facturación electrónica no habilitada",
+        "BILLING_NOT_ENABLED_TEXT": "Tu empresa aún no tiene activado el módulo de facturación electrónica. Comunícate con soporte para habilitarlo.",
+        "BILLING_NOT_ENABLED_TOOLTIP": "Facturación no habilitada — click para más información"
       },
       "XML": {
         "LABELS": {

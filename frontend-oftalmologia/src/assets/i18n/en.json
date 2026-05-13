@@ -1969,7 +1969,10 @@
         "XML_NOT_AVAILABLE_TITLE": "No XML",
         "XML_NOT_AVAILABLE_TEXT": "The invoice has no XML available.",
         "XML_ERROR_TITLE": "Download error",
-        "XML_ERROR_TEXT": "The XML could not be downloaded."
+        "XML_ERROR_TEXT": "The XML could not be downloaded.",
+        "BILLING_NOT_ENABLED_TITLE": "Electronic billing not enabled",
+        "BILLING_NOT_ENABLED_TEXT": "Electronic billing is not yet enabled for your company. Please contact support to activate this feature.",
+        "BILLING_NOT_ENABLED_TOOLTIP": "Billing not enabled — click for more information"
       },
       "XML": {
         "LABELS": {

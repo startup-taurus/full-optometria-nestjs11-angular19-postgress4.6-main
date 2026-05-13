@@ -29,6 +29,7 @@ import { Store } from '@ngrx/store'
 
 import { AppState } from '@core/states'
 import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
+import { selectUser } from '@core/states/auth/auth.selectors'
 import { PurchaseOrdersService } from '@core/services/api/purchase-orders.service'
 import {
   PurchaseOrder,
@@ -124,6 +125,7 @@ export class TablePurchaseOrdersComponent
   public filter: Partial<PurchaseOrderQueryParams> = {}
   private unsubscribe$ = new Subject<void>()
   private hasInitializedBranchSubscription = false
+  private hasBillingApiKey = false
 
   private purchaseOrdersService = inject(PurchaseOrdersService)
   private modalService = inject(NgbModal)
@@ -132,6 +134,7 @@ export class TablePurchaseOrdersComponent
 
   ngOnInit(): void {
     this.subscribeToBranchChanges()
+    this.subscribeToBillingApiKey()
   }
 
   ngAfterViewInit(): void {
@@ -218,6 +221,15 @@ export class TablePurchaseOrdersComponent
         }
 
         this.reloadDatatable(this.filter)
+      })
+  }
+
+  private subscribeToBillingApiKey(): void {
+    this.store
+      .select(selectUser)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((user) => {
+        this.hasBillingApiKey = !!user?.company?.hasBillingApiKey
       })
   }
 
@@ -552,6 +564,32 @@ export class TablePurchaseOrdersComponent
       default:
         return 'PURCHASE_ORDERS.BILLING.STATE.CREATED'
     }
+  }
+
+  public canUseBilling(): boolean {
+    return this.hasBillingApiKey
+  }
+
+  public showBillingBlockedIndicator(order: PurchaseOrder): boolean {
+    if (this.canUseBilling()) {
+      return false
+    }
+    return (
+      this.canIssueInvoice(order) ||
+      this.canRetryInvoice(order) ||
+      this.canAuthorizeInvoice(order) ||
+      this.canCheckInvoiceStatus(order) ||
+      this.hasInvoiceXml(order)
+    )
+  }
+
+  public async onBillingActionBlocked(): Promise<void> {
+    await Swal.fire({
+      ...SWAL_ERROR_CONFIG,
+      icon: 'info',
+      title: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.BILLING_NOT_ENABLED_TITLE'),
+      text: this.t('PURCHASE_ORDERS.BILLING.MESSAGES.BILLING_NOT_ENABLED_TEXT'),
+    })
   }
 
   public canIssueInvoice(order: PurchaseOrder): boolean {

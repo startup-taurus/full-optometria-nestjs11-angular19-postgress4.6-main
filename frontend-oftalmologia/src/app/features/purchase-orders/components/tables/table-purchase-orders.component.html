@@ -188,7 +188,18 @@
 <ng-template #actionsTemplate let-row="row">
   <div class="d-flex gap-1 flex-wrap">
     <button
-      *ngIf="canIssueInvoice(row)"
+      *ngIf="showBillingBlockedIndicator(row)"
+      class="btn btn-outline-warning btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'PURCHASE_ORDERS.BILLING.MESSAGES.BILLING_NOT_ENABLED_TOOLTIP' | translate"
+      (click)="onBillingActionBlocked()"
+    >
+      <i class="ti ti-info-circle"></i>
+    </button>
+
+    <button
+      *ngIf="canIssueInvoice(row) && canUseBilling()"
       class="btn btn-outline-success btn-xs"
       type="button"
       placement="left"
@@ -199,7 +210,7 @@
     </button>
 
     <button
-      *ngIf="canRetryInvoice(row)"
+      *ngIf="canRetryInvoice(row) && canUseBilling()"
       class="btn btn-outline-warning btn-xs"
       type="button"
       placement="left"
@@ -210,7 +221,7 @@
     </button>
 
     <button
-      *ngIf="canAuthorizeInvoice(row)"
+      *ngIf="canAuthorizeInvoice(row) && canUseBilling()"
       class="btn btn-outline-primary btn-xs"
       type="button"
       placement="left"
@@ -221,7 +232,7 @@
     </button>
 
     <button
-      *ngIf="canCheckInvoiceStatus(row)"
+      *ngIf="canCheckInvoiceStatus(row) && canUseBilling()"
       class="btn btn-outline-dark btn-xs"
       type="button"
       placement="left"
@@ -232,7 +243,7 @@
     </button>
 
     <button
-      *ngIf="hasInvoiceXml(row)"
+      *ngIf="hasInvoiceXml(row) && canUseBilling()"
       class="btn btn-outline-info btn-xs"
       type="button"
       placement="left"
@@ -243,7 +254,7 @@
     </button>
 
     <button
-      *ngIf="hasInvoiceXml(row)"
+      *ngIf="hasInvoiceXml(row) && canUseBilling()"
       class="btn btn-outline-info btn-xs"
       type="button"
       placement="left"
