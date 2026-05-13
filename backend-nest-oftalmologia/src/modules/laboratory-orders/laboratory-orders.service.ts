@@ -6,7 +6,13 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, QueryFailedError, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  In,
+  QueryFailedError,
+  Repository,
+} from 'typeorm';
 import { LaboratoryOrder } from './entities/laboratory-order.entity';
 import { LaboratoryOrderStatus } from './entities/laboratory-order.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
@@ -126,7 +132,14 @@ export class LaboratoryOrdersService {
         const effectiveClientId =
           normalizedCreateDtoWithAttendance.clientId ?? null;
 
-        const orderNumber = await this.generateOrderNumber();
+        await this.lockOrderNumberScope(
+          queryRunner.manager,
+          effectiveCompanyId,
+        );
+        const orderNumber = await this.generateOrderNumber(
+          effectiveCompanyId,
+          queryRunner.manager,
+        );
         const persistedLineItems = this.buildPersistedLineItems(
           normalizedLineItems,
           productMap
@@ -984,14 +997,38 @@ export class LaboratoryOrdersService {
     });
   }
 
-  private async generateOrderNumber(): Promise<number> {
-    const result = await this.laboratoryOrderRepository
+  private async generateOrderNumber(
+    companyId: string | null,
+    manager?: EntityManager,
+  ): Promise<number> {
+    const repository =
+      manager?.getRepository(LaboratoryOrder) || this.laboratoryOrderRepository;
+    const queryBuilder = repository
       .createQueryBuilder('order')
-      .select('MAX(order.orderNumber)', 'maxOrderNumber')
-      .getRawOne();
+      .select('MAX(order.orderNumber)', 'maxOrderNumber');
 
-    const maxOrderNumber = result?.maxOrderNumber || 0;
+    if (companyId) {
+      queryBuilder.where('order.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.where('order.companyId IS NULL');
+    }
+
+    const result = await queryBuilder.getRawOne();
+
+    const maxOrderNumber = result?.maxOrderNumber
+      ? parseInt(result.maxOrderNumber, 10)
+      : 0;
     return maxOrderNumber + 1;
+  }
+
+  private async lockOrderNumberScope(
+    manager: EntityManager,
+    companyId: string | null,
+  ): Promise<void> {
+    const scopeKey = companyId ?? '__null_company__';
+    await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
+      `laboratory_orders_order_number:${scopeKey}`,
+    ]);
   }
 
   private async resolveAttendanceDate(

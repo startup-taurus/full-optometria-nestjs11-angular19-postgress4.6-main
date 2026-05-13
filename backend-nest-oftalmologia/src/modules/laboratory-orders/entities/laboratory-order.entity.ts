@@ -30,6 +30,14 @@ export enum LaboratoryOrderStatus {
 }
 
 @Entity('laboratory_orders')
+@Index('UQ_laboratory_orders_company_order_number', ['companyId', 'orderNumber'], {
+  unique: true,
+  where: '"company_id" IS NOT NULL AND "order_number" IS NOT NULL',
+})
+@Index('UQ_laboratory_orders_null_company_order_number', ['orderNumber'], {
+  unique: true,
+  where: '"company_id" IS NULL AND "order_number" IS NOT NULL',
+})
 @Index(['companyId'])
 @Index(['branchId'])
 @Index(['patientId'])
@@ -37,13 +45,12 @@ export enum LaboratoryOrderStatus {
 @Index(['isConfirmed'])
 @Index(['status'])
 @Index(['attendanceDate'])
-@Index(['orderNumber'], { unique: true })
 @Index(['createdByUserId'])
 export class LaboratoryOrder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'order_number', unique: true, nullable: true })
+  @Column({ name: 'order_number', nullable: true })
   orderNumber: number;
 
   @Column({ name: 'company_id', nullable: true })
