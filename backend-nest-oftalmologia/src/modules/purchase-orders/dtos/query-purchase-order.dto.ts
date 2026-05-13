@@ -8,6 +8,7 @@ import {
   IsNumber,
   Matches,
   IsIn,
+  IsUUID,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { PurchaseOrderStatus } from '../entities/purchase-order.entity';
@@ -35,6 +36,15 @@ export class QueryPurchaseOrderDto {
   @IsString()
   @Transform(({ value }) => value?.trim())
   clientName?: string;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => value?.trim())
+  clientDocument?: string;
+
+  @IsOptional()
+  @IsUUID()
+  laboratoryOrderId?: string;
 
   @IsOptional()
   @IsString()

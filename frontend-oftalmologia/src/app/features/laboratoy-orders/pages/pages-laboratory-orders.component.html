@@ -1,1 +1,13 @@
-<table-laboratory-orders></table-laboratory-orders>
+<div class="container-fluid mb-3" *ngIf="orderId">
+	<div class="alert alert-info d-flex align-items-center justify-content-between mb-0">
+		<div>
+			<strong>{{ 'LABORATORY_ORDERS_MODULE.LINKED_FILTER.ACTIVE_LABEL' | translate }}</strong>
+			{{ 'LABORATORY_ORDERS_MODULE.LINKED_FILTER.ACTIVE_DESCRIPTION' | translate }}
+		</div>
+		<button type="button" class="btn btn-sm btn-outline-info" (click)="clearLinkedFilter()">
+			{{ 'LABORATORY_ORDERS_MODULE.LINKED_FILTER.CLEAR' | translate }}
+		</button>
+	</div>
+</div>
+
+<table-laboratory-orders [orderId]="orderId"></table-laboratory-orders>

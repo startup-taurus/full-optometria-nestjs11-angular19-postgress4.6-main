@@ -53,6 +53,7 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
   private initForm(): void {
     this.purchaseOrdersFilterForm = this.fb.group({
       clientName: [''],
+      clientDocument: [''],
       invoiceNumber: [''],
       status: [''],
       paymentMethod: [''],
@@ -76,6 +77,7 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
         if (filter && Object.keys(filter).length > 0) {
           const formValue = {
             clientName: filter['clientName'] || '',
+            clientDocument: filter['clientDocument'] || '',
             invoiceNumber: filter['invoiceNumber'] || '',
             status: filter['status'] || '',
             paymentMethod: filter['paymentMethod'] || '',
@@ -122,6 +124,10 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
 
     if (formValue.clientName) {
       cleanedFilter['clientName'] = formValue.clientName
+    }
+
+    if (formValue.clientDocument) {
+      cleanedFilter['clientDocument'] = formValue.clientDocument
     }
 
     if (formValue.invoiceNumber) {

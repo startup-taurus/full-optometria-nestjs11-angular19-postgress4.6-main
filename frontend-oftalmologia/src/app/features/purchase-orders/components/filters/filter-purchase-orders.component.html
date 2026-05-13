@@ -12,6 +12,16 @@
       </div>
 
       <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'PURCHASE_ORDERS.FILTERS.CLIENT_DOCUMENT' | translate }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="clientDocument"
+          [placeholder]="'PURCHASE_ORDERS.FILTERS.CLIENT_DOCUMENT_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
         <label class="form-label fw-semibold">{{ 'PURCHASE_ORDERS.FILTERS.INVOICE_NUMBER' | translate }}</label>
         <input
           type="text"

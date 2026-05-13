@@ -4,11 +4,15 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   inject,
+  Input,
+  OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
 } from '@angular/core'
+import { Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import {
@@ -56,7 +60,6 @@ import {
 import { FilterPurchaseOrdersComponent } from '../filters/filter-purchase-orders.component'
 import { ViewPurchaseOrderModalComponent } from '../modals/view-purchase-order-modal/view-purchase-order-modal.component'
 import { CreateEditPurchaseOrderModalComponent } from '../modals/create-edit-purchase-order-modal/create-edit-purchase-order-modal.component'
-import { ViewLaboratoryOrderComponent } from '../../../laboratoy-orders/components/forms/view-laboratory-order/view-laboratory-order.component'
 import { PurchaseOrdersSummaryComponent } from '../purchase-orders-summary/purchase-orders-summary.component'
 import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
 import { ExportColumn } from '@core/services/ui/table-export.service'
@@ -79,7 +82,7 @@ import { ExportColumn } from '@core/services/ui/table-export.service'
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TablePurchaseOrdersComponent
-  implements OnInit, OnDestroy, AfterViewInit
+  implements OnInit, OnChanges, OnDestroy, AfterViewInit
 {
   private static readonly FINAL_CONSUMER_NAME = 'Consumidor Final'
   private static readonly FINAL_CONSUMER_DOCUMENT = '9999999999999'
@@ -93,6 +96,8 @@ export class TablePurchaseOrdersComponent
   ])
 
   private pagination = DEFAULT_NGX_DATATABLE_PAGINATION
+
+  @Input() laboratoryOrderId: string | null = null
 
   public sideFilterComponent = FilterPurchaseOrdersComponent
 
@@ -126,11 +131,13 @@ export class TablePurchaseOrdersComponent
   private unsubscribe$ = new Subject<void>()
   private hasInitializedBranchSubscription = false
   private hasBillingApiKey = false
+  private isViewInitialized = false
 
   private purchaseOrdersService = inject(PurchaseOrdersService)
   private modalService = inject(NgbModal)
   private store = inject(Store<AppState>)
   private translateService = inject(TranslateService)
+  private router = inject(Router)
 
   ngOnInit(): void {
     this.subscribeToBranchChanges()
@@ -141,8 +148,16 @@ export class TablePurchaseOrdersComponent
     setTimeout(() => {
       this.config$ = this.setConfigDatatable()
       this.exportColumns = this.buildExportColumns()
+      this.isViewInitialized = true
       this.reloadDatatable(this.filter)
     }, 0)
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.isViewInitialized || !changes['laboratoryOrderId']) {
+      return
+    }
+    this.reloadDatatable(this.filter)
   }
 
   private buildExportColumns(): ExportColumn<PurchaseOrder>[] {
@@ -327,6 +342,9 @@ export class TablePurchaseOrdersComponent
 
     const queryParams: PurchaseOrderQueryParams = {
       ...this.filter,
+      ...(this.laboratoryOrderId
+        ? { laboratoryOrderId: this.laboratoryOrderId }
+        : {}),
       limit: this.config$.value.limit,
       page: this.config$.value.page,
     }
@@ -409,14 +427,9 @@ export class TablePurchaseOrdersComponent
       return
     }
 
-    const modalRef = this.modalService.open(ViewLaboratoryOrderComponent, {
-      size: 'xl',
-      centered: true,
-      backdrop: 'static',
-      keyboard: false,
+    this.router.navigate(['/laboratory-orders'], {
+      queryParams: { orderId: linkedOrderId },
     })
-
-    modalRef.componentInstance.orderId = linkedOrderId
   }
 
   public openEditModal(order: PurchaseOrder): void {

@@ -1002,6 +1002,8 @@ export class PurchaseOrdersService {
       limit,
       search,
       clientName,
+      clientDocument,
+      laboratoryOrderId,
       invoiceNumber,
       status,
       invoiceState,
@@ -1015,45 +1017,55 @@ export class PurchaseOrdersService {
 
     const { skip, take } = PaginationUtil.getSkipAndTake({ page, limit });
 
-    const queryBuilder = this.purchaseOrderRepository
+    const idsQuery = this.purchaseOrderRepository
       .createQueryBuilder('po')
-      .leftJoinAndSelect('po.client', 'client')
-      .leftJoinAndSelect('po.laboratoryOrder', 'laboratoryOrder')
-      .leftJoinAndSelect('po.items', 'items')
-      .leftJoinAndSelect('po.invoice', 'invoice')
+      .leftJoin('po.client', 'client')
+      .leftJoin('po.invoice', 'invoice')
       .where('po.branchId = :branchId', { branchId });
 
     if (companyId !== null && companyId !== undefined) {
-      queryBuilder.andWhere('po.companyId = :companyId', { companyId });
+      idsQuery.andWhere('po.companyId = :companyId', { companyId });
     }
 
     if (search) {
-      queryBuilder.andWhere(
+      idsQuery.andWhere(
         '(po.orderNumber::text LIKE :search OR LOWER(client.firstName) LIKE LOWER(:search) OR LOWER(client.lastName) LIKE LOWER(:search) OR client.documentNumber LIKE :search OR invoice.invoiceNumber LIKE :search OR invoice.accessKey LIKE :search)',
         { search: `%${search}%` },
       );
     }
 
     if (clientName) {
-      queryBuilder.andWhere(
+      idsQuery.andWhere(
         "LOWER(CONCAT(COALESCE(client.firstName, ''), ' ', COALESCE(client.lastName, ''))) LIKE LOWER(:clientName)",
         { clientName: `%${clientName}%` },
       );
     }
 
+    if (clientDocument) {
+      idsQuery.andWhere('client.documentNumber ILIKE :clientDocument', {
+        clientDocument: `%${clientDocument}%`,
+      });
+    }
+
+    if (laboratoryOrderId) {
+      idsQuery.andWhere('po.laboratoryOrderId = :laboratoryOrderId', {
+        laboratoryOrderId,
+      });
+    }
+
     if (invoiceNumber) {
-      queryBuilder.andWhere(
+      idsQuery.andWhere(
         '(invoice.invoiceNumber LIKE :invoiceNumber OR invoice.accessKey LIKE :invoiceNumber OR invoice.externalInvoiceId::text LIKE :invoiceNumber)',
         { invoiceNumber: `%${invoiceNumber}%` },
       );
     }
 
     if (status) {
-      queryBuilder.andWhere('po.status = :status', { status });
+      idsQuery.andWhere('po.status = :status', { status });
     }
 
     if (invoiceState) {
-      queryBuilder.andWhere('invoice.state = :invoiceState', { invoiceState });
+      idsQuery.andWhere('invoice.state = :invoiceState', { invoiceState });
     }
 
     const normalizedPaymentMethod = paymentMethod
@@ -1062,7 +1074,7 @@ export class PurchaseOrdersService {
     const isFilteringByPaymentMethod = normalizedPaymentMethod.length > 0;
 
     if (isFilteringByPaymentMethod) {
-      queryBuilder.andWhere(
+      idsQuery.andWhere(
         "(invoice.paymentMethod = :paymentMethod OR LTRIM(invoice.paymentMethod, '0') = LTRIM(:paymentMethod, '0'))",
         {
           paymentMethod: normalizedPaymentMethod,
@@ -1075,17 +1087,17 @@ export class PurchaseOrdersService {
         ? true
         : shouldInvoice;
 
-      queryBuilder.andWhere('po.shouldInvoice = :shouldInvoice', {
+      idsQuery.andWhere('po.shouldInvoice = :shouldInvoice', {
         shouldInvoice: effectiveShouldInvoice,
       });
     }
 
     if (minTotal !== undefined) {
-      queryBuilder.andWhere('po.totalAmount >= :minTotal', { minTotal });
+      idsQuery.andWhere('po.totalAmount >= :minTotal', { minTotal });
     }
 
     if (maxTotal !== undefined) {
-      queryBuilder.andWhere('po.totalAmount <= :maxTotal', { maxTotal });
+      idsQuery.andWhere('po.totalAmount <= :maxTotal', { maxTotal });
     }
 
     if (dateFrom) {
@@ -1100,7 +1112,7 @@ export class PurchaseOrdersService {
         });
       }
 
-      queryBuilder.andWhere('po.createdAt >= :dateFromStart', {
+      idsQuery.andWhere('po.createdAt >= :dateFromStart', {
         dateFromStart,
       });
     }
@@ -1120,16 +1132,46 @@ export class PurchaseOrdersService {
       const dateToExclusive = new Date(dateToStart);
       dateToExclusive.setUTCDate(dateToExclusive.getUTCDate() + 1);
 
-      queryBuilder.andWhere('po.createdAt < :dateToExclusive', {
+      idsQuery.andWhere('po.createdAt < :dateToExclusive', {
         dateToExclusive,
       });
     }
 
-    const [purchaseOrders, total] = await queryBuilder
+    const total = await idsQuery.clone().getCount();
+
+    const paginatedIdRows = await idsQuery
+      .select('po.id', 'id')
+      .groupBy('po.id')
+      .orderBy('MAX(po.createdAt)', 'DESC')
+      .offset(skip)
+      .limit(take)
+      .getRawMany<{ id: string }>();
+
+    const paginatedIds = paginatedIdRows.map((row) => row.id);
+
+    if (paginatedIds.length === 0) {
+      return {
+        messageKey: 'PURCHASE_ORDER.FOUND',
+        message: {
+          es: 'Órdenes de pedido obtenidas correctamente',
+          en: 'Purchase orders fetched successfully',
+        },
+        result: [],
+        totalCount: total,
+        currentPage: page,
+        pageSize: limit,
+      };
+    }
+
+    const purchaseOrders = await this.purchaseOrderRepository
+      .createQueryBuilder('po')
+      .leftJoinAndSelect('po.client', 'client')
+      .leftJoinAndSelect('po.laboratoryOrder', 'laboratoryOrder')
+      .leftJoinAndSelect('po.items', 'items')
+      .leftJoinAndSelect('po.invoice', 'invoice')
+      .where('po.id IN (:...ids)', { ids: paginatedIds })
       .orderBy('po.createdAt', 'DESC')
-      .skip(skip)
-      .take(take)
-      .getManyAndCount();
+      .getMany();
 
     return {
       messageKey: 'PURCHASE_ORDER.FOUND',

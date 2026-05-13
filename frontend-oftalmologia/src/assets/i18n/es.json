@@ -1647,7 +1647,12 @@
     "SENT": "Enviado",
     "RECEIVED": "Recibido",
     "DELIVERED": "Entregado",
-    "CANCELLED": "Cancelado"
+    "CANCELLED": "Cancelado",
+    "LINKED_FILTER": {
+      "ACTIVE_LABEL": "Filtro activo:",
+      "ACTIVE_DESCRIPTION": "se muestra solo la orden de laboratorio relacionada.",
+      "CLEAR": "Limpiar filtro"
+    }
   },
   "LABORATORY_ORDERS": {
     "CREATE_TITLE": "Crear Orden de Laboratorio",
@@ -1807,6 +1812,8 @@
       "GENERAL_SEARCH": "Búsqueda general",
       "CLIENT_NAME": "Nombre del cliente",
       "CLIENT_NAME_PLACEHOLDER": "Buscar por nombre o apellido",
+      "CLIENT_DOCUMENT": "Cédula del cliente",
+      "CLIENT_DOCUMENT_PLACEHOLDER": "Buscar por número de cédula",
       "INVOICE_NUMBER": "Número de factura",
       "INVOICE_NUMBER_PLACEHOLDER": "Buscar por número, clave o id externo",
       "INVOICE_STATE": "Estado de factura",
@@ -1821,6 +1828,11 @@
       "MAX_TOTAL_PLACEHOLDER": "Ej: 500.00",
       "DATE_FROM": "Fecha desde",
       "DATE_TO": "Fecha hasta"
+    },
+    "LINKED_FILTER": {
+      "ACTIVE_LABEL": "Filtro activo:",
+      "ACTIVE_DESCRIPTION": "se muestra solo la orden de pedido relacionada.",
+      "CLEAR": "Limpiar filtro"
     },
     "TABLE": {
       "ORDER": "Orden",

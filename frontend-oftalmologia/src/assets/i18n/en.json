@@ -1633,7 +1633,12 @@
     "SENT": "Sent",
     "RECEIVED": "Received",
     "DELIVERED": "Delivered",
-    "CANCELLED": "Cancelled"
+    "CANCELLED": "Cancelled",
+    "LINKED_FILTER": {
+      "ACTIVE_LABEL": "Active filter:",
+      "ACTIVE_DESCRIPTION": "showing only the related laboratory order.",
+      "CLEAR": "Clear filter"
+    }
   },
   "LABORATORY_ORDERS": {
     "CREATE_TITLE": "Create Laboratory Order",
@@ -1823,6 +1828,8 @@
       "GENERAL_SEARCH": "General search",
       "CLIENT_NAME": "Client name",
       "CLIENT_NAME_PLACEHOLDER": "Search by first or last name",
+      "CLIENT_DOCUMENT": "Client document",
+      "CLIENT_DOCUMENT_PLACEHOLDER": "Search by document number",
       "INVOICE_NUMBER": "Invoice number",
       "INVOICE_NUMBER_PLACEHOLDER": "Search by number, access key or external id",
       "INVOICE_STATE": "Invoice state",
@@ -1837,6 +1844,11 @@
       "MAX_TOTAL_PLACEHOLDER": "Eg: 500.00",
       "DATE_FROM": "Date from",
       "DATE_TO": "Date to"
+    },
+    "LINKED_FILTER": {
+      "ACTIVE_LABEL": "Active filter:",
+      "ACTIVE_DESCRIPTION": "showing only the related purchase order.",
+      "CLEAR": "Clear filter"
     },
     "TABLE": {
       "ORDER": "Order",

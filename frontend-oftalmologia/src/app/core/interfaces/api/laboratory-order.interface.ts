@@ -172,6 +172,7 @@ export interface LaboratoryOrderQueryParams {
   page?: number
   limit?: number
   patientId?: string
+  orderId?: string
   isConfirmed?: boolean
   search?: string
   identification?: string

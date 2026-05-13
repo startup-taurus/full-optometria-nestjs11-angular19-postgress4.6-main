@@ -105,6 +105,8 @@ export interface PurchaseOrderQueryParams {
   limit?: number
   search?: string
   clientName?: string
+  clientDocument?: string
+  laboratoryOrderId?: string
   invoiceNumber?: string
   status?: PurchaseOrderStatus
   invoiceState?: PurchaseOrderInvoiceState

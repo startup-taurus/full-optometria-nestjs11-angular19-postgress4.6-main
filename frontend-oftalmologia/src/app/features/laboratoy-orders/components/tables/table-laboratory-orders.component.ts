@@ -1,12 +1,16 @@
 import {
   Component,
+  Input,
+  OnChanges,
   OnInit,
   OnDestroy,
+  SimpleChanges,
   ViewChild,
   CUSTOM_ELEMENTS_SCHEMA,
   inject,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { PageTitleComponent } from '../../../../shared/components/layouts/page-title/page-title.component'
@@ -26,7 +30,6 @@ import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf
 import { Branch } from '@core/interfaces/api/branch.interface'
 import { LaboratoryOrderUpsertModalComponent } from '../laboratory-order-upsert-modal/laboratory-order-upsert-modal.component'
 import { ViewLaboratoryOrderComponent } from '../forms/view-laboratory-order/view-laboratory-order.component'
-import { ViewPurchaseOrderModalComponent } from '../../../purchase-orders/components/modals/view-purchase-order-modal/view-purchase-order-modal.component'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
 import { selectSelectedBranchId } from '@core/states/branch/branch.selectors'
@@ -62,7 +65,9 @@ import { ExportColumn } from '@core/services/ui/table-export.service'
   styleUrl: './table-laboratory-orders.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
+export class TableLaboratoryOrdersComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   private _laboratoryOrdersService = inject(LaboratoryOrdersService)
   private _purchaseOrdersService = inject(PurchaseOrdersService)
   private _branchService = inject(BranchService)
@@ -71,6 +76,9 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   private _translateService = inject(TranslateService)
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _store = inject(Store<AppState>)
+  private _router = inject(Router)
+
+  @Input() orderId: string | null = null
 
   public laboratoryOrders: LaboratoryOrder[] = []
   public filteredOrders: LaboratoryOrder[] = []
@@ -94,6 +102,13 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.exportColumns = this.buildExportColumns()
     this.initializeSubscriptions()
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.isInitialLoad || !changes['orderId']) {
+      return
+    }
+    this.resetAndLoad()
   }
 
   private buildExportColumns(): ExportColumn<LaboratoryOrder>[] {
@@ -219,6 +234,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
     const queryParams = {
       ...filters,
+      ...(this.orderId ? { orderId: this.orderId } : {}),
       page: this.currentPage,
       limit: this.pageSize,
     }
@@ -525,6 +541,10 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   }
 
   public onViewLinkedPurchaseOrder(order: LaboratoryOrder): void {
+    if (!order?.id) {
+      return
+    }
+
     this._purchaseOrdersService.getByLaboratoryOrderId(order.id).subscribe({
       next: (purchaseOrder) => {
         if (!purchaseOrder?.id) {
@@ -538,13 +558,9 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
           return
         }
 
-        const modalRef = this._modalService.open(ViewPurchaseOrderModalComponent, {
-          size: 'lg',
-          centered: true,
-          backdrop: 'static',
+        this._router.navigate(['/purchase-orders'], {
+          queryParams: { laboratoryOrderId: order.id },
         })
-
-        modalRef.componentInstance.orderId = purchaseOrder.id
       },
       error: () => {
         Swal.fire({

@@ -281,6 +281,7 @@ export class LaboratoryOrdersService {
       page,
       limit,
       patientFilterId,
+      orderId,
       isConfirmed,
       cedula,
       firstName,
@@ -307,6 +308,10 @@ export class LaboratoryOrdersService {
       queryBuilder.andWhere('lo.patientId = :patientFilterId', {
         patientFilterId,
       });
+    }
+
+    if (orderId) {
+      queryBuilder.andWhere('lo.id = :orderId', { orderId });
     }
 
     if (typeof isConfirmed === 'boolean') {
