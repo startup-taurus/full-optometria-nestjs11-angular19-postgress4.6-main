@@ -19,6 +19,7 @@ import { QueryLaboratoryOrderDto } from './dtos/query-laboratory-order.dto';
 import { ChangeStatusDto } from './dtos/change-status.dto';
 import { BranchContext } from '../../common/decorators/branch-context.decorator';
 import { CompanyId } from '../../common/decorators/company-context.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @Controller('laboratory-orders')
 @UseGuards(AuthGuard('jwt'))
@@ -31,10 +32,16 @@ export class LaboratoryOrdersController {
   async create(
     @Body(ValidationPipe) createDto: CreateLaboratoryOrderDto,
     @BranchContext() branchId: string,
-    @CompanyId() companyId?: string
+    @CompanyId() companyId?: string,
+    @CurrentUser() user?: any,
   ) {
     try {
-      const result = await this.laboratoryOrdersService.create(createDto, branchId, companyId);
+      const result = await this.laboratoryOrdersService.create(
+        createDto,
+        branchId,
+        companyId,
+        user?.id,
+      );
       return result;
     } catch (error) {
       throw error;
@@ -87,13 +94,15 @@ export class LaboratoryOrdersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) statusDto: ChangeStatusDto,
     @BranchContext() branchId: string,
-    @CompanyId() companyId?: string
+    @CompanyId() companyId?: string,
+    @CurrentUser() user?: any,
   ) {
     return this.laboratoryOrdersService.changeStatus(
       id,
       statusDto.status,
       branchId,
-      companyId
+      companyId,
+      user?.id,
     );
   }
 

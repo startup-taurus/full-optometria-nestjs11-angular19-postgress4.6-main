@@ -14,6 +14,10 @@ export class QueryLaboratoryOrderDto {
   patientFilterId?: string;
 
   @IsOptional()
+  @IsUUID()
+  orderId?: string;
+
+  @IsOptional()
   @IsBoolean()
   isConfirmed?: boolean;
 

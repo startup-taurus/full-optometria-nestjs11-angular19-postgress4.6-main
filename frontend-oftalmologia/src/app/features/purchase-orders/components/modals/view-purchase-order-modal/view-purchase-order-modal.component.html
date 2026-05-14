@@ -1,0 +1,197 @@
+<div class="modal-header d-flex justify-content-between align-items-center">
+  <h5 class="modal-title">{{ 'PURCHASE_ORDERS.VIEW_TITLE' | translate }}</h5>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+  <div class="text-center py-4" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && purchaseOrder" class="row g-3">
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.NUMBER' | translate }}</label>
+        <p class="detail-value">#{{ purchaseOrder.orderNumber || '-' }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.STATUS' | translate }}</label>
+        <p class="detail-value">
+          <span class="badge" [ngClass]="getStatusBadgeClass(purchaseOrder.status)">
+            {{ ('PURCHASE_ORDERS.STATUS_' + (purchaseOrder.status || '').toUpperCase()) | translate }}
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'CLIENT.SINGULAR' | translate }}</label>
+        <p class="detail-value">
+          {{ getClientDisplayName(purchaseOrder) }}
+        </p>
+        <small class="text-body-secondary">{{ getClientDisplayDocument(purchaseOrder) }}</small>
+        <div class="detail-inline-list mt-2">
+          <div>
+            <strong>{{ 'PURCHASE_ORDERS.FIELDS.EMAIL' | translate }}:</strong>
+            {{ getClientDisplayEmail(purchaseOrder) }}
+          </div>
+          <div>
+            <strong>{{ 'PURCHASE_ORDERS.FIELDS.ADDRESS' | translate }}:</strong>
+            {{ getClientDisplayAddress(purchaseOrder) }}
+          </div>
+          <div>
+            <strong>{{ 'PURCHASE_ORDERS.FIELDS.PHONE' | translate }}:</strong>
+            {{ getClientDisplayPhone(purchaseOrder) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.SHOULD_INVOICE' | translate }}</label>
+        <p class="detail-value">
+          <span class="badge" [ngClass]="getShouldInvoiceBadgeClass(purchaseOrder.shouldInvoice)">
+            {{ (purchaseOrder.shouldInvoice ? 'COMMON.YES' : 'COMMON.NO') | translate }}
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'COMMON.CREATED_AT' | translate }}</label>
+        <p class="detail-value">{{ purchaseOrder.createdAt | date: 'dd/MM/yyyy, HH:mm' }}</p>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.INVOICE' | translate }}</label>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <span
+              class="badge"
+              [ngClass]="
+                purchaseOrder.shouldInvoice
+                  ? getInvoiceBadgeClass(purchaseOrder.invoice?.state)
+                  : 'bg-secondary text-white'
+              "
+            >
+              {{ getInvoiceStateLabelKey(purchaseOrder) | translate }}
+            </span>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.PAYMENT_METHOD' | translate }}:</strong>
+              {{
+                purchaseOrder.shouldInvoice
+                  ? getPaymentMethodLabel(purchaseOrder.invoice?.paymentMethod)
+                  : ('PURCHASE_ORDERS.BILLING.STATE.NOT_APPLICABLE' | translate)
+              }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.TAX_PERCENT' | translate }}:</strong>
+              {{
+                purchaseOrder.invoice?.taxPercent === undefined || purchaseOrder.invoice?.taxPercent === null
+                  ? '-'
+                  : (purchaseOrder.invoice?.taxPercent + '%')
+              }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.INVOICE_NUMBER' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.invoiceNumber || '-' }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.EXTERNAL_ID' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.externalInvoiceId || '-' }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.ACCESS_KEY' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.accessKey || '-' }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.AUTH_NUMBER' | translate }}:</strong>
+              {{ purchaseOrder.invoice?.authorizationNumber || '-' }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="invoice-detail-line">
+              <strong>{{ 'PURCHASE_ORDERS.FIELDS.AUTH_DATE' | translate }}:</strong>
+              {{ formatDateTime(purchaseOrder.invoice?.authorizationDate) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="detail-block">
+        <label class="detail-label">{{ 'PURCHASE_ORDERS.ITEMS_TITLE' | translate }}</label>
+
+        <div class="table-responsive" *ngIf="getPurchaseOrderItems().length > 0; else noItems">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>{{ 'PURCHASE_ORDERS.FIELDS.PRODUCT' | translate }}</th>
+                <th class="text-center">{{ 'PURCHASE_ORDERS.FIELDS.QUANTITY' | translate }}</th>
+                <th class="text-end">{{ 'PURCHASE_ORDERS.FIELDS.UNIT_PRICE' | translate }}</th>
+                <th class="text-end">{{ 'PURCHASE_ORDERS.FIELDS.LINE_TOTAL' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of getPurchaseOrderItems()">
+                <td>
+                  <div class="fw-semibold">{{ item.productName }}</div>
+                  <small class="text-body-secondary">
+                    {{ item.productCode }}
+                    <span *ngIf="item.productBrand"> - {{ item.productBrand }}</span>
+                  </small>
+                </td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-end">{{ formatCurrency(item.unitPrice) }}</td>
+                <td class="text-end">{{ formatCurrency(getItemAmount(item)) }}</td>
+              </tr>
+              <tr class="table-bottom-total">
+                <td colspan="3" class="text-end fw-semibold">
+                  {{ 'PURCHASE_ORDERS.TOTAL_AMOUNT' | translate }}:
+                </td>
+                <td class="text-end fw-semibold">{{ formatCurrency(purchaseOrder.totalAmount) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ng-template #noItems>
+          <div class="text-muted small">{{ 'COMMON.NO_DATA' | translate }}</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !purchaseOrder" class="alert alert-warning mb-0">
+    {{ 'COMMON.NO_DATA' | translate }}
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">
+    {{ 'COMMON.CLOSE' | translate }}
+  </button>
+</div>

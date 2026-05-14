@@ -13,11 +13,11 @@
     </div>
     <div class="card-body">
       <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label"
-            >{{ 'LABORATORY_ORDERS.FIELDS.FIRST_NAME' | translate }} -
-            {{ 'LABORATORY_ORDERS.FIELDS.LAST_NAME' | translate }}</label
-          >
+        <div class="col-md-9">
+          <label class="form-label">
+            {{ 'LABORATORY_ORDERS.FIELDS.FIRST_NAME' | translate }} -
+            {{ 'LABORATORY_ORDERS.FIELDS.LAST_NAME' | translate }}
+          </label>
           <input
             type="text"
             class="form-control"
@@ -25,22 +25,13 @@
             readonly
             disabled
           />
+          <div class="mt-2 d-flex align-items-center gap-2 patient-document-inline">
+            <span class="fw-semibold text-muted">{{ 'CLIENT.DOCUMENT_NUMBER' | translate }}:</span>
+            <span class="badge bg-primary fs-6 px-3 py-2">{{ userDocumentNumber }}</span>
+          </div>
         </div>
 
-        <div class="col-md-6">
-          <label class="form-label">{{
-            'LABORATORY_ORDERS.FIELDS.DOCUMENT_NUMBER' | translate
-          }}</label>
-          <input
-            type="text"
-            class="form-control"
-            [value]="userDocumentNumber"
-            readonly
-            disabled
-          />
-        </div>
-
-        <div class="col-md-6">
+        <div class="col-md-3">
           <label class="form-label">{{
             'LABORATORY_ORDERS.FIELDS.EMAIL' | translate
           }}</label>
@@ -53,7 +44,7 @@
           />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-6">
           <label class="form-label">{{
             'LABORATORY_ORDERS.FIELDS.MOBILE_PHONE' | translate
           }}</label>
@@ -66,7 +57,7 @@
           />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-6">
           <label class="form-label">{{
             'LABORATORY_ORDERS.FIELDS.HOME_PHONE' | translate
           }}</label>
@@ -77,6 +68,79 @@
             readonly
             disabled
           />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+      <h6 class="mb-0">
+        <i class="ti ti-user-check me-2"></i>
+        {{ 'CLIENT.SINGULAR' | translate }}
+      </h6>
+      <div class="toggle-switch">
+        <input
+          type="checkbox"
+          id="patientClientsSwitch"
+          class="toggle-input"
+          [(ngModel)]="showPatientClientsOnly"
+          (change)="onTogglePatientClientsFilter()"
+          [disabled]="clientsLoading"
+        />
+        <label for="patientClientsSwitch" class="toggle-label mb-0">
+          <span class="toggle-slider"></span>
+          <span class="toggle-text">
+            {{ showPatientClientsOnly ? ('CLIENT.SHOW_PATIENT_CLIENTS_ONLY' | translate) : ('CLIENT.SHOW_ALL_CLIENTS' | translate) }}
+          </span>
+        </label>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3" [formGroup]="formGroup">
+        <div class="col-12">
+          <label class="form-label">
+            {{ 'CLIENT.SELECT_OR_CREATE' | translate }}
+          </label>
+          <div class="input-group lab-client-select-group">
+            <ng-select
+              [items]="clients"
+              bindLabel="displayLabel"
+              bindValue="id"
+              placeholder="{{ 'CLIENT.SELECT_PLACEHOLDER' | translate }}"
+              [loading]="clientsLoading"
+              [searchFn]="searchClient"
+              [compareWith]="compareClients"
+              (change)="onClientSelected($event)"
+              formControlName="clientId"
+              class="flex-grow-1 filter-select-v2"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <div class="d-flex align-items-center flex-wrap gap-2 w-100 client-option-inline">
+                  <span class="fw-medium">
+                    {{ item.firstName }} {{ item.lastName }}
+                  </span>
+                  <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
+                    {{ item.documentNumber || ('CLIENT.UNIDENTIFIED' | translate) }}
+                  </span>
+                  <span *ngIf="item.isPatientSelf" class="text-primary fw-medium"
+                    >({{ 'CLIENT.IS_PATIENT' | translate }})</span
+                  >
+                </div>
+              </ng-template>
+            </ng-select>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="openClientModal()"
+              title="{{ 'CLIENT.CREATE_NEW' | translate }}"
+            >
+              <i class="ti ti-plus"></i>
+            </button>
+          </div>
+          <small class="text-muted d-block mt-2">
+            {{ 'CLIENT.EMPTY_MEANS_FINAL_CONSUMER' | translate }}
+          </small>
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 export interface StartSessionResult {
   sessionKey: string;
   qrCode: string;
@@ -54,6 +56,8 @@ export interface WhatsAppProvider {
   startSession(sessionKey: string): Promise<StartSessionResult>;
   refreshQr(sessionKey: string): Promise<string>;
   isSessionConnected(sessionKey: string): Promise<boolean>;
+  hasAuthOnDisk(sessionKey: string): Promise<boolean>;
+  getSessionStream(sessionKey: string): Observable<WhatsAppSessionSnapshot>;
   sendMessage(
     sessionKey: string,
     phone: string,

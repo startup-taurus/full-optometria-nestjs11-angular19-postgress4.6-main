@@ -54,6 +54,9 @@
                     <th style="width: 18%">Marca</th>
                     <th class="text-center" style="width: 12%">Stock</th>
                     <th class="text-center" style="width: 18%">Cantidad</th>
+                    <th class="text-center" style="width: 16%">Precio</th>
+                    <th class="text-center" style="width: 16%">Descuento</th>
+                    <th class="text-center" style="width: 14%">Total</th>
                     <th class="text-center" style="width: 56px"></th>
                   </tr>
                 </thead>
@@ -104,6 +107,25 @@
                           <i class="ti ti-plus"></i>
                         </button>
                       </div>
+                    </td>
+                    <td class="text-center">
+                      ${{ getLineItemUnitPrice(lineItem.productId) | number:'1.2-2' }}
+                    </td>
+                    <td class="text-center">
+                      <input
+                        type="number"
+                        class="form-control form-control-sm text-end mx-auto"
+                        style="max-width: 120px"
+                        min="0"
+                        step="0.01"
+                        [value]="getLineItemDiscount(lineItem.productId)"
+                        (input)="onDiscountChange(lineItem.productId, $any($event.target).value)"
+                        [attr.aria-label]="'Descuento para ' + getLineItemDisplayName(lineItem.productId)"
+                        placeholder="0.00"
+                      />
+                    </td>
+                    <td class="text-center fw-medium">
+                      ${{ getLineItemNetTotal(lineItem.productId) | number:'1.2-2' }}
                     </td>
                     <td class="text-center">
                       <button
@@ -228,6 +250,27 @@
             />
           </div>
 
+        </div>
+
+        <div class="row g-3 mt-3" *ngIf="lineItems.length > 0">
+          <div class="col-12 col-md-4">
+            <div class="border rounded-3 p-3 bg-light h-100">
+              <small class="text-muted d-block">Subtotal</small>
+              <div class="fw-semibold fs-5">${{ getSubtotal() | number:'1.2-2' }}</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="border rounded-3 p-3 bg-light h-100">
+              <small class="text-muted d-block">Descuento total</small>
+              <div class="fw-semibold fs-5 text-danger">-${{ getTotalDiscount() | number:'1.2-2' }}</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="border rounded-3 p-3 bg-light h-100">
+              <small class="text-muted d-block">Total</small>
+              <div class="fw-semibold fs-5 text-primary">${{ getTotal() | number:'1.2-2' }}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

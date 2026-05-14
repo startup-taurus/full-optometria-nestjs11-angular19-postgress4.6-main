@@ -15,18 +15,25 @@
     <div class="row">
       <div class="col-12">
         <div class="steps-container">
-          <div *ngFor="let title of stepTitles; let i = index" class="step-item">
+          <div
+            *ngFor="let title of stepTitles; let i = index"
+            class="step-item"
+            [class.clickable]="true"
+            role="button"
+            tabindex="0"
+            (click)="goToStep(i + 1)"
+            (keydown.enter)="goToStep(i + 1)"
+            (keydown.space)="goToStep(i + 1)"
+          >
             <div
               class="step-circle"
               [class.active]="currentStep === i + 1"
               [class.completed]="currentStep > i + 1"
-              [class.clickable]="true"
-              (click)="goToStep(i + 1)"
             >
               <span *ngIf="currentStep > i + 1">✓</span>
               <span *ngIf="currentStep <= i + 1">{{ i + 1 }}</span>
             </div>
-            <div class="step-label ms-2">
+            <div class="step-label">
               <span>{{ title | translate }}</span>
             </div>
             <div class="step-divider" *ngIf="i < totalSteps - 1"></div>
@@ -84,6 +91,41 @@
         </div>
 
         <div class="col-lg-6 mb-4">
+          <div class="info-card mb-4">
+            <div class="card-header">
+              <h6>
+                <i class="ti ti-receipt-2 me-2"></i>
+                {{ 'LABORATORY_ORDERS.FIELDS.CLIENT_INFO' | translate }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.FIRST_NAME' | translate }}:</strong>
+                <span>{{ getClientDisplayFirstName() }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.LAST_NAME' | translate }}:</strong>
+                <span>{{ getClientDisplayLastName() }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.DOCUMENT_NUMBER' | translate }}:</strong>
+                <span>{{ getClientDisplayDocument() }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.EMAIL' | translate }}:</strong>
+                <span>{{ getClientDisplayEmail() }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.MOBILE_PHONE' | translate }}:</strong>
+                <span>{{ getClientDisplayMobilePhone() }}</span>
+              </div>
+              <div class="data-field">
+                <strong>{{ 'LABORATORY_ORDERS.FIELDS.HOME_PHONE' | translate }}:</strong>
+                <span>{{ getClientDisplayHomePhone() }}</span>
+              </div>
+            </div>
+          </div>
+
           <div class="info-card">
             <div class="card-header">
               <h6>
@@ -92,6 +134,10 @@
               </h6>
             </div>
             <div class="card-body">
+              <div class="data-field">
+                <strong>{{ 'COMMON.CREATED_AT' | translate }}:</strong>
+                <span>{{ formatDateTime(order?.createdAt || null) }}</span>
+              </div>
               <div class="data-field">
                 <strong>{{ 'LABORATORY_ORDERS.FIELDS.ATTENDANCE_DATE' | translate }}:</strong>
                 <span>{{ formatDate(order?.attendanceDate || null) }}</span>
@@ -237,8 +283,10 @@
                       <th>Código</th>
                       <th>Producto</th>
                       <th>Marca</th>
-                      <th class="text-center">Stock</th>
                       <th class="text-center">Cant.</th>
+                      <th class="text-end">P. Unit.</th>
+                      <th class="text-end">Desc.</th>
+                      <th class="text-end">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -246,14 +294,28 @@
                       <td>{{ row.code }}</td>
                       <td>{{ row.name }}</td>
                       <td>{{ row.brand }}</td>
-                      <td class="text-center">{{ row.stock ?? '-' }}</td>
                       <td class="text-center">{{ row.quantity }}</td>
+                      <td class="text-end">${{ row.unitPrice | number:'1.2-2' }}</td>
+                      <td class="text-end text-danger">-${{ row.discount | number:'1.2-2' }}</td>
+                      <td class="text-end fw-semibold">${{ row.total | number:'1.2-2' }}</td>
                     </tr>
                     <tr *ngIf="getOrderProductRows().length === 0">
-                      <td colspan="5" class="text-center text-muted">-</td>
+                      <td colspan="7" class="text-center text-muted">-</td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              <div class="row mt-3" *ngIf="getOrderProductRows().length > 0">
+                <div class="col-md-4 mb-2">
+                  <div class="data-field"><strong>Subtotal:</strong> <span>${{ getSubtotal() | number:'1.2-2' }}</span></div>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <div class="data-field"><strong>Descuento total:</strong> <span class="text-danger">-${{ getTotalDiscount() | number:'1.2-2' }}</span></div>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <div class="data-field"><strong>Total:</strong> <span class="fw-semibold">${{ getTotal() | number:'1.2-2' }}</span></div>
+                </div>
               </div>
 
               <div class="row mt-3">

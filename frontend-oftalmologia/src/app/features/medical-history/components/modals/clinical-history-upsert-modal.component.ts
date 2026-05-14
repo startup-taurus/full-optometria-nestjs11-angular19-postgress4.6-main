@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, Input, inject } from '@angular/core'
+﻿import { Component, OnInit, OnDestroy, Input, inject, HostBinding } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
   ReactiveFormsModule,
@@ -14,7 +14,11 @@ import { Subject, takeUntil } from 'rxjs'
 import { ToastrService } from 'ngx-toastr'
 import { ClinicalHistoriesService } from '@core/services/api/clinical-histories.service'
 import { FieldVisibilityService } from '@core/services/ui/field-visibility.service'
-import { FieldsConfig } from '@core/interfaces/api/clinical-form-config.interface'
+import { AuthenticationService } from '@core/services/api/auth.service'
+import {
+  DEFAULT_CLINICAL_FORM_STRUCTURE,
+  FieldsConfig,
+} from '@core/interfaces/api/clinical-form-config.interface'
 import { BaseStepModalComponent } from '../../../../shared/components/base-step-modal/base-step-modal.component'
 import { ClinicalHistoryStep1Component } from '../steps/clinical-history-step1/clinical-history-step1.component'
 import { ClinicalHistoryStep2Component } from '../steps/clinical-history-step2/clinical-history-step2.component'
@@ -47,8 +51,14 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   @Input() selectedRecord: ClinicalHistory | null = null
   @Input() recordId?: string
   @Input() preSelectedPatientId?: string
+  @Input() duplicateMode = false
   @Input() fromShiftFlow = false
   @Input() sourceShiftId?: string
+
+  @HostBinding('class.duplicate-mode')
+  get isDuplicateModeClass(): boolean {
+    return this.duplicateMode
+  }
 
   private destroySilentlyContinue = new Subject<void>()
 
@@ -57,14 +67,16 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   private _formBuilder = inject(FormBuilder)
   private _translateService = inject(TranslateService)
   private _fieldVisibilityService = inject(FieldVisibilityService)
+  private _authService = inject(AuthenticationService)
   private _toastr = inject(ToastrService)
 
   public clinicalForm!: FormGroup
   public saving = false
-  public fieldsConfig: FieldsConfig | null = null
+  public fieldsConfig: FieldsConfig | null = DEFAULT_CLINICAL_FORM_STRUCTURE
 
   public currentStep = 1
   public totalSteps = 3
+  public originalFormValue: Record<string, any> | null = null
 
   public stepTitles: string[] = []
 
@@ -73,6 +85,23 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
     this.initializeForm()
     this.loadFieldsConfiguration()
     this.loadExistingData()
+    this.applyDefaultProfessionalName()
+  }
+
+  private applyDefaultProfessionalName(): void {
+    if (this.editMode || this.duplicateMode) {
+      return
+    }
+
+    const currentUser = this._authService.getCurrentUser()
+    if (!currentUser) {
+      return
+    }
+
+    const fullName = `${currentUser.firstName ?? ''} ${currentUser.lastName ?? ''}`.trim()
+    if (fullName) {
+      this.clinicalForm.get('professionalName')?.setValue(fullName)
+    }
   }
 
   ngOnDestroy(): void {
@@ -115,8 +144,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       previousRxOd: [''],
       previousAddOd: [''],
+      previousOdVl: [''],
+      previousOdVp: [''],
       previousRxOi: [''],
       previousAddOi: [''],
+      previousOiVl: [''],
+      previousOiVp: [''],
+      previousAo: [''],
 
       visualAcuityOdVl: [''],
       visualAcuityOdVp: [''],
@@ -231,7 +265,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
   }
 
   private loadExistingData(): void {
-    if (this.editMode) {
+    if (this.editMode || this.duplicateMode) {
       if (this.selectedRecord) {
 
         this.populateFormFromRecord(this.selectedRecord)
@@ -275,8 +309,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       previousRxOd: record.previousRxOd || '',
       previousAddOd: record.previousAddOd || '',
+      previousOdVl: record.previousOdVl || '',
+      previousOdVp: record.previousOdVp || '',
       previousRxOi: record.previousRxOi || '',
       previousAddOi: record.previousAddOi || '',
+      previousOiVl: record.previousOiVl || '',
+      previousOiVp: record.previousOiVp || '',
+      previousAo: record.previousAo || '',
 
       visualAcuityOdVl: record.visualAcuityOdVl || '',
       visualAcuityOdVp: record.visualAcuityOdVp || '',
@@ -394,6 +433,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
       record.additionalTreatments.forEach((treatment) => {
         additionalTreatmentsArray.push(this._formBuilder.control(treatment))
       })
+    }
+
+    this.clinicalForm.markAsPristine()
+    this.clinicalForm.markAsUntouched()
+
+    if (this.duplicateMode) {
+      this.originalFormValue = this.clinicalForm.getRawValue()
     }
   }
 
@@ -555,8 +601,13 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       previousRxOd: formData.previousRxOd,
       previousAddOd: formData.previousAddOd,
+      previousOdVl: formData.previousOdVl,
+      previousOdVp: formData.previousOdVp,
       previousRxOi: formData.previousRxOi,
       previousAddOi: formData.previousAddOi,
+      previousOiVl: formData.previousOiVl,
+      previousOiVp: formData.previousOiVp,
+      previousAo: formData.previousAo,
 
       visualAcuityOdVl: formData.visualAcuityOdVl,
       visualAcuityOdVp: formData.visualAcuityOdVp,

@@ -6,6 +6,7 @@
 .wrapper {
     height: 100%;
     width: 100%;
+    --layout-inline-gap: calc(#{$grid-gutter-width} * 0.5);
 }
 
 // Content Page
@@ -14,9 +15,15 @@
     flex-direction: column;
     position: relative;
     margin-left: $sidenav-width;
-    transition: $transition-base;
+    transition: margin-left 0.25s ease;
     min-height: calc(100vh - $topbar-height);
-    padding: 0 calc($grid-gutter-width * 0.5);
+    padding: 0 var(--layout-inline-gap) 1rem;
+}
+
+@include media-breakpoint-down(sm) {
+    .wrapper {
+        --layout-inline-gap: 0.75rem;
+    }
 }
 
 // Logo Height

@@ -29,6 +29,9 @@ export interface Company {
     mimeType: string
   }
   isActive?: boolean
+  maxUsers?: number | null
+  maxBranches?: number | null
+  hasBillingApiKey?: boolean
 }
 
 export interface User {

@@ -27,6 +27,12 @@ export enum DispatchStatus {
 @Index(['patientId'])
 @Index(['status'])
 @Index(['scheduledAt'])
+@Index('idx_dispatch_logs_branch_status_sentat', ['branchId', 'status', 'sentAt'])
+@Index('idx_dispatch_logs_branch_patient_scheduled', [
+  'branchId',
+  'patientId',
+  'scheduledAt',
+])
 export class MessageDispatchLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;

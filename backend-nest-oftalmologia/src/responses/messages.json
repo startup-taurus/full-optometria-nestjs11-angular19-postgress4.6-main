@@ -228,5 +228,88 @@
   "AUTH.ADMIN_BRANCH_FILTER_CLEARED": {
     "es": "Filtro de sucursal eliminado exitosamente",
     "en": "Branch filter cleared successfully"
+  },
+
+  "CLIENT.CREATED": {
+    "es": "Cliente creado correctamente",
+    "en": "Client created successfully"
+  },
+  "CLIENT.UPDATED": {
+    "es": "Cliente actualizado correctamente",
+    "en": "Client updated successfully"
+  },
+  "CLIENT.DELETED": {
+    "es": "Cliente eliminado correctamente",
+    "en": "Client deleted successfully"
+  },
+  "CLIENT.FOUND": {
+    "es": "Clientes obtenidos correctamente",
+    "en": "Clients fetched successfully"
+  },
+  "CLIENT.FETCHED": {
+    "es": "Cliente obtenido correctamente",
+    "en": "Client fetched successfully"
+  },
+  "CLIENT.SEARCH_RESULTS": {
+    "es": "Resultados de búsqueda obtenidos",
+    "en": "Search results retrieved"
+  },
+
+  "PURCHASE_ORDER.CREATED": {
+    "es": "Orden de pedido creada correctamente",
+    "en": "Purchase order created successfully"
+  },
+  "PURCHASE_ORDER.UPDATED": {
+    "es": "Orden de pedido actualizada correctamente",
+    "en": "Purchase order updated successfully"
+  },
+  "PURCHASE_ORDER.DELETED": {
+    "es": "Orden de pedido eliminada correctamente",
+    "en": "Purchase order deleted successfully"
+  },
+  "PURCHASE_ORDER.FOUND": {
+    "es": "Órdenes de pedido obtenidas correctamente",
+    "en": "Purchase orders fetched successfully"
+  },
+  "PURCHASE_ORDER.FETCHED": {
+    "es": "Orden de pedido obtenida correctamente",
+    "en": "Purchase order fetched successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_CREATED": {
+    "es": "Factura electrónica generada correctamente",
+    "en": "Electronic invoice created successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_RETRIED": {
+    "es": "Reintento de facturación ejecutado correctamente",
+    "en": "Invoice retry executed successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_FETCHED": {
+    "es": "Factura de la orden obtenida correctamente",
+    "en": "Order invoice fetched successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_AUTHORIZED": {
+    "es": "Factura autorizada correctamente",
+    "en": "Invoice authorized successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_XML_FETCHED": {
+    "es": "XML de factura obtenido correctamente",
+    "en": "Invoice XML fetched successfully"
+  },
+  "PURCHASE_ORDER.INVOICE_STATUS_SYNCED": {
+    "es": "Estado de factura sincronizado correctamente",
+    "en": "Invoice status synced successfully"
+  },
+  "PURCHASE_ORDER.BILLING_PAYMENT_METHODS_FETCHED": {
+    "es": "Métodos de pago obtenidos correctamente",
+    "en": "Payment methods fetched successfully"
+  },
+
+  "ERROR.INVALID_RELATION": {
+    "es": "No se encontró la entidad relacionada",
+    "en": "Related entity not found"
+  },
+  "ERROR.INTERNAL_SERVER": {
+    "es": "Error inesperado del servidor",
+    "en": "Unexpected server error"
   }
 }

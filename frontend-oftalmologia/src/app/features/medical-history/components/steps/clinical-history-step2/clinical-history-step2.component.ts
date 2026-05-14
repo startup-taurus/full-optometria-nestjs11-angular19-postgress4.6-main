@@ -1,12 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
-import {
-  ReactiveFormsModule,
-  FormGroup,
-  FormArray,
-  FormControl,
-} from '@angular/forms'
+import { ReactiveFormsModule, FormGroup } from '@angular/forms'
 import { FieldsConfig } from '@core/interfaces/api/clinical-form-config.interface'
 
 @Component({
@@ -19,35 +14,17 @@ import { FieldsConfig } from '@core/interfaces/api/clinical-form-config.interfac
 export class ClinicalHistoryStep2Component {
   @Input({ required: true }) formGroup!: FormGroup
   @Input() fieldsConfig: FieldsConfig | null = null
+  @Input() duplicateMode = false
+  @Input() originalFormValue: Record<string, any> | null = null
 
-  // Datos estáticos - NO MODIFICARR (opciones para seleccionar)
   public motorTestOptions = ['OD', 'OI', 'A.O.']
-
-  public lensTypeOptions = [
-    'monofocales',
-    'bifocales',
-    'progresivos',
-    'acomodativos u ocupacionales',
-  ]
-
-  public additionalTreatmentOptions = [
-    'fotocromático',
-    'filtro de luz azul',
-    'antireflejo',
-    'blanco',
-    'transition',
-  ]
-
-  ngOnInit(): void {}
 
   shouldShowSection(sectionKey: string): boolean {
     if (!this.fieldsConfig) {
       return true
     }
     const section = this.fieldsConfig.sections[sectionKey]
-    const visible = section ? section.visible : true
-
-    return visible
+    return section ? section.visible : true
   }
 
   shouldShowField(sectionKey: string, fieldName: string): boolean {
@@ -58,60 +35,74 @@ export class ClinicalHistoryStep2Component {
     if (!section || !section.visible) {
       return false
     }
-    const fieldVisible = section.fields[fieldName] ?? true
-
-    return fieldVisible
+    return section.fields[fieldName] ?? true
   }
 
   public getMotorTestControl(testType: string) {
     return this.formGroup.get(['motorTest', testType])
   }
 
-  get lensTypesArray(): FormArray {
-    return this.formGroup.get('lensTypes') as FormArray
-  }
-
-  public isLensTypeSelected(type: string): boolean {
-    return this.lensTypesArray.value.includes(type)
-  }
-
-  public toggleLensType(type: string): void {
-    const currentTypes = [...this.lensTypesArray.value]
-    const index = currentTypes.indexOf(type)
-
-    if (index > -1) {
-      currentTypes.splice(index, 1)
-    } else {
-      currentTypes.push(type)
+  public shouldShowOriginalValue(path: string): boolean {
+    if (!this.duplicateMode) {
+      return false
     }
 
-    this.lensTypesArray.clear()
-    currentTypes.forEach((lensType) => {
-      this.lensTypesArray.push(new FormControl(lensType))
-    })
+    return this.getOriginalValue(path) !== null
   }
 
-  get additionalTreatmentsArray(): FormArray {
-    return this.formGroup.get('additionalTreatments') as FormArray
+  public getOriginalValue(path: string): string | null {
+    return this.normalizeValue(this.getValueByPath(this.originalFormValue, path))
   }
 
-  public isAdditionalTreatmentSelected(treatment: string): boolean {
-    return this.additionalTreatmentsArray.value.includes(treatment)
-  }
-
-  public toggleAdditionalTreatment(treatment: string): void {
-    const currentTreatments = [...this.additionalTreatmentsArray.value]
-    const index = currentTreatments.indexOf(treatment)
-
-    if (index > -1) {
-      currentTreatments.splice(index, 1)
-    } else {
-      currentTreatments.push(treatment)
+  public isOriginalValueModified(path: string): boolean {
+    if (!this.duplicateMode) {
+      return false
     }
 
-    this.additionalTreatmentsArray.clear()
-    currentTreatments.forEach((treat) => {
-      this.additionalTreatmentsArray.push(new FormControl(treat))
-    })
+    const originalRaw = this.getValueByPath(this.originalFormValue, path)
+    const normalizedOriginal = this.normalizeValue(originalRaw)
+    if (normalizedOriginal === null) {
+      return false
+    }
+
+    const currentValue = this.formGroup.get(path)?.value
+    return !this.areValuesEqual(currentValue, originalRaw)
+  }
+
+  private getValueByPath(source: any, path: string): any {
+    if (!source || !path) {
+      return undefined
+    }
+
+    return path.split('.').reduce((acc, key) => acc?.[key], source)
+  }
+
+  private normalizeValue(value: any): string | null {
+    if (value === null || value === undefined) {
+      return null
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value.join(', ') : null
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      return trimmed.length > 0 ? trimmed : null
+    }
+
+    if (typeof value === 'number') {
+      return String(value)
+    }
+
+    if (typeof value === 'boolean') {
+      return value ? 'Si' : 'No'
+    }
+
+    return String(value)
+  }
+
+  private areValuesEqual(currentValue: any, originalValue: any): boolean {
+    return JSON.stringify(currentValue ?? null) === JSON.stringify(originalValue ?? null)
   }
 }

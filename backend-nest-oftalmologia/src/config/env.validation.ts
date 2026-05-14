@@ -42,6 +42,15 @@ export class EnvironmentVariables {
 
   @IsNumber()
   BCRYPT_SALT_ROUNDS: number;
+
+  @IsString()
+  BILLING_API_URL: string;
+
+  @IsNumber()
+  BILLING_API_TIMEOUT_MS: number;
+
+  @IsNumber()
+  BILLING_API_MAX_RETRIES: number;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -50,6 +59,12 @@ export function validate(config: Record<string, unknown>) {
     PORT: parseInt(config.PORT as string, 10),
     DATABASE_PORT: parseInt(config.DATABASE_PORT as string, 10),
     BCRYPT_SALT_ROUNDS: parseInt(config.BCRYPT_SALT_ROUNDS as string, 10) || 10,
+    BILLING_API_TIMEOUT_MS: config.BILLING_API_TIMEOUT_MS
+      ? parseInt(config.BILLING_API_TIMEOUT_MS as string, 10)
+      : undefined,
+    BILLING_API_MAX_RETRIES: config.BILLING_API_MAX_RETRIES
+      ? parseInt(config.BILLING_API_MAX_RETRIES as string, 10)
+      : undefined,
   };
 
   return validatedConfig;

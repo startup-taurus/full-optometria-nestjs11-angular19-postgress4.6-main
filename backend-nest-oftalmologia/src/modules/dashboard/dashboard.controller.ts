@@ -48,6 +48,20 @@ export class DashboardController {
     return this.dashboardService.getProductsInventory(branchId, companyId);
   }
 
+  @Get('top-products-sold')
+  @RequirePermissions('dashboard_read')
+  async getTopProductsSold(
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null,
+    @Query('months') months?: string
+  ) {
+    const parsedMonths = months ? parseInt(months, 10) : 1;
+    const allowedMonths = [1, 3, 6];
+    const monthsNumber = allowedMonths.includes(parsedMonths) ? parsedMonths : 1;
+
+    return this.dashboardService.getTopProductsSold(branchId, companyId, monthsNumber);
+  }
+
   @Get('shift-status-distribution')
   @RequirePermissions('dashboard_read')
   async getShiftStatusDistribution(
@@ -65,4 +79,14 @@ export class DashboardController {
   ) {
     return this.dashboardService.getPatientsAgeDemographics(branchId, companyId);
   }
+
+  @Get('purchase-orders-summary')
+  @RequirePermissions('dashboard_read')
+  async getPurchaseOrdersSummary(
+    @BranchContext() branchId: string,
+    @CompanyId() companyId: string | null
+  ) {
+    return this.dashboardService.getPurchaseOrdersSummary(branchId, companyId);
+  }
 }
+

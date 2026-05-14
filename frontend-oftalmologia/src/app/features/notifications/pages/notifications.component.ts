@@ -1,12 +1,17 @@
 import { CommonModule } from '@angular/common'
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core'
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { FormsModule } from '@angular/forms'
-import { Router } from '@angular/router'
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { finalize } from 'rxjs'
-import { Store } from '@ngrx/store'
-import { selectUser } from '@core/states/auth/auth.selectors'
+import { distinctUntilChanged } from 'rxjs/operators'
 import { PageTitleComponent } from '@/app/shared/components/layouts/page-title/page-title.component'
 import { NotificationsService } from '@core/services/api/notifications.service'
 import {
@@ -15,166 +20,207 @@ import {
   WhatsAppSession,
 } from '@core/interfaces/api/notifications.interface'
 import { ToastrNotificationService } from '@core/services/ui/notification.service'
+import { WhatsappQrCardComponent } from '../components/whatsapp-qr-card/whatsapp-qr-card.component'
+import { WhatsappStatusBadgeComponent } from '../components/whatsapp-status-badge/whatsapp-status-badge.component'
+import { ReminderRulesFormComponent } from '../components/reminder-rules-form/reminder-rules-form.component'
+import { MessageTemplateEditorComponent } from '../components/message-template-editor/message-template-editor.component'
+import { EligiblePatientsTableComponent } from '../components/eligible-patients-table/eligible-patients-table.component'
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, NgbTooltipModule, PageTitleComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+    NgbTooltipModule,
+    NgbNavModule,
+    PageTitleComponent,
+    WhatsappQrCardComponent,
+    WhatsappStatusBadgeComponent,
+    ReminderRulesFormComponent,
+    MessageTemplateEditorComponent,
+    EligiblePatientsTableComponent,
+  ],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
 })
-export class NotificationsComponent implements OnInit, OnDestroy {
+export class NotificationsComponent implements OnInit {
   private readonly notificationsService = inject(NotificationsService)
   private readonly notificationService = inject(ToastrNotificationService)
-  private readonly router = inject(Router)
-  private readonly store = inject(Store)
   private readonly translate = inject(TranslateService)
+  private readonly destroyRef = inject(DestroyRef)
 
-  session: WhatsAppSession | null = null
-  reminderRule: ReminderRule | null = null
-  eligiblePatients: RenewalEligiblePatient[] = []
-  selectedPatientIds: string[] = []
-  currentUser$ = this.store.select(selectUser)
+  readonly session = signal<WhatsAppSession | null>(null)
+  readonly reminderRule = signal<ReminderRule | null>(null)
+  readonly eligiblePatients = signal<RenewalEligiblePatient[]>([])
+  readonly selectedPatientIds = signal<string[]>([])
+  readonly manualMessageTemplate = signal('')
+  readonly search = signal('')
+  readonly activeTab = signal(1)
 
-  manualMessageTemplate = ''
-  templateDraft = ''
-  isTemplateModalOpen = false
-  search = ''
-  syncingSession = false
-  lastSessionSyncAt: Date | null = null
-  defaultManualTemplate = ''
-  readonly templateVariables = [
-    { key: 'nombres', labelKey: 'NOTIFICATIONS.TEMPLATE.VARIABLES.NOMBRES' },
-    { key: 'apellidos', labelKey: 'NOTIFICATIONS.TEMPLATE.VARIABLES.APELLIDOS' },
-    { key: 'cedula', labelKey: 'NOTIFICATIONS.TEMPLATE.VARIABLES.CEDULA' },
-    { key: 'telefono', labelKey: 'NOTIFICATIONS.TEMPLATE.VARIABLES.TELEFONO' },
-  ]
-  @ViewChild('templateTextarea') templateTextarea?: ElementRef<HTMLTextAreaElement>
-  private readonly sessionSyncMs = 30000
-  private sessionSyncTimer: ReturnType<typeof setInterval> | null = null
+  readonly initLoading = signal(false)
+  readonly loadingEligible = signal(false)
+  readonly sendingManual = signal(false)
+  readonly savingRule = signal(false)
 
-  loadingSession = false
-  loadingRule = false
-  loadingEligible = false
-  sendingManual = false
-  savingRule = false
+  private defaultTemplate = ''
 
   ngOnInit(): void {
-    this.initializeTemplateTexts()
-    this.loadSession()
+    this.initializeDefaultTemplate()
+    this.loadInitialSession()
+    this.subscribeSessionStream()
     this.loadRule()
     this.loadEligible()
-    this.startAutoSessionSync()
   }
 
-  ngOnDestroy(): void {
-    this.stopAutoSessionSync()
-  }
-
-  loadSession(silent = false): void {
-    if (this.loadingSession || this.syncingSession) {
-      return
-    }
-
-    if (silent) {
-      this.syncingSession = true
-    } else {
-      this.loadingSession = true
-    }
-
+  private loadInitialSession(): void {
     this.notificationsService
       .getWhatsAppSession()
-      .pipe(
-        finalize(() => {
-          if (silent) {
-            this.syncingSession = false
-            return
-          }
-
-          this.loadingSession = false
-        })
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.session = response.data
-          this.lastSessionSyncAt = new Date()
+          if (response?.data && !this.session()) {
+            this.session.set(response.data)
+          }
+        },
+        error: () => {},
+      })
+  }
+
+  private subscribeSessionStream(): void {
+    this.notificationsService
+      .streamSession()
+      .pipe(
+        distinctUntilChanged(
+          (a, b) =>
+            a?.status === b?.status &&
+            a?.qrCode === b?.qrCode &&
+            a?.connectedPhone === b?.connectedPhone
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (session) => {
+          console.log(
+            `[FE_SESSION_SET] status=${session?.status} qrCodeLen=${session?.qrCode?.length || 0} ts=${Date.now()}`
+          )
+          this.session.set(session)
+          this.initLoading.set(false)
+        },
+        error: (err) => {
+          console.error('[notifications] stream error', err)
         },
       })
   }
 
+  isConnected(): boolean {
+    return this.session()?.status === 'connected'
+  }
 
-
-  logoutSession(): void {
-    this.loadingSession = true
+  onGenerateQr(): void {
+    if (this.initLoading()) return
+    this.initLoading.set(true)
     this.notificationsService
-      .logoutWhatsAppSession()
-      .pipe(finalize(() => (this.loadingSession = false)))
+      .initWhatsAppSession()
+      .pipe(finalize(() => this.initLoading.set(false)))
       .subscribe({
         next: (response) => {
-          this.session = response.data
-          this.showSuccess('NOTIFICATIONS.SESSION.LOGOUT_SUCCESS')
+          this.session.set(response.data)
+        },
+        error: () => {
+          this.notificationService.showNotification({
+            title: 'NOTIFICATIONS.TITLE',
+            message: 'NOTIFICATIONS.SESSION.ERROR_LOADING',
+            type: 'error',
+          })
         },
       })
+  }
+
+  onRefreshQr(): void {
+    this.notificationsService.refreshWhatsAppQr().subscribe({
+      next: (response) => {
+        this.session.set(response.data)
+      },
+    })
+  }
+
+  onDisconnect(): void {
+    this.notificationsService.logoutWhatsAppSession().subscribe({
+      next: (response) => {
+        this.session.set(response.data)
+        this.selectedPatientIds.set([])
+        this.notificationService.showNotification({
+          title: 'NOTIFICATIONS.TITLE',
+          message: 'NOTIFICATIONS.SESSION.LOGOUT_SUCCESS',
+          type: 'success',
+        })
+      },
+    })
   }
 
   loadRule(): void {
-    this.loadingRule = true
-    this.notificationsService
-      .getReminderRule()
-      .pipe(finalize(() => (this.loadingRule = false)))
-      .subscribe({
-        next: (response) => {
-          this.reminderRule = response.data
-        },
-      })
+    this.notificationsService.getReminderRule().subscribe({
+      next: (response) => this.reminderRule.set(response.data),
+    })
   }
 
-  saveRule(): void {
-    if (!this.reminderRule) {
-      return
-    }
-
-    this.savingRule = true
+  saveRule(payload: Partial<ReminderRule>): void {
+    this.savingRule.set(true)
     this.notificationsService
-      .updateReminderRule(this.reminderRule)
-      .pipe(finalize(() => (this.savingRule = false)))
+      .updateReminderRule(payload)
+      .pipe(finalize(() => this.savingRule.set(false)))
       .subscribe({
         next: (response) => {
-          this.reminderRule = response.data
-          this.showSuccess('NOTIFICATIONS.RULE.UPDATED')
+          this.reminderRule.set(response.data)
+          this.notificationService.showNotification({
+            title: 'NOTIFICATIONS.TITLE',
+            message: 'NOTIFICATIONS.RULE.UPDATED',
+            type: 'success',
+          })
           this.loadEligible()
         },
       })
   }
 
   loadEligible(): void {
-    this.loadingEligible = true
+    this.loadingEligible.set(true)
     this.notificationsService
-      .getRenewalEligible({ page: 1, limit: 50, search: this.search, includeAll: true })
-      .pipe(finalize(() => (this.loadingEligible = false)))
+      .getRenewalEligible({
+        page: 1,
+        limit: 50,
+        search: this.search(),
+        includeAll: true,
+      })
+      .pipe(finalize(() => this.loadingEligible.set(false)))
       .subscribe({
         next: (response) => {
-          this.eligiblePatients = response.data.result || []
-          this.selectedPatientIds = this.selectedPatientIds.filter((id) =>
-            this.eligiblePatients.some((item) => item.patientId === id)
+          const list = response.data.result || []
+          this.eligiblePatients.set(list)
+          const validIds = new Set(list.map((p) => p.patientId))
+          this.selectedPatientIds.update((current) =>
+            current.filter((id) => validIds.has(id))
           )
         },
       })
   }
 
-  togglePatient(patientId: string, checked: boolean): void {
-    if (checked) {
-      if (!this.selectedPatientIds.includes(patientId)) {
-        this.selectedPatientIds = [...this.selectedPatientIds, patientId]
-      }
-      return
-    }
+  onSearchChange(value: string): void {
+    this.search.set(value)
+    this.loadEligible()
+  }
 
-    this.selectedPatientIds = this.selectedPatientIds.filter((id) => id !== patientId)
+  onSelectionChange(ids: string[]): void {
+    this.selectedPatientIds.set(ids)
+  }
+
+  onTemplateChange(value: string): void {
+    this.manualMessageTemplate.set(value)
   }
 
   sendManual(): void {
-    if (!this.selectedPatientIds.length) {
+    if (!this.selectedPatientIds().length) {
       this.notificationService.showNotification({
         title: 'NOTIFICATIONS.TITLE',
         message: 'NOTIFICATIONS.ELIGIBLE.SELECT_REQUIRED',
@@ -183,151 +229,41 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       return
     }
 
-    this.sendingManual = true
+    this.sendingManual.set(true)
     this.notificationsService
       .sendManualRenewalReminder({
-        patientIds: this.selectedPatientIds,
-        messageTemplate: this.manualMessageTemplate,
+        patientIds: this.selectedPatientIds(),
+        messageTemplate:
+          this.manualMessageTemplate() || this.defaultTemplate,
       })
-      .pipe(finalize(() => (this.sendingManual = false)))
+      .pipe(finalize(() => this.sendingManual.set(false)))
       .subscribe({
         next: (response) => {
           const data = response.data
-          const resultMessage = this.translate.instant('NOTIFICATIONS.ELIGIBLE.SEND_RESULT', {
-            sent: data.sent,
-            failed: data.failed,
-          })
-
+          const resultMessage = this.translate.instant(
+            'NOTIFICATIONS.ELIGIBLE.SEND_RESULT',
+            { sent: data.sent, failed: data.failed }
+          )
           this.notificationService.showNotification({
             title: 'NOTIFICATIONS.TITLE',
             message: resultMessage,
             type: 'success',
           })
+          this.selectedPatientIds.set([])
           this.loadEligible()
         },
       })
   }
 
-  isSelected(patientId: string): boolean {
-    return this.selectedPatientIds.includes(patientId)
-  }
-
-  goToProfile(): void {
-    this.router.navigate(['/profile'])
-  }
-
-  openTemplateModal(): void {
-    this.templateDraft = this.manualMessageTemplate || this.defaultManualTemplate
-    this.isTemplateModalOpen = true
-
-    setTimeout(() => {
-      this.templateTextarea?.nativeElement.focus()
-    })
-  }
-
-  closeTemplateModal(): void {
-    this.isTemplateModalOpen = false
-  }
-
-  applyTemplateDraft(): void {
-    const normalizedTemplate = this.templateDraft.trim()
-    this.manualMessageTemplate = normalizedTemplate || this.defaultManualTemplate
-    this.closeTemplateModal()
-  }
-
-  resetTemplateDraft(): void {
-    this.templateDraft = this.defaultManualTemplate
-  }
-
-  insertVariable(variableKey: string): void {
-    const token = `{{${variableKey}}}`
-    const textarea = this.templateTextarea?.nativeElement
-    if (!textarea) {
-      this.templateDraft = `${this.templateDraft}${token}`
-      return
+  private initializeDefaultTemplate(): void {
+    const translated = this.translate.instant(
+      'NOTIFICATIONS.TEMPLATE.DEFAULT_MESSAGE'
+    )
+    this.defaultTemplate =
+      translated ||
+      'Hola {{nombres}} {{apellidos}}, te recordamos que tu renovación de lentes está próxima.'
+    if (!this.manualMessageTemplate()) {
+      this.manualMessageTemplate.set(this.defaultTemplate)
     }
-
-    const start = textarea.selectionStart ?? this.templateDraft.length
-    const end = textarea.selectionEnd ?? this.templateDraft.length
-    this.templateDraft = `${this.templateDraft.slice(0, start)}${token}${this.templateDraft.slice(end)}`
-
-    setTimeout(() => {
-      textarea.focus()
-      const nextPos = start + token.length
-      textarea.setSelectionRange(nextPos, nextPos)
-    })
-  }
-
-  get templatePreview(): string {
-    return this.interpolateTemplate(this.templateDraft || this.defaultManualTemplate)
-  }
-
-  private interpolateTemplate(template: string): string {
-    const previewPatient = this.getPreviewPatient()
-    const previewPatientLabel = this.translate.instant('NOTIFICATIONS.TEMPLATE.PREVIEW_PATIENT')
-    const firstName = (previewPatient?.firstName || previewPatientLabel).trim()
-    const lastName = (previewPatient?.lastName || '').trim()
-    const values: Record<string, string> = {
-      nombre: `${firstName} ${lastName}`.trim(),
-      nombres: firstName,
-      apellidos: lastName,
-      cedula: previewPatient?.documentNumber || '0000000000',
-      telefono: previewPatient?.phone || '+593000000000',
-    }
-
-    return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, key: string) => {
-      const normalizedKey = key.toLowerCase()
-      return values[normalizedKey] ?? ''
-    })
-  }
-
-  private initializeTemplateTexts(): void {
-    const translatedDefault = this.translate.instant('NOTIFICATIONS.TEMPLATE.DEFAULT_MESSAGE')
-    this.defaultManualTemplate = translatedDefault || 'Hola {{nombres}} {{apellidos}}, te recordamos que tu renovación de lentes está próxima. Agenda tu cita cuando gustes.'
-
-    if (!this.manualMessageTemplate) {
-      this.manualMessageTemplate = this.defaultManualTemplate
-    }
-  }
-
-  private getPreviewPatient(): RenewalEligiblePatient | undefined {
-    if (this.selectedPatientIds.length) {
-      return this.eligiblePatients.find((patient) =>
-        this.selectedPatientIds.includes(patient.patientId)
-      )
-    }
-
-    return this.eligiblePatients[0]
-  }
-
-  private startAutoSessionSync(): void {
-    if (this.sessionSyncTimer) {
-      return
-    }
-
-    this.sessionSyncTimer = setInterval(() => {
-      this.loadSession(true)
-    }, this.sessionSyncMs)
-  }
-
-  private stopAutoSessionSync(): void {
-    if (!this.sessionSyncTimer) {
-      return
-    }
-
-    clearInterval(this.sessionSyncTimer)
-    this.sessionSyncTimer = null
-  }
-
-  get canShowLogoutAction(): boolean {
-    return !!this.session && this.session.status === 'connected'
-  }
-
-  private showSuccess(message: string): void {
-    this.notificationService.showNotification({
-      title: 'NOTIFICATIONS.TITLE',
-      message,
-      type: 'success',
-    })
   }
 }

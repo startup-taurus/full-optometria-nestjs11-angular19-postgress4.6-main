@@ -1,0 +1,33 @@
+<button
+  *ngIf="showExcel"
+  type="button"
+  class="btn btn-outline-success btn-sm"
+  placement="top"
+  ngbTooltip="Exportar Excel"
+  [disabled]="disabled || isBusy"
+  (click)="onExportExcel()"
+>
+  <i
+    class="ti"
+    [class.ti-file-type-xls]="!isExportingExcel"
+    [class.ti-loader-2]="isExportingExcel"
+    [class.ti-spin]="isExportingExcel"
+  ></i>
+</button>
+
+<button
+  *ngIf="showPdf"
+  type="button"
+  class="btn btn-outline-danger btn-sm"
+  placement="top"
+  ngbTooltip="Exportar PDF"
+  [disabled]="disabled || isBusy"
+  (click)="onExportPdf()"
+>
+  <i
+    class="ti"
+    [class.ti-file-type-pdf]="!isExportingPdf"
+    [class.ti-loader-2]="isExportingPdf"
+    [class.ti-spin]="isExportingPdf"
+  ></i>
+</button>

@@ -12,32 +12,29 @@ export class CreateSupplierDto {
   @Length(1, 100)
   name: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @Length(1, 20)
-  documentNumber?: string;
+  documentNumber: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @Length(1, 20)
-  phone?: string;
+  phone: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsEmail()
-  email?: string;
+  email: string;
 
   @IsOptional()
   @IsString()
-  @Length(1, 255)
   website?: string;
 
   @IsOptional()
   @IsString()
-  @Length(1, 255)
   address?: string;
 
   @IsOptional()
   @IsString()
-  @Length(1, 1000)
   notes?: string;
 }

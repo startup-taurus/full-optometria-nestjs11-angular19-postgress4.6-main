@@ -1,0 +1,13 @@
+<div class="container-fluid mb-3" *ngIf="laboratoryOrderId">
+	<div class="alert alert-info d-flex align-items-center justify-content-between mb-0">
+		<div>
+			<strong>{{ 'PURCHASE_ORDERS.LINKED_FILTER.ACTIVE_LABEL' | translate }}</strong>
+			{{ 'PURCHASE_ORDERS.LINKED_FILTER.ACTIVE_DESCRIPTION' | translate }}
+		</div>
+		<button type="button" class="btn btn-sm btn-outline-info" (click)="clearLinkedFilter()">
+			{{ 'PURCHASE_ORDERS.LINKED_FILTER.CLEAR' | translate }}
+		</button>
+	</div>
+</div>
+
+<table-purchase-orders [laboratoryOrderId]="laboratoryOrderId"></table-purchase-orders>

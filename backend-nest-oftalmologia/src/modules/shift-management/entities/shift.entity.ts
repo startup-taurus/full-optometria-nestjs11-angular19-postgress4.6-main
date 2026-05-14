@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { Patient } from '../../patients/entities/patient.entity';
 import { Branch } from '../../branches/entities/branch.entity';
@@ -13,6 +14,11 @@ import { ShiftStatus } from './shift-status.entity';
 import { Company } from '../../companies/entities/company.entity';
 
 @Entity('shifts')
+@Index('idx_shifts_branch_user_appointment', [
+  'branchId',
+  'createdByUserId',
+  'appointmentDate',
+])
 export class Shift {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -25,6 +31,9 @@ export class Shift {
 
   @Column({ name: 'branch_id' })
   branchId: string;
+
+  @Column({ name: 'created_by_user_id', nullable: true })
+  createdByUserId: string | null;
 
   @Column({ name: 'status_id' })
   statusId: string;

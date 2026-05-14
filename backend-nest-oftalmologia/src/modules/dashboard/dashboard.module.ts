@@ -8,6 +8,8 @@ import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.
 import { Product } from '../products/entities/product.entity';
 import { User } from '../users/entities/user.entity';
 import { Patient } from '../patients/entities/patient.entity';
+import { PurchaseOrderItem } from '../purchase-orders/entities/purchase-order-item.entity';
+import { PurchaseOrder } from '../purchase-orders/entities/purchase-order.entity';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { Patient } from '../patients/entities/patient.entity';
       Product,
       User,
       Patient,
+      PurchaseOrderItem,
+      PurchaseOrder,
     ]),
   ],
   controllers: [DashboardController],

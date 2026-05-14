@@ -144,7 +144,10 @@
 </ng-template>
 
 <ng-template #roleTemplate let-row="row" let-rowIndex="rowIndex">
-  <span class="badge common-badge bg-primary" *ngIf="row.role">
+  <span
+    class="badge common-badge bg-primary-subtle text-primary-emphasis border border-primary-subtle"
+    *ngIf="row.role"
+  >
     {{ row.role.roleName }}
   </span>
   <span class="text-muted small" *ngIf="!row.role">
@@ -165,7 +168,10 @@
 </ng-template>
 
 <ng-template #companyTemplate let-row="row" let-rowIndex="rowIndex">
-  <span class="badge common-badge bg-info" *ngIf="row.company">
+  <span
+    class="badge common-badge bg-info-subtle text-info-emphasis border border-info-subtle"
+    *ngIf="row.company"
+  >
     {{ row.company.name }}
   </span>
   <span class="text-muted small" *ngIf="!row.company">

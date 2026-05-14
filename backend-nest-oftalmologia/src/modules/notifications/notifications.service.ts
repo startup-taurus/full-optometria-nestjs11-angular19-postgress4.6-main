@@ -1,13 +1,16 @@
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, MessageEvent } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron } from '@nestjs/schedule';
 import { randomUUID } from 'crypto';
-import { In, QueryFailedError, Repository } from 'typeorm';
+import { defer, from, Observable, switchMap } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Between, In, IsNull, QueryFailedError, Repository } from 'typeorm';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { Patient } from '../patients/entities/patient.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
 import { LaboratoryOrder } from '../laboratory-orders/entities/laboratory-order.entity';
+import { Shift } from '../shift-management/entities/shift.entity';
 import {
   WhatsAppSession,
   WhatsAppSessionStatus,
@@ -31,10 +34,17 @@ import {
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
+  private readonly defaultDialCode = this.resolveDefaultDialCode();
   private readonly qrTtlMs = 60000;
   private readonly sessionNormalizationTimeoutMs = 2500;
   private readonly runtimeStartTimeoutMs = 45000;
   private readonly refreshWaitTimeoutMs = 5000;
+  private readonly throttleMinDelayMs = this.resolveThrottleMinDelayMs();
+  private readonly throttleMaxDelayMs = this.resolveThrottleMaxDelayMs();
+  private readonly sessionSendChains = new Map<string, Promise<void>>();
+  private readonly sessionNextAllowedSendAt = new Map<string, number>();
+  private appointmentReminderCronRunning = false;
+  private appointmentReminderLastRunAt: Date | null = null;
 
   constructor(
     @InjectRepository(WhatsAppSession)
@@ -51,6 +61,8 @@ export class NotificationsService {
     private clinicalHistoryRepository: Repository<ClinicalHistory>,
     @InjectRepository(LaboratoryOrder)
     private laboratoryOrderRepository: Repository<LaboratoryOrder>,
+    @InjectRepository(Shift)
+    private shiftRepository: Repository<Shift>,
     @Inject(WHATSAPP_PROVIDER)
     private whatsappProvider: WhatsAppProvider,
   ) {}
@@ -108,6 +120,30 @@ export class NotificationsService {
     };
   }
 
+  streamWhatsAppSession(
+    branchId: string,
+    companyId: string | null,
+    userId: string,
+  ): Observable<MessageEvent> {
+    return defer(() =>
+      from(this.getOrCreateSession(branchId, companyId, userId)),
+    ).pipe(
+      switchMap((session) =>
+        this.whatsappProvider.getSessionStream(session.sessionKey).pipe(
+          switchMap((snapshot) =>
+            from(this.applySnapshotToSession(session, snapshot)),
+          ),
+          map((updatedSession) => {
+            console.log(
+              `[SVC_SSE_EMIT] sessionKey=${updatedSession.sessionKey} status=${updatedSession.status} qrPresent=${!!updatedSession.qrCode} ts=${Date.now()}`,
+            );
+            return { data: updatedSession } as MessageEvent;
+          }),
+        ),
+      ),
+    );
+  }
+
   async refreshWhatsAppQr(branchId: string, companyId: string | null, userId: string) {
     const session = await this.getOrCreateSession(branchId, companyId, userId);
 
@@ -146,7 +182,7 @@ export class NotificationsService {
     const session = await this.getOrCreateSession(branchId, companyId, userId);
 
     session.status = WhatsAppSessionStatus.CONNECTED;
-    session.connectedPhone = dto.connectedPhone || null;
+    session.connectedPhone = this.normalizeConnectedPhone(dto.connectedPhone);
     session.qrCode = null;
     session.lastConnectedAt = new Date();
     await this.whatsappSessionRepository.save(session);
@@ -288,6 +324,11 @@ export class NotificationsService {
     });
 
     const preferenceMap = new Map(preferences.map((item) => [item.patientId, item]));
+    const inferredConnectedPhone =
+      await this.inferConnectedPhoneFromRecentSuccessfulLogs(
+      branchId,
+      companyId,
+    );
     let sent = 0;
     let failed = 0;
 
@@ -298,7 +339,12 @@ export class NotificationsService {
         continue;
       }
 
-      const phone = this.resolvePatientPhone(patient, preference?.preferredPhone);
+      const phone = this.resolvePatientPhone(
+        patient,
+        preference?.preferredPhone,
+        session.connectedPhone,
+        inferredConnectedPhone,
+      );
 
       if (!phone) {
         failed += 1;
@@ -331,10 +377,15 @@ export class NotificationsService {
       const savedLog = await this.messageDispatchLogRepository.save(log);
 
       try {
-        const result = await this.whatsappProvider.sendMessage(
+        const result = await this.enqueueSessionSend(
           session.sessionKey,
-          phone,
-          content,
+          'manual_renewal',
+          async () =>
+            this.whatsappProvider.sendMessage(
+              session.sessionKey,
+              phone,
+              content,
+            ),
         );
         savedLog.status = DispatchStatus.SENT;
         savedLog.sentAt = new Date();
@@ -408,12 +459,328 @@ export class NotificationsService {
     }
   }
 
+  @Cron('0 8 * * *')
+  async processAutomaticAppointmentReminders() {
+    if (this.appointmentReminderCronRunning) {
+      this.logger.warn('Se omite ejecución de recordatorios automáticos por solapamiento');
+      return;
+    }
+
+    this.appointmentReminderCronRunning = true;
+    const runStartedAt = new Date();
+    const startedAtMs = Date.now();
+
+    let sessionsEvaluated = 0;
+    let shiftsEvaluated = 0;
+    let shiftsDispatched = 0;
+
+    try {
+      const tomorrowStart = new Date(runStartedAt);
+      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+      tomorrowStart.setHours(0, 0, 0, 0);
+
+      const tomorrowEnd = new Date(tomorrowStart);
+      tomorrowEnd.setHours(23, 59, 59, 999);
+
+      const connectedSessions = await this.whatsappSessionRepository.find({
+        where: {
+          status: WhatsAppSessionStatus.CONNECTED,
+        },
+        take: 200,
+      });
+
+      const eligibleSessions = connectedSessions.filter(
+        (s) => s.branchId && s.userId,
+      );
+
+      if (!eligibleSessions.length) {
+        this.logger.log('No hay sesiones conectadas elegibles para recordatorios');
+        return;
+      }
+
+      const branchIds = Array.from(
+        new Set(eligibleSessions.map((s) => s.branchId)),
+      );
+      const userIds = Array.from(
+        new Set(eligibleSessions.map((s) => s.userId)),
+      );
+
+      const shifts = await this.shiftRepository.find({
+        where: {
+          branchId: In(branchIds),
+          createdByUserId: In(userIds),
+          appointmentDate: Between(tomorrowStart, tomorrowEnd),
+        },
+        relations: ['patient'],
+        order: {
+          appointmentDate: 'ASC',
+          id: 'ASC',
+        },
+      });
+
+      shiftsEvaluated = shifts.length;
+
+      if (!shifts.length) {
+        this.logger.log(
+          `Recordatorios automáticos: sin citas para ${tomorrowStart.toISOString().slice(0, 10)}`,
+        );
+        return;
+      }
+
+      const patientIds = Array.from(
+        new Set(shifts.map((s) => s.patientId).filter(Boolean) as string[]),
+      );
+
+      const preferences = patientIds.length
+        ? await this.patientContactPreferenceRepository.find({
+            where: {
+              branchId: In(branchIds),
+              patientId: In(patientIds),
+            },
+          })
+        : [];
+
+      const preferenceMap = new Map<string, PatientContactPreference>();
+      for (const pref of preferences) {
+        preferenceMap.set(`${pref.branchId}:${pref.patientId}`, pref);
+      }
+
+      const dispatchTolerance = 30 * 60 * 1000;
+      const recentLogsLowerBound = new Date(tomorrowStart.getTime() - dispatchTolerance);
+      const recentLogsUpperBound = new Date(tomorrowEnd.getTime() + dispatchTolerance);
+
+      const recentLogs = patientIds.length
+        ? await this.messageDispatchLogRepository.find({
+            where: {
+              branchId: In(branchIds),
+              patientId: In(patientIds),
+              channel: 'whatsapp',
+              status: In([
+                DispatchStatus.PENDING,
+                DispatchStatus.PROCESSING,
+                DispatchStatus.SENT,
+              ]),
+              scheduledAt: Between(recentLogsLowerBound, recentLogsUpperBound),
+            },
+            select: ['branchId', 'patientId', 'scheduledAt'],
+          })
+        : [];
+
+      const dispatchedKeys = new Set<string>();
+      for (const log of recentLogs) {
+        dispatchedKeys.add(`${log.branchId}:${log.patientId}`);
+      }
+
+      const inferredPhoneCache = new Map<string, string | null>();
+
+      const sessionsByKey = new Map<string, WhatsAppSession>();
+      for (const session of eligibleSessions) {
+        sessionsByKey.set(`${session.branchId}:${session.userId}`, session);
+      }
+
+      const ruleCache = new Map<string, ReminderRule>();
+      const quietBranches = new Set<string>();
+
+      for (const shift of shifts) {
+        if (!shift.patientId || !shift.patient || !shift.createdByUserId) {
+          continue;
+        }
+
+        const session = sessionsByKey.get(`${shift.branchId}:${shift.createdByUserId}`);
+        if (!session) {
+          continue;
+        }
+
+        sessionsEvaluated += 1;
+
+        const ruleKey = `${session.branchId}:${session.companyId || ''}`;
+        let rule = ruleCache.get(ruleKey);
+        if (!rule) {
+          rule = await this.getOrCreateReminderRule(
+            session.branchId,
+            session.companyId || null,
+          );
+          ruleCache.set(ruleKey, rule);
+        }
+
+        if (!rule.isActive) {
+          continue;
+        }
+
+        if (this.isQuietHour(rule)) {
+          if (!quietBranches.has(session.branchId)) {
+            quietBranches.add(session.branchId);
+            this.logger.log(
+              `Sucursal ${session.branchId} en quiet hours; se omite envío`,
+            );
+          }
+          continue;
+        }
+
+        const dedupeKey = `${shift.branchId}:${shift.patientId}`;
+        if (dispatchedKeys.has(dedupeKey)) {
+          continue;
+        }
+
+        const preference = preferenceMap.get(dedupeKey);
+        if (preference && !preference.whatsappOptIn) {
+          continue;
+        }
+
+        const inferredCacheKey = `${session.branchId}:${session.companyId || ''}`;
+        let inferredConnectedPhone = inferredPhoneCache.get(inferredCacheKey);
+        if (inferredConnectedPhone === undefined) {
+          inferredConnectedPhone = await this.inferConnectedPhoneFromRecentSuccessfulLogs(
+            session.branchId,
+            session.companyId || null,
+          );
+          inferredPhoneCache.set(inferredCacheKey, inferredConnectedPhone);
+        }
+
+        const phone = this.resolvePatientPhone(
+          shift.patient,
+          preference?.preferredPhone,
+          session.connectedPhone,
+          inferredConnectedPhone,
+        );
+
+        if (!phone) {
+          continue;
+        }
+
+        const reminderHours = Number(rule.appointmentReminderHoursBefore || 24);
+        const scheduledAt = new Date(
+          shift.appointmentDate.getTime() - reminderHours * 60 * 60 * 1000,
+        );
+
+        const content = this.interpolateTemplate(
+          'Hola {{nombre}}, te recordamos que tienes una cita medica manana a las {{hora}}.',
+          {
+            nombre: `${shift.patient.firstName} ${shift.patient.lastName}`.trim(),
+            hora: this.toHourString(shift.appointmentDate),
+          },
+        );
+
+        await this.dispatchAutomaticMessage({
+          branchId: session.branchId,
+          companyId: session.companyId || null,
+          patientId: shift.patientId,
+          phone,
+          content,
+          sessionKey: session.sessionKey,
+          scheduledAt,
+          useThrottle: true,
+          source: 'appointment_reminder',
+        });
+
+        dispatchedKeys.add(dedupeKey);
+        shiftsDispatched += 1;
+      }
+
+      this.logger.log(
+        `Recordatorios automáticos procesados: sesiones=${sessionsEvaluated}, candidatos=${shiftsEvaluated}, enviados=${shiftsDispatched}, duracionMs=${Date.now() - startedAtMs}`,
+      );
+    } finally {
+      this.appointmentReminderLastRunAt = runStartedAt;
+      this.appointmentReminderCronRunning = false;
+    }
+  }
+
+  async sendLaboratoryOrderReceivedReminder(
+    orderId: string,
+    branchId: string,
+    companyId: string | null,
+    fallbackUserId: string | null = null,
+  ) {
+    const order = await this.laboratoryOrderRepository.findOne({
+      where: CompanyFilterUtil.buildWhereCondition(
+        {
+          id: orderId,
+          branchId,
+        },
+        companyId,
+      ),
+      relations: ['patient'],
+    });
+
+    const senderUserId = order?.createdByUserId || fallbackUserId;
+
+    if (!order || !order.patientId || !senderUserId) {
+      return;
+    }
+
+    const session = await this.getConnectedSessionForSender(
+      branchId,
+      companyId,
+      senderUserId,
+    );
+
+    if (!session) {
+      return;
+    }
+
+    const inferredConnectedPhone =
+      await this.inferConnectedPhoneFromRecentSuccessfulLogs(branchId, companyId);
+
+    const preference = await this.patientContactPreferenceRepository.findOne({
+      where: CompanyFilterUtil.buildWhereCondition(
+        {
+          branchId,
+          patientId: order.patientId,
+        },
+        companyId,
+      ),
+    });
+
+    if (preference && !preference.whatsappOptIn) {
+      return;
+    }
+
+    const patient = order.patient;
+    if (!patient) {
+      return;
+    }
+
+    const phone = this.resolvePatientPhone(
+      patient,
+      preference?.preferredPhone,
+      session.connectedPhone,
+      inferredConnectedPhone,
+    );
+    if (!phone) {
+      return;
+    }
+
+    const content = this.interpolateTemplate(
+      'Hola {{nombre}}, tu producto ya esta listo para retiro en nuestra sucursal.',
+      {
+        nombre: `${patient.firstName} ${patient.lastName}`.trim(),
+      },
+    );
+
+    await this.dispatchAutomaticMessage({
+      branchId,
+      companyId,
+      patientId: patient.id,
+      phone,
+      content,
+      sessionKey: session.sessionKey,
+      scheduledAt: new Date(),
+    });
+  }
+
   private async getOrCreateSession(
     branchId: string,
     companyId: string | null,
     userId: string,
   ) {
-    const where = CompanyFilterUtil.buildWhereCondition({ branchId, userId }, companyId);
+    const where: any = { branchId, userId };
+    if (companyId) {
+      where.companyId = companyId;
+    } else {
+      where.companyId = IsNull();
+    }
+
     let session = await this.whatsappSessionRepository.findOne({ where });
 
     if (!session) {
@@ -439,6 +806,102 @@ export class NotificationsService {
     }
 
     return session;
+  }
+
+  private async getConnectedSessionForSender(
+    branchId: string,
+    companyId: string | null,
+    userId: string,
+  ) {
+    const where: any = {
+      branchId,
+      userId,
+      status: WhatsAppSessionStatus.CONNECTED,
+    };
+
+    if (companyId) {
+      where.companyId = companyId;
+    } else {
+      where.companyId = IsNull();
+    }
+
+    const session = await this.whatsappSessionRepository.findOne({
+      where,
+    });
+
+    if (!session) {
+      return null;
+    }
+
+    const connected = await this.whatsappProvider.isSessionConnected(session.sessionKey);
+
+    if (!connected) {
+      session.status = WhatsAppSessionStatus.DISCONNECTED;
+      session.qrCode = null;
+      session.connectedPhone = null;
+      await this.whatsappSessionRepository.save(session);
+      return null;
+    }
+
+    return session;
+  }
+
+  private async dispatchAutomaticMessage(params: {
+    branchId: string;
+    companyId: string | null;
+    patientId: string;
+    phone: string;
+    content: string;
+    sessionKey: string;
+    scheduledAt: Date;
+    useThrottle?: boolean;
+    source?: 'appointment_reminder' | 'manual_renewal' | 'other';
+  }) {
+    const {
+      branchId,
+      companyId,
+      patientId,
+      phone,
+      content,
+      sessionKey,
+      scheduledAt,
+      useThrottle,
+      source,
+    } = params;
+
+    const log = this.messageDispatchLogRepository.create({
+      branchId,
+      companyId,
+      patientId,
+      channel: 'whatsapp',
+      phone,
+      message: content,
+      status: DispatchStatus.PROCESSING,
+      scheduledAt,
+    });
+
+    const savedLog = await this.messageDispatchLogRepository.save(log);
+
+    try {
+      const sendOperation = async () =>
+        this.whatsappProvider.sendMessage(sessionKey, phone, content);
+      const result = useThrottle
+        ? await this.enqueueSessionSend(
+            sessionKey,
+            source || 'other',
+            sendOperation,
+          )
+        : await sendOperation();
+      savedLog.status = DispatchStatus.SENT;
+      savedLog.sentAt = new Date();
+      savedLog.providerMessageId = result.providerMessageId;
+      await this.messageDispatchLogRepository.save(savedLog);
+    } catch (error) {
+      savedLog.status = DispatchStatus.FAILED;
+      savedLog.errorReason =
+        error instanceof Error ? error.message : 'Unexpected error';
+      await this.messageDispatchLogRepository.save(savedLog);
+    }
   }
 
   private async getOrCreateReminderRule(branchId: string, companyId: string | null) {
@@ -483,15 +946,21 @@ export class NotificationsService {
   }
 
   private async ensureValidQrForSession(session: WhatsAppSession): Promise<WhatsAppSession> {
+    if (session.status === WhatsAppSessionStatus.CONNECTED) {
+      const authExists = await this.whatsappProvider.hasAuthOnDisk(session.sessionKey);
+      if (authExists) {
+        return session;
+      }
+    }
+
     const snapshot = await this.withTimeout<WhatsAppSessionSnapshot | null>(
-      this.whatsappProvider.ensureRuntime(session.sessionKey),
+      this.whatsappProvider.getSessionSnapshot(session.sessionKey),
       this.sessionNormalizationTimeoutMs,
-      `ensureRuntime(${session.sessionKey})`,
+      `getSessionSnapshot(${session.sessionKey})`,
       () => null,
     );
 
     if (!snapshot) {
-
       return session;
     }
 
@@ -503,9 +972,6 @@ export class NotificationsService {
       return this.applySnapshotToSession(session, snapshot);
     }
 
-    // Durante reinicios/despliegues el runtime puede quedar en estados transitorios
-    // sin QR todavía. En ese caso conservamos el estado persistido para evitar
-    // desconexiones falsas en la UI y en la base de datos.
     if (snapshot.state === 'booting' || snapshot.state === 'authenticated') {
       return session;
     }
@@ -528,21 +994,52 @@ export class NotificationsService {
     session: WhatsAppSession,
     snapshot: WhatsAppSessionSnapshot,
   ): Promise<WhatsAppSession> {
+    const __statusBefore = session.status;
+    console.log(
+      `[SVC_APPLY_IN] sessionKey=${session.sessionKey} snapshotState=${snapshot.state} snapshotConnected=${snapshot.connected} sessionStatusBefore=${__statusBefore}`,
+    );
+
     if (snapshot.connected || snapshot.state === 'ready') {
       session.status = WhatsAppSessionStatus.CONNECTED;
       session.qrCode = null;
       session.lastConnectedAt = new Date();
-      return this.whatsappSessionRepository.save(session);
+      const saved = await this.whatsappSessionRepository.save(session);
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=1 sessionStatusAfter=${saved.status} saved=true`,
+      );
+      return saved;
     }
 
     if (this.hasValidImageQr(snapshot.qrCode)) {
       session.status = WhatsAppSessionStatus.QR_READY;
       session.qrCode = snapshot.qrCode;
-      return this.whatsappSessionRepository.save(session);
+      const saved = await this.whatsappSessionRepository.save(session);
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=2 sessionStatusAfter=${saved.status} saved=true`,
+      );
+      return saved;
     }
 
     if (snapshot.state === 'booting' || snapshot.state === 'authenticated') {
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=3 sessionStatusAfter=${session.status} saved=false`,
+      );
       return session;
+    }
+
+    if (
+      snapshot.state === 'idle' &&
+      session.status === WhatsAppSessionStatus.CONNECTED
+    ) {
+      const authExists = await this.whatsappProvider.hasAuthOnDisk(
+        session.sessionKey,
+      );
+      if (authExists) {
+        console.log(
+          `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=4 sessionStatusAfter=${session.status} saved=false`,
+        );
+        return session;
+      }
     }
 
     if (
@@ -550,13 +1047,20 @@ export class NotificationsService {
       session.status === WhatsAppSessionStatus.QR_READY &&
       !this.isQrExpired(session)
     ) {
+      console.log(
+        `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=5 sessionStatusAfter=${session.status} saved=false`,
+      );
       return session;
     }
 
     session.status = WhatsAppSessionStatus.DISCONNECTED;
     session.qrCode = null;
     session.connectedPhone = null;
-    return this.whatsappSessionRepository.save(session);
+    const saved = await this.whatsappSessionRepository.save(session);
+    console.log(
+      `[SVC_APPLY_OUT] sessionKey=${session.sessionKey} pathTaken=6 sessionStatusAfter=${saved.status} saved=true`,
+    );
+    return saved;
   }
 
   private fireAndForgetQrRefresh(
@@ -687,7 +1191,12 @@ export class NotificationsService {
         const baseClinicalDate = maxClinicalDateByPatient.get(patient.id);
         const baseLabDate = maxLabDateByPatient.get(patient.id);
 
-        const baseDate = this.pickLatestDate(baseClinicalDate, baseLabDate);
+        let baseDate = this.pickLatestDate(baseClinicalDate, baseLabDate);
+
+        if (!baseDate && includeAll) {
+          baseDate = patient.updatedAt || patient.createdAt;
+        }
+
         if (!baseDate) {
           return null;
         }
@@ -730,7 +1239,12 @@ export class NotificationsService {
     return available.reduce((acc, current) => (current > acc ? current : acc));
   }
 
-  private resolvePatientPhone(patient: Patient, preferredPhone?: string | null) {
+  private resolvePatientPhone(
+    patient: Patient,
+    preferredPhone?: string | null,
+    senderConnectedPhone?: string | null,
+    inferredConnectedPhone?: string | null,
+  ) {
     const raw = preferredPhone || patient.mobilePhone || patient.homePhone;
     if (!raw) {
       return null;
@@ -739,23 +1253,137 @@ export class NotificationsService {
     const normalized = raw.replace(/[^\d+]/g, '');
     const digits = normalized.replace(/\D/g, '');
 
-    let e164: string;
-
-    if (normalized.startsWith('+')) {
-      e164 = `+${digits}`;
-    } else if (digits.startsWith('593') && digits.length === 12) {
-      e164 = `+${digits}`;
-    } else if (digits.startsWith('0') && digits.length === 10) {
-      e164 = `+593${digits.slice(1)}`;
-    } else if (digits.length === 9) {
-      e164 = `+593${digits}`;
-    } else {
-      e164 = `+${digits}`;
+    if (!digits) {
+      return null;
     }
 
-    const isValid = /^\+[1-9]\d{7,14}$/.test(e164);
+    if (normalized.startsWith('+')) {
+      const e164 = `+${digits}`;
+      const isValidE164 = /^\+[1-9]\d{7,14}$/.test(e164);
+      return isValidE164 ? e164 : null;
+    }
 
-    return isValid ? e164 : null;
+    if (/^0\d{9,14}$/.test(digits)) {
+      const nationalNumber = digits.slice(1);
+      const senderDialCode = this.extractDialCodeFromSender(
+        senderConnectedPhone,
+        nationalNumber.length,
+      );
+      const inferredDialCode = this.extractDialCodeFromSender(
+        inferredConnectedPhone,
+        nationalNumber.length,
+      );
+      const dialCode =
+        senderDialCode ||
+        inferredDialCode ||
+        this.defaultDialCode;
+
+      if (!senderDialCode && !inferredDialCode && dialCode) {
+        this.logger.debug(
+          `Usando dial code fallback para normalizar teléfono de paciente ${patient.id}`,
+        );
+      }
+
+      if (dialCode) {
+        const e164 = `+${dialCode}${nationalNumber}`;
+        const isValidE164 = /^\+[1-9]\d{7,14}$/.test(e164);
+        if (isValidE164) {
+          return e164;
+        }
+      }
+
+      return null;
+    }
+
+    const isValidInternationalDigits = /^[1-9]\d{7,14}$/.test(digits);
+    return isValidInternationalDigits ? `+${digits}` : null;
+  }
+
+  private normalizeConnectedPhone(connectedPhone?: string | null): string | null {
+    if (!connectedPhone) {
+      return null;
+    }
+
+    const digits = connectedPhone.replace(/\D/g, '');
+    const isValidInternationalDigits = /^[1-9]\d{7,14}$/.test(digits);
+
+    return isValidInternationalDigits ? `+${digits}` : null;
+  }
+
+  private resolveDefaultDialCode(): string {
+    const rawDialCode =
+      process.env.WHATSAPP_DEFAULT_DIAL_CODE ||
+      process.env.WHATSAPP_DEFAULT_COUNTRY_CODE ||
+      '593';
+    const digits = rawDialCode.replace(/\D/g, '');
+
+    if (/^[1-9]\d{0,3}$/.test(digits)) {
+      return digits;
+    }
+
+    return '593';
+  }
+
+  private extractDialCodeFromSender(
+    senderConnectedPhone: string | null | undefined,
+    expectedNationalLength: number,
+  ): string | null {
+    if (!senderConnectedPhone) {
+      return null;
+    }
+
+    const senderDigits = senderConnectedPhone.replace(/\D/g, '');
+    if (!senderDigits || senderDigits.length <= expectedNationalLength) {
+      return null;
+    }
+
+    const dialCode = senderDigits.slice(0, senderDigits.length - expectedNationalLength);
+    return /^[1-9]\d{0,3}$/.test(dialCode) ? dialCode : null;
+  }
+
+  private async inferConnectedPhoneFromRecentSuccessfulLogs(
+    branchId: string,
+    companyId: string | null,
+  ): Promise<string | null> {
+    try {
+      const query = this.messageDispatchLogRepository
+        .createQueryBuilder('log')
+        .where('log.branchId = :branchId', { branchId })
+        .andWhere('log.channel = :channel', { channel: 'whatsapp' })
+        .andWhere('log.status = :status', { status: DispatchStatus.SENT });
+
+      if (companyId) {
+        query.andWhere('log.companyId = :companyId', { companyId });
+      } else {
+        query.andWhere('log.companyId IS NULL');
+      }
+
+      const logs = await query
+        .orderBy('log.sentAt', 'DESC', 'NULLS LAST')
+        .addOrderBy('log.createdAt', 'DESC')
+        .take(30)
+        .getMany();
+
+      for (const log of logs) {
+        const phone = log.phone || '';
+
+        const normalized = this.normalizeConnectedPhone(phone);
+        if (!normalized) {
+          continue;
+        }
+
+        if (/^\+[1-9]\d{7,14}$/.test(normalized)) {
+          return normalized;
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'unknown';
+      this.logger.warn(
+        `No se pudo inferir phone de referencia por logs (branchId=${branchId}, companyId=${companyId}): ${errorMessage}`,
+      );
+    }
+
+    return null;
   }
 
   private interpolateTemplate(
@@ -784,6 +1412,14 @@ export class NotificationsService {
     return nowMinutes >= startMinutes || nowMinutes < endMinutes;
   }
 
+  private toHourString(date: Date): string {
+    return date.toLocaleTimeString('es-EC', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }
+
   private async withTimeout<T>(
     operation: Promise<T>,
     timeoutMs: number,
@@ -802,6 +1438,80 @@ export class NotificationsService {
       this.logger.warn(`${label} falló: ${errorMessage}`);
       return fallback();
     }
+  }
+
+  private async enqueueSessionSend<T>(
+    sessionKey: string,
+    source: 'appointment_reminder' | 'manual_renewal' | 'other',
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    const previous = this.sessionSendChains.get(sessionKey) ?? Promise.resolve();
+
+    const current = previous
+      .catch(() => undefined)
+      .then(async () => {
+        await this.waitForSessionThrottle(sessionKey, source);
+        return operation();
+      });
+
+    this.sessionSendChains.set(
+      sessionKey,
+      current
+        .then(() => undefined)
+        .catch(() => undefined),
+    );
+
+    return current;
+  }
+
+  private async waitForSessionThrottle(
+    sessionKey: string,
+    source: 'appointment_reminder' | 'manual_renewal' | 'other',
+  ): Promise<void> {
+    const now = Date.now();
+    const nextAllowedAt = this.sessionNextAllowedSendAt.get(sessionKey) || now;
+    const waitMs = Math.max(0, nextAllowedAt - now);
+
+    if (waitMs > 0) {
+      this.logger.debug(
+        `Throttle WhatsApp aplicado: sessionKey=${sessionKey} source=${source} waitMs=${waitMs}`,
+      );
+      await this.delay(waitMs);
+    }
+
+    const jitterMs = this.randomIntInclusive(
+      this.throttleMinDelayMs,
+      this.throttleMaxDelayMs,
+    );
+    this.sessionNextAllowedSendAt.set(sessionKey, Date.now() + jitterMs);
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private randomIntInclusive(min: number, max: number): number {
+    const safeMin = Math.min(min, max);
+    const safeMax = Math.max(min, max);
+    return Math.floor(Math.random() * (safeMax - safeMin + 1)) + safeMin;
+  }
+
+  private resolveThrottleMinDelayMs(): number {
+    const raw = Number(process.env.WHATSAPP_THROTTLE_MIN_DELAY_MS);
+    if (Number.isFinite(raw) && raw >= 1000) {
+      return Math.trunc(raw);
+    }
+
+    return 5000;
+  }
+
+  private resolveThrottleMaxDelayMs(): number {
+    const raw = Number(process.env.WHATSAPP_THROTTLE_MAX_DELAY_MS);
+    if (Number.isFinite(raw) && raw >= this.throttleMinDelayMs) {
+      return Math.trunc(raw);
+    }
+
+    return 8000;
   }
 
 }

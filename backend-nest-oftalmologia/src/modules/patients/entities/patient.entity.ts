@@ -25,11 +25,11 @@ export class Patient {
   @Column({ name: 'last_name' })
   lastName: string;
 
-  @Column({ unique: true })
-  email: string;
+  @Column({ unique: true, nullable: true })
+  email: string | null;
 
-  @Column({ name: 'document_number' })
-  documentNumber: string;
+  @Column({ name: 'document_number', nullable: true })
+  documentNumber: string | null;
 
   @Column({ name: 'company_id', nullable: true })
   companyId: string;
@@ -38,7 +38,10 @@ export class Patient {
   branchId: string;
 
   @Column({ name: 'date_of_birth', nullable: true })
-  dateOfBirth: Date;
+  dateOfBirth: Date | null;
+
+  @Column({ name: 'birth_year', type: 'smallint', nullable: true })
+  birthYear: number | null;
 
   @Column({ name: 'address', nullable: true })
   address: string;

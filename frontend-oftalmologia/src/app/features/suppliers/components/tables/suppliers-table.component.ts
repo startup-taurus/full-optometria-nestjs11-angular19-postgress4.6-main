@@ -39,6 +39,7 @@ import {
   tap,
   distinctUntilChanged,
   debounceTime,
+  skip,
 } from 'rxjs'
 import { PageTitleComponent } from '../../../../shared/components/layouts/page-title/page-title.component'
 import { NgxDatatableComponent } from '../../../../shared/components/tables/ngx-datatabale/ngx-datatable.component'
@@ -94,7 +95,6 @@ export class SuppliersTableComponent
 
   private filter: object = {}
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
-  private isInitialLoad = true
 
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _supplierService = inject(SupplierService)
@@ -104,7 +104,6 @@ export class SuppliersTableComponent
 
   ngOnInit(): void {
     this.initializeSubscriptions()
-    this.loadSuppliers()
   }
 
   ngAfterViewInit(): void {
@@ -127,22 +126,18 @@ export class SuppliersTableComponent
         debounceTime(300)
       )
       .subscribe({
-        next: (branchId) => {
-          if (!this.isInitialLoad) {
-            this.loadSuppliers()
-          }
+        next: () => {
+          this.loadSuppliers()
         },
         error: (error) => {},
       })
 
     this._filterCommunicationService.currentFilter
-      .pipe(takeUntil(this.unsubscribe$), distinctUntilChanged())
+      .pipe(takeUntil(this.unsubscribe$), skip(1), distinctUntilChanged())
       .subscribe({
         next: (filter) => {
-          if (!this.isInitialLoad) {
-            this.filter = filter || {}
-            this.loadSuppliers()
-          }
+          this.filter = filter || {}
+          this.loadSuppliers()
         },
         error: (err) => {},
       })
@@ -150,7 +145,6 @@ export class SuppliersTableComponent
 
   private loadSuppliers(): void {
     this.data$ = this.loadSuppliersObservable()
-    this.isInitialLoad = false
   }
 
   private loadSuppliersObservable() {

@@ -124,6 +124,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   public refreshQuota(): void {
+    this._authService.invalidateMyQuotaCache()
     this._authService.getMyQuota()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({

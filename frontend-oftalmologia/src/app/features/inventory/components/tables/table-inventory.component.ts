@@ -70,6 +70,8 @@ import {
   SWAL_ERROR_CONFIG,
 } from '@core/helpers/ui/ui.constants'
 import { PublicCatalogPdfService } from '@core/services/ui/public-catalog-pdf.service'
+import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
+import { ExportColumn } from '@core/services/ui/table-export.service'
 
 interface InventoryUpsertModalData extends ModalWithAction<Product> {
   initialCode?: string
@@ -84,6 +86,7 @@ interface InventoryUpsertModalData extends ModalWithAction<Product> {
     NgbModule,
     NgxDatatableComponent,
     SideFilterPanelComponent,
+    TableExportButtonsComponent,
   ],
   templateUrl: './table-inventory.component.html',
   styleUrls: ['./table-inventory.component.scss'],
@@ -123,6 +126,8 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
 
   public config$ = new BehaviorSubject<Partial<NgxDatatableConfig>>({})
   public data$: Observable<Product[]> = of([])
+  public latestRows: Product[] = []
+  public exportColumns: ExportColumn<Product>[] = []
 
   public isPdfLoading = false
 
@@ -146,6 +151,83 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     this.initializeSubscriptions()
     this.loadBranchNames()
     this.config$ = this.setConfigDatatable()
+    this.exportColumns = this.buildExportColumns()
+  }
+
+  private buildExportColumns(): ExportColumn<Product>[] {
+    const translate = this._translateService
+    return [
+      { label: translate.instant('INVENTORY.TABLE.CODE'), key: 'code' },
+      { label: translate.instant('INVENTORY.TABLE.NAME'), key: 'name' },
+      {
+        label: translate.instant('INVENTORY.TABLE.DESCRIPTION'),
+        formatter: (row) => row.description || '-',
+      },
+      { label: translate.instant('INVENTORY.TABLE.BRAND'), key: 'brand' },
+      {
+        label: translate.instant('INVENTORY.TABLE.CATEGORY'),
+        formatter: (row) => row.category?.name || '-',
+      },
+      {
+        label: translate.instant('INVENTORY.TABLE.SUBCATEGORY'),
+        formatter: (row) => row.subcategory?.name || '-',
+      },
+      {
+        label: translate.instant('INVENTORY.TABLE.SUPPLIER'),
+        formatter: (row) => row.defaultSupplier?.name || '-',
+      },
+      {
+        label: translate.instant('INVENTORY.TABLE.UNIT_PRICE'),
+        formatter: (row) => this.formatPrice(row.unitPrice),
+      },
+      {
+        label: translate.instant('INVENTORY.TABLE.DISCOUNT'),
+        formatter: (row) => {
+          if (!row.hasActiveDiscount || !row.discount) {
+            return '-'
+          }
+          const symbol = row.discount.type === 'PERCENTAGE' ? '%' : ' USD'
+          return `-${row.discount.value}${symbol} (${this.formatPrice(row.discount.finalPrice)})`
+        },
+      },
+      {
+        label: translate.instant('INVENTORY.TABLE.QUANTITY'),
+        formatter: (row) => String(row.quantity ?? 0),
+      },
+      {
+        label: translate.instant('INVENTORY.TABLE.STATUS'),
+        formatter: (row) =>
+          translate.instant(
+            row.isActive ? 'INVENTORY.FILTERS.ACTIVE' : 'INVENTORY.FILTERS.INACTIVE'
+          ),
+      },
+      {
+        label: translate.instant('INVENTORY.TABLE.CREATED_AT'),
+        formatter: (row) => this.formatDate(row.createdAt),
+      },
+    ]
+  }
+
+  private formatPrice(value: unknown): string {
+    const amount = Number(value)
+    if (!Number.isFinite(amount)) {
+      return '$0.00'
+    }
+    return `$${amount.toFixed(2)}`
+  }
+
+  private formatDate(value?: string | Date | null): string {
+    if (!value) {
+      return '-'
+    }
+    const date = value instanceof Date ? value : new Date(value)
+    if (Number.isNaN(date.getTime())) {
+      return '-'
+    }
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
   }
 
   private loadBranchNames(): void {
@@ -325,6 +407,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
     this.config$.next({ ...this.config$.value, loadingIndicator: true })
     return this._productsManagementService.getProducts(this.filter).pipe(
       tap((products) => {
+        this.latestRows = products || []
         this.config$.next({
           ...this.config$.value,
           loadingIndicator: false,

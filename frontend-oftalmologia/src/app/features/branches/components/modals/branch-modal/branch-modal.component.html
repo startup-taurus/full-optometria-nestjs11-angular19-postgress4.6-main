@@ -100,6 +100,46 @@
       </div>
 
       <div class="col-md-6 mb-3">
+        <label for="establishmentCode" class="form-label">
+          {{ 'BRANCHES_MODULE.ESTABLISHMENT_CODE' | translate }}
+          <span class="text-muted small">({{ 'COMMON.OPTIONAL' | translate }})</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="establishmentCode"
+          formControlName="establishmentCode"
+          [class.is-invalid]="isFieldInvalid('establishmentCode')"
+          [placeholder]="'BRANCHES_MODULE.ESTABLISHMENT_CODE_PLACEHOLDER' | translate"
+        />
+        @if (isFieldInvalid('establishmentCode')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('establishmentCode') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="emissionPointCode" class="form-label">
+          {{ 'BRANCHES_MODULE.EMISSION_POINT_CODE' | translate }}
+          <span class="text-muted small">({{ 'COMMON.OPTIONAL' | translate }})</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="emissionPointCode"
+          formControlName="emissionPointCode"
+          [class.is-invalid]="isFieldInvalid('emissionPointCode')"
+          [placeholder]="'BRANCHES_MODULE.EMISSION_POINT_CODE_PLACEHOLDER' | translate"
+        />
+        @if (isFieldInvalid('emissionPointCode')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('emissionPointCode') | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
         <label for="phone" class="form-label">
           {{ 'BRANCHES_MODULE.PHONE' | translate }}
           <span class="text-danger">*</span>

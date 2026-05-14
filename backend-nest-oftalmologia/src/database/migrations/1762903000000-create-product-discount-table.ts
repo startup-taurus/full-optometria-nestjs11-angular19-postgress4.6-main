@@ -7,30 +7,41 @@ export class CreateProductDiscountTable1762903000000 implements MigrationInterfa
     await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
 
     await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS "product_discount" (
+        "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+        "product_id" uuid NOT NULL,
+        "branch_id" uuid NOT NULL,
+        "company_id" uuid NOT NULL,
+        "discount_type" character varying(20) NOT NULL,
+        "discount_value" numeric(10,2) NOT NULL,
+        "is_active" boolean NOT NULL DEFAULT true,
+        "start_date" timestamp NULL,
+        "end_date" timestamp NULL,
+        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+        "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
+        CONSTRAINT "PK_product_discount" PRIMARY KEY ("id")
+      )
+    `);
+
+    await queryRunner.query(`
       DO $$
       BEGIN
-        IF NOT EXISTS (
-          SELECT FROM information_schema.tables
-          WHERE table_schema = 'public'
-            AND table_name = 'product_discount'
-        ) THEN
-          CREATE TABLE "product_discount" (
-            "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-            "product_id" uuid NOT NULL,
-            "branch_id" uuid NOT NULL,
-            "company_id" uuid NOT NULL,
-            "discount_type" character varying(20) NOT NULL,
-            "discount_value" numeric(10,2) NOT NULL,
-            "is_active" boolean NOT NULL DEFAULT true,
-            "start_date" timestamp NULL,
-            "end_date" timestamp NULL,
-            "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-            "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-            CONSTRAINT "PK_product_discount" PRIMARY KEY ("id"),
-            CONSTRAINT "FK_product_discount_product" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE,
-            CONSTRAINT "FK_product_discount_branch" FOREIGN KEY ("branch_id") REFERENCES "branches"("id") ON DELETE CASCADE,
-            CONSTRAINT "FK_product_discount_company" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE
-          );
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'products')
+           AND NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema = 'public' AND table_name = 'product_discount' AND constraint_name = 'FK_product_discount_product') THEN
+          ALTER TABLE "product_discount"
+          ADD CONSTRAINT "FK_product_discount_product" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE;
+        END IF;
+
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'branches')
+           AND NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema = 'public' AND table_name = 'product_discount' AND constraint_name = 'FK_product_discount_branch') THEN
+          ALTER TABLE "product_discount"
+          ADD CONSTRAINT "FK_product_discount_branch" FOREIGN KEY ("branch_id") REFERENCES "branches"("id") ON DELETE CASCADE;
+        END IF;
+
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'companies')
+           AND NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema = 'public' AND table_name = 'product_discount' AND constraint_name = 'FK_product_discount_company') THEN
+          ALTER TABLE "product_discount"
+          ADD CONSTRAINT "FK_product_discount_company" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE;
         END IF;
       END $$;
     `);

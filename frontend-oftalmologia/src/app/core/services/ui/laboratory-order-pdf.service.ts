@@ -2,12 +2,7 @@ import { Injectable, inject } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 import pdfMake from 'pdfmake/build/pdfmake'
 import * as pdfFonts from 'pdfmake/build/vfs_fonts'
-import {
-  Content,
-  ContentTable,
-  TDocumentDefinitions,
-  TableCell,
-} from 'pdfmake/interfaces'
+import { Content, TDocumentDefinitions } from 'pdfmake/interfaces'
 import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf.interface'
 import { FrameType } from '@core/interfaces/api/laboratory-order.interface'
 import { Branch } from '@core/interfaces/api/branch.interface'
@@ -63,25 +58,29 @@ export class LaboratoryOrderPdfService {
     }
   }
 
-  public async generatePdf(data: LaboratoryOrderPdfData): Promise<void> {
+  public async generatePdf(
+    data: LaboratoryOrderPdfData,
+    pageSize: 'A4' | 'A5' = 'A4'
+  ): Promise<void> {
     if (!this.logoBase64) {
       await this.loadLogo()
       await new Promise((resolve) => setTimeout(resolve, 500))
     }
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).open()
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).open()
     }
   }
 
   public async downloadPdf(
     data: LaboratoryOrderPdfData,
-    filename?: string
+    filename?: string,
+    pageSize: 'A4' | 'A5' = 'A4'
   ): Promise<void> {
     if (!this.logoBase64) {
       await this.loadLogo()
@@ -91,45 +90,58 @@ export class LaboratoryOrderPdfService {
     const pdfFileName = filename || `orden_laboratorio_${data.orderNumber}.pdf`
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).download(pdfFileName)
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data)
+      const docDefinition = this.buildDocumentDefinition(data, pageSize)
       pdfMake.createPdf(docDefinition).download(pdfFileName)
     }
   }
 
   private buildDocumentDefinition(
-    data: LaboratoryOrderPdfData
+    data: LaboratoryOrderPdfData,
+    pageSize: 'A4' | 'A5'
   ): TDocumentDefinitions {
+    const isCompact = pageSize === 'A5'
+    const margins: [number, number, number, number] = isCompact
+      ? [24, 24, 24, 24]
+      : [40, 40, 40, 40]
+    const sectionGap = isCompact ? 5 : 10
+    const signatureGap = isCompact ? 8 : 15
+    const fontSize = isCompact ? 8 : 10
+
     return {
-      pageSize: 'A4',
-      pageMargins: [40, 40, 40, 40],
+      pageSize,
+      pageMargins: margins,
       content: [
-        this.buildHeader(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        this.buildHeader(data, isCompact),
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildCustomerSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildProductSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildDesignParametersSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, sectionGap, 0, sectionGap] },
         this.buildFrameDataSection(data),
-        { text: '', margin: [0, 15, 0, 0] },
-        this.buildSignatureSection(),
+        { text: '', margin: [0, signatureGap, 0, 0] },
+        this.buildSignatureSection(isCompact),
       ],
-      styles: this.getStyles(),
+      styles: this.getStyles(isCompact),
       defaultStyle: {
         font: 'Roboto',
-        fontSize: 10,
+        fontSize,
       },
     }
   }
 
-  private buildHeader(data: LaboratoryOrderPdfData): Content {
+  private buildHeader(
+    data: LaboratoryOrderPdfData,
+    isCompact: boolean = false
+  ): Content {
     const branch = data.branch
     const orderNumber = data.orderNumber
+    const logoWidth = isCompact ? 80 : 120
 
     return {
       columns: [
@@ -169,7 +181,7 @@ export class LaboratoryOrderPdfService {
             this.logoBase64
               ? {
                   image: this.logoBase64,
-                  width: 120,
+                  width: logoWidth,
                   alignment: 'right',
                   margin: [0, 0, 0, 10],
                 }
@@ -489,6 +501,76 @@ export class LaboratoryOrderPdfService {
         },
         { text: '', margin: [0, 5, 0, 5] },
         {
+          text: this._translateService.instant(
+            'PDF.LABORATORY_ORDER.DIGITAL_PARAMETERS'
+          ),
+          style: 'sectionTitle',
+        },
+        {
+          table: {
+            widths: ['20%', '20%', '20%', '20%', '20%'],
+            headerRows: 1,
+            body: [
+              [
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.D_VERTEX'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.PANTOS'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.PANORA'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.DIST_VP'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+                {
+                  text: this._translateService.instant(
+                    'PDF.LABORATORY_ORDER.ENGRAVING'
+                  ),
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#E3F2FD',
+                },
+              ],
+              [
+                { text: order.dVertex || '-', alignment: 'center' },
+                { text: order.pantos || '-', alignment: 'center' },
+                { text: order.panora || '-', alignment: 'center' },
+                { text: order.distVp || '-', alignment: 'center' },
+                { text: order.engraving || '-', alignment: 'center' },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#CCCCCC',
+            vLineColor: () => '#CCCCCC',
+          },
+        },
+        { text: '', margin: [0, 5, 0, 5] },
+        {
           table: {
             widths: ['*'],
             body: [
@@ -511,14 +593,14 @@ export class LaboratoryOrderPdfService {
     const order = data.order
     const productSectionTitle = this.getProductSectionTitle(order)
     const productRows = this.getProductRows(order)
+    const hasProducts = productRows.length > 0
     const productTableBody =
-      productRows.length > 0
+      hasProducts
         ? [
             [
               { text: 'Código', bold: true, fillColor: '#E3F2FD' },
               { text: 'Producto', bold: true, fillColor: '#E3F2FD' },
               { text: 'Marca', bold: true, fillColor: '#E3F2FD' },
-              { text: 'Stock', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
               { text: 'Cant.', bold: true, alignment: 'center', fillColor: '#E3F2FD' },
             ],
             ...productRows,
@@ -527,17 +609,15 @@ export class LaboratoryOrderPdfService {
             [
               {
                 text: 'Sin productos',
-                colSpan: 5,
+                colSpan: 4,
                 alignment: 'center',
                 margin: [0, 4, 0, 4],
               },
               {},
               {},
               {},
-              {},
             ],
           ]
-            const hasProducts = productRows.length > 0
 
     return {
       stack: [
@@ -547,14 +627,14 @@ export class LaboratoryOrderPdfService {
         },
         {
           table: {
-            widths: ['22%', '30%', '18%', '15%', '15%'],
+            widths: ['20%', '40%', '25%', '15%'],
             headerRows: hasProducts ? 1 : 0,
             dontBreakRows: true,
             body: productTableBody,
           },
           layout: 'lightHorizontalLines',
         },
-        { text: '', margin: [0, 6, 0, 6] },
+        { text: '', margin: [0, 8, 0, 4] },
         {
           table: {
             widths: ['50%', '50%'],
@@ -588,20 +668,23 @@ export class LaboratoryOrderPdfService {
     }
   }
 
-  private buildSignatureSection(): Content {
+  private buildSignatureSection(isCompact: boolean = false): Content {
+    const lineLength = isCompact ? 150 : 200
+    const topGap = isCompact ? 14 : 20
+
     return {
       columns: [
         {
           width: '50%',
           stack: [
-            { text: '', margin: [0, 20, 0, 0] },
+            { text: '', margin: [0, topGap, 0, 0] },
             {
               canvas: [
                 {
                   type: 'line',
                   x1: 0,
                   y1: 0,
-                  x2: 200,
+                  x2: lineLength,
                   y2: 0,
                   lineWidth: 1,
                 },
@@ -620,14 +703,14 @@ export class LaboratoryOrderPdfService {
         {
           width: '50%',
           stack: [
-            { text: '', margin: [0, 20, 0, 0] },
+            { text: '', margin: [0, topGap, 0, 0] },
             {
               canvas: [
                 {
                   type: 'line',
                   x1: 0,
                   y1: 0,
-                  x2: 200,
+                  x2: lineLength,
                   y2: 0,
                   lineWidth: 1,
                 },
@@ -647,35 +730,35 @@ export class LaboratoryOrderPdfService {
     }
   }
 
-  private getStyles(): any {
+  private getStyles(isCompact: boolean = false): any {
     return {
       branchName: {
-        fontSize: 12,
+        fontSize: isCompact ? 10 : 12,
         bold: true,
         margin: [0, 0, 0, 3],
       },
       branchInfo: {
-        fontSize: 9,
+        fontSize: isCompact ? 7 : 9,
         margin: [0, 1, 0, 1],
       },
       orderTitle: {
-        fontSize: 11,
+        fontSize: isCompact ? 9 : 11,
         bold: true,
         color: '#1976D2',
       },
       orderNumber: {
-        fontSize: 16,
+        fontSize: isCompact ? 13 : 16,
         bold: true,
         color: '#D32F2F',
       },
       sectionTitle: {
-        fontSize: 12,
+        fontSize: isCompact ? 10 : 12,
         bold: true,
-        margin: [0, 5, 0, 10],
+        margin: [0, 5, 0, 8],
         color: '#1976D2',
       },
       noLogo: {
-        fontSize: 10,
+        fontSize: isCompact ? 8 : 10,
         italics: true,
         color: '#999999',
       },
@@ -711,6 +794,7 @@ export class LaboratoryOrderPdfService {
     name?: string
     brand?: string
     code?: string
+    unitPrice?: number
   }> {
     if (Array.isArray(order?.products) && order.products.length > 0) {
       return order.products
@@ -732,14 +816,6 @@ export class LaboratoryOrderPdfService {
         { text: lineItem.product?.name || '-', margin: [0, 2, 0, 2] },
         { text: lineItem.product?.brand || '-', margin: [0, 2, 0, 2] },
         {
-          text:
-            Number.isFinite(Number(lineItem.product?.quantity))
-              ? String(lineItem.product.quantity)
-              : '-',
-          alignment: 'center',
-          margin: [0, 2, 0, 2],
-        },
-        {
           text: String(Number(lineItem.quantity || 1)),
           alignment: 'center',
           margin: [0, 2, 0, 2],
@@ -754,14 +830,6 @@ export class LaboratoryOrderPdfService {
         { text: product.code || '-', margin: [0, 2, 0, 2] },
         { text: product.name || '-', margin: [0, 2, 0, 2] },
         { text: product.brand || '-', margin: [0, 2, 0, 2] },
-        {
-          text:
-            Number.isFinite(Number((product as any).quantity))
-              ? String((product as any).quantity)
-              : '-',
-          alignment: 'center',
-          margin: [0, 2, 0, 2],
-        },
         { text: '1', alignment: 'center', margin: [0, 2, 0, 2] },
       ])
     }

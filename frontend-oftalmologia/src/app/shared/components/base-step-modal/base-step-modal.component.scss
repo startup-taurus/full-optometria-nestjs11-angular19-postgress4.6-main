@@ -1,5 +1,7 @@
 .modal-progress {
-  background-color: var(--bs-tertiary-bg);
+  background:
+    linear-gradient(180deg, rgba(var(--bs-primary-rgb), 0.04), transparent),
+    var(--bs-tertiary-bg);
   border-bottom: 1px solid var(--bs-border-color);
 
   .steps-container {
@@ -35,6 +37,17 @@ background: var(--bs-secondary-color);
     align-items: center;
     gap: 0.5rem;
     flex-shrink: 0;
+    border-radius: 999px;
+    padding: 0.35rem 0.5rem;
+    transition: background-color 0.2s ease;
+
+    &.clickable {
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.06);
+      }
+    }
   }
 
   .step-circle {
@@ -46,45 +59,52 @@ background: var(--bs-secondary-color);
     justify-content: center;
     font-weight: 600;
     font-size: 14px;
-    border: 2px solid var(--bs-secondary);
-    background-color: var(--bs-body-bg);
-    color: var(--bs-secondary-color);
+    border: 2px solid #d4d4d8;
+    background-color: #f5f5f5;
+    color: #737373;
     transition: all 0.3s ease;
     user-select: none;
     flex-shrink: 0;
+    box-shadow: none;
 
     &.current {
       border-color: var(--bs-primary);
       background-color: var(--bs-primary);
       color: var(--bs-white);
       transform: scale(1.1);
+      box-shadow: 0 0.25rem 0.75rem rgba(var(--bs-primary-rgb), 0.18);
     }
 
     &.completed {
-      border-color: var(--bs-success);
-      background-color: var(--bs-success);
-      color: var(--bs-white);
+      border-color: #d4d4d8;
+      background-color: #f5f5f5;
+      color: #737373;
+      box-shadow: none;
     }
 
-    &.clickable {
-      cursor: pointer;
+    &.inactive {
+      border-color: #d4d4d8;
+      background-color: #f5f5f5;
+      color: #737373;
+    }
 
-      &:hover:not(.current) {
-        border-color: var(--bs-primary);
-        background-color: rgba(var(--bs-primary-rgb), 0.1);
-      }
+    &:hover:not(.current):not(.completed) {
+      border-color: #cfd4dc;
+      background-color: #ffffff;
+      color: #616161;
     }
   }
 
   .step-label {
     font-size: 12px;
     font-weight: 500;
-    color: var(--bs-secondary-color);
+    color: var(--bs-body-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 150px;
     flex-shrink: 0;
+    cursor: inherit;
 
     span {
       display: block;
@@ -93,12 +113,27 @@ background: var(--bs-secondary-color);
 }
 
 :host ::ng-deep .modal-dialog {
-  max-width: 1200px;
+  max-width: min(1200px, calc(100vw - 1.5rem));
 }
 
 :host ::ng-deep .modal-body {
   max-height: 70vh;
   overflow-y: auto;
+  background:
+    radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.04), transparent 28%),
+    var(--bs-body-bg);
+}
+
+:host ::ng-deep .modal-content {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 1.25rem 3rem rgba(15, 23, 42, 0.14);
+}
+
+:host ::ng-deep .modal-header {
+  background: linear-gradient(180deg, rgba(var(--bs-primary-rgb), 0.04), transparent);
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .step-content {
@@ -248,6 +283,12 @@ background: var(--bs-secondary-color);
         font-size: 0.875rem;
       }
     }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-progress .step-item.clickable:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
   }
 }
 

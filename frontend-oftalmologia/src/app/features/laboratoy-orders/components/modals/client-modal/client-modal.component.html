@@ -1,0 +1,210 @@
+<form [formGroup]="clientForm" (ngSubmit)="save()">
+  <div class="modal-header client-modal__header border-bottom pb-2">
+    <div class="d-flex align-items-start gap-3">
+      <div class="client-modal__icon">
+        <i class="ti ti-user-plus"></i>
+      </div>
+      <div>
+        <h5 class="modal-title mb-1">
+          {{ (isCreateMode ? 'COMMON.CREATE' : 'COMMON.EDIT') | translate }}
+          {{ 'CLIENT.SINGULAR' | translate }}
+        </h5>
+        <p class="client-modal__subtitle mb-0">
+          {{ 'CLIENT.SELECT_OR_CREATE' | translate }}
+        </p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="btn-close ms-auto"
+      aria-label="Close"
+      (click)="activeModal.dismiss()"
+      [disabled]="isLoading"
+    ></button>
+  </div>
+
+  <div class="modal-body pt-2 client-modal__body">
+    <div class="client-modal__section mb-3">
+      <div class="client-modal__section-title mb-3 text-body-emphasis">
+        Informacion principal
+      </div>
+      <div class="row g-3 mb-3" *ngIf="allowPatientSelection">
+        <div class="col-12">
+          <label class="form-label">{{ 'PATIENT.SINGULAR' | translate }}</label>
+          <div class="client-patient-select-shell">
+            <ng-select
+              class="client-patient-select"
+              [items]="patientOptions"
+              bindValue="id"
+              formControlName="patientIds"
+              [searchable]="true"
+              [clearable]="true"
+              [multiple]="true"
+              [loading]="searchingPatients"
+              [placeholder]="'CLIENT.SELECT_PATIENT_OPTIONAL' | translate"
+              (search)="onPatientSearch($event.term)"
+            >
+              <ng-template ng-label-tmp let-item="item">
+                {{ getPatientLabel(item) }}
+              </ng-template>
+              <ng-template ng-option-tmp let-item="item">
+                {{ getPatientLabel(item) }}
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col">
+          <label class="form-label">
+            {{ 'CLIENT.FIRST_NAME' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="firstName"
+            [class.is-invalid]="isFieldInvalid('firstName')"
+            placeholder="Ingrese nombres"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('firstName')">
+            {{ 'VALIDATION.REQUIRED' | translate }}
+          </div>
+        </div>
+
+        <div class="col">
+          <label class="form-label">
+            {{ 'CLIENT.LAST_NAME' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="lastName"
+            [class.is-invalid]="isFieldInvalid('lastName')"
+            placeholder="Ingrese apellidos"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('lastName')">
+            {{ 'VALIDATION.REQUIRED' | translate }}
+          </div>
+        </div>
+
+        <div class="col">
+          <label class="form-label">
+            {{ 'CLIENT.DOCUMENT_NUMBER' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="documentNumber"
+            [class.is-invalid]="isFieldInvalid('documentNumber')"
+            placeholder="Ingrese cédula"
+          />
+          <div
+            class="invalid-feedback"
+            *ngIf="isFieldInvalid('documentNumber')"
+          >
+            {{ 'VALIDATION.REQUIRED' | translate }}
+          </div>
+        </div>
+
+        <div class="col">
+          <label class="form-label">
+            {{ 'CLIENT.EMAIL' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="email"
+            class="form-control"
+            formControlName="email"
+            [class.is-invalid]="isFieldInvalid('email')"
+            placeholder="Ingrese correo electrónico"
+          />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
+            {{ 'VALIDATION.EMAIL_INVALID' | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="client-modal__section">
+      <div class="client-modal__section-title mb-3 text-body-emphasis">
+        Informacion de contacto
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col">
+          <label class="form-label">
+            {{ 'CLIENT.MOBILE_PHONE' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="mobilePhone"
+            [class.is-invalid]="isPhoneGroupInvalid()"
+            placeholder="Ingrese teléfono móvil"
+          />
+          <div class="invalid-feedback d-block" *ngIf="isPhoneGroupInvalid()">
+            Ingrese al menos un teléfono (móvil o fijo)
+          </div>
+        </div>
+
+        <div class="col">
+          <label class="form-label">
+            {{ 'CLIENT.HOME_PHONE' | translate }}
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="homePhone"
+            [class.is-invalid]="isPhoneGroupInvalid()"
+            placeholder="Ingrese teléfono fijo"
+          />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">
+            {{ 'CLIENT.ADDRESS' | translate }}
+            <span class="text-danger">*</span>
+          </label>
+          <textarea
+            class="form-control"
+            rows="3"
+            formControlName="address"
+            [class.is-invalid]="isFieldInvalid('address')"
+            placeholder="Ingrese dirección"
+          ></textarea>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('address')">
+            {{ 'VALIDATION.REQUIRED' | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer border-0 pt-2">
+    <button
+      type="button"
+      class="btn btn-light"
+      (click)="activeModal.dismiss()"
+      [disabled]="isLoading"
+    >
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+
+    <button
+      type="submit"
+      class="btn btn-primary client-modal__submit"
+      [disabled]="!clientForm.valid || isLoading"
+    >
+      <span
+        *ngIf="isLoading"
+        class="spinner-border spinner-border-sm me-2"
+        aria-hidden="true"
+      ></span>
+      {{ 'COMMON.SAVE' | translate }}
+    </button>
+  </div>
+</form>

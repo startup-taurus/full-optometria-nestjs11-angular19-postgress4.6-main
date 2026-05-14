@@ -476,15 +476,6 @@
                                   {{ getProductQuantityInCart(product) }}
                                 </span>
                               }
-
-                              <span class="product-stock">
-                                <iconify-icon
-                                  icon="mdi:package-variant"
-                                  width="16"
-                                  height="16"
-                                ></iconify-icon>
-                                {{ product.quantity }}
-                              </span>
                             </div>
                           </div>
 
@@ -955,6 +946,13 @@
             <h5>{{ selectedProductName }}</h5>
             <p class="text-muted mb-0">{{ selectedProductCode }}</p>
           </div>
+
+          @if (selectedProduct && getProductGallery(selectedProduct).length > 1) {
+            <p class="image-modal-shortcut-hint mb-0">
+              <i class="bi bi-arrow-left-right me-1"></i>
+              Usa <span>←</span> y <span>→</span> para cambiar la imagen
+            </p>
+          }
         </div>
       </div>
 

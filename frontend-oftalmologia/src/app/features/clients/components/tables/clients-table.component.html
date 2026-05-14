@@ -1,0 +1,155 @@
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card common-datatable-card border-0 shadow-sm">
+        <div class="card-header border-bottom bg-white py-3">
+          <div
+            class="d-flex flex-wrap justify-content-between align-items-center gap-2"
+          >
+            <h5 class="card-title mb-0 text-primary">
+              <i class="ti ti-users me-2"></i>
+              {{ 'CLIENTS' | translate }}
+            </h5>
+
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-outline-danger btn-sm filter-clear-btn"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RESET' | translate"
+                (click)="sideFilterPanel?.resetFilters()"
+                *ngIf="sideFilterPanel?.hasActiveFilters()"
+              >
+                <i class="ti ti-filter-off"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
+                (click)="reloadDatatable(filter)"
+                [disabled]="(config$ | async)?.loadingIndicator"
+              >
+                <i class="ti ti-refresh"></i>
+              </button>
+
+              <table-export-buttons
+                [columns]="exportColumns"
+                [rows]="latestRows"
+                filenameBase="clientes"
+                [title]="'CLIENTS' | translate"
+              ></table-export-buttons>
+
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                placement="top"
+                [ngbTooltip]="'COMMON.CREATE' | translate"
+                (click)="openCreateModal()"
+              >
+                <i class="ti ti-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <shared-ngx-datatable
+            [config]="config$ | async"
+            [data]="data$ | async"
+            (onChangeLimit)="onChangeLimit($event)"
+            (onChangePage)="onChangePage($event)"
+            class="common-ngx-datatable"
+          >
+          </shared-ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<side-filter-panel
+  #sideFilterPanel
+  [filterComponent]="sideFilterComponent"
+  [config]="{
+    title: 'COMMON.FILTERS',
+    showBadge: true,
+    position: 'right',
+    width: '400px',
+    backdrop: true,
+    closeOnEsc: true,
+  }"
+></side-filter-panel>
+
+<ng-template #nameTemplate let-row="row">
+  <div class="fw-semibold">{{ row.firstName }} {{ row.lastName }}</div>
+  <small class="text-muted">{{ row.mobilePhone || '-' }}</small>
+</ng-template>
+
+<ng-template #patientLinkTemplate let-row="row">
+  <span
+    class="badge common-badge"
+    [class.bg-info-subtle]="!!row.patientIds?.length"
+    [class.text-info-emphasis]="!!row.patientIds?.length"
+    [class.border]="true"
+    [class.border-info-subtle]="!!row.patientIds?.length"
+    [class.bg-secondary-subtle]="!row.patientIds?.length"
+    [class.text-secondary-emphasis]="!row.patientIds?.length"
+    [class.border-secondary-subtle]="!row.patientIds?.length"
+  >
+    {{ getPatientLabel(row) }}
+  </span>
+</ng-template>
+
+<ng-template #statusTemplate let-row="row">
+  <span
+    class="badge common-badge badge-sm border"
+    [class.bg-success-subtle]="row.isActive"
+    [class.text-success-emphasis]="row.isActive"
+    [class.border-success-subtle]="row.isActive"
+    [class.bg-secondary-subtle]="!row.isActive"
+    [class.text-secondary-emphasis]="!row.isActive"
+    [class.border-secondary-subtle]="!row.isActive"
+  >
+    {{
+      row.isActive
+        ? ('COMMON.ACTIVE' | translate)
+        : ('COMMON.INACTIVE' | translate)
+    }}
+  </span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row="row">
+  <div class="d-flex gap-1 flex-wrap">
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'COMMON.VIEW' | translate"
+      (click)="openDetails(row)"
+    >
+      <i class="ti ti-eye"></i>
+    </button>
+
+    <button
+      class="btn btn-outline-secondary btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'COMMON.EDIT' | translate"
+      (click)="openEditModal(row)"
+    >
+      <i class="ti ti-edit"></i>
+    </button>
+
+    <button
+      class="btn btn-outline-danger btn-xs"
+      type="button"
+      placement="left"
+      [ngbTooltip]="'COMMON.DELETE' | translate"
+      (click)="deleteClient(row)"
+    >
+      <i class="ti ti-trash"></i>
+    </button>
+  </div>
+</ng-template>

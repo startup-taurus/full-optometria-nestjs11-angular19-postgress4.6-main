@@ -1,0 +1,191 @@
+:host {
+  display: block;
+}
+
+.client-modal__header {
+  background: var(--bs-secondary-bg);
+  border-bottom-color: var(--bs-border-color) !important;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+.client-modal__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bs-primary);
+  color: var(--bs-light);
+  font-size: 1.25rem;
+  box-shadow: 0 8px 20px rgba(var(--bs-primary-rgb), 0.22);
+}
+
+.client-modal__subtitle {
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+}
+
+.client-modal__body {
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+}
+
+.client-modal__section {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: var(--bs-body-bg);
+}
+
+.client-modal__section-title {
+  font-weight: 600;
+  color: var(--bs-emphasis-color);
+  font-size: 0.95rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--bs-emphasis-color);
+}
+
+.form-control,
+textarea.form-control {
+  border-radius: 0.65rem;
+  border-color: var(--bs-border-color);
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+.form-control:focus,
+textarea.form-control:focus {
+  border-color: rgba(var(--bs-primary-rgb), 0.65);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.14);
+}
+
+.invalid-feedback {
+  display: block;
+  color: var(--bs-danger);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.is-invalid {
+  border-color: var(--bs-danger);
+}
+
+.client-modal__submit {
+  min-width: 9rem;
+}
+
+:host ::ng-deep ng-select.client-patient-select {
+  .ng-select-container {
+    border: 0 !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    min-height: 40px;
+  }
+
+  .ng-value-container {
+    padding: 0.2rem 0.55rem !important;
+  }
+
+  .ng-value-container .ng-input > input {
+    padding-left: 0 !important;
+  }
+}
+
+:host ::ng-deep .client-patient-select-shell {
+  border-radius: 0.65rem;
+  border: 1px solid var(--bs-border-color) !important;
+  background-color: var(--bs-body-bg) !important;
+  box-shadow: inset 0 0 0 1px var(--bs-border-color) !important;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+
+  &:hover {
+    border-color: var(--bs-border-color) !important;
+    box-shadow: inset 0 0 0 1px var(--bs-border-color) !important;
+  }
+
+  &:focus-within {
+    border-color: var(--bs-primary) !important;
+    box-shadow:
+      inset 0 0 0 1px var(--bs-primary),
+      0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.2) !important;
+  }
+}
+
+:host ::ng-deep ng-select.client-patient-select {
+  .ng-select-container {
+    border-radius: 0.65rem;
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+    transition:
+      border-color 0.15s ease-in-out,
+      box-shadow 0.15s ease-in-out,
+      background-color 0.15s ease-in-out;
+    min-height: 42px;
+  }
+
+  .ng-select-container:hover {
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  &.ng-select-focused .ng-select-container,
+  &.ng-select-opened .ng-select-container {
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .ng-value-container {
+    color: var(--bs-body-color) !important;
+  }
+
+  .ng-value-container .ng-value,
+  .ng-value-container .ng-value .ng-value-label,
+  .ng-value-container .ng-input > input,
+  .ng-placeholder {
+    color: var(--bs-body-color) !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: var(--bs-body-color) !important;
+  }
+
+  .ng-value-container .ng-value {
+    background-color: var(--bs-secondary-bg) !important;
+    border-radius: 0.45rem;
+    border: 1px solid var(--bs-border-color) !important;
+  }
+
+  .ng-clear-wrapper .ng-clear,
+  .ng-arrow-wrapper .ng-arrow {
+    color: var(--bs-secondary-color) !important;
+    border-top-color: var(--bs-secondary-color) !important;
+  }
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+@media (max-width: 576px) {
+  .client-modal__header {
+    padding-bottom: 0.5rem;
+  }
+
+  .client-modal__icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1.1rem;
+  }
+
+  .client-modal__section {
+    padding: 0.85rem;
+  }
+}

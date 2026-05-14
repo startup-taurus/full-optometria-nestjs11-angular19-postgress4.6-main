@@ -32,6 +32,13 @@
                 <i class="ti ti-refresh"></i>
               </button>
 
+              <table-export-buttons
+                [columns]="exportColumns"
+                [rows]="latestRows"
+                filenameBase="pacientes"
+                [title]="'PATIENT.TITLE' | translate"
+              ></table-export-buttons>
+
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
@@ -86,8 +93,13 @@
 <ng-template #statusTemplate let-row="row" let-rowIndex="rowIndex">
   <span
     class="badge common-badge badge-sm"
-    [class.bg-success]="row.isActive"
-    [class.bg-secondary]="!row.isActive"
+    [class.bg-success-subtle]="row.isActive"
+    [class.text-success-emphasis]="row.isActive"
+    [class.border]="true"
+    [class.border-success-subtle]="row.isActive"
+    [class.bg-secondary-subtle]="!row.isActive"
+    [class.text-secondary-emphasis]="!row.isActive"
+    [class.border-secondary-subtle]="!row.isActive"
   >
     {{
       (row.isActive ? 'PATIENT.STATUS.ACTIVE' : 'PATIENT.STATUS.INACTIVE')
@@ -136,13 +148,12 @@
       </ng-container>
     </button>
     <button
-      *ngIf="canShowViewMedicalHistoryButton(row.id)"
       class="btn btn-outline-info btn-xs"
       placement="left"
       [ngbTooltip]="'PATIENT.BUTTONS.VIEW_MEDICAL_HISTORY' | translate"
       (click)="viewMedicalHistory(row)"
     >
-      <i class="ti ti-file-description"></i>
+      <i class="ti ti-arrow-forward-up"></i>
     </button>
     <button
       class="btn btn-outline-secondary btn-xs"
@@ -159,6 +170,14 @@
       (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
     >
       <i class="ti ti-edit"></i>
+    </button>
+    <button
+      class="btn btn-outline-primary btn-xs"
+      placement="left"
+      ngbTooltip="Añadir cliente"
+      (click)="openCreateClientModal(row)"
+    >
+      <i class="ti ti-user-plus"></i>
     </button>
     <button
       class="btn btn-outline-danger btn-xs"

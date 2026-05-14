@@ -1,7 +1,13 @@
-# Ignorar archivos de entorno globales
+# Archivos de entorno (nunca versionar secretos)
 .env
-/.env
+.env.*
+**/.env
+**/.env.*
 
 # WhatsApp WebJS runtime/cache artifacts
 backend-nest-oftalmologia/.wwebjs_cache/
 backend-nest-oftalmologia/uploads/whatsapp-auth*/
+
+# Claude Code per-user settings (rutas locales, permisos personales — no compartir)
+.claude/settings.local.json
+**/.claude/settings.local.json

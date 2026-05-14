@@ -8,6 +8,8 @@ import { LaboratoryOrderStatus } from '../laboratory-orders/entities/laboratory-
 import { Product } from '../products/entities/product.entity';
 import { User } from '../users/entities/user.entity';
 import { Patient } from '../patients/entities/patient.entity';
+import { PurchaseOrderItem } from '../purchase-orders/entities/purchase-order-item.entity';
+import { PurchaseOrder, PurchaseOrderStatus } from '../purchase-orders/entities/purchase-order.entity';
 import {
   AppointmentsTrendResponse,
   DiagnosisFrequencyResponse,
@@ -15,6 +17,8 @@ import {
   ProductsInventoryResponse,
   ShiftStatusDistributionResponse,
   PatientsAgeDemographicsResponse,
+  TopProductsSoldResponse,
+  PurchaseOrdersSummaryResponse,
 } from './dto/dashboard-responses.dto';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
 
@@ -32,7 +36,11 @@ export class DashboardService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Patient)
-    private readonly patientRepository: Repository<Patient>
+    private readonly patientRepository: Repository<Patient>,
+    @InjectRepository(PurchaseOrderItem)
+    private readonly purchaseOrderItemRepository: Repository<PurchaseOrderItem>,
+    @InjectRepository(PurchaseOrder)
+    private readonly purchaseOrderRepository: Repository<PurchaseOrder>
   ) {}
 
   async getAppointmentsTrend(
@@ -217,6 +225,63 @@ export class DashboardService {
     };
   }
 
+  async getTopProductsSold(
+    branchId: string,
+    companyId: string | null,
+    months: number = 1
+  ): Promise<TopProductsSoldResponse> {
+    const topLimit = 10;
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+
+    const queryBuilder = this.purchaseOrderItemRepository
+      .createQueryBuilder('item')
+      .innerJoin('item.purchaseOrder', 'purchaseOrder')
+      .where('purchaseOrder.branchId = :branchId', { branchId })
+      .andWhere('purchaseOrder.status != :cancelledStatus', {
+        cancelledStatus: PurchaseOrderStatus.CANCELLED,
+      })
+      .andWhere('purchaseOrder.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      });
+
+    CompanyFilterUtil.applyCompanyFilter(queryBuilder, 'purchaseOrder', companyId);
+
+    const rawResults = await queryBuilder
+      .select('item.productId', 'productId')
+      .addSelect('item.productName', 'productName')
+      .addSelect('SUM(item.quantity)', 'quantitySold')
+      .addSelect('SUM(item.lineTotal)', 'totalRevenue')
+      .groupBy('item.productId')
+      .addGroupBy('item.productName')
+      .orderBy('SUM(item.quantity)', 'DESC')
+      .addOrderBy('item.productName', 'ASC')
+      .limit(topLimit)
+      .getRawMany<{
+        productId: string;
+        productName: string;
+        quantitySold: string;
+        totalRevenue: string;
+      }>();
+
+    const items = rawResults.map((item) => ({
+      productId: item.productId,
+      productName: item.productName,
+      quantitySold: Number(item.quantitySold),
+      totalRevenue: Number(item.totalRevenue),
+    }));
+
+    return {
+      labels: items.map((item) => item.productName),
+      data: items.map((item) => item.quantitySold),
+      total: items.reduce((acc, item) => acc + item.quantitySold, 0),
+      period: `${months}m`,
+      items,
+    };
+  }
+
   async getShiftStatusDistribution(
     branchId: string,
     companyId: string | null
@@ -290,6 +355,64 @@ export class DashboardService {
       labels: Object.keys(ageGroups),
       data: Object.values(ageGroups),
       total: patients.length,
+    };
+  }
+
+  async getPurchaseOrdersSummary(
+    branchId: string,
+    companyId: string | null
+  ): Promise<PurchaseOrdersSummaryResponse> {
+    const whereCondition = CompanyFilterUtil.buildWhereCondition({ branchId }, companyId);
+
+    const orders = await this.purchaseOrderRepository.find({
+      where: whereCondition,
+      select: ['status', 'shouldInvoice', 'totalAmount'],
+    });
+
+    let pending = 0;
+    let invoiced = 0;
+    let cancelled = 0;
+    let pendingToInvoice = 0;
+    let invoicedAmount = 0;
+    let nonInvoicedAmount = 0;
+    let grossAmount = 0;
+
+    orders.forEach((order) => {
+      const amount = Number(order.totalAmount ?? 0);
+      const safeAmount = Number.isFinite(amount) ? amount : 0;
+
+      if (order.status !== PurchaseOrderStatus.CANCELLED) {
+        grossAmount += safeAmount;
+      }
+
+      if (order.status === PurchaseOrderStatus.CANCELLED) {
+        cancelled++;
+      } else if (order.status === PurchaseOrderStatus.INVOICED) {
+        invoiced++;
+        invoicedAmount += safeAmount;
+      } else if (order.status === PurchaseOrderStatus.PENDING) {
+        nonInvoicedAmount += safeAmount;
+        if (order.shouldInvoice) {
+          pendingToInvoice++;
+        } else {
+          pending++;
+        }
+      }
+    });
+
+    return {
+      totalOrders: orders.length,
+      statuses: {
+        pending,
+        pendingToInvoice,
+        invoiced,
+        cancelled,
+      },
+      amounts: {
+        invoiced: Number(invoicedAmount.toFixed(2)),
+        nonInvoiced: Number(nonInvoicedAmount.toFixed(2)),
+        gross: Number(grossAmount.toFixed(2)),
+      },
     };
   }
 }

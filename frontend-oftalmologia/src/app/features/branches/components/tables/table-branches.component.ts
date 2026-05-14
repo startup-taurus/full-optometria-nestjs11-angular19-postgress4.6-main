@@ -113,6 +113,7 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   }
 
   public refreshQuota(): void {
+    this.authService.invalidateMyQuotaCache()
     this.authService.getMyQuota()
       .pipe(takeUntil(this.destroy$))
       .subscribe({

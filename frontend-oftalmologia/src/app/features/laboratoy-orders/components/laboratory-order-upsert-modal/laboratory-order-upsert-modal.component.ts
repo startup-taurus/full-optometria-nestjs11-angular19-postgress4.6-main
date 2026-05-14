@@ -23,6 +23,7 @@ import {
 } from '@core/interfaces/api/laboratory-order.interface'
 import { LaboratoryOrderPdfData } from '@core/interfaces/ui/laboratory-order-pdf.interface'
 import { Branch } from '@core/interfaces/api/user.interface'
+import { LaboratoryOrderStatus } from '@core/interfaces/api/laboratory-order.interface'
 
 import { LaboratoryOrderStep1Component } from '../steps/laboratory-order-step1/laboratory-order-step1.component'
 import { LaboratoryOrderStep2Component } from '../steps/laboratory-order-step2/laboratory-order-step2.component'
@@ -99,6 +100,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
   private initializeForms(): void {
     this.stepForms[1] = this._fb.group({
+      clientId: [null],
       attendanceDate: [this.getTodayDateString()],
       deliveryDate: [null, Validators.required],
     })
@@ -212,6 +214,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
   private patchFormWithOrderData(order: any): void {
     this.stepForms[1].patchValue({
+      clientId: order.clientId || null,
       attendanceDate: order.attendanceDate,
       deliveryDate: order.deliveryDate,
     })
@@ -258,7 +261,13 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
           : order.productId
             ? [order.productId]
             : [],
-      lineItems: Array.isArray(order.lineItems) ? order.lineItems : [],
+      lineItems: Array.isArray(order.lineItems)
+        ? order.lineItems.map((lineItem: LaboratoryOrderLineItem) => ({
+            productId: lineItem.productId,
+            quantity: Number(lineItem.quantity || 1),
+            discount: Number(lineItem.discount || 0),
+          }))
+        : [],
       frameType: order.frameType,
       frameTypeDescription: order.frameTypeDescription,
       frameBrand: order.frameBrand,
@@ -326,11 +335,80 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
         return
       }
 
-      this.createOrder(formValue)
+      if (!formValue.clinicalHistoryId) {
+        this.createOrder(formValue)
+        return
+      }
+
+      this.preventActiveDuplicateOrder(formValue)
+      return
+
     } else {
       const formValue = this.buildFormData() as UpdateLaboratoryOrderDto
       this.updateOrder(formValue)
     }
+  }
+
+  private preventActiveDuplicateOrder(data: CreateLaboratoryOrderDto): void {
+    if (!data.patientId) {
+      this.isSaving = false
+      return
+    }
+
+    const queryParams = {
+      page: 1,
+      limit: 1000,
+      patientFilterId: data.patientId,
+    }
+
+    this._laboratoryOrdersService.getAllWithFilters(queryParams).subscribe({
+      next: (response) => {
+        const orders = response?.data || []
+        const hasActiveOrder = orders.some((order) => {
+          if (order.clinicalHistoryId !== data.clinicalHistoryId) {
+            return false
+          }
+
+          return this.normalizeOrderStatus(order) !== LaboratoryOrderStatus.CANCELLED
+        })
+
+        if (hasActiveOrder) {
+          this.isSaving = false
+          this._notificationService.showNotification({
+            type: 'error',
+            message: {
+              es: 'Esta historia clínica ya tiene una orden de laboratorio activa. Cancela la orden actual para crear una nueva.',
+              en: 'This clinical history already has an active laboratory order. Cancel the current order to create a new one.',
+            },
+            title: 'LABORATORY_ORDERS_MODULE.TITLE',
+          })
+          return
+        }
+
+        this.createOrder(data)
+      },
+      error: () => {
+        this.isSaving = false
+        this._notificationService.showNotification({
+          type: 'warning',
+          message: {
+            es: 'No se pudo validar si ya existe una orden activa. Intenta nuevamente.',
+            en: 'Could not validate whether an active order already exists. Please try again.',
+          },
+          title: 'LABORATORY_ORDERS_MODULE.TITLE',
+        })
+      },
+    })
+  }
+
+  private normalizeOrderStatus(order: LaboratoryOrder): LaboratoryOrderStatus {
+    if (order.status) {
+      return order.status
+    }
+
+    return order.isConfirmed
+      ? LaboratoryOrderStatus.RECEIVED
+      : LaboratoryOrderStatus.PENDING
   }
 
   private buildFormData(): CreateLaboratoryOrderDto | UpdateLaboratoryOrderDto {
@@ -339,6 +417,26 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
       ...this.stepForms[2].value,
       ...this.stepForms[3].value,
       ...this.stepForms[4].value,
+    }
+
+    // clientId es opcional, pero si viene del select como objeto debe enviarse solo su UUID.
+    if (data.clientId && typeof data.clientId === 'object') {
+      data.clientId = data.clientId.id || null
+    }
+
+    // Si no es UUID válido, no se envía para evitar error de validación en backend.
+    if (
+      data.clientId &&
+      (typeof data.clientId !== 'string' ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          data.clientId
+        ))
+    ) {
+      data.clientId = null
+    }
+
+    if (!data.clientId) {
+      delete data.clientId
     }
 
     if (this.clinicalHistoryId) {

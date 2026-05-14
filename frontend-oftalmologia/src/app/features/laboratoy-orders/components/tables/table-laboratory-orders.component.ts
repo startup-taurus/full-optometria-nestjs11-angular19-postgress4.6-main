@@ -1,12 +1,16 @@
 import {
   Component,
+  Input,
+  OnChanges,
   OnInit,
   OnDestroy,
+  SimpleChanges,
   ViewChild,
   CUSTOM_ELEMENTS_SCHEMA,
   inject,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { PageTitleComponent } from '../../../../shared/components/layouts/page-title/page-title.component'
@@ -14,6 +18,7 @@ import { SideFilterPanelComponent } from '../../../../shared/components/filters/
 import { InfiniteScrollDirective } from '../../../../shared/directives/infinite-scroll.directive'
 import { FilterLaboratoryOrdersComponent } from '../filters/filter-laboratory-orders.component'
 import { LaboratoryOrdersService } from '@core/services/api/laboratory-orders.service'
+import { PurchaseOrdersService } from '@core/services/api/purchase-orders.service'
 import { BranchService } from '@core/services/api/branch.service'
 import { LaboratoryOrderPdfService } from '@core/services/ui/laboratory-order-pdf.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
@@ -41,6 +46,8 @@ import {
   SWAL_SUCCESS_CONFIG,
   SWAL_ERROR_CONFIG,
 } from '@core/helpers/ui/ui.constants'
+import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
+import { ExportColumn } from '@core/services/ui/table-export.service'
 
 @Component({
   selector: 'table-laboratory-orders',
@@ -52,22 +59,30 @@ import {
     NgbModule,
     SideFilterPanelComponent,
     InfiniteScrollDirective,
+    TableExportButtonsComponent,
   ],
   templateUrl: './table-laboratory-orders.component.html',
   styleUrl: './table-laboratory-orders.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
+export class TableLaboratoryOrdersComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   private _laboratoryOrdersService = inject(LaboratoryOrdersService)
+  private _purchaseOrdersService = inject(PurchaseOrdersService)
   private _branchService = inject(BranchService)
   private _pdfService = inject(LaboratoryOrderPdfService)
   private _modalService = inject(NgbModal)
   private _translateService = inject(TranslateService)
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _store = inject(Store<AppState>)
+  private _router = inject(Router)
+
+  @Input() orderId: string | null = null
 
   public laboratoryOrders: LaboratoryOrder[] = []
   public filteredOrders: LaboratoryOrder[] = []
+  public exportColumns: ExportColumn<LaboratoryOrder>[] = []
   public sideFilterComponent = FilterLaboratoryOrdersComponent
   public isLoading = false
   public showFloatingMenu: string | null = null
@@ -79,12 +94,65 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<boolean> = new Subject<boolean>()
   private isInitialLoad = true
   private currentBranchId: string | null = null
+  private loadRequestToken = 0
 
   @ViewChild('sideFilterPanel', { static: false })
   public sideFilterPanel?: SideFilterPanelComponent
 
   ngOnInit(): void {
+    this.exportColumns = this.buildExportColumns()
     this.initializeSubscriptions()
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.isInitialLoad || !changes['orderId']) {
+      return
+    }
+    this.resetAndLoad()
+  }
+
+  private buildExportColumns(): ExportColumn<LaboratoryOrder>[] {
+    const translate = this._translateService
+    return [
+      {
+        label: 'N° Orden',
+        formatter: (row) =>
+          row.orderNumber
+            ? String(row.orderNumber).padStart(9, '0')
+            : '-',
+      },
+      {
+        label: translate.instant('PATIENT.SINGULAR') || 'Paciente',
+        formatter: (row) =>
+          `${row.patient?.firstName || ''} ${row.patient?.lastName || ''}`
+            .trim() || '-',
+      },
+      {
+        label: translate.instant('WORDS.CEDULA') || 'Cédula',
+        formatter: (row) => row.patient?.documentNumber || '-',
+      },
+      {
+        label: translate.instant('LABORATORY_ORDERS_MODULE.DATE') || 'Fecha',
+        formatter: (row) => this.formatDate(row.deliveryDate),
+      },
+      {
+        label: 'Productos',
+        formatter: (row) => this.getOrderProductsText(row),
+      },
+      {
+        label: translate.instant('WORDS.PHONE') || 'Teléfono',
+        formatter: (row) =>
+          row.patient?.mobilePhone || row.patient?.homePhone || '-',
+      },
+      {
+        label: translate.instant('WORDS.EMAIL') || 'Email',
+        formatter: (row) => row.patient?.email || '-',
+      },
+      {
+        label: translate.instant('COMMON.STATUS') || 'Estado',
+        formatter: (row) => translate.instant(this.getStatusText(row)),
+      },
+    ]
   }
 
   ngOnDestroy(): void {
@@ -132,11 +200,12 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   }
 
   private resetAndLoad(): void {
+    const requestToken = ++this.loadRequestToken
     this.currentPage = 1
     this.laboratoryOrders = []
     this.filteredOrders = []
     this.hasMore = true
-    this.loadLaboratoryOrders(this.currentFilters)
+    this.loadLaboratoryOrders(this.currentFilters, requestToken)
   }
 
   public reloadData(): void {
@@ -153,8 +222,11 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     this.resetAndLoad()
   }
 
-  private loadLaboratoryOrders(filters: any = {}): void {
-    if (this.isLoading || !this.hasMore) {
+  private loadLaboratoryOrders(
+    filters: any = {},
+    requestToken: number = this.loadRequestToken
+  ): void {
+    if (!this.hasMore) {
       return
     }
 
@@ -162,12 +234,17 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
     const queryParams = {
       ...filters,
+      ...(this.orderId ? { orderId: this.orderId } : {}),
       page: this.currentPage,
       limit: this.pageSize,
     }
 
     this._laboratoryOrdersService.getAllWithFilters(queryParams).subscribe({
       next: (response: any) => {
+        if (requestToken !== this.loadRequestToken) {
+          return
+        }
+
         const items =
           response?.data?.result || response?.data || response?.items || []
 
@@ -185,6 +262,10 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
         this.isInitialLoad = false
       },
       error: (error: any) => {
+        if (requestToken !== this.loadRequestToken) {
+          return
+        }
+
         this.isLoading = false
         this.isInitialLoad = false
         this.hasMore = false
@@ -195,7 +276,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   public onScrollEnd(): void {
     if (!this.isLoading && this.hasMore) {
       this.currentPage++
-      this.loadLaboratoryOrders(this.currentFilters)
+      this.loadLaboratoryOrders(this.currentFilters, this.loadRequestToken)
     }
   }
 
@@ -212,6 +293,8 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
   public getStatusClass(order: LaboratoryOrder): string {
     switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.CANCELLED:
+        return 'bg-danger'
       case LaboratoryOrderStatus.SENT:
         return 'bg-info'
       case LaboratoryOrderStatus.RECEIVED:
@@ -225,6 +308,8 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
   public getStatusText(order: LaboratoryOrder): string {
     switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.CANCELLED:
+        return 'LABORATORY_ORDERS_MODULE.CANCELLED'
       case LaboratoryOrderStatus.SENT:
         return 'LABORATORY_ORDERS_MODULE.SENT'
       case LaboratoryOrderStatus.RECEIVED:
@@ -238,6 +323,8 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
 
   public getStatusActionClass(order: LaboratoryOrder): string {
     switch (this.normalizeStatus(order)) {
+      case LaboratoryOrderStatus.CANCELLED:
+        return 'status-action--cancelled'
       case LaboratoryOrderStatus.SENT:
         return 'status-action--sent'
       case LaboratoryOrderStatus.RECEIVED:
@@ -267,6 +354,14 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   public onChangeStatusClick(event: Event, order: LaboratoryOrder): void {
     event.stopPropagation()
     this.onChangeStatus(order)
+  }
+
+  public onViewLinkedPurchaseOrderClick(
+    event: Event,
+    order: LaboratoryOrder
+  ): void {
+    event.stopPropagation()
+    this.onViewLinkedPurchaseOrder(order)
   }
 
   public onEdit(order: LaboratoryOrder): void {
@@ -320,8 +415,11 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
             Swal.fire({
               ...SWAL_ERROR_CONFIG,
               title: this._translateService.instant('COMMON.ERROR'),
-              text: this._translateService.instant(
-                'LABORATORY_ORDERS.MESSAGES.DELETE_ERROR'
+              text: this.getErrorMessage(
+                error,
+                this._translateService.instant(
+                  'LABORATORY_ORDERS.MESSAGES.DELETE_ERROR'
+                )
               ),
             })
           },
@@ -403,13 +501,29 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
               this.resetAndLoad()
             },
             error: (error: any) => {
-              Swal.fire({
-                icon: 'error',
-                title: this._translateService.instant('COMMON.ERROR'),
-                html: error.error?.message?.es || error.error?.message || this._translateService.instant(
-                  'LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_ERROR'
-                ),
-              })
+              const errorMessage = error.error?.message?.es || error.error?.message || this._translateService.instant(
+                'LABORATORY_ORDERS.MESSAGES.STATUS_CHANGE_ERROR'
+              );
+
+              // Handle insufficient stock for reactivation
+              if (error.error?.messageKey === 'REACTIVATION.INSUFFICIENT_STOCK' && error.error?.details?.length > 0) {
+                const insufficientProducts = error.error.details;
+                const productsList = insufficientProducts
+                  .map((p: any) => `<li>${p.productName}: disponible ${p.available}, necesario ${p.needed}</li>`)
+                  .join('');
+
+                Swal.fire({
+                  icon: 'error',
+                  title: this._translateService.instant('COMMON.ERROR'),
+                  html: `<p>${errorMessage}</p><ul style="text-align: left;">${productsList}</ul>`,
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: this._translateService.instant('COMMON.ERROR'),
+                  html: errorMessage,
+                });
+              }
             },
           })
       }
@@ -424,6 +538,40 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
     })
 
     modalRef.componentInstance.orderId = order.id
+  }
+
+  public onViewLinkedPurchaseOrder(order: LaboratoryOrder): void {
+    if (!order?.id) {
+      return
+    }
+
+    this._purchaseOrdersService.getByLaboratoryOrderId(order.id).subscribe({
+      next: (purchaseOrder) => {
+        if (!purchaseOrder?.id) {
+          Swal.fire({
+            icon: 'warning',
+            title: this._translateService.instant('COMMON.WARNING'),
+            text: this._translateService.instant(
+              'LABORATORY_ORDERS.MESSAGES.PURCHASE_ORDER_NOT_FOUND'
+            ),
+          })
+          return
+        }
+
+        this._router.navigate(['/purchase-orders'], {
+          queryParams: { laboratoryOrderId: order.id },
+        })
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'warning',
+          title: this._translateService.instant('COMMON.WARNING'),
+          text: this._translateService.instant(
+            'LABORATORY_ORDERS.MESSAGES.PURCHASE_ORDER_NOT_FOUND'
+          ),
+        })
+      },
+    })
   }
 
   trackByOrderId(index: number, order: LaboratoryOrder): string {
@@ -515,7 +663,21 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
       [LaboratoryOrderStatus.DELIVERED]: this._translateService.instant(
         'LABORATORY_ORDERS_MODULE.DELIVERED'
       ),
+      [LaboratoryOrderStatus.CANCELLED]: this._translateService.instant(
+        'LABORATORY_ORDERS_MODULE.CANCELLED'
+      ),
     }
+  }
+
+  private getErrorMessage(error: any, fallback: string): string {
+    return (
+      error?.error?.message?.es ||
+      error?.error?.message?.en ||
+      error?.error?.data?.localizedMessage?.es ||
+      error?.error?.data?.localizedMessage?.en ||
+      error?.error?.data?.error ||
+      fallback
+    )
   }
 
   public onSendWhatsApp(order: LaboratoryOrder): void {
@@ -593,6 +755,12 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
   }
 
   public async onPrintOrder(order: LaboratoryOrder): Promise<void> {
+    const pageSize = await this.askPdfPageSize()
+
+    if (!pageSize) {
+      return
+    }
+
     try {
       const branchState = await firstValueFrom(
         this._branchService.getBranchFilterState()
@@ -620,7 +788,7 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
         orderNumber: orderNumber,
       }
 
-      await this._pdfService.generatePdf(pdfData)
+      await this._pdfService.generatePdf(pdfData, pageSize)
 
       this.showFloatingMenu = null
     } catch (error) {
@@ -632,6 +800,33 @@ export class TableLaboratoryOrdersComponent implements OnInit, OnDestroy {
         ),
       })
     }
+  }
+
+  private async askPdfPageSize(): Promise<'A4' | 'A5' | null> {
+    const result = await Swal.fire({
+      title: 'Tamaño del PDF',
+      text: 'Selecciona el tamaño de impresión de la orden',
+      icon: 'question',
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: 'Hoja completa (A4)',
+      denyButtonText: 'Media hoja (A5)',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      confirmButtonColor: '#1976D2',
+      denyButtonColor: '#198754',
+      cancelButtonColor: '#6c757d',
+    })
+
+    if (result.isConfirmed) {
+      return 'A4'
+    }
+
+    if (result.isDenied) {
+      return 'A5'
+    }
+
+    return null
   }
 
   private formatOrderNumber(orderNumber: number): string {

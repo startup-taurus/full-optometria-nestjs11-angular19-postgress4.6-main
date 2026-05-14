@@ -8,6 +8,7 @@ import { MessageDispatchLog } from './entities/message-dispatch-log.entity';
 import { PatientContactPreference } from './entities/patient-contact-preference.entity';
 import { ReminderRule } from './entities/reminder-rule.entity';
 import { WhatsAppSession } from './entities/whatsapp-session.entity';
+import { Shift } from '../shift-management/entities/shift.entity';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
 import { WhatsAppWebJsProvider } from './providers/whatsapp-webjs.provider';
@@ -24,6 +25,7 @@ import { WHATSAPP_PROVIDER } from './providers/whatsapp-provider.interface';
       Patient,
       ClinicalHistory,
       LaboratoryOrder,
+      Shift,
     ]),
   ],
   controllers: [NotificationsController],

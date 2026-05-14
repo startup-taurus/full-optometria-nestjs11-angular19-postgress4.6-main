@@ -198,6 +198,26 @@ export class PublicCatalogComponent implements OnInit {
     }
   }
 
+  @HostListener('document:keydown.arrowleft', ['$event'])
+  onArrowLeftPressed(event: KeyboardEvent): void {
+    if (!this.shouldHandleGalleryKeyboardNavigation(event)) {
+      return
+    }
+
+    event.preventDefault()
+    this.previousProductImage()
+  }
+
+  @HostListener('document:keydown.arrowright', ['$event'])
+  onArrowRightPressed(event: KeyboardEvent): void {
+    if (!this.shouldHandleGalleryKeyboardNavigation(event)) {
+      return
+    }
+
+    event.preventDefault()
+    this.nextProductImage()
+  }
+
   isMobileViewport(): boolean {
     return window.innerWidth < 992
   }
@@ -977,6 +997,28 @@ export class PublicCatalogComponent implements OnInit {
     }
 
     return ''
+  }
+
+  private shouldHandleGalleryKeyboardNavigation(event: KeyboardEvent): boolean {
+    if (!this.selectedProduct) {
+      return false
+    }
+
+    if (!this.showImageModal && !this.showProductModal) {
+      return false
+    }
+
+    const target = event.target as HTMLElement | null
+    if (!target) {
+      return this.getProductGallery(this.selectedProduct).length > 1
+    }
+
+    const interactiveTags = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON']
+    if (interactiveTags.includes(target.tagName) || target.isContentEditable) {
+      return false
+    }
+
+    return this.getProductGallery(this.selectedProduct).length > 1
   }
 
   private async showWhatsAppBranchSelector(

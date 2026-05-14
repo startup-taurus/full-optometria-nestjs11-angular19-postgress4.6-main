@@ -181,4 +181,13 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   toggleThemeCustomizer(): void {
     this.themeCustomizerService.togglePanel()
   }
+
+  openNewPatientModal(): void {
+    this.router.navigate(['/patients'], {
+      queryParams: {
+        openPatientModal: 'create',
+        modalTs: Date.now(),
+      },
+    })
+  }
 }

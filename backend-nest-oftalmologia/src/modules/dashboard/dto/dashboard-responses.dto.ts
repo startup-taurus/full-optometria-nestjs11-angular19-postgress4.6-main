@@ -40,3 +40,33 @@ export interface PatientsAgeDemographicsResponse {
   data: number[];
   total: number;
 }
+
+export interface TopProductSoldItemResponse {
+  productId: string;
+  productName: string;
+  quantitySold: number;
+  totalRevenue: number;
+}
+
+export interface TopProductsSoldResponse {
+  labels: string[];
+  data: number[];
+  total: number;
+  period: string;
+  items: TopProductSoldItemResponse[];
+}
+
+export interface PurchaseOrdersSummaryResponse {
+  totalOrders: number;
+  statuses: {
+    pending: number;
+    pendingToInvoice: number;
+    invoiced: number;
+    cancelled: number;
+  };
+  amounts: {
+    invoiced: number;
+    nonInvoiced: number;
+    gross: number;
+  };
+}

@@ -95,7 +95,6 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadShiftStatuses()
     this.initializeBranchFilter()
-    this.initializeFilterSubscription()
   }
 
   ngOnDestroy(): void {
@@ -108,17 +107,12 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
       .select(selectSelectedBranchId)
       .pipe(takeUntil(this.destroy$), distinctUntilChanged(), debounceTime(300))
       .subscribe({
-        next: (branchId) => {
-          if (!this.isInitialLoad) {
-            this.resetAndLoad()
-          }
+        next: () => {
+          this.resetAndLoad()
+          this.isInitialLoad = false
         },
         error: (error) => {},
       })
-  }
-
-  private initializeFilterSubscription(): void {
-    this.loadShiftsWithBranchFilter()
   }
 
   public reloadData(): void {

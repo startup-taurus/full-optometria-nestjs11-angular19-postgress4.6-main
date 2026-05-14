@@ -1,0 +1,70 @@
+<div class="filter-form filter-form-unified filter-form-v2">
+  <form [formGroup]="clientFilterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'CLIENT.FIRST_NAME' | translate }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [placeholder]="'CLIENT.FIRST_NAME' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'CLIENT.LAST_NAME' | translate }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [placeholder]="'CLIENT.LAST_NAME' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'CLIENT.EMAIL' | translate }}</label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [placeholder]="'CLIENT.EMAIL' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'CLIENT.DOCUMENT_NUMBER' | translate }}</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="documentNumber"
+          [placeholder]="'CLIENT.DOCUMENT_NUMBER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">{{ 'CLIENT.PATIENT_LINK' | translate }}</label>
+        <ng-select
+          formControlName="hasPatientLink"
+          [items]="linkOptions$ | async"
+          bindLabel="label"
+          bindValue="value"
+          [clearable]="true"
+          [placeholder]="'COMMON.ALL' | translate"
+        ></ng-select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onReset()">
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

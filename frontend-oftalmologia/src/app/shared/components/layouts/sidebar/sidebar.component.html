@@ -152,7 +152,10 @@
 >
   <li
     [class]="itemClassName"
-    [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+    [ngClass]="{
+      active: activeMenuItems.includes(menu.key),
+      'menu-divider-after': menu.key === 'PURCHASE_ORDERS'
+    }"
   >
     <!-- Insertamos el link simple -->
     <ng-container

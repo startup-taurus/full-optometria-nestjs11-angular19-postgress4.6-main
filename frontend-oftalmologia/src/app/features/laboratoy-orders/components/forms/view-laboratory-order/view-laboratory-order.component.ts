@@ -13,6 +13,12 @@ import { LaboratoryOrder } from '@core/interfaces/api/laboratory-order.interface
   styleUrls: ['./view-laboratory-order.component.scss'],
 })
 export class ViewLaboratoryOrderComponent implements OnInit {
+  private static readonly FINAL_CONSUMER_FIRST_NAME = 'Consumidor'
+  private static readonly FINAL_CONSUMER_LAST_NAME = 'Final'
+  private static readonly FINAL_CONSUMER_DOCUMENT = '9999999999999'
+  private static readonly FINAL_CONSUMER_EMAIL = 'consumidor.final@example.com'
+  private static readonly FINAL_CONSUMER_PHONE = '0999999999'
+
   @Input() orderId: string | null = null
   @Input() order: LaboratoryOrder | null = null
 
@@ -154,6 +160,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
     brand: string
     stock: number | null
     quantity: number
+    unitPrice: number
+    discount: number
+    total: number
   }> {
     if (!this.order) return []
 
@@ -168,6 +177,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
             ? lineItem.product.quantity
             : null,
         quantity: Number(lineItem.quantity || 1),
+        unitPrice: this.getLineUnitPrice(lineItem),
+        discount: this.getLineDiscount(lineItem),
+        total: this.getLineTotal(lineItem),
       }))
     }
 
@@ -182,6 +194,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
             ? (product as any).quantity
             : null,
         quantity: 1,
+        unitPrice: Number((product as any).unitPrice || 0),
+        discount: 0,
+        total: Number((product as any).unitPrice || 0),
       }))
     }
 
@@ -196,6 +211,9 @@ export class ViewLaboratoryOrderComponent implements OnInit {
               ? (this.order.product as any).quantity
               : null,
           quantity: 1,
+            unitPrice: Number((this.order.product as any).unitPrice || 0),
+            discount: 0,
+            total: Number((this.order.product as any).unitPrice || 0),
         },
       ]
     }
@@ -216,5 +234,108 @@ export class ViewLaboratoryOrderComponent implements OnInit {
       month: '2-digit',
       day: '2-digit',
     })
+  }
+
+  public formatDateTime(dateTime: string | null): string {
+    if (!dateTime) return '-'
+
+    const date = new Date(dateTime)
+    if (Number.isNaN(date.getTime())) {
+      return '-'
+    }
+
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`
+  }
+
+  public getClientDisplayFirstName(): string {
+    return (
+      String(this.order?.client?.firstName || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_FIRST_NAME
+    )
+  }
+
+  public getClientDisplayLastName(): string {
+    return (
+      String(this.order?.client?.lastName || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_LAST_NAME
+    )
+  }
+
+  public getClientDisplayDocument(): string {
+    return (
+      String(this.order?.client?.documentNumber || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_DOCUMENT
+    )
+  }
+
+  public getClientDisplayEmail(): string {
+    return (
+      String(this.order?.client?.email || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_EMAIL
+    )
+  }
+
+  public getClientDisplayMobilePhone(): string {
+    return (
+      String(this.order?.client?.mobilePhone || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_PHONE
+    )
+  }
+
+  public getClientDisplayHomePhone(): string {
+    return (
+      String(this.order?.client?.homePhone || '').trim() ||
+      ViewLaboratoryOrderComponent.FINAL_CONSUMER_PHONE
+    )
+  }
+
+  public getSubtotal(): number {
+    return Number(
+      (this.order?.lineItems || []).reduce(
+        (sum, lineItem) => sum + this.getLineGrossTotal(lineItem),
+        0
+      ).toFixed(2)
+    )
+  }
+
+  public getTotalDiscount(): number {
+    return Number(
+      (this.order?.lineItems || []).reduce(
+        (sum, lineItem) => sum + this.getLineDiscount(lineItem),
+        0
+      ).toFixed(2)
+    )
+  }
+
+  public getTotal(): number {
+    return Number((this.getSubtotal() - this.getTotalDiscount()).toFixed(2))
+  }
+
+  private getLineUnitPrice(lineItem: any): number {
+    const unitPrice = Number(lineItem?.unitPrice || lineItem?.product?.unitPrice || 0)
+    return Number.isFinite(unitPrice) ? unitPrice : 0
+  }
+
+  private getLineDiscount(lineItem: any): number {
+    const discount = Number(lineItem?.discount || 0)
+    return Number.isFinite(discount) ? discount : 0
+  }
+
+  private getLineGrossTotal(lineItem: any): number {
+    return Number(
+      (this.getLineUnitPrice(lineItem) * Number(lineItem?.quantity || 1)).toFixed(2)
+    )
+  }
+
+  private getLineTotal(lineItem: any): number {
+    return Number(
+      Math.max(this.getLineGrossTotal(lineItem) - this.getLineDiscount(lineItem), 0).toFixed(2)
+    )
   }
 }

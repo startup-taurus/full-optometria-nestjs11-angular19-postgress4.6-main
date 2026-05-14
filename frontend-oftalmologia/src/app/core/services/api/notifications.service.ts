@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { environment } from '@environment/environment'
 import { ApiData, ApiResponse } from '@core/interfaces/api/api-response.interface'
 import {
@@ -10,15 +10,72 @@ import {
 } from '@core/interfaces/api/notifications.interface'
 import { Observable } from 'rxjs'
 import { tap, catchError } from 'rxjs/operators'
-import { throwError } from 'rxjs'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { StorageService } from '@core/services/ui/storage.service'
+import { USER_SESSION } from '@core/helpers/global/global.constants'
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationsService {
   private readonly API_URL = `${environment.apiBaseUrl}/notifications`
+  private readonly storageService = inject(StorageService)
 
   constructor(private readonly http: HttpClient) {}
+
+  streamSession(): Observable<WhatsAppSession> {
+    return new Observable<WhatsAppSession>((subscriber) => {
+      const ctrl = new AbortController()
+      const session = JSON.parse(
+        this.storageService.secureStorage.getItem(USER_SESSION) || 'null'
+      )
+      const token = session?.accessToken
+      const headers: Record<string, string> = { Accept: 'text/event-stream' }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      fetchEventSource(`${this.API_URL}/whatsapp/session/stream`, {
+        signal: ctrl.signal,
+        headers,
+        openWhenHidden: true,
+        onmessage: (ev) => {
+          if (!ev.data) return
+          console.log(
+            `[FE_SSE_RAW] len=${ev.data.length} sample=${ev.data.slice(0, 120)}`
+          )
+          try {
+            const parsed = JSON.parse(ev.data)
+            const session =
+              parsed &&
+              typeof parsed === 'object' &&
+              parsed.data &&
+              typeof parsed.data === 'object' &&
+              'status' in parsed.data
+                ? parsed.data
+                : parsed
+            console.log(
+              `[FE_SSE_PARSED] status=${session?.status} qrCodeLen=${session?.qrCode?.length || 0} ts=${Date.now()}`
+            )
+            subscriber.next(session)
+          } catch (err: any) {
+            console.error(
+              `[FE_SSE_PARSE_ERR] msg=${err?.message} rawSample=${ev.data.slice(0, 200)}`
+            )
+          }
+        },
+        onerror: (err) => {
+          console.warn('[SSE] error', err)
+        },
+      }).catch((err) => {
+        if (!ctrl.signal.aborted) {
+          subscriber.error(err)
+        }
+      })
+
+      return () => ctrl.abort()
+    })
+  }
 
   getWhatsAppSession(): Observable<ApiResponse<WhatsAppSession>> {
     return this.http.get<ApiResponse<WhatsAppSession>>(

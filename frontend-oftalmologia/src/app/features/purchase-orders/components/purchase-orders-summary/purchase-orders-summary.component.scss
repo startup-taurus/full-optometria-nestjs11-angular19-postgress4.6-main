@@ -1,0 +1,232 @@
+.purchase-orders-summary-container {
+  --summary-bg: var(--bs-body-bg);
+  --summary-card-border: var(--bs-border-color);
+  --summary-text: var(--bs-body-color);
+  --summary-muted: var(--bs-secondary-color);
+  --summary-shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  animation: summary-fade-in 220ms ease-out;
+}
+
+@keyframes summary-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.summary-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+}
+
+.summary-card {
+  min-height: 138px;
+  border: 1px solid var(--summary-card-border);
+  border-radius: 0.75rem;
+  background: var(--summary-bg);
+  box-shadow: var(--summary-shadow);
+  padding: 0.95rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+  &.pending-card,
+  &.to-invoice-card,
+  &.invoiced-card,
+  &.total-orders-card {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &.pending-card:hover,
+  &.to-invoice-card:hover,
+  &.invoiced-card:hover,
+  &.total-orders-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.11);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.45rem;
+
+    i {
+      font-size: 1.2rem;
+      opacity: 0.92;
+    }
+
+    .label {
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: var(--summary-text);
+      line-height: 1.1;
+    }
+  }
+
+  .card-value {
+    font-size: 2rem;
+    line-height: 1.05;
+    font-weight: 800;
+    color: var(--summary-text);
+    margin: 0.25rem 0 0.6rem;
+
+    &.amount {
+      font-size: clamp(1.3rem, 2vw, 1.65rem);
+      word-break: break-word;
+    }
+  }
+
+  .card-footer {
+    border-top: 1px solid color-mix(in srgb, var(--summary-card-border) 80%, transparent);
+    padding-top: 0.62rem;
+
+    small {
+      color: var(--summary-muted);
+      font-size: 0.8rem;
+      line-height: 1.2;
+    }
+  }
+
+  &.pending-card {
+    border-left: 5px solid #f59e0b;
+
+    .card-header i,
+    .card-value {
+      color: #d97706;
+    }
+  }
+
+  &.to-invoice-card {
+    border-left: 5px solid #3b82f6;
+
+    .card-header i,
+    .card-value {
+      color: #2563eb;
+    }
+  }
+
+  &.invoiced-card {
+    border-left: 5px solid #22c55e;
+
+    .card-header i,
+    .card-value {
+      color: #16a34a;
+    }
+  }
+
+  &.total-orders-card {
+    border-left: 5px solid #6366f1;
+
+    .card-header i,
+    .card-value {
+      color: #4f46e5;
+    }
+  }
+
+  &.amount-card {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--summary-bg) 80%, #ffffff 20%), var(--summary-bg));
+
+    .card-value {
+      color: var(--summary-text);
+    }
+  }
+
+  &.invoiced-amount-card {
+    border-top: 3px solid #16a34a;
+  }
+
+  &.non-invoiced-amount-card {
+    border-top: 3px solid #f59e0b;
+  }
+
+  &.gross-amount-card {
+    border-top: 3px solid #0ea5e9;
+  }
+}
+
+.summary-loading,
+.summary-empty {
+  border: 1px dashed var(--summary-card-border);
+  border-radius: 0.75rem;
+  background: var(--summary-bg);
+  color: var(--summary-muted);
+}
+
+.summary-loading {
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summary-empty {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.2rem;
+
+  i {
+    font-size: 2rem;
+    margin-bottom: 0.6rem;
+    opacity: 0.6;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+[data-bs-theme='dark'] .purchase-orders-summary-container {
+  --summary-bg: #1f2a37;
+  --summary-card-border: #334155;
+  --summary-text: #e2e8f0;
+  --summary-muted: #94a3b8;
+  --summary-shadow: 0 10px 22px rgba(2, 6, 23, 0.35);
+}
+
+@media (max-width: 992px) {
+  .summary-cards-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .summary-cards-row {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .summary-card {
+    min-height: 126px;
+
+    .card-value {
+      font-size: 1.7rem;
+
+      &.amount {
+        font-size: 1.3rem;
+      }
+    }
+  }
+}

@@ -114,7 +114,7 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           branch: user.branch,
-          company: user.company,
+          company: this.buildCompanyPayload(user.company),
           profilePhoto: user.profilePhoto,
           address: user.address,
           documentNumber: user.documentNumber,
@@ -124,6 +124,28 @@ export class AuthService {
         },
         ...tokens,
       },
+    };
+  }
+
+  private buildCompanyPayload(company: User['company']) {
+    if (!company) {
+      return null;
+    }
+    return {
+      id: company.id,
+      name: company.name,
+      code: company.code,
+      slug: company.slug,
+      email: company.email,
+      phone: company.phone,
+      logoFileId: company.logoFileId,
+      logoFile: company.logoFile,
+      isActive: company.isActive,
+      maxUsers: company.maxUsers,
+      maxBranches: company.maxBranches,
+      hasBillingApiKey:
+        typeof company.billingApiKey === 'string' &&
+        company.billingApiKey.trim().length > 0,
     };
   }
 
@@ -195,7 +217,7 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
         branch: user.branch,
-        company: user.company,
+        company: this.buildCompanyPayload(user.company),
         isAdmin: isAdmin,
         profilePhoto: user.profilePhoto,
         address: user.address,

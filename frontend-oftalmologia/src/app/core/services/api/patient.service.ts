@@ -88,10 +88,19 @@ export class PatientService {
     )
   }
 
-  public deletePatient(id: string): Observable<ApiResponse<Patient>> {
+  public deletePatient(
+    id: string,
+    deleteAssociatedClients: boolean = false
+  ): Observable<ApiResponse<Patient>> {
     const endpoint = `${this.API_URL}/${id}`
+    let params = new HttpParams()
+
+    if (deleteAssociatedClients) {
+      params = params.set('deleteAssociatedClients', 'true')
+    }
+
     return this._httpClient
-      .delete<ApiResponse<Patient>>(endpoint)
+      .delete<ApiResponse<Patient>>(endpoint, { params })
       .pipe(tap((res) => this.showNotification(res.message, 'PATIENT.TITLE')))
   }
 

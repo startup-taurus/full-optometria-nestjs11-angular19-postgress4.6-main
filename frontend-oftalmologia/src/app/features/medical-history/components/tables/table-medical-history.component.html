@@ -79,10 +79,16 @@
 
 <ng-template #statusTemplate let-row="row" let-rowIndex="rowIndex">
   <span
-    class="badge badge-sm"
-    [class.bg-success]="row.status === 'enviado'"
-    [class.bg-warning]="row.status === 'pendiente'"
-    [class.bg-danger]="row.status === 'cancelado'"
+    class="badge common-badge badge-sm border"
+    [class.bg-success-subtle]="row.status === 'enviado'"
+    [class.text-success-emphasis]="row.status === 'enviado'"
+    [class.border-success-subtle]="row.status === 'enviado'"
+    [class.bg-warning-subtle]="row.status === 'pendiente'"
+    [class.text-warning-emphasis]="row.status === 'pendiente'"
+    [class.border-warning-subtle]="row.status === 'pendiente'"
+    [class.bg-danger-subtle]="row.status === 'cancelado'"
+    [class.text-danger-emphasis]="row.status === 'cancelado'"
+    [class.border-danger-subtle]="row.status === 'cancelado'"
   >
     {{ 'MEDICAL_HISTORY.STATUS.' + row.status.toUpperCase() | translate }}
   </span>
@@ -120,6 +126,16 @@
       placement="left"
     >
       <i class="ti ti-edit"></i>
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      (click)="duplicateRecord(row)"
+      [attr.aria-label]="'Duplicar historia clínica'"
+      [ngbTooltip]="'Duplicar historia clínica'"
+      placement="left"
+    >
+      <i class="ti ti-copy"></i>
     </button>
     <button
       *ngIf="row.status !== 'cancelado'"

@@ -6,6 +6,8 @@ import { environment } from '@/environments/environment'
 import {
   ChartDataResponse,
   ProductsInventoryResponse,
+  TopProductsSoldResponse,
+  PurchaseOrdersSummaryResponse,
   ApiResponse,
 } from '../models/dashboard.model'
 
@@ -74,11 +76,33 @@ export class DashboardService {
       )
   }
 
+  getTopProductsSold(months: number = 1): Observable<TopProductsSoldResponse> {
+    return this.http
+      .get<
+        ApiResponse<TopProductsSoldResponse>
+      >(`${this.apiUrl}/top-products-sold?months=${months}`)
+      .pipe(
+        map((response) => {
+          return response.data
+        })
+      )
+  }
+
   getPatientsAgeDemographics(): Observable<ChartDataResponse> {
     return this.http
       .get<
         ApiResponse<ChartDataResponse>
       >(`${this.apiUrl}/patients-age-demographics`)
+      .pipe(
+        map((response) => {
+          return response.data
+        })
+      )
+  }
+
+  getPurchaseOrdersSummary(): Observable<PurchaseOrdersSummaryResponse> {
+    return this.http
+      .get<ApiResponse<PurchaseOrdersSummaryResponse>>(`${this.apiUrl}/purchase-orders-summary`)
       .pipe(
         map((response) => {
           return response.data

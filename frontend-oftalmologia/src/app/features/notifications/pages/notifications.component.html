@@ -1,301 +1,121 @@
 <page-title title="{{ 'NOTIFICATIONS.TITLE' | translate }}" />
 
-<div class="container-fluid notifications-whatsapp-page">
-  <div class="hero-banner rounded-4 shadow-sm mb-3 p-3 p-md-4">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-      <div>
-        <h5 class="mb-1">{{ 'NOTIFICATIONS.TITLE' | translate }}</h5>
-        <p class="mb-0 text-muted">{{ 'NOTIFICATIONS.DESCRIPTION' | translate }}</p>
-      </div>
-      <div class="d-flex align-items-center gap-2 status-pill" *ngIf="session">
-        <span class="session-dot" [ngClass]="session?.status === 'connected' ? 'is-connected' : 'is-offline'"></span>
-        <span *ngIf="session.status === 'connected'">{{ 'NOTIFICATIONS.SESSION.STATUS_CONNECTED' | translate }}</span>
-        <span *ngIf="session.status === 'qr_ready'">{{ 'NOTIFICATIONS.SESSION.STATUS_QR_READY' | translate }}</span>
-        <span *ngIf="session.status === 'disconnected'">{{ 'NOTIFICATIONS.SESSION.STATUS_DISCONNECTED' | translate }}</span>
+<div class="container-fluid notifications-page">
+  @if (!isConnected()) {
+    <!-- GATE: solo QR card hasta que se conecte -->
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-9 col-xxl-7">
+        <app-whatsapp-qr-card
+          [session]="session()"
+          [loading]="initLoading()"
+          (generate)="onGenerateQr()"
+          (refresh)="onRefreshQr()"
+          (disconnect)="onDisconnect()"
+        ></app-whatsapp-qr-card>
       </div>
     </div>
-  </div>
-
-  <div class="row g-3">
-    <div class="col-12 col-xl-5">
-      <div class="card border-0 shadow-sm rounded-4 card-hover">
-        <div class="card-body">
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-            <h5 class="mb-0">{{ 'NOTIFICATIONS.SESSION.TITLE' | translate }}</h5>
-            <span class="session-dot" [ngClass]="session?.status === 'connected' ? 'is-connected' : 'is-offline'"></span>
-          </div>
-
-          <div class="mb-3" *ngIf="currentUser$ | async as user">
-            <label class="form-label text-muted">{{ 'PROFILE.USERNAME' | translate }}</label>
-            <p class="fw-semibold">{{ user?.name }}</p>
-          </div>
-
-          <div class="d-flex align-items-center gap-2 mb-3" *ngIf="session">
-            <span class="badge rounded-pill px-3 py-2 text-bg-secondary" *ngIf="session.status === 'disconnected'">
-              {{ 'NOTIFICATIONS.SESSION.STATUS_DISCONNECTED' | translate }}
-            </span>
-            <span class="badge rounded-pill px-3 py-2 text-bg-warning" *ngIf="session.status === 'qr_ready'">
-              {{ 'NOTIFICATIONS.SESSION.STATUS_QR_READY' | translate }}
-            </span>
-            <span class="badge rounded-pill px-3 py-2 text-bg-success" *ngIf="session.status === 'connected'">
-              {{ 'NOTIFICATIONS.SESSION.STATUS_CONNECTED' | translate }}
-            </span>
-          </div>
-
-          <div class="small mb-3" *ngIf="session">
-            <span class="text-muted" *ngIf="syncingSession">
-              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-              {{ 'NOTIFICATIONS.SESSION.SYNCING_STATUS' | translate }}
-            </span>
-            <span class="text-muted" *ngIf="!syncingSession && lastSessionSyncAt">
-              {{ 'NOTIFICATIONS.SESSION.LAST_CHECK' | translate:{ time: (lastSessionSyncAt | date:'shortTime') } }}
-            </span>
-          </div>
-
-          <div class="alert alert-info" *ngIf="session?.status !== 'connected'">
-            <small>{{ 'NOTIFICATIONS.SESSION.SETUP_REQUIRED' | translate }}</small>
-          </div>
-
-          <div class="d-flex flex-wrap gap-2 session-actions">
-            <button class="btn btn-outline-danger" (click)="logoutSession()" [disabled]="loadingSession" *ngIf="canShowLogoutAction">
-              {{ 'NOTIFICATIONS.SESSION.LOGOUT' | translate }}
-            </button>
-            <button class="btn btn-primary" (click)="goToProfile()" [disabled]="loadingSession">
-              {{ 'NOTIFICATIONS.SESSION.SETUP_IN_PROFILE' | translate }}
-            </button>
-          </div>
+  } @else {
+    <!-- DASHBOARD: solo cuando está conectado -->
+    <div class="connected-header">
+      <div class="connected-header__left">
+        <div class="connected-header__icon">
+          <i class="ti ti-brand-whatsapp"></i>
+        </div>
+        <div>
+          <h5 class="m-0">{{ 'NOTIFICATIONS.TITLE' | translate }}</h5>
+          <p class="text-muted small mb-0">
+            {{ 'NOTIFICATIONS.DESCRIPTION' | translate }}
+          </p>
         </div>
       </div>
+      <div class="connected-header__right">
+        <app-whatsapp-status-badge status="connected" />
+        @if (session()?.connectedPhone) {
+          <span class="text-muted small">{{ session()?.connectedPhone }}</span>
+        }
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger"
+          (click)="onDisconnect()"
+        >
+          <i class="ti ti-logout me-1"></i>
+          {{ 'NOTIFICATIONS.SESSION.LOGOUT' | translate }}
+        </button>
+      </div>
+    </div>
 
-      <div class="card border-0 shadow-sm rounded-4 card-hover">
-        <div class="card-body" *ngIf="reminderRule">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <h5 class="mb-0">{{ 'NOTIFICATIONS.RULE.TITLE' | translate }}</h5>
+    <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav nav-pills notifications-tabs">
+      <li [ngbNavItem]="1">
+        <a ngbNavLink>
+          <i class="ti ti-user-plus me-1"></i>
+          {{ 'NOTIFICATIONS.TABS.RENEWALS' | translate }}
+        </a>
+        <ng-template ngbNavContent>
+          <app-eligible-patients-table
+            [patients]="eligiblePatients()"
+            [loading]="loadingEligible()"
+            [searchValue]="search()"
+            (searchChange)="onSearchChange($event)"
+            (refresh)="loadEligible()"
+            (selectionChange)="onSelectionChange($event)"
+          ></app-eligible-patients-table>
+
+          <div class="send-bar">
+            <div class="send-bar__info">
+              <i class="ti ti-send text-success"></i>
+              <span>
+                @if (selectedPatientIds().length) {
+                  {{ selectedPatientIds().length }} {{ 'NOTIFICATIONS.ELIGIBLE.SELECTED' | translate }}
+                } @else {
+                  {{ 'NOTIFICATIONS.ELIGIBLE.SELECT_REQUIRED' | translate }}
+                }
+              </span>
+            </div>
             <button
               type="button"
-              class="btn btn-link p-0 text-muted tooltip-trigger"
-              [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_GENERAL' | translate"
-              container="body"
+              class="btn btn-success"
+              [disabled]="!selectedPatientIds().length || sendingManual()"
+              (click)="sendManual()"
             >
-              <i class="ri-information-line"></i>
+              @if (sendingManual()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              } @else {
+                <i class="ti ti-send me-1"></i>
+              }
+              {{ 'NOTIFICATIONS.ELIGIBLE.SEND_MANUAL' | translate }}
             </button>
           </div>
+        </ng-template>
+      </li>
 
-          <div class="row g-2 reminder-grid">
-            <div class="col-6">
-              <label class="form-label d-flex align-items-center gap-1">
-                <span>{{ 'NOTIFICATIONS.RULE.RENEWAL_AFTER_DAYS' | translate }}</span>
-                <i
-                  class="ri-question-line text-muted"
-                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_RENEWAL_AFTER' | translate"
-                  container="body"
-                ></i>
-              </label>
-              <input class="form-control" type="number" [(ngModel)]="reminderRule.renewalAfterDays" />
-            </div>
-            <div class="col-6">
-              <label class="form-label d-flex align-items-center gap-1">
-                <span>{{ 'NOTIFICATIONS.RULE.NOTIFY_BEFORE_DAYS' | translate }}</span>
-                <i
-                  class="ri-question-line text-muted"
-                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_NOTIFY_BEFORE' | translate"
-                  container="body"
-                ></i>
-              </label>
-              <input class="form-control" type="number" [(ngModel)]="reminderRule.renewalNotifyBeforeDays" />
-            </div>
-            <div class="col-6">
-              <label class="form-label d-flex align-items-center gap-1">
-                <span>{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_START' | translate }}</span>
-                <i
-                  class="ri-question-line text-muted"
-                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS_START' | translate"
-                  container="body"
-                ></i>
-              </label>
-              <input class="form-control" type="time" [(ngModel)]="reminderRule.quietHoursStart" />
-            </div>
-            <div class="col-6">
-              <label class="form-label d-flex align-items-center gap-1">
-                <span>{{ 'NOTIFICATIONS.RULE.QUIET_HOURS_END' | translate }}</span>
-                <i
-                  class="ri-question-line text-muted"
-                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_QUIET_HOURS_END' | translate"
-                  container="body"
-                ></i>
-              </label>
-              <input class="form-control" type="time" [(ngModel)]="reminderRule.quietHoursEnd" />
-            </div>
-            <div class="col-12 form-check mt-2 ms-2">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="ruleActive"
-                [(ngModel)]="reminderRule.isActive"
-              />
-              <label class="form-check-label" for="ruleActive">
-                <span>{{ 'NOTIFICATIONS.RULE.ACTIVE' | translate }}</span>
-                <i
-                  class="ri-question-line text-muted ms-1"
-                  [ngbTooltip]="'NOTIFICATIONS.RULE.TOOLTIP_ACTIVE' | translate"
-                  container="body"
-                ></i>
-              </label>
-            </div>
-          </div>
+      <li [ngbNavItem]="2">
+        <a ngbNavLink>
+          <i class="ti ti-settings me-1"></i>
+          {{ 'NOTIFICATIONS.TABS.RULES' | translate }}
+        </a>
+        <ng-template ngbNavContent>
+          <app-reminder-rules-form
+            [rule]="reminderRule()"
+            [saving]="savingRule()"
+            (save)="saveRule($event)"
+          ></app-reminder-rules-form>
+        </ng-template>
+      </li>
 
-          <button class="btn btn-primary mt-3" (click)="saveRule()" [disabled]="savingRule">
-            {{ 'NOTIFICATIONS.RULE.SAVE' | translate }}
-          </button>
-        </div>
-      </div>
-    </div>
+      <li [ngbNavItem]="3">
+        <a ngbNavLink>
+          <i class="ti ti-message me-1"></i>
+          {{ 'NOTIFICATIONS.TABS.TEMPLATE' | translate }}
+        </a>
+        <ng-template ngbNavContent>
+          <app-message-template-editor
+            [value]="manualMessageTemplate()"
+            (valueChange)="onTemplateChange($event)"
+          ></app-message-template-editor>
+        </ng-template>
+      </li>
+    </ul>
 
-    <div class="col-12 col-xl-7">
-      <div class="card border-0 shadow-sm rounded-4 card-hover">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center gap-2 mb-3 flex-wrap">
-            <h5 class="mb-0">{{ 'NOTIFICATIONS.ELIGIBLE.TITLE' | translate }}</h5>
-            <div class="d-flex gap-2">
-              <input
-                class="form-control"
-                [(ngModel)]="search"
-                [placeholder]="'NOTIFICATIONS.ELIGIBLE.SEARCH' | translate"
-              />
-              <button class="btn btn-outline-secondary" (click)="loadEligible()">
-                {{ 'NOTIFICATIONS.ELIGIBLE.REFRESH' | translate }}
-              </button>
-            </div>
-          </div>
-
-          <div class="table-responsive">
-            <table class="table table-sm align-middle patient-table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>{{ 'NOTIFICATIONS.ELIGIBLE.PATIENT' | translate }}</th>
-                  <th>{{ 'NOTIFICATIONS.ELIGIBLE.DOCUMENT' | translate }}</th>
-                  <th>{{ 'NOTIFICATIONS.ELIGIBLE.PHONE' | translate }}</th>
-                  <th>{{ 'NOTIFICATIONS.ELIGIBLE.DAYS' | translate }}</th>
-                  <th>{{ 'NOTIFICATIONS.ELIGIBLE.DUE_SOON' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let patient of eligiblePatients">
-                  <td>
-                    <input
-                      type="checkbox"
-                      [checked]="isSelected(patient.patientId)"
-                      (change)="togglePatient(patient.patientId, $any($event.target).checked)"
-                    />
-                  </td>
-                  <td>{{ patient.firstName }} {{ patient.lastName }}</td>
-                  <td>{{ patient.documentNumber }}</td>
-                  <td>{{ patient.phone }}</td>
-                  <td>{{ patient.daysUntilRenewal }}</td>
-                  <td>
-                    <span class="badge" [ngClass]="patient.isDueSoon ? 'text-bg-success' : 'text-bg-secondary'">
-                      {{ patient.isDueSoon ? ('NOTIFICATIONS.ELIGIBLE.DUE_SOON_YES' | translate) : ('NOTIFICATIONS.ELIGIBLE.DUE_SOON_NO' | translate) }}
-                    </span>
-                  </td>
-                </tr>
-                <tr *ngIf="!eligiblePatients.length">
-                  <td colspan="6" class="text-center text-muted py-4">
-                    {{ 'NOTIFICATIONS.ELIGIBLE.EMPTY' | translate }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
-              <label class="form-label mb-0 d-flex align-items-center gap-1">
-                <span>{{ 'NOTIFICATIONS.ELIGIBLE.MESSAGE_TEMPLATE' | translate }}</span>
-                <i
-                  class="ri-question-line text-muted"
-                  [ngbTooltip]="'NOTIFICATIONS.TEMPLATE.TOOLTIP_MESSAGE_TEMPLATE' | translate"
-                  container="body"
-                ></i>
-              </label>
-              <button class="btn btn-outline-primary btn-sm" (click)="openTemplateModal()">
-                {{ 'NOTIFICATIONS.TEMPLATE.OPEN_EDITOR' | translate }}
-              </button>
-            </div>
-            <textarea class="form-control" rows="4" [(ngModel)]="manualMessageTemplate"></textarea>
-            <small class="text-muted d-block mt-2">
-              {{ 'NOTIFICATIONS.TEMPLATE.HELP' | translate }}
-            </small>
-          </div>
-
-          <button class="btn btn-success" (click)="sendManual()" [disabled]="sendingManual || session?.status !== 'connected'">
-            {{ 'NOTIFICATIONS.ELIGIBLE.SEND_MANUAL' | translate }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div [ngbNavOutlet]="nav" class="notifications-tab-content"></div>
+  }
 </div>
-
-<div class="modal fade show template-modal" tabindex="-1" [style.display]="isTemplateModalOpen ? 'block' : 'none'" [attr.aria-hidden]="!isTemplateModalOpen" *ngIf="isTemplateModalOpen">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg rounded-4 modal-enter">
-      <div class="modal-header">
-        <h5 class="modal-title d-flex align-items-center gap-2">
-          <span>{{ 'NOTIFICATIONS.TEMPLATE.MODAL_TITLE' | translate }}</span>
-          <i
-            class="ri-information-line text-muted"
-            [ngbTooltip]="'NOTIFICATIONS.TEMPLATE.TOOLTIP_MODAL' | translate"
-            container="body"
-          ></i>
-        </h5>
-        <button type="button" class="btn-close ms-auto" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="closeTemplateModal()"></button>
-      </div>
-
-      <div class="modal-body">
-        <p class="text-muted mb-3">
-          {{ 'NOTIFICATIONS.TEMPLATE.MODAL_DESCRIPTION' | translate }}
-        </p>
-
-        <div class="d-flex flex-wrap gap-2 mb-3 template-variable-list">
-          <button
-            type="button"
-            class="btn btn-outline-secondary btn-sm variable-chip"
-            *ngFor="let variable of templateVariables"
-            (click)="insertVariable(variable.key)"
-            [ngbTooltip]="'NOTIFICATIONS.TEMPLATE.TOOLTIP_INSERT' | translate"
-            container="body"
-          >
-            {{ variable.labelKey | translate }}
-          </button>
-        </div>
-
-        <label class="form-label fw-semibold">{{ 'NOTIFICATIONS.TEMPLATE.LABEL' | translate }}</label>
-        <textarea
-          #templateTextarea
-          class="form-control mb-3"
-          rows="5"
-          [(ngModel)]="templateDraft"
-        ></textarea>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="resetTemplateDraft()">
-            {{ 'NOTIFICATIONS.TEMPLATE.RESET_DEFAULT' | translate }}
-          </button>
-        </div>
-
-        <div class="border rounded p-3 bg-body-tertiary">
-          <label class="form-label fw-semibold mb-2">{{ 'NOTIFICATIONS.TEMPLATE.PREVIEW' | translate }}</label>
-          <p class="mb-0" style="white-space: pre-wrap">{{ templatePreview }}</p>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" (click)="closeTemplateModal()">{{ 'COMMON.CANCEL' | translate }}</button>
-        <button type="button" class="btn btn-primary" (click)="applyTemplateDraft()">{{ 'NOTIFICATIONS.TEMPLATE.APPLY' | translate }}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-backdrop fade show" *ngIf="isTemplateModalOpen"></div>

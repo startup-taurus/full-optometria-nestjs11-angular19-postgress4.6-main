@@ -49,7 +49,8 @@ export class ShiftsService {
   async create(
     createShiftDto: CreateShiftDto,
     branchId: string,
-    companyId?: string
+    companyId?: string,
+    createdByUserId?: string
   ) {
     const { patientId, appointmentDate } = createShiftDto;
 
@@ -69,6 +70,7 @@ export class ShiftsService {
       description: normalizedDescription,
       branchId,
       companyId,
+      createdByUserId: createdByUserId || null,
       appointmentDate: appointmentDateTime,
       statusId: pendingStatus.id,
     });

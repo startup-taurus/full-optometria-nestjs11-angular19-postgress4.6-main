@@ -26,7 +26,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousRxOd')"
                   >
-                    <label class="form-label small">RX ANTERIOR</label>
+                    <label class="form-label small">
+                      RX ANTERIOR
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousRxOd')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousRxOd')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousRxOd') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -40,7 +52,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousAddOd')"
                   >
-                    <label class="form-label small">ADD</label>
+                    <label class="form-label small">
+                      ADD
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousAddOd')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousAddOd')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousAddOd') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -52,7 +76,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousOdVl')"
                   >
-                    <label class="form-label small">VL</label>
+                    <label class="form-label small">
+                      VL
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousOdVl')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousOdVl')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousOdVl') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -64,7 +100,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousOdVp')"
                   >
-                    <label class="form-label small">VP</label>
+                    <label class="form-label small">
+                      VP
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousOdVp')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousOdVp')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousOdVp') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -91,7 +139,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousRxOi')"
                   >
-                    <label class="form-label small">RX ANTERIOR</label>
+                    <label class="form-label small">
+                      RX ANTERIOR
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousRxOi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousRxOi')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousRxOi') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -105,7 +165,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousAddOi')"
                   >
-                    <label class="form-label small">ADD</label>
+                    <label class="form-label small">
+                      ADD
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousAddOi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousAddOi')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousAddOi') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -117,7 +189,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousOiVl')"
                   >
-                    <label class="form-label small">VL</label>
+                    <label class="form-label small">
+                      VL
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousOiVl')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousOiVl')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousOiVl') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -129,7 +213,19 @@
                     class="col-md-3"
                     *ngIf="shouldShowField('step2_previousRx', 'previousOiVp')"
                   >
-                    <label class="form-label small">VP</label>
+                    <label class="form-label small">
+                      VP
+                      <small
+                        *ngIf="shouldShowOriginalValue('previousOiVp')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('previousOiVp')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('previousOiVp') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -148,7 +244,19 @@
           >
             <div class="row g-2">
               <div class="col-md-3">
-                <label class="form-label small">AO</label>
+                <label class="form-label small">
+                  AO
+                  <small
+                    *ngIf="shouldShowOriginalValue('previousAo')"
+                    class="ms-1"
+                    [ngClass]="
+                      isOriginalValueModified('previousAo')
+                        ? 'text-success'
+                        : 'text-muted'
+                    "
+                    >({{ getOriginalValue('previousAo') }})</small
+                  >
+                </label>
                 <input
                   type="text"
                   class="form-control"
@@ -167,9 +275,19 @@
           *ngIf="shouldShowField('step1_personalData', 'segmentAnterior')"
         >
           <div class="col-12">
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.ANTERIOR_SEGMENT' | translate
-            }}</label>
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.ANTERIOR_SEGMENT' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('segmentAnterior')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('segmentAnterior')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('segmentAnterior') }})</small
+              >
+            </label>
             <div class="mb-2">
               @for (option of ['OD', 'OI', 'A.O.']; track option) {
                 <div class="form-check form-check-inline">
@@ -230,7 +348,19 @@
                     class="col-md-6"
                     *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVl')"
                   >
-                    <label class="form-label">VL</label>
+                    <label class="form-label">
+                      VL
+                      <small
+                        *ngIf="shouldShowOriginalValue('visualAcuityOdVl')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('visualAcuityOdVl')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('visualAcuityOdVl') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -242,7 +372,19 @@
                     class="col-md-6"
                     *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOdVp')"
                   >
-                    <label class="form-label">VP</label>
+                    <label class="form-label">
+                      VP
+                      <small
+                        *ngIf="shouldShowOriginalValue('visualAcuityOdVp')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('visualAcuityOdVp')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('visualAcuityOdVp') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -269,7 +411,19 @@
                     class="col-md-6"
                     *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVl')"
                   >
-                    <label class="form-label">VL</label>
+                    <label class="form-label">
+                      VL
+                      <small
+                        *ngIf="shouldShowOriginalValue('visualAcuityOiVl')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('visualAcuityOiVl')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('visualAcuityOiVl') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -281,7 +435,19 @@
                     class="col-md-6"
                     *ngIf="shouldShowField('step2_visualAcuity', 'visualAcuityOiVp')"
                   >
-                    <label class="form-label">VP</label>
+                    <label class="form-label">
+                      VP
+                      <small
+                        *ngIf="shouldShowOriginalValue('visualAcuityOiVp')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('visualAcuityOiVp')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{ getOriginalValue('visualAcuityOiVp') }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
@@ -289,109 +455,6 @@
                       [placeholder]="'MEDICAL_HISTORY.PLACEHOLDERS.OI_VP' | translate"
                     />
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-lg-6 mb-4" *ngIf="shouldShowSection('step2_lensTypes')">
-    <div class="card">
-      <div class="card-header">
-        <h6 class="mb-0">
-          <i class="ti ti-eye me-2"></i>
-          {{ 'MEDICAL_HISTORY.FIELDS.LENS_TYPES' | translate }}
-        </h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div
-            class="col-12"
-            *ngIf="shouldShowField('step2_lensTypes', 'lensTypes')"
-          >
-            <label class="form-label mb-3"
-              >{{
-                'MEDICAL_HISTORY.FIELDS.SELECT_LENS_TYPES' | translate
-              }}:</label
-            >
-            <div class="row">
-              <div
-                class="col-md-6 mb-3"
-                *ngFor="let lensType of lensTypeOptions"
-              >
-                <div class="toggle-switch">
-                  <input
-                    type="checkbox"
-                    [id]="'lens-' + lensType"
-                    class="toggle-input"
-                    [checked]="isLensTypeSelected(lensType)"
-                    (change)="toggleLensType(lensType)"
-                  />
-                  <label [for]="'lens-' + lensType" class="toggle-label">
-                    <span class="toggle-slider"></span>
-                    <span class="toggle-text">
-                      {{ lensType | titlecase }}
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="col-lg-6 mb-4"
-    *ngIf="shouldShowSection('step2_additionalTreatments')"
-  >
-    <div class="card">
-      <div class="card-header">
-        <h6 class="mb-0">
-          <i class="ti ti-circle-half me-2"></i>
-          {{ 'MEDICAL_HISTORY.FIELDS.ADDITIONAL_TREATMENTS' | translate }}
-        </h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div
-            class="col-12"
-            *ngIf="
-              shouldShowField(
-                'step2_additionalTreatments',
-                'additionalTreatments'
-              )
-            "
-          >
-            <label class="form-label mb-3"
-              >{{
-                'MEDICAL_HISTORY.FIELDS.SELECT_ADDITIONAL_TREATMENTS'
-                  | translate
-              }}:</label
-            >
-            <div class="row">
-              <div
-                class="col-md-6 mb-3"
-                *ngFor="let treatment of additionalTreatmentOptions"
-              >
-                <div class="toggle-switch">
-                  <input
-                    type="checkbox"
-                    [id]="'treatment-' + treatment"
-                    class="toggle-input"
-                    [checked]="isAdditionalTreatmentSelected(treatment)"
-                    (change)="toggleAdditionalTreatment(treatment)"
-                  />
-                  <label [for]="'treatment-' + treatment" class="toggle-label">
-                    <span class="toggle-slider"></span>
-                    <span class="toggle-text">
-                      {{ treatment | titlecase }}
-                    </span>
-                  </label>
                 </div>
               </div>
             </div>
@@ -437,11 +500,19 @@
                 *ngIf="getMotorTestControl('exophoria')?.get('applies')?.value"
               >
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.od')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.exophoria.od')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.exophoria.od') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -452,9 +523,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.oi')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.exophoria.oi')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.exophoria.oi') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -465,9 +546,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.value')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.exophoria.value')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.exophoria.value') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -505,11 +596,19 @@
                 *ngIf="getMotorTestControl('endophoria')?.get('applies')?.value"
               >
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.od')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.endophoria.od')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.endophoria.od') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -520,9 +619,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.oi')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.endophoria.oi')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.endophoria.oi') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -533,9 +642,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.value')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.endophoria.value')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.endophoria.value') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -573,11 +692,19 @@
                 *ngIf="getMotorTestControl('exotropia')?.get('applies')?.value"
               >
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.od')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.exotropia.od')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.exotropia.od') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -588,9 +715,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.oi')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.exotropia.oi')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.exotropia.oi') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -601,9 +738,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.value')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.exotropia.value')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.exotropia.value') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -641,11 +788,19 @@
                 *ngIf="getMotorTestControl('endotropia')?.get('applies')?.value"
               >
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.od')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.endotropia.od')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.endotropia.od') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -656,9 +811,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.oi')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.endotropia.oi')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.endotropia.oi') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -669,9 +834,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.value')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.endotropia.value')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.endotropia.value') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -713,11 +888,19 @@
                 "
               >
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.od')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.hyperphoria.od')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.hyperphoria.od') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -728,9 +911,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.oi')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.hyperphoria.oi')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.hyperphoria.oi') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -741,9 +934,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.value')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.hyperphoria.value')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.hyperphoria.value') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -781,11 +984,19 @@
                 *ngIf="getMotorTestControl('hypotropia')?.get('applies')?.value"
               >
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.od')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.hypotropia.od')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.hypotropia.od') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -796,9 +1007,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.oi')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.hypotropia.oi')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.hypotropia.oi') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -809,9 +1030,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.value')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.hypotropia.value')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.hypotropia.value') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -851,11 +1082,19 @@
                 "
               >
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
-                    }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.alternating.od')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.alternating.od')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.alternating.od') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -866,9 +1105,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.alternating.oi')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.alternating.oi')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.alternating.oi') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -879,9 +1128,19 @@
                   />
                 </div>
                 <div class="col-md-4 mb-2">
-                  <label class="form-label small"
-                    >{{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:</label
-                  >
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.alternating.value')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.alternating.value')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.alternating.value') }})</small
+                    >
+                  </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
@@ -899,15 +1158,18 @@
     </div>
   </div>
 
-  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step2_finalRx')">
+  <div
+    class="col-lg-12 mb-4"
+    *ngIf="shouldShowSection('step2_pupillaryReflexes')"
+  >
     <div class="card">
       <div class="card-header">
         <h6 class="mb-0">
-          <i class="ti ti-first-aid-kit me-2"></i>
-          {{ 'MEDICAL_HISTORY.FIELDS.FINAL_RX' | translate }}
+          <i class="ti ti-circle me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.PUPILLARY_REFLEXES' | translate }}
         </h6>
       </div>
-      <div class="card-body">
+      <div class="card-body" formGroupName="pupillaryReflexes">
         <div class="row g-2">
           <div class="col-12">
             <div class="row g-2 align-items-center">
@@ -920,83 +1182,105 @@
               <div class="col">
                 <div class="row g-2">
                   <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdSphere')"
+                    class="col-md-4"
+                    formGroupName="photomotor"
+                    *ngIf="shouldShowField('step2_pupillaryReflexes', 'photomotor')"
                   >
-                    <label class="form-label small">{{
-                      'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
-                    }}</label>
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.PUPILLARY_REFLEXES.PHOTOMOTOR'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('pupillaryReflexes.photomotor.od')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified(
+                            'pupillaryReflexes.photomotor.od'
+                          )
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('pupillaryReflexes.photomotor.od')
+                        }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
-                      formControlName="finalRxOdSphere"
-                      [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
-                    />
-                  </div>
-                  <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdCylinder')"
-                  >
-                    <label class="form-label small">{{
-                      'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
-                    }}</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="finalRxOdCylinder"
+                      formControlName="od"
                       [placeholder]="
-                        'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                        'MEDICAL_HISTORY.PLACEHOLDERS.PHOTOMOTOR_OD' | translate
                       "
                     />
                   </div>
                   <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAxis')"
+                    class="col-md-4"
+                    formGroupName="consensual"
+                    *ngIf="shouldShowField('step2_pupillaryReflexes', 'consensual')"
                   >
-                    <label class="form-label small">{{
-                      'MEDICAL_HISTORY.FIELDS.AXIS' | translate
-                    }}</label>
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.PUPILLARY_REFLEXES.CONSENSUAL'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('pupillaryReflexes.consensual.od')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified(
+                            'pupillaryReflexes.consensual.od'
+                          )
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('pupillaryReflexes.consensual.od')
+                        }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
-                      formControlName="finalRxOdAxis"
-                      [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.CONSENSUAL_OD' | translate
+                      "
                     />
                   </div>
                   <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAdd')"
+                    class="col-md-4"
+                    formGroupName="accommodative"
+                    *ngIf="shouldShowField('step2_pupillaryReflexes', 'accommodative')"
                   >
-                    <label class="form-label small">ADD</label>
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.PUPILLARY_REFLEXES.ACCOMMODATIVE'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('pupillaryReflexes.accommodative.od')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified(
+                            'pupillaryReflexes.accommodative.od'
+                          )
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('pupillaryReflexes.accommodative.od')
+                        }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
-                      formControlName="finalRxOdAdd"
-                      placeholder="ADD"
-                    />
-                  </div>
-                  <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVl')"
-                  >
-                    <label class="form-label small">AV VL</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="correctedAvOdVl"
-                      placeholder="AV VL"
-                    />
-                  </div>
-                  <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOdAvVp')"
-                  >
-                    <label class="form-label small">AV VP</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="correctedAvOdVp"
-                      placeholder="AV VP"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.ACCOMMODATIVE_OD' | translate
+                      "
                     />
                   </div>
                 </div>
@@ -1015,83 +1299,105 @@
               <div class="col">
                 <div class="row g-2">
                   <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiSphere')"
+                    class="col-md-4"
+                    formGroupName="photomotor"
+                    *ngIf="shouldShowField('step2_pupillaryReflexes', 'photomotor')"
                   >
-                    <label class="form-label small">{{
-                      'MEDICAL_HISTORY.FIELDS.SPHERE' | translate
-                    }}</label>
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.PUPILLARY_REFLEXES.PHOTOMOTOR'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('pupillaryReflexes.photomotor.oi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified(
+                            'pupillaryReflexes.photomotor.oi'
+                          )
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('pupillaryReflexes.photomotor.oi')
+                        }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
-                      formControlName="finalRxOiSphere"
-                      [placeholder]="'MEDICAL_HISTORY.FIELDS.SPHERE' | translate"
-                    />
-                  </div>
-                  <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiCylinder')"
-                  >
-                    <label class="form-label small">{{
-                      'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
-                    }}</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="finalRxOiCylinder"
+                      formControlName="oi"
                       [placeholder]="
-                        'MEDICAL_HISTORY.FIELDS.CYLINDER' | translate
+                        'MEDICAL_HISTORY.PLACEHOLDERS.PHOTOMOTOR_OI' | translate
                       "
                     />
                   </div>
                   <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAxis')"
+                    class="col-md-4"
+                    formGroupName="consensual"
+                    *ngIf="shouldShowField('step2_pupillaryReflexes', 'consensual')"
                   >
-                    <label class="form-label small">{{
-                      'MEDICAL_HISTORY.FIELDS.AXIS' | translate
-                    }}</label>
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.PUPILLARY_REFLEXES.CONSENSUAL'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('pupillaryReflexes.consensual.oi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified(
+                            'pupillaryReflexes.consensual.oi'
+                          )
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('pupillaryReflexes.consensual.oi')
+                        }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
-                      formControlName="finalRxOiAxis"
-                      [placeholder]="'MEDICAL_HISTORY.FIELDS.AXIS' | translate"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.CONSENSUAL_OI' | translate
+                      "
                     />
                   </div>
                   <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAdd')"
+                    class="col-md-4"
+                    formGroupName="accommodative"
+                    *ngIf="shouldShowField('step2_pupillaryReflexes', 'accommodative')"
                   >
-                    <label class="form-label small">ADD</label>
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.PUPILLARY_REFLEXES.ACCOMMODATIVE'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('pupillaryReflexes.accommodative.oi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified(
+                            'pupillaryReflexes.accommodative.oi'
+                          )
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('pupillaryReflexes.accommodative.oi')
+                        }})</small
+                      >
+                    </label>
                     <input
                       type="text"
                       class="form-control"
-                      formControlName="finalRxOiAdd"
-                      placeholder="ADD"
-                    />
-                  </div>
-                  <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVl')"
-                  >
-                    <label class="form-label small">AV VL</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="correctedAvOiVl"
-                      placeholder="AV VL"
-                    />
-                  </div>
-                  <div
-                    class="col-md-2"
-                    *ngIf="shouldShowField('step2_finalRx', 'finalRxOiAvVp')"
-                  >
-                    <label class="form-label small">AV VP</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="correctedAvOiVp"
-                      placeholder="AV VP"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.ACCOMMODATIVE_OI' | translate
+                      "
                     />
                   </div>
                 </div>
@@ -1099,25 +1405,461 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <hr class="my-4" *ngIf="shouldShowSection('step2_professionalName')" />
-
-        <div class="row" *ngIf="shouldShowSection('step2_professionalName')">
+  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step2_ophthalmoscopy')">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="ti ti-droplet me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.OPHTHALMOSCOPY' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
           <div
-            class="col-12 mb-3"
-            *ngIf="
-              shouldShowField('step2_professionalName', 'professionalName')
-            "
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('step2_ophthalmoscopy', 'ophthalmoscopyOd')"
           >
-            <label class="form-label">{{
-              'MEDICAL_HISTORY.FIELDS.PROFESSIONAL' | translate
-            }}</label>
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('ophthalmoscopyOd')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('ophthalmoscopyOd')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('ophthalmoscopyOd') }})</small
+              >
+            </label>
+            <textarea
+              class="form-control"
+              rows="4"
+              formControlName="ophthalmoscopyOd"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.OPHTHALMOSCOPY_OD' | translate
+              "
+            ></textarea>
+          </div>
+          <div
+            class="col-md-6 mb-3"
+            *ngIf="shouldShowField('step2_ophthalmoscopy', 'ophthalmoscopyOi')"
+          >
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('ophthalmoscopyOi')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('ophthalmoscopyOi')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('ophthalmoscopyOi') }})</small
+              >
+            </label>
+            <textarea
+              class="form-control"
+              rows="4"
+              formControlName="ophthalmoscopyOi"
+              [placeholder]="
+                'MEDICAL_HISTORY.PLACEHOLDERS.OPHTHALMOSCOPY_OI' | translate
+              "
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="col-lg-12 mb-4"
+    *ngIf="shouldShowSection('step2_refractiveTests')"
+  >
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="ti ti-glasses me-2"></i>
+          {{ 'MEDICAL_HISTORY.REFRACTIVE_TESTS.TITLE' | translate }}
+        </h6>
+      </div>
+      <div class="card-body" formGroupName="refractiveTests">
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-primary mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-3"
+                    formGroupName="keratometry"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'keratometry')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.KERATOMETRY'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.keratometry.od')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.keratometry.od')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.keratometry.od')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.KERATOMETRY_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="autorefract"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'autorefract')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.AUTOREFRACT'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.autorefract.od')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.autorefract.od')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.autorefract.od')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.AUTOREFRACT_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="refraction"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'refraction')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.REFRACTION'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.refraction.od')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.refraction.od')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.refraction.od')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.REFRACTION_OD' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="subjective"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'subjective')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.SUBJECTIVE'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.subjective.od')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.subjective.od')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.subjective.od')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="od"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.SUBJECTIVE_OD' | translate
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <label class="fw-bold text-success mb-0">
+                  <i class="ti ti-circle-filled me-1"></i>
+                  {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}
+                </label>
+              </div>
+              <div class="col">
+                <div class="row g-2">
+                  <div
+                    class="col-md-3"
+                    formGroupName="keratometry"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'keratometry')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.KERATOMETRY'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.keratometry.oi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.keratometry.oi')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.keratometry.oi')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.KERATOMETRY_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="autorefract"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'autorefract')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.AUTOREFRACT'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.autorefract.oi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.autorefract.oi')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.autorefract.oi')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.AUTOREFRACT_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="refraction"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'refraction')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.REFRACTION'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.refraction.oi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.refraction.oi')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.refraction.oi')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.REFRACTION_OI' | translate
+                      "
+                    />
+                  </div>
+                  <div
+                    class="col-md-3"
+                    formGroupName="subjective"
+                    *ngIf="shouldShowField('step2_refractiveTests', 'subjective')"
+                  >
+                    <label class="form-label">
+                      {{
+                        'MEDICAL_HISTORY.REFRACTIVE_TESTS.SUBJECTIVE'
+                          | translate
+                      }}
+                      <small
+                        *ngIf="shouldShowOriginalValue('refractiveTests.subjective.oi')"
+                        class="ms-1"
+                        [ngClass]="
+                          isOriginalValueModified('refractiveTests.subjective.oi')
+                            ? 'text-success'
+                            : 'text-muted'
+                        "
+                        >({{
+                          getOriginalValue('refractiveTests.subjective.oi')
+                        }})</small
+                      >
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="oi"
+                      [placeholder]="
+                        'MEDICAL_HISTORY.PLACEHOLDERS.SUBJECTIVE_OI' | translate
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-12 mb-4" *ngIf="shouldShowSection('step2_otherExams')">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="ti ti-droplet me-2"></i>
+          {{ 'MEDICAL_HISTORY.FIELDS.OTHER_EXAMS' | translate }}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div
+            class="col-md-4 mb-3"
+            *ngIf="shouldShowField('step2_otherExams', 'stereopsis')"
+          >
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.STEREOPSIS' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('stereopsis')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('stereopsis')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('stereopsis') }})</small
+              >
+            </label>
             <input
               type="text"
               class="form-control"
-              formControlName="professionalName"
+              formControlName="stereopsis"
+              [placeholder]="'MEDICAL_HISTORY.FIELDS.STEREOPSIS' | translate"
+            />
+          </div>
+          <div
+            class="col-md-4 mb-3"
+            *ngIf="shouldShowField('step2_otherExams', 'worthTest')"
+          >
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.WORTH_TEST' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('worthTest')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('worthTest')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('worthTest') }})</small
+              >
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="worthTest"
+              [placeholder]="'MEDICAL_HISTORY.FIELDS.WORTH_TEST' | translate"
+            />
+          </div>
+          <div
+            class="col-md-4 mb-3"
+            *ngIf="shouldShowField('step2_otherExams', 'otherNotes')"
+          >
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.OTHER_NOTES' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('otherNotes')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('otherNotes')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('otherNotes') }})</small
+              >
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="otherNotes"
               [placeholder]="
-                'MEDICAL_HISTORY.PLACEHOLDERS.PROFESSIONAL_NAME' | translate
+                'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_NOTES' | translate
               "
             />
           </div>

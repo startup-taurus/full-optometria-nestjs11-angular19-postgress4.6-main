@@ -1,0 +1,54 @@
+<div class="modal-header border-0 pb-2">
+  <h5 class="modal-title fw-semibold">{{ 'CLIENT.SINGULAR' | translate }}</h5>
+  <button type="button" class="btn-close ms-auto" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body pt-0">
+  <div class="row g-3">
+    <div class="col-12 col-md-6">
+      <label class="text-muted small">{{ 'CLIENT.FIRST_NAME' | translate }}</label>
+      <div class="fw-semibold">{{ client.firstName || '-' }}</div>
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="text-muted small">{{ 'CLIENT.LAST_NAME' | translate }}</label>
+      <div class="fw-semibold">{{ client.lastName || '-' }}</div>
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="text-muted small">{{ 'CLIENT.DOCUMENT_NUMBER' | translate }}</label>
+      <div>{{ client.documentNumber || '-' }}</div>
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="text-muted small">{{ 'CLIENT.EMAIL' | translate }}</label>
+      <div>{{ client.email || '-' }}</div>
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="text-muted small">{{ 'CLIENT.MOBILE_PHONE' | translate }}</label>
+      <div>{{ client.mobilePhone || '-' }}</div>
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="text-muted small">{{ 'CLIENT.HOME_PHONE' | translate }}</label>
+      <div>{{ client.homePhone || '-' }}</div>
+    </div>
+    <div class="col-12">
+      <label class="text-muted small">{{ 'CLIENT.ADDRESS' | translate }}</label>
+      <div>{{ client.address || '-' }}</div>
+    </div>
+    <div class="col-12">
+      <label class="text-muted small">{{ 'CLIENT.PATIENT_LINK' | translate }}</label>
+      <div>
+        <span *ngIf="(client.patientIds?.length || client.patients?.length || 0) > 0; else noLink">
+          <span *ngFor="let patient of patientLinks; let isLast = last">
+            {{ patient.firstName }} {{ patient.lastName }}<span *ngIf="!isLast">, </span>
+          </span>
+        </span>
+        <ng-template #noLink>{{ 'CLIENT.WITHOUT_PATIENT_LINK' | translate }}</ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer border-0 pt-2">
+  <button type="button" class="btn btn-light" (click)="activeModal.dismiss()">
+    {{ 'COMMON.CLOSE' | translate }}
+  </button>
+</div>

@@ -2,9 +2,17 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  In,
+  QueryFailedError,
+  Repository,
+} from 'typeorm';
 import { LaboratoryOrder } from './entities/laboratory-order.entity';
 import { LaboratoryOrderStatus } from './entities/laboratory-order.entity';
 import { ClinicalHistory } from '../clinical-histories/entities/clinical-history.entity';
@@ -15,6 +23,9 @@ import { UpdateLaboratoryOrderDto } from './dtos/update-laboratory-order.dto';
 import { QueryLaboratoryOrderDto } from './dtos/query-laboratory-order.dto';
 import { PaginationUtil } from '../../common/utils/pagination.util';
 import { CompanyFilterUtil } from '../../common/utils/company-filter.util';
+import { PurchaseOrdersService } from '../purchase-orders/purchase-orders.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { Branch } from '../branches/entities/branch.entity';
 
 @Injectable()
 export class LaboratoryOrdersService {
@@ -25,21 +36,31 @@ export class LaboratoryOrdersService {
     @InjectRepository(ClinicalHistory)
     private clinicalHistoryRepository: Repository<ClinicalHistory>,
     @InjectRepository(Product)
-    private productRepository: Repository<Product>
+    private productRepository: Repository<Product>,
+    @InjectRepository(Branch)
+    private branchRepository: Repository<Branch>,
+    @Inject(forwardRef(() => PurchaseOrdersService))
+    private purchaseOrdersService: PurchaseOrdersService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(
     createDto: CreateLaboratoryOrderDto,
     branchId: string,
-    companyId?: string
+    companyId?: string,
+    createdByUserId?: string,
   ) {
     const maxRetries = 3;
     let lastError: any;
+    const effectiveCompanyId = await this.resolveEffectiveCompanyId(
+      branchId,
+      companyId ?? null,
+    );
     const normalizedCreateDto = this.normalizeProductSelection(createDto);
     const attendanceDate = await this.resolveAttendanceDate(
       normalizedCreateDto,
       branchId,
-      companyId
+      effectiveCompanyId,
     );
     const normalizedCreateDtoWithAttendance = {
       ...normalizedCreateDto,
@@ -61,7 +82,7 @@ export class LaboratoryOrdersService {
         const products = productIds.length
           ? await queryRunner.manager.getRepository(Product).find({
               where: { id: In(productIds), branchId },
-              select: ['id', 'code', 'name', 'quantity'],
+              select: ['id', 'code', 'name', 'quantity', 'unitPrice'],
             })
           : [];
 
@@ -108,7 +129,21 @@ export class LaboratoryOrdersService {
           });
         }
 
-        const orderNumber = await this.generateOrderNumber();
+        const effectiveClientId =
+          normalizedCreateDtoWithAttendance.clientId ?? null;
+
+        await this.lockOrderNumberScope(
+          queryRunner.manager,
+          effectiveCompanyId,
+        );
+        const orderNumber = await this.generateOrderNumber(
+          effectiveCompanyId,
+          queryRunner.manager,
+        );
+        const persistedLineItems = this.buildPersistedLineItems(
+          normalizedLineItems,
+          productMap
+        );
 
         const {
           lineItems: _lineItems,
@@ -120,10 +155,12 @@ export class LaboratoryOrdersService {
           .getRepository(LaboratoryOrder)
           .create({
           ...persistableCreateDto,
+          clientId: effectiveClientId,
           branchId,
-          companyId,
+          companyId: effectiveCompanyId,
+          createdByUserId: createdByUserId || null,
           orderNumber,
-          productQuantities: normalizedLineItems,
+          productQuantities: persistedLineItems,
           status: LaboratoryOrderStatus.PENDING,
         });
 
@@ -149,7 +186,7 @@ export class LaboratoryOrdersService {
               const movement = queryRunner.manager
                 .getRepository(StockMovement)
                 .create({
-                  companyId: companyId || null,
+                  companyId: effectiveCompanyId || null,
                   branchId,
                   productId: lineItem.productId,
                   movementType: 'LABORATORY_ORDER_CREATE',
@@ -168,7 +205,7 @@ export class LaboratoryOrdersService {
         if (normalizedCreateDtoWithAttendance.clinicalHistoryId) {
           const whereCondition = CompanyFilterUtil.buildWhereCondition(
             { id: normalizedCreateDtoWithAttendance.clinicalHistoryId, branchId },
-            companyId
+            effectiveCompanyId
           );
           await queryRunner.manager.getRepository(ClinicalHistory).update(whereCondition, {
             isSent: true,
@@ -180,11 +217,31 @@ export class LaboratoryOrdersService {
         const orderWithRelations = await this.laboratoryOrderRepository.findOne(
           {
             where: { id: savedOrder.id },
-            relations: ['patient', 'product', 'branch'],
+            relations: ['patient', 'product', 'branch', 'client'],
           }
         );
 
+        let purchaseOrderWarning: { es: string; en: string } | null = null;
+
+        try {
+          await this.purchaseOrdersService.createFromLaboratoryOrder(
+            savedOrder.id,
+            effectiveClientId,
+            effectiveCompanyId,
+            branchId,
+          );
+        } catch (error) {
+          purchaseOrderWarning = {
+            es: 'La orden de laboratorio fue creada, pero no se pudo crear la orden de pedido automáticamente',
+            en: 'Laboratory order was created, but purchase order could not be generated automatically',
+          };
+          console.error('Error creating purchase order:', error);
+        }
+
         const response = await this.formatResponse(orderWithRelations);
+        if (purchaseOrderWarning) {
+          (response as any).warning = purchaseOrderWarning;
+        }
         return response;
       } catch (error) {
         try {
@@ -193,7 +250,12 @@ export class LaboratoryOrdersService {
         }
         await queryRunner.release();
         lastError = error;
-        if (error.code === '23505' && attempt < maxRetries - 1) {
+        const isUniqueConstraintError =
+          error instanceof QueryFailedError &&
+          (error as QueryFailedError & { driverError?: { code?: string } })
+            .driverError?.code === '23505';
+
+        if (isUniqueConstraintError && attempt < maxRetries - 1) {
           await new Promise((resolve) =>
             setTimeout(resolve, 100 * (attempt + 1))
           );
@@ -219,6 +281,7 @@ export class LaboratoryOrdersService {
       page,
       limit,
       patientFilterId,
+      orderId,
       isConfirmed,
       cedula,
       firstName,
@@ -235,6 +298,7 @@ export class LaboratoryOrdersService {
       .createQueryBuilder('lo')
       .leftJoinAndSelect('lo.patient', 'patient')
       .leftJoinAndSelect('lo.product', 'product')
+      .leftJoinAndSelect('lo.client', 'client')
       .leftJoinAndSelect('lo.branch', 'branch')
       .where('lo.branchId = :branchId', { branchId });
 
@@ -244,6 +308,10 @@ export class LaboratoryOrdersService {
       queryBuilder.andWhere('lo.patientId = :patientFilterId', {
         patientFilterId,
       });
+    }
+
+    if (orderId) {
+      queryBuilder.andWhere('lo.id = :orderId', { orderId });
     }
 
     if (typeof isConfirmed === 'boolean') {
@@ -320,7 +388,7 @@ export class LaboratoryOrdersService {
 
     const laboratoryOrder = await this.laboratoryOrderRepository.findOne({
       where: whereCondition,
-      relations: ['patient', 'product', 'branch'],
+      relations: ['patient', 'product', 'branch', 'client'],
     });
 
     if (!laboratoryOrder) {
@@ -359,7 +427,18 @@ export class LaboratoryOrdersService {
     };
 
     if (Object.prototype.hasOwnProperty.call(normalizedUpdateDto, 'lineItems')) {
-      updatePayload.productQuantities = normalizedLineItems;
+      const productIds = normalizedLineItems.map((line) => line.productId);
+      const products = productIds.length
+        ? await this.productRepository.find({
+            where: { id: In(productIds), branchId },
+            select: ['id', 'unitPrice'],
+          })
+        : [];
+      const productMap = new Map(products.map((product) => [product.id, product]));
+      updatePayload.productQuantities = this.buildPersistedLineItems(
+        normalizedLineItems,
+        productMap
+      );
     }
 
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
@@ -376,7 +455,8 @@ export class LaboratoryOrdersService {
     id: string,
     status: LaboratoryOrderStatus | null,
     branchId: string,
-    companyId?: string
+    companyId?: string,
+    updatedByUserId?: string,
   ) {
     const existingOrder = await this.findOne(id, branchId, companyId);
 
@@ -399,6 +479,8 @@ export class LaboratoryOrdersService {
     }
 
     const normalizedStatus = this.normalizeStatus(status);
+    const previousStatus = this.normalizeStatus(existingOrder?.status) ||
+      this.deriveStatusFromLegacyFlag(existingOrder?.isConfirmed);
 
     if (!normalizedStatus) {
       throw new BadRequestException({
@@ -407,10 +489,45 @@ export class LaboratoryOrdersService {
       });
     }
 
+    if (normalizedStatus === LaboratoryOrderStatus.CANCELLED) {
+      await this.purchaseOrdersService.cancelByLaboratoryOrderId(
+        id,
+        branchId,
+        companyId || null,
+      );
+
+      return this.findOne(id, branchId, companyId);
+    }
+
+    if (
+      normalizedStatus === LaboratoryOrderStatus.PENDING &&
+      previousStatus === LaboratoryOrderStatus.CANCELLED
+    ) {
+      await this.purchaseOrdersService.reactivateByLaboratoryOrderId(
+        id,
+        branchId,
+        companyId || null,
+      );
+
+      return this.findOne(id, branchId, companyId);
+    }
+
     await this.laboratoryOrderRepository.update(whereCondition, {
       status: normalizedStatus,
       isConfirmed: this.getLegacyConfirmedValue(normalizedStatus),
     });
+
+    if (
+      previousStatus !== LaboratoryOrderStatus.RECEIVED &&
+      normalizedStatus === LaboratoryOrderStatus.RECEIVED
+    ) {
+      await this.notificationsService.sendLaboratoryOrderReceivedReminder(
+        id,
+        branchId,
+        companyId || null,
+        updatedByUserId || null,
+      );
+    }
 
     const updatedOrder = await this.findOne(id, branchId, companyId);
     return updatedOrder;
@@ -426,19 +543,18 @@ export class LaboratoryOrdersService {
       });
     }
 
-    const whereCondition = CompanyFilterUtil.buildWhereCondition(
-      { id, branchId },
-      companyId
+    await this.purchaseOrdersService.cancelByLaboratoryOrderId(
+      id,
+      branchId,
+      companyId || null,
     );
-    await this.laboratoryOrderRepository.delete(whereCondition);
-
-    const resolvedStatus =
-      this.normalizeStatus(laboratoryOrder.status) ||
-      this.deriveStatusFromLegacyFlag(laboratoryOrder.isConfirmed);
 
     return {
-      messageKey: 'SUCCESS.DELETED',
-      message: 'Laboratory order deleted successfully',
+      messageKey: 'LABORATORY_ORDER.CANCELLED',
+      message: {
+        es: 'Orden de laboratorio cancelada correctamente',
+        en: 'Laboratory order cancelled successfully',
+      },
     };
   }
 
@@ -525,6 +641,7 @@ export class LaboratoryOrdersService {
       orderNumber: laboratoryOrder.orderNumber,
       branchId: laboratoryOrder.branchId,
       patientId: laboratoryOrder.patientId,
+      clientId: laboratoryOrder.clientId,
       clinicalHistoryId: laboratoryOrder.clinicalHistoryId,
       attendanceDate: laboratoryOrder.attendanceDate,
       deliveryDate: laboratoryOrder.deliveryDate,
@@ -580,6 +697,18 @@ export class LaboratoryOrdersService {
             homePhone: laboratoryOrder.patient.homePhone,
           }
         : null,
+      client: laboratoryOrder.client
+        ? {
+            id: laboratoryOrder.client.id,
+            firstName: laboratoryOrder.client.firstName,
+            lastName: laboratoryOrder.client.lastName,
+            documentNumber: laboratoryOrder.client.documentNumber,
+            email: laboratoryOrder.client.email,
+            mobilePhone: laboratoryOrder.client.mobilePhone,
+            homePhone: laboratoryOrder.client.homePhone,
+            address: laboratoryOrder.client.address,
+          }
+        : null,
       product: primaryProduct,
       products,
       branch: laboratoryOrder.branch
@@ -625,7 +754,7 @@ export class LaboratoryOrdersService {
 
     const products = await this.productRepository.find({
       where: { id: In(productIds) },
-      select: ['id', 'code', 'name', 'brand', 'quantity'],
+      select: ['id', 'code', 'name', 'brand', 'quantity', 'unitPrice'],
     });
 
     const productsById = new Map(products.map((product) => [product.id, product]));
@@ -639,6 +768,7 @@ export class LaboratoryOrdersService {
         name: product.name,
         brand: product.brand,
         quantity: product.quantity,
+        unitPrice: product.unitPrice,
       }));
   }
 
@@ -710,6 +840,10 @@ export class LaboratoryOrdersService {
       case 'delivered':
       case 'entregado':
         return LaboratoryOrderStatus.DELIVERED;
+      case LaboratoryOrderStatus.CANCELLED:
+      case 'cancelled':
+      case 'cancelado':
+        return LaboratoryOrderStatus.CANCELLED;
       default:
         return null;
     }
@@ -725,7 +859,7 @@ export class LaboratoryOrdersService {
 
   private normalizeLineItems(
     dto: Partial<CreateLaboratoryOrderDto>
-  ): Array<{ productId: string; quantity: number }> {
+  ): Array<{ productId: string; quantity: number; discount: number }> {
     const sourceItems = Array.isArray(dto.lineItems) ? dto.lineItems : [];
 
     if (!sourceItems.length) {
@@ -739,10 +873,14 @@ export class LaboratoryOrdersService {
         )
       );
 
-      return normalizedIds.map((productId) => ({ productId, quantity: 1 }));
+      return normalizedIds.map((productId) => ({
+        productId,
+        quantity: 1,
+        discount: 0,
+      }));
     }
 
-    const grouped = new Map<string, number>();
+    const grouped = new Map<string, { quantity: number; discount: number }>();
 
     sourceItems.forEach((lineItem) => {
       if (!lineItem || typeof lineItem.productId !== 'string') {
@@ -759,72 +897,149 @@ export class LaboratoryOrdersService {
         ? Math.max(1, Math.floor(parsedQuantity))
         : 1;
 
-      grouped.set(productId, (grouped.get(productId) || 0) + quantity);
+      const parsedDiscount = Number(lineItem.discount || 0);
+      const discount = Number.isFinite(parsedDiscount) && parsedDiscount > 0
+        ? Number(parsedDiscount.toFixed(2))
+        : 0;
+
+      const current = grouped.get(productId) || { quantity: 0, discount: 0 };
+      grouped.set(productId, {
+        quantity: current.quantity + quantity,
+        discount: discount > 0 ? discount : current.discount,
+      });
     });
 
-    return Array.from(grouped.entries()).map(([productId, quantity]) => ({
+    return Array.from(grouped.entries()).map(([productId, value]) => ({
       productId,
-      quantity,
+      quantity: value.quantity,
+      discount: value.discount,
     }));
   }
 
   private buildResponseLineItems(laboratoryOrder: any, products: any[]) {
-    const quantityMap = this.getProductQuantityMap(laboratoryOrder);
+    const persistedLineItems = this.getPersistedLineItems(laboratoryOrder);
+    const lineItemMap = new Map(
+      persistedLineItems.map((line) => [line.productId, line])
+    );
 
     if (products.length > 0) {
       return products.map((product) => ({
         productId: product.id,
-        quantity: quantityMap.get(product.id) || 1,
+        quantity: lineItemMap.get(product.id)?.quantity || 1,
+        discount: lineItemMap.get(product.id)?.discount || 0,
+        unitPrice: lineItemMap.get(product.id)?.unitPrice || product.unitPrice || 0,
         product,
       }));
     }
 
-    return Array.from(quantityMap.entries()).map(([productId, quantity]) => ({
-      productId,
-      quantity,
-    }));
+    return persistedLineItems.map((line) => ({ ...line }));
   }
 
-  private getProductQuantityMap(laboratoryOrder: any): Map<string, number> {
-    const map = new Map<string, number>();
+  private getPersistedLineItems(laboratoryOrder: any): Array<{
+    productId: string;
+    quantity: number;
+    discount: number;
+    unitPrice: number;
+  }> {
     const persisted = Array.isArray(laboratoryOrder?.productQuantities)
       ? laboratoryOrder.productQuantities
       : Array.isArray(laboratoryOrder?.lineItems)
         ? laboratoryOrder.lineItems
         : [];
 
-    persisted.forEach((line: any) => {
-      if (!line || typeof line.productId !== 'string') {
-        return;
-      }
+    const normalized = persisted
+      .map((line: any) => {
+        if (!line || typeof line.productId !== 'string') {
+          return null;
+        }
 
-      const quantity = Number(line.quantity);
-      map.set(line.productId, Number.isFinite(quantity) && quantity > 0 ? quantity : 1);
-    });
+        const quantity = Number(line.quantity);
+        const unitPrice = Number(line.unitPrice || 0);
+        const discount = Number(line.discount || 0);
 
-    if (!map.size) {
-      this.extractProductIds(laboratoryOrder).forEach((productId) => {
-        map.set(productId, 1);
-      });
+        return {
+          productId: line.productId,
+          quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+          unitPrice: Number.isFinite(unitPrice) && unitPrice > 0 ? unitPrice : 0,
+          discount: Number.isFinite(discount) && discount > 0 ? Number(discount.toFixed(2)) : 0,
+        };
+      })
+      .filter(Boolean) as Array<{
+      productId: string;
+      quantity: number;
+      discount: number;
+      unitPrice: number;
+    }>;
+
+    if (normalized.length) {
+      return normalized;
     }
 
-    return map;
+    return this.extractProductIds(laboratoryOrder).map((productId) => ({
+      productId,
+      quantity: 1,
+      discount: 0,
+      unitPrice: 0,
+    }));
   }
 
-  private async generateOrderNumber(): Promise<number> {
-    const result = await this.laboratoryOrderRepository
-      .createQueryBuilder('order')
-      .select('MAX(order.orderNumber)', 'maxOrderNumber')
-      .getRawOne();
+  private buildPersistedLineItems(
+    normalizedLineItems: Array<{ productId: string; quantity: number; discount: number }>,
+    productMap: Map<string, any>
+  ): Array<{ productId: string; quantity: number; unitPrice: number; discount: number }> {
+    return normalizedLineItems.map((line) => {
+      const product = productMap.get(line.productId);
+      const unitPrice = Number(product?.unitPrice || 0);
+      const grossTotal = Number((unitPrice * line.quantity).toFixed(2));
+      const normalizedDiscount = Math.min(Math.max(Number(line.discount || 0), 0), grossTotal);
 
-    const maxOrderNumber = result?.maxOrderNumber || 0;
+      return {
+        productId: line.productId,
+        quantity: line.quantity,
+        unitPrice,
+        discount: Number(normalizedDiscount.toFixed(2)),
+      };
+    });
+  }
+
+  private async generateOrderNumber(
+    companyId: string | null,
+    manager?: EntityManager,
+  ): Promise<number> {
+    const repository =
+      manager?.getRepository(LaboratoryOrder) || this.laboratoryOrderRepository;
+    const queryBuilder = repository
+      .createQueryBuilder('order')
+      .select('MAX(order.orderNumber)', 'maxOrderNumber');
+
+    if (companyId) {
+      queryBuilder.where('order.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.where('order.companyId IS NULL');
+    }
+
+    const result = await queryBuilder.getRawOne();
+
+    const maxOrderNumber = result?.maxOrderNumber
+      ? parseInt(result.maxOrderNumber, 10)
+      : 0;
     return maxOrderNumber + 1;
+  }
+
+  private async lockOrderNumberScope(
+    manager: EntityManager,
+    companyId: string | null,
+  ): Promise<void> {
+    const scopeKey = companyId ?? '__null_company__';
+    await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
+      `laboratory_orders_order_number:${scopeKey}`,
+    ]);
   }
 
   private async resolveAttendanceDate(
     dto: CreateLaboratoryOrderDto,
     branchId: string,
-    companyId?: string
+    companyId?: string | null
   ): Promise<string> {
     if (dto.attendanceDate) {
       return dto.attendanceDate;
@@ -847,6 +1062,22 @@ export class LaboratoryOrdersService {
     }
 
     return this.toISODateOnly(new Date());
+  }
+
+  private async resolveEffectiveCompanyId(
+    branchId: string,
+    companyId: string | null,
+  ): Promise<string | null> {
+    if (companyId !== null && companyId !== undefined) {
+      return companyId;
+    }
+
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      select: ['id', 'companyId'],
+    });
+
+    return branch?.companyId ?? null;
   }
 
   private toISODateOnly(date: Date): string {

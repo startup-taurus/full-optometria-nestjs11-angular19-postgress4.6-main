@@ -55,6 +55,14 @@
             <strong>{{ 'BRANCHES_MODULE.ADDRESS' | translate }}:</strong>
             <p class="mb-0">{{ selectedBranch.address }}</p>
           </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.ESTABLISHMENT_CODE' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.establishmentCode || 'N/A' }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>{{ 'BRANCHES_MODULE.EMISSION_POINT_CODE' | translate }}:</strong>
+            <p class="mb-0">{{ selectedBranch.emissionPointCode || 'N/A' }}</p>
+          </div>
         </div>
       </div>
     </div>

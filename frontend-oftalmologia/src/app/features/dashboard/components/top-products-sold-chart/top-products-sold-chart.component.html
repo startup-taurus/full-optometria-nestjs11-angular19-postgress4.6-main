@@ -1,0 +1,97 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="card-title mb-0">
+          {{ 'DASHBOARD.TOP_PRODUCTS_SOLD.TITLE' | translate }}
+        </h5>
+        <iconify-icon
+          icon="ph:info"
+          [ngbTooltip]="'DASHBOARD.TOP_PRODUCTS_SOLD.TOOLTIP' | translate"
+          placement="top"
+          container="body"
+          style="cursor: help; color: #64748b; font-size: 18px"
+        ></iconify-icon>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 top-products-controls">
+        <select
+          class="form-select form-select-sm"
+          [value]="selectedMonths()"
+          (change)="onMonthsChange($event)"
+        >
+          @for (option of monthsOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+
+        <button class="btn btn-sm btn-outline-primary" type="button" (click)="toggleView()">
+          @if (isTableView()) {
+            {{ 'DASHBOARD.TOP_PRODUCTS_SOLD.SHOW_CHART' | translate }}
+          } @else {
+            {{ 'DASHBOARD.TOP_PRODUCTS_SOLD.SHOW_TABLE' | translate }}
+          }
+        </button>
+
+        @if (chartData()) {
+          <span class="badge bg-primary-subtle text-primary">
+            {{ 'DASHBOARD.TOP_PRODUCTS_SOLD.TOTAL_UNITS' | translate }}: {{ chartData()!.total }}
+          </span>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{
+            'DASHBOARD.TOP_PRODUCTS_SOLD.LOADING' | translate
+          }}</span>
+        </div>
+      </div>
+    } @else if (chartData()?.items?.length) {
+      @if (isTableView()) {
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0 top-products-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">{{ 'DASHBOARD.TOP_PRODUCTS_SOLD.TABLE.PRODUCT' | translate }}</th>
+                <th scope="col" class="text-end">{{ 'DASHBOARD.TOP_PRODUCTS_SOLD.TABLE.UNITS' | translate }}</th>
+                <th scope="col" class="text-end">{{ 'DASHBOARD.TOP_PRODUCTS_SOLD.TABLE.REVENUE' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of chartData()!.items; track item.productId; let index = $index) {
+                <tr>
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ item.productName }}</td>
+                  <td class="text-end">{{ item.quantitySold | number: '1.0-0' }}</td>
+                  <td class="text-end">{{ item.totalRevenue | number: '1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <apx-chart
+          [series]="chartOptions.series!"
+          [chart]="chartOptions.chart!"
+          [plotOptions]="chartOptions.plotOptions!"
+          [dataLabels]="chartOptions.dataLabels!"
+          [colors]="chartOptions.colors!"
+          [xaxis]="chartOptions.xaxis!"
+          [yaxis]="chartOptions.yaxis!"
+          [grid]="chartOptions.grid!"
+          [legend]="chartOptions.legend!"
+          [tooltip]="chartOptions.tooltip!"
+        ></apx-chart>
+      }
+    } @else {
+      <div class="text-center py-5 text-muted">
+        <i class="ti ti-chart-bar fs-1 mb-2"></i>
+        <p>{{ 'DASHBOARD.TOP_PRODUCTS_SOLD.NO_DATA' | translate }}</p>
+      </div>
+    }
+  </div>
+</div>

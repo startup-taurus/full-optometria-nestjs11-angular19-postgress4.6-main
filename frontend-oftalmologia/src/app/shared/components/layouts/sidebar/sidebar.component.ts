@@ -30,7 +30,13 @@ import { PermissionsService } from '@core/services/api/permissions.service'
   ],
   templateUrl: './sidebar.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  styles: ``,
+  styles: `
+    :host ::ng-deep .side-nav-item.menu-divider-after {
+      border-bottom: 1px solid var(--bs-border-color, #dbe2ea);
+      margin-bottom: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+  `,
 })
 export class SidebarComponent implements OnInit {
   menuItems: MenuItemType[] = []
@@ -96,30 +102,7 @@ export class SidebarComponent implements OnInit {
       return
     }
 
-    this.filteredMenuItems = this.menuItems.filter((item) => {
-      if (item.isTitle) {
-        return true
-      }
-
-
-      if (item.key === 'COMPANIES') {
-        return this.permissionsService.isSuperAdmin()
-      }
-
-      if (item.key === 'FEEDBACK_ADMIN') {
-        return this.permissionsService.isSuperAdmin()
-      }
-
-      if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
-        return true
-      }
-
-      const hasPermission = item.requiredPermissions.some((permissionId) =>
-        this.permissionsService.hasPermissionById(permissionId)
-      )
-
-      return hasPermission
-    })
+    this.filteredMenuItems = this.filterMenuTree(this.menuItems)
   }
 
   ngAfterViewInit() {
@@ -132,7 +115,55 @@ export class SidebarComponent implements OnInit {
   }
 
   hasSubmenu(menu: MenuItemType): boolean {
-    return menu.children ? true : false
+    return !!menu.children?.length
+  }
+
+  private filterMenuTree(menuItems: MenuItemType[]): MenuItemType[] {
+    return menuItems.reduce<MenuItemType[]>((visibleItems, item) => {
+      if (item.isTitle) {
+        visibleItems.push(item)
+        return visibleItems
+      }
+
+      const visibleChildren = item.children?.length
+        ? this.filterMenuTree(item.children)
+        : []
+
+      if (item.children?.length) {
+        if (visibleChildren.length > 0) {
+          visibleItems.push({
+            ...item,
+            children: visibleChildren,
+          })
+        }
+
+        return visibleItems
+      }
+
+      if (this.hasPermissionForMenuItem(item)) {
+        visibleItems.push({ ...item })
+      }
+
+      return visibleItems
+    }, [])
+  }
+
+  private hasPermissionForMenuItem(item: MenuItemType): boolean {
+    if (item.isTitle) {
+      return true
+    }
+
+    if (item.key === 'COMPANIES' || item.key === 'FEEDBACK_ADMIN') {
+      return this.permissionsService.isSuperAdmin()
+    }
+
+    if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
+      return true
+    }
+
+    return item.requiredPermissions.some((permissionId) =>
+      this.permissionsService.hasPermissionById(permissionId)
+    )
   }
 
   scrollToActive(): void {
@@ -202,18 +233,16 @@ export class SidebarComponent implements OnInit {
 
       if (matchingMenuItem) {
         const mid = matchingMenuItem.getAttribute('aria-controls')
-        const activeMt = findMenuItem(this.menuItems, mid)
+        const activeMt = findMenuItem(this.filteredMenuItems, mid)
 
         if (activeMt) {
           const matchingObjs = [
             activeMt['key'],
-            ...findAllParent(this.menuItems, activeMt),
+            ...findAllParent(this.filteredMenuItems, activeMt),
           ]
 
           this.activeMenuItems = matchingObjs
-          this.menuItems.forEach((menu: MenuItemType) => {
-            menu.collapsed = !matchingObjs.includes(menu.key!)
-          })
+   
         }
       }
     }
@@ -230,9 +259,9 @@ export class SidebarComponent implements OnInit {
     if (!menuItem.collapsed) {
       openMenuItems = [
         menuItem['key'],
-        ...findAllParent(this.menuItems, menuItem),
+        ...findAllParent(this.filteredMenuItems, menuItem),
       ]
-      this.menuItems.forEach((menu: MenuItemType) => {
+      this.filteredMenuItems.forEach((menu: MenuItemType) => {
         if (!openMenuItems.includes(menu.key!)) {
           menu.collapsed = true
         }

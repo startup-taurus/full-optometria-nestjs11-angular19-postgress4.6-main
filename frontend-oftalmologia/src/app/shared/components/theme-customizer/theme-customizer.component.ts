@@ -9,6 +9,9 @@ import { languages, languageToFlagMap } from '../layouts/topbar/data'
 import { Store } from '@ngrx/store'
 import { changetheme } from '@core/states/layout/layout-action'
 import type { LayoutState } from '@core/states/layout/layout-reducers'
+import { GlobalService } from '@core/services/ui/global.service'
+import { ToastrNotificationService } from '@core/services/ui/notification.service'
+import { Clipboard } from '@angular/cdk/clipboard'
 
 @Component({
   selector: 'app-theme-customizer',
@@ -24,10 +27,14 @@ export class ThemeCustomizerComponent implements OnInit {
   public selectedMode: 'light' | 'dark' = 'light'
   public languageList = languages
   public readonly languageToFlagMap = languageToFlagMap
+  public companySlug: string = ''
 
   private themeService = inject(ThemeCustomizerService)
   public translate = inject(TranslateService)
   private store = inject(Store)
+  private profileService = inject(GlobalService)
+  private clipboard = inject(Clipboard)
+  private notificationService = inject(ToastrNotificationService)
 
   ngOnInit(): void {
     this.availableColors = this.themeService.availableColors
@@ -42,6 +49,10 @@ export class ThemeCustomizerComponent implements OnInit {
 
     this.store.select('layout').subscribe((layout: LayoutState) => {
       this.selectedMode = layout.LAYOUT_THEME === 'dark' ? 'dark' : 'light'
+    })
+
+    this.profileService.profile.subscribe((user) => {
+      this.companySlug = user.company?.slug || ''
     })
   }
 
@@ -78,6 +89,21 @@ export class ThemeCustomizerComponent implements OnInit {
 
   public getCurrentLanguage(): string {
     return this.translate.currentLang || 'en'
+  }
+
+  public copyCompanyUrl(): void {
+    if (!this.companySlug) return
+
+    const url = `https://optometria.zgameslatam.com/catalog/${this.companySlug}`
+    const success = this.clipboard.copy(url)
+
+    if (success) {
+      this.notificationService.showNotification({
+        title: this.translate.instant('COMPANIES_MODULE.COPY_URL'),
+        message: this.translate.instant('COMPANIES_MODULE.URL_COPIED'),
+        type: 'success',
+      })
+    }
   }
 
   public resetToDefaults(): void {

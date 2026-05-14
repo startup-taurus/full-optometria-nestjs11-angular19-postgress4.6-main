@@ -76,27 +76,27 @@ export class CreateEditSupplierComponent implements OnInit, OnDestroy {
       ],
       documentNumber: [
         { value: this.supplier?.documentNumber || '', disabled: false },
-        [Validators.maxLength(20)],
+        [Validators.required, Validators.maxLength(20)],
       ],
       phone: [
         { value: this.supplier?.phone || '', disabled: false },
-        [Validators.maxLength(20)],
+        [Validators.required, Validators.maxLength(20)],
       ],
       email: [
         { value: this.supplier?.email || '', disabled: false },
-        [Validators.email],
+        [Validators.required, Validators.email],
       ],
       website: [
         { value: this.supplier?.website || '', disabled: false },
-        [Validators.maxLength(255)],
+        [],
       ],
       address: [
         { value: this.supplier?.address || '', disabled: false },
-        [Validators.maxLength(255)],
+        [],
       ],
       notes: [
         { value: this.supplier?.notes || '', disabled: false },
-        [Validators.maxLength(1000)],
+        [],
       ],
       isActive: [{ value: this.supplier?.isActive ?? true, disabled: false }],
     })

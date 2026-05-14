@@ -21,6 +21,13 @@
   .form-control {
     font-size: 0.9rem;
   }
+
+  .digital-params-toggle {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
 }
 
 @media (max-width: 992px) {

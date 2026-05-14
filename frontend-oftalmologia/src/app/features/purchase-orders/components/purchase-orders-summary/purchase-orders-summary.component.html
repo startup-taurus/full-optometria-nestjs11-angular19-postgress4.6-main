@@ -1,0 +1,127 @@
+<div class="purchase-orders-summary-container">
+  <div *ngIf="isLoading()" class="summary-loading">
+    <div class="spinner-border spinner-border-sm" role="status">
+      <span class="visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+    <span class="ms-2">{{ 'COMMON.LOADING' | translate }}</span>
+  </div>
+
+  <div *ngIf="!isLoading() && summaryData()" class="summary-cards-row">
+    <div
+      class="summary-card pending-card"
+      role="button"
+      tabindex="0"
+      (click)="onCardClick('pending')"
+      (keydown.enter)="onCardClick('pending')"
+      [ngbTooltip]="'PURCHASE_ORDERS.SUMMARY.PENDING_TOOLTIP' | translate"
+      placement="bottom"
+    >
+      <div class="card-header">
+        <i class="ti ti-hourglass-empty"></i>
+        <span class="label">{{ 'PURCHASE_ORDERS.SUMMARY.PENDING' | translate }}</span>
+      </div>
+      <div class="card-value">{{ summaryData()!.statuses.pending }}</div>
+      <div class="card-footer">
+        <small class="text-muted">{{ 'PURCHASE_ORDERS.SUMMARY.PENDING_DESC' | translate }}</small>
+      </div>
+    </div>
+
+    <div
+      class="summary-card to-invoice-card"
+      role="button"
+      tabindex="0"
+      (click)="onCardClick('pendingToInvoice')"
+      (keydown.enter)="onCardClick('pendingToInvoice')"
+      [ngbTooltip]="'PURCHASE_ORDERS.SUMMARY.TO_INVOICE_TOOLTIP' | translate"
+      placement="bottom"
+    >
+      <div class="card-header">
+        <i class="ti ti-file-invoice"></i>
+        <span class="label">{{ 'PURCHASE_ORDERS.SUMMARY.TO_INVOICE' | translate }}</span>
+      </div>
+      <div class="card-value">{{ summaryData()!.statuses.pendingToInvoice }}</div>
+      <div class="card-footer">
+        <small class="text-muted">{{ 'PURCHASE_ORDERS.SUMMARY.TO_INVOICE_DESC' | translate }}</small>
+      </div>
+    </div>
+
+    <div
+      class="summary-card invoiced-card"
+      role="button"
+      tabindex="0"
+      (click)="onCardClick('invoiced')"
+      (keydown.enter)="onCardClick('invoiced')"
+      [ngbTooltip]="'PURCHASE_ORDERS.SUMMARY.INVOICED_TOOLTIP' | translate"
+      placement="bottom"
+    >
+      <div class="card-header">
+        <i class="ti ti-receipt"></i>
+        <span class="label">{{ 'PURCHASE_ORDERS.SUMMARY.INVOICED' | translate }}</span>
+      </div>
+      <div class="card-value">{{ summaryData()!.statuses.invoiced }}</div>
+      <div class="card-footer">
+        <small class="text-muted">{{ 'PURCHASE_ORDERS.SUMMARY.INVOICED_DESC' | translate }}</small>
+      </div>
+    </div>
+
+    <div
+      class="summary-card total-orders-card"
+      role="button"
+      tabindex="0"
+      (click)="onCardClick('all')"
+      (keydown.enter)="onCardClick('all')"
+      [ngbTooltip]="'PURCHASE_ORDERS.SUMMARY.TOTAL_ORDERS_TOOLTIP' | translate"
+      placement="bottom"
+    >
+      <div class="card-header">
+        <i class="ti ti-list-numbers"></i>
+        <span class="label">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_ORDERS' | translate }}</span>
+      </div>
+      <div class="card-value">{{ summaryData()!.totalOrders }}</div>
+      <div class="card-footer">
+        <small class="text-muted">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_ORDERS_DESC' | translate }}</small>
+      </div>
+    </div>
+
+    <div class="summary-card amount-card invoiced-amount-card">
+      <div class="card-header">
+        <i class="ti ti-currency-dollar"></i>
+        <span class="label">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_INVOICED' | translate }}</span>
+      </div>
+      <div class="card-value amount">{{ formatCurrency(summaryData()!.amounts.invoiced) }}</div>
+      <div class="card-footer">
+        <small class="text-muted">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_INVOICED_DESC' | translate }}</small>
+      </div>
+    </div>
+
+    <div class="summary-card amount-card non-invoiced-amount-card">
+      <div class="card-header">
+        <i class="ti ti-wallet"></i>
+        <span class="label">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_NON_INVOICED' | translate }}</span>
+      </div>
+      <div class="card-value amount">{{ formatCurrency(summaryData()!.amounts.nonInvoiced) }}</div>
+      <div class="card-footer">
+        <small class="text-muted">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_NON_INVOICED_DESC' | translate }}</small>
+      </div>
+    </div>
+
+    <div class="summary-card amount-card gross-amount-card">
+      <div class="card-header">
+        <i class="ti ti-chart-line"></i>
+        <span class="label">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_SOLD' | translate }}</span>
+      </div>
+      <div class="card-value amount">{{ formatCurrency(summaryData()!.amounts.gross) }}</div>
+      <div class="card-footer">
+        <small class="text-muted">{{ 'PURCHASE_ORDERS.SUMMARY.TOTAL_SOLD_DESC' | translate }}</small>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="!isLoading() && (!summaryData() || summaryData()!.totalOrders === 0)"
+    class="summary-empty"
+  >
+    <i class="ti ti-inbox"></i>
+    <p>{{ 'PURCHASE_ORDERS.SUMMARY.EMPTY' | translate }}</p>
+  </div>
+</div>

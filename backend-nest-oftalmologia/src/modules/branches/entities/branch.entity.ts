@@ -38,6 +38,12 @@ export class Branch {
   @Column({ name: 'corporate_email', nullable: true })
   corporateEmail: string;
 
+  @Column({ name: 'establishment_code', nullable: true, length: 3 })
+  establishmentCode: string | null;
+
+  @Column({ name: 'emission_point_code', nullable: true, length: 3 })
+  emissionPointCode: string | null;
+
   @Column({ name: 'opening_hours', type: 'text', nullable: true })
   openingHours: string;
 

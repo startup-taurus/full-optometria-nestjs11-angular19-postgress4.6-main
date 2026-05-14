@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, IsNull, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Subcategory } from '../subcategories/entities/subcategory.entity';
@@ -2078,6 +2078,9 @@ export class ProductsService {
         },
       };
     } catch (error) {
+      const errorDetails =
+        error instanceof Error ? error.message : 'Unexpected error';
+
       throw new BadRequestException({
         statusCode: 400,
         success: false,
@@ -2085,7 +2088,7 @@ export class ProductsService {
           es: 'Error al subir la imagen del producto',
           en: 'Error uploading product image',
         },
-        details: error.message,
+        details: errorDetails,
       });
     }
   }
@@ -2229,6 +2232,9 @@ export class ProductsService {
         },
       };
     } catch (error) {
+      const errorDetails =
+        error instanceof Error ? error.message : 'Unexpected error';
+
       throw new BadRequestException({
         statusCode: 400,
         success: false,
@@ -2236,7 +2242,7 @@ export class ProductsService {
           es: 'Error al eliminar la imagen del producto',
           en: 'Error deleting product image',
         },
-        details: error.message,
+        details: errorDetails,
       });
     }
   }
@@ -2531,9 +2537,13 @@ export class ProductsService {
     return { statusCode: 200, success: true, data };
   }
 
-  async getActiveDiscounts(branchId: string) {
+  async getActiveDiscounts(branchId: string, companyId: string | null) {
     const discounts = await this.productDiscountRepository.find({
-      where: { branchId, isActive: true },
+      where: {
+        branchId,
+        isActive: true,
+        companyId: companyId ?? IsNull(),
+      },
       relations: ['product'],
       order: { updatedAt: 'DESC' },
     });

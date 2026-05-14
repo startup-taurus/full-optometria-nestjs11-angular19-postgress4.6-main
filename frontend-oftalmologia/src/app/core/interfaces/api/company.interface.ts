@@ -22,6 +22,8 @@ export interface Company {
   isActive: boolean
   maxUsers?: number | null
   maxBranches?: number | null
+  billingApiKey?: string | null
+  billingContributorId?: number | null
   usersCount?: number
   branchesCount?: number
   createdAt: Date | string
@@ -37,6 +39,8 @@ export interface CreateCompanyDto {
   logoFileId?: string
   maxUsers?: number | null
   maxBranches?: number | null
+  billingApiKey?: string
+  billingContributorId?: number | null
 }
 
 export interface CreateCompanyCompleteDto {
@@ -44,6 +48,8 @@ export interface CreateCompanyCompleteDto {
   code: string
   companyEmail?: string
   companyPhone?: string
+  billingApiKey?: string
+  billingContributorId?: number | null
   slug?: string
   maxUsers?: number | null
   maxBranches?: number | null
@@ -51,6 +57,8 @@ export interface CreateCompanyCompleteDto {
   branchCode: string
   branchAddress: string
   branchCity: string
+  branchEstablishmentCode?: string
+  branchEmissionPointCode?: string
   username: string
   email: string
   firstName: string
@@ -70,6 +78,8 @@ export interface UpdateCompanyDto {
   isActive?: boolean
   maxUsers?: number | null
   maxBranches?: number | null
+  billingApiKey?: string
+  billingContributorId?: number | null
 }
 
 export interface QueryCompanyDto {

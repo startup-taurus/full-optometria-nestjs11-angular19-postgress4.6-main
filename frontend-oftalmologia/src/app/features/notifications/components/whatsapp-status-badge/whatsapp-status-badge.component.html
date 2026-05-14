@@ -1,0 +1,4 @@
+<span class="wa-badge" [attr.data-status]="status">
+  <span class="wa-badge__dot" [class.is-connected]="status === 'connected'"></span>
+  <span class="wa-badge__label">{{ computedLabel | translate }}</span>
+</span>

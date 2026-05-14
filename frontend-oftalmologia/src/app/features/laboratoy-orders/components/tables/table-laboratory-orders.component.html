@@ -19,6 +19,12 @@
           <i class="ti ti-filter-off"></i>
         </button>
       }
+      <table-export-buttons
+        [columns]="exportColumns"
+        [rows]="filteredOrders"
+        filenameBase="ordenes-laboratorio"
+        [title]="'LABORATORY_ORDERS_MODULE.TITLE' | translate"
+      ></table-export-buttons>
       <!-- <button
         type="button"
         class="btn btn-outline-secondary btn-sm"
@@ -130,6 +136,14 @@
                       [title]="'LABORATORY_ORDERS_MODULE.VIEW' | translate"
                     >
                       <i class="ti ti-eye"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary btn-action"
+                      (click)="onViewLinkedPurchaseOrderClick($event, order)"
+                      [title]="'LABORATORY_ORDERS.ACTIONS.VIEW_PURCHASE_ORDER' | translate"
+                    >
+                      <i class="ti ti-shopping-cart"></i>
                     </button>
                     <button
                       type="button"

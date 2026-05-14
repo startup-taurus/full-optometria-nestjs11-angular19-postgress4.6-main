@@ -80,7 +80,40 @@ export const DEFAULT_CLINICAL_FORM_STRUCTURE: FieldsConfig = {
         alternating: true,
       },
     },
-    step2_finalRx: {
+    step2_pupillaryReflexes: {
+      visible: true,
+      fields: {
+        photomotor: true,
+        consensual: true,
+        accommodative: true,
+      },
+    },
+    step2_ophthalmoscopy: {
+      visible: true,
+      fields: {
+        ophthalmoscopyOd: true,
+        ophthalmoscopyOi: true,
+      },
+    },
+    step2_refractiveTests: {
+      visible: true,
+      fields: {
+        keratometry: true,
+        autorefract: true,
+        refraction: true,
+        subjective: true,
+      },
+    },
+    step2_otherExams: {
+      visible: true,
+      fields: {
+        stereopsis: true,
+        worthTest: true,
+        otherNotes: true,
+      },
+    },
+
+    step3_finalRx: {
       visible: true,
       fields: {
         finalRxOdSphere: true,
@@ -97,62 +130,34 @@ export const DEFAULT_CLINICAL_FORM_STRUCTURE: FieldsConfig = {
         finalRxOiAvVp: true,
       },
     },
-    step2_lensTypes: {
+    step3_lensTypes: {
       visible: true,
       fields: {
         lensTypes: true,
       },
     },
-    step2_additionalTreatments: {
+    step3_additionalTreatments: {
       visible: true,
       fields: {
         additionalTreatments: true,
       },
     },
-    step2_professionalName: {
-      visible: true,
-      fields: {
-        professionalName: true,
-      },
-    },
-
-    step3_pupillaryReflexes: {
-      visible: true,
-      fields: {
-        photomotor: true,
-        consensual: true,
-        accommodative: true,
-      },
-    },
-    step3_ophthalmoscopy: {
-      visible: true,
-      fields: {
-        ophthalmoscopyOd: true,
-        ophthalmoscopyOi: true,
-      },
-    },
-    step3_refractiveTests: {
-      visible: true,
-      fields: {
-        keratometry: true,
-        autorefract: true,
-        refraction: true,
-        subjective: true,
-      },
-    },
-    step3_otherExams: {
-      visible: true,
-      fields: {
-        stereopsis: true,
-        worthTest: true,
-        otherNotes: true,
-      },
-    },
-    step3_diagnosisAndDisposition: {
+    step3_diagnosis: {
       visible: true,
       fields: {
         diagnosis: true,
+      },
+    },
+    step3_disposition: {
+      visible: true,
+      fields: {
         disposition: true,
+      },
+    },
+    step3_professionalName: {
+      visible: true,
+      fields: {
+        professionalName: true,
       },
     },
   },
@@ -165,16 +170,17 @@ export const CLINICAL_FORM_LABELS = {
     step2_previousRx: 'Lensometría RX Anterior',
     step2_visualAcuity: 'Agudeza Visual sin RX',
     step2_motorTest: 'Test Motor',
-    step2_finalRx: 'RX Final',
-    step2_lensTypes: 'Tipos de Luna',
-    step2_additionalTreatments: 'Agudeza Visual Corregida',
-    step2_professionalName: 'Nombre Profesional',
+    step2_pupillaryReflexes: 'Reflejos Pupilares',
+    step2_ophthalmoscopy: 'Oftalmoscopía',
+    step2_refractiveTests: 'Pruebas Refractivas',
+    step2_otherExams: 'Otros Exámenes',
 
-    step3_pupillaryReflexes: 'Reflejos Pupilares',
-    step3_ophthalmoscopy: 'Oftalmoscopia',
-    step3_refractiveTests: 'Tests Refractivos',
-    step3_otherExams: 'Otros Exámenes',
-    step3_diagnosisAndDisposition: 'Diagnóstico y Disposición',
+    step3_finalRx: 'RX Final',
+    step3_lensTypes: 'Tipos de Lentes',
+    step3_additionalTreatments: 'Tratamientos',
+    step3_diagnosis: 'Diagnóstico',
+    step3_disposition: 'Disposición',
+    step3_professionalName: 'Profesional',
   },
   fields: {
     occupation: 'Ocupación/Actividad',
@@ -207,6 +213,22 @@ export const CLINICAL_FORM_LABELS = {
     hypotropia: 'Hipertropia',
     alternating: 'Alternante',
 
+    photomotor: 'Fotomotor (OD, OI)',
+    consensual: 'Consensual (OD, OI)',
+    accommodative: 'Acomodativo (OD, OI)',
+
+    ophthalmoscopyOd: 'Oftalmoscopía OD',
+    ophthalmoscopyOi: 'Oftalmoscopía OI',
+
+    keratometry: 'Queratometría (OD, OI)',
+    autorefract: 'Autorefract (OD, OI)',
+    refraction: 'Refracción (OD, OI)',
+    subjective: 'Subjetivo (OD, OI)',
+
+    stereopsis: 'Estereopsis',
+    worthTest: 'Worth',
+    otherNotes: 'Otras notas',
+
     finalRxOdSphere: 'Esfera OD',
     finalRxOdCylinder: 'Cilindro OD',
     finalRxOdAxis: 'Eje OD',
@@ -220,33 +242,17 @@ export const CLINICAL_FORM_LABELS = {
     finalRxOiAvVl: 'AV VL OI',
     finalRxOiAvVp: 'AV VP OI',
 
-    lensTypes: 'Tipos de Luna',
-    additionalTreatments: 'Agudeza Visual Corregida',
-    professionalName: 'Nombre Profesional',
-
-    // Step 3
-    photomotor: 'Fotomotor (OD, OI)',
-    consensual: 'Consensual (OD, OI)',
-    accommodative: 'Acomodativo (OD, OI)',
-
-    ophthalmoscopyOd: 'Oftalmoscopia OD',
-    ophthalmoscopyOi: 'Oftalmoscopia OI',
-
-    keratometry: 'Queratometría (OD, OI)',
-    autorefract: 'Autorefract (OD, OI)',
-    refraction: 'Refracción (OD, OI)',
-    subjective: 'Subjetivo (OD, OI)',
-
-    stereopsis: 'Estereopsis',
-    worthTest: 'Worth',
-    otherNotes: 'Otras notas',
+    lensTypes: 'Tipos de Lentes',
+    additionalTreatments: 'Tratamientos',
 
     diagnosis: 'Diagnóstico',
     disposition: 'Disposición',
+
+    professionalName: 'Profesional',
   },
   steps: {
     step1: 'Paso 1: Datos Generales del Paciente',
-    step2: 'Paso 2: Mediciones y RX',
-    step3: 'Paso 3: Diagnóstico y Exámenes',
+    step2: 'Paso 2: Exámenes y Mediciones',
+    step3: 'Paso 3: RX, Tratamientos y Diagnóstico',
   },
 }

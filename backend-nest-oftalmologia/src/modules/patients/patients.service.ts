@@ -5,8 +5,14 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryFailedError } from 'typeorm';
+import {
+  Repository,
+  QueryFailedError,
+  SelectQueryBuilder,
+  DeleteQueryBuilder,
+} from 'typeorm';
 import { Patient } from './entities/patient.entity';
+import { Client } from './entities/client.entity';
 import { CreatePatientDto } from './dtos/create-patient.dto';
 import { UpdatePatientDto } from './dtos/update-patient.dto';
 import { QueryPatientDto } from './dtos/query-patient.dto';
@@ -19,8 +25,97 @@ export class PatientsService {
   constructor(
     @InjectRepository(Patient)
     private patientRepository: Repository<Patient>,
+    @InjectRepository(Client)
+    private clientRepository: Repository<Client>,
     private filesService: FilesService
   ) {}
+
+  private applyClientCompanyScope(
+    queryBuilder: SelectQueryBuilder<Client> | DeleteQueryBuilder<Client>,
+    companyId: string | null
+  ): void {
+    if (companyId) {
+      queryBuilder.andWhere('client.companyId = :companyId', { companyId });
+      return;
+    }
+
+    queryBuilder.andWhere('client.companyId IS NULL');
+  }
+
+  private async countAssociatedClients(
+    patientId: string,
+    branchId: string,
+    companyId: string | null
+  ): Promise<number> {
+    const queryBuilder = this.clientRepository
+      .createQueryBuilder('client')
+      .innerJoin('client_patients', 'cp', 'cp.client_id = client.id')
+      .where('cp.patient_id = :patientId', { patientId })
+      .andWhere('client.branchId = :branchId', { branchId });
+
+    if (companyId) {
+      queryBuilder.andWhere('client.companyId = :companyId', { companyId });
+    } else {
+      queryBuilder.andWhere('client.companyId IS NULL');
+    }
+
+    const result = await queryBuilder
+      .select('COUNT(DISTINCT client.id)', 'count')
+      .getRawOne();
+    return Number(result?.count || 0);
+  }
+
+  private async deleteAssociatedClients(
+    patientId: string,
+    branchId: string,
+    companyId: string | null
+  ): Promise<number> {
+    const associatedClientsQuery = this.clientRepository
+      .createQueryBuilder('client')
+      .innerJoin('client_patients', 'cp', 'cp.client_id = client.id')
+      .where('cp.patient_id = :patientId', { patientId })
+      .andWhere('client.branchId = :branchId', { branchId });
+
+    if (companyId) {
+      associatedClientsQuery.andWhere('client.companyId = :companyId', { companyId });
+    } else {
+      associatedClientsQuery.andWhere('client.companyId IS NULL');
+    }
+
+    const associatedClients = await associatedClientsQuery
+      .select('client.id', 'id')
+      .getRawMany<{ id: string }>();
+
+    let deletedClientsCount = 0;
+
+    for (const associatedClient of associatedClients) {
+      const links = await this.clientRepository.query(
+        'SELECT patient_id FROM client_patients WHERE client_id = $1',
+        [associatedClient.id]
+      );
+
+      const remainingPatientIds = links
+        .map((row: { patient_id: string }) => row.patient_id)
+        .filter((id: string) => id !== patientId);
+
+      if (!remainingPatientIds.length) {
+        await this.clientRepository.delete({ id: associatedClient.id });
+        deletedClientsCount += 1;
+        continue;
+      }
+
+      await this.clientRepository.query(
+        'DELETE FROM client_patients WHERE client_id = $1 AND patient_id = $2',
+        [associatedClient.id, patientId]
+      );
+
+      await this.clientRepository.update(associatedClient.id, {
+        patientId: remainingPatientIds[0],
+      });
+    }
+
+    return deletedClientsCount;
+  }
 
   async create(
     createPatientDto: CreatePatientDto,
@@ -31,48 +126,68 @@ export class PatientsService {
       email,
       documentNumber,
       dateOfBirth,
+      birthYear,
       companyId: _,
       branchId: __,
       ...patientData
     } = createPatientDto;
 
-    const existingPatient = await this.patientRepository.findOne({
-      where: { email: email.toLowerCase() },
-    });
+    const normalizedEmail =
+      typeof email === 'string' && email.trim().length > 0
+        ? email.toLowerCase().trim()
+        : null;
+    const normalizedDocumentNumber =
+      typeof documentNumber === 'string' && documentNumber.trim().length > 0
+        ? documentNumber.trim()
+        : null;
 
-    if (existingPatient) {
-      throw new ConflictException({
-        messageKey: 'ERROR.VALIDATION',
-        message: {
-          es: 'El correo electrónico ya existe',
-          en: 'Email already exists',
-        },
+    if (normalizedEmail) {
+      const existingPatient = await this.patientRepository.findOne({
+        where: { email: normalizedEmail },
       });
+
+      if (existingPatient) {
+        throw new ConflictException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'El correo electrónico ya existe',
+            en: 'Email already exists',
+          },
+        });
+      }
     }
 
     const resolvedCompanyId = companyId;
-    const existingDocument = await this.patientRepository.findOne({
-      where: {
-        documentNumber,
-        companyId: resolvedCompanyId,
-      },
-    });
-
-    if (existingDocument) {
-      throw new ConflictException({
-        messageKey: 'ERROR.VALIDATION',
-        message: {
-          es: 'El número de documento ya existe en esta compañía',
-          en: 'Document number already exists in this company',
+    if (normalizedDocumentNumber) {
+      const existingDocument = await this.patientRepository.findOne({
+        where: {
+          documentNumber: normalizedDocumentNumber,
+          companyId: resolvedCompanyId,
         },
       });
+
+      if (existingDocument) {
+        throw new ConflictException({
+          messageKey: 'ERROR.VALIDATION',
+          message: {
+            es: 'El número de documento ya existe en esta compañía',
+            en: 'Document number already exists in this company',
+          },
+        });
+      }
     }
 
+    const resolvedDateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
+    const resolvedBirthYear = resolvedDateOfBirth
+      ? null
+      : birthYear ?? null;
+
     const patient = this.patientRepository.create({
-      email: email.toLowerCase(),
-      documentNumber,
+      email: normalizedEmail,
+      documentNumber: normalizedDocumentNumber,
       companyId: resolvedCompanyId,
-      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+      dateOfBirth: resolvedDateOfBirth,
+      birthYear: resolvedBirthYear,
       ...patientData,
       branchId,
     });
@@ -154,6 +269,7 @@ export class PatientsService {
         'patient.email',
         'patient.documentNumber',
         'patient.dateOfBirth',
+        'patient.birthYear',
         'patient.address',
         'patient.homePhone',
         'patient.mobilePhone',
@@ -291,12 +407,28 @@ export class PatientsService {
       });
     }
 
-    const { email, documentNumber, dateOfBirth, ...updateData } =
+    const { email, documentNumber, dateOfBirth, birthYear, ...updateData } =
       updatePatientDto;
 
-    if (email && email.toLowerCase() !== patient.email) {
+    const normalizedEmail =
+      typeof email === 'string'
+        ? email.trim().length > 0
+          ? email.toLowerCase().trim()
+          : null
+        : email;
+    const normalizedDocumentNumber =
+      typeof documentNumber === 'string'
+        ? documentNumber.trim().length > 0
+          ? documentNumber.trim()
+          : null
+        : documentNumber;
+
+    if (
+      typeof normalizedEmail === 'string' &&
+      normalizedEmail !== (patient.email ?? '').toLowerCase()
+    ) {
       const existingPatient = await this.patientRepository.findOne({
-        where: { email: email.toLowerCase() },
+        where: { email: normalizedEmail },
       });
       if (existingPatient) {
         throw new ConflictException({
@@ -309,10 +441,13 @@ export class PatientsService {
       }
     }
 
-    if (documentNumber && documentNumber !== patient.documentNumber) {
+    if (
+      typeof normalizedDocumentNumber === 'string' &&
+      normalizedDocumentNumber !== patient.documentNumber
+    ) {
       const existingPatient = await this.patientRepository.findOne({
         where: {
-          documentNumber,
+          documentNumber: normalizedDocumentNumber,
           companyId: patient.companyId,
         },
       });
@@ -327,12 +462,31 @@ export class PatientsService {
       }
     }
 
-    const updateDataMapped = {
-      email: email ? email.toLowerCase() : undefined,
-      documentNumber,
-      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+    const updateDataMapped: any = {
+      email: normalizedEmail,
+      documentNumber: normalizedDocumentNumber,
       ...updateData,
     };
+
+    if (dateOfBirth !== undefined) {
+      const parsedDate =
+        typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : null;
+      updateDataMapped.dateOfBirth = parsedDate;
+      if (parsedDate) {
+        updateDataMapped.birthYear = null;
+      }
+    }
+
+    if (birthYear !== undefined && dateOfBirth === undefined) {
+      const parsedYear =
+        birthYear === null || birthYear === undefined
+          ? null
+          : Number(birthYear);
+      updateDataMapped.birthYear = parsedYear;
+      if (parsedYear !== null) {
+        updateDataMapped.dateOfBirth = null;
+      }
+    }
 
     delete (updateDataMapped as any).companyId;
     delete (updateDataMapped as any).branchId;
@@ -360,7 +514,12 @@ export class PatientsService {
     };
   }
 
-  async remove(id: string, branchId: string, companyId: string | null) {
+  async remove(
+    id: string,
+    branchId: string,
+    companyId: string | null,
+    deleteAssociatedClients: boolean = false
+  ) {
     const whereCondition = CompanyFilterUtil.buildWhereCondition(
       { id, branchId },
       companyId
@@ -471,6 +630,42 @@ export class PatientsService {
       });
     }
 
+    const associatedClientsCount = await this.countAssociatedClients(
+      id,
+      branchId,
+      companyId
+    );
+
+    if (associatedClientsCount > 0 && !deleteAssociatedClients) {
+      throw new ConflictException({
+        messageKey: 'ERROR.VALIDATION',
+        message: {
+          es: `No se puede eliminar el paciente ${patient.firstName} ${patient.lastName} porque tiene ${associatedClientsCount} cliente${
+            associatedClientsCount > 1 ? 's' : ''
+          } asociado${
+            associatedClientsCount > 1 ? 's' : ''
+          }. Confirme si desea eliminar también los clientes asociados.`,
+          en: `Cannot delete patient ${patient.firstName} ${patient.lastName} because it has ${associatedClientsCount} associated client${
+            associatedClientsCount > 1 ? 's' : ''
+          }. Confirm if you also want to delete associated clients.`,
+        },
+        data: {
+          associatedClientsCount,
+          requiresClientDeletionConfirmation: true,
+        },
+      });
+    }
+
+    let deletedClientsCount = 0;
+
+    if (associatedClientsCount > 0 && deleteAssociatedClients) {
+      deletedClientsCount = await this.deleteAssociatedClients(
+        id,
+        branchId,
+        companyId
+      );
+    }
+
     await this.patientRepository.remove(patient);
 
     return {
@@ -479,7 +674,10 @@ export class PatientsService {
         es: 'Paciente eliminado correctamente',
         en: 'Patient deleted successfully',
       },
-      data: { id },
+      data: {
+        id,
+        deletedClientsCount,
+      },
     };
   }
 

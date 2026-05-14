@@ -13,6 +13,7 @@ import { Patient } from '../../patients/entities/patient.entity';
 import { Product } from '../../products/entities/product.entity';
 import { ClinicalHistory } from '../../clinical-histories/entities/clinical-history.entity';
 import { Company } from '../../companies/entities/company.entity';
+import { Client } from '../../patients/entities/client.entity';
 
 export enum FrameType {
   THREE_PIECES_AIR = '3_piezas_al_aire',
@@ -25,21 +26,31 @@ export enum LaboratoryOrderStatus {
   SENT = 'sent',
   RECEIVED = 'received',
   DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
 }
 
 @Entity('laboratory_orders')
+@Index('UQ_laboratory_orders_company_order_number', ['companyId', 'orderNumber'], {
+  unique: true,
+  where: '"company_id" IS NOT NULL AND "order_number" IS NOT NULL',
+})
+@Index('UQ_laboratory_orders_null_company_order_number', ['orderNumber'], {
+  unique: true,
+  where: '"company_id" IS NULL AND "order_number" IS NOT NULL',
+})
 @Index(['companyId'])
 @Index(['branchId'])
 @Index(['patientId'])
+@Index(['clientId'])
 @Index(['isConfirmed'])
 @Index(['status'])
 @Index(['attendanceDate'])
-@Index(['orderNumber'], { unique: true })
+@Index(['createdByUserId'])
 export class LaboratoryOrder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'order_number', unique: true, nullable: true })
+  @Column({ name: 'order_number', nullable: true })
   orderNumber: number;
 
   @Column({ name: 'company_id', nullable: true })
@@ -48,11 +59,17 @@ export class LaboratoryOrder {
   @Column({ name: 'branch_id' })
   branchId: string;
 
+  @Column({ name: 'created_by_user_id', nullable: true })
+  createdByUserId: string | null;
+
   @Column({ name: 'patient_id' })
   patientId: string;
 
   @Column({ name: 'clinical_history_id', nullable: true })
   clinicalHistoryId: string;
+
+  @Column({ name: 'client_id', nullable: true })
+  clientId: string;
 
   // Step 1: Datos del Cliente
   @Column({ name: 'attendance_date', type: 'date', nullable: true })
@@ -142,7 +159,12 @@ export class LaboratoryOrder {
   productIds: string[];
 
   @Column({ name: 'product_quantities', type: 'jsonb', nullable: true })
-  productQuantities: Array<{ productId: string; quantity: number }>;
+  productQuantities: Array<{
+    productId: string;
+    quantity: number;
+    unitPrice?: number;
+    discount?: number;
+  }>;
 
   @Column({
     type: 'enum',
@@ -209,6 +231,10 @@ export class LaboratoryOrder {
   @ManyToOne(() => Patient)
   @JoinColumn({ name: 'patient_id' })
   patient: Patient;
+
+  @ManyToOne(() => Client, { nullable: true })
+  @JoinColumn({ name: 'client_id' })
+  client: Client;
 
   @ManyToOne(() => Product, { nullable: true })
   @JoinColumn({ name: 'product_id' })

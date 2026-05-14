@@ -321,7 +321,39 @@ export class ClinicalFormConfigService {
               alternating: true,
             },
           },
-          step2_finalRx: {
+          step2_pupillaryReflexes: {
+            visible: true,
+            fields: {
+              photomotor: true,
+              consensual: true,
+              accommodative: true,
+            },
+          },
+          step2_ophthalmoscopy: {
+            visible: true,
+            fields: {
+              ophthalmoscopyOd: true,
+              ophthalmoscopyOi: true,
+            },
+          },
+          step2_refractiveTests: {
+            visible: true,
+            fields: {
+              keratometry: true,
+              autorefract: true,
+              refraction: true,
+              subjective: true,
+            },
+          },
+          step2_otherExams: {
+            visible: true,
+            fields: {
+              stereopsis: true,
+              worthTest: true,
+              otherNotes: true,
+            },
+          },
+          step3_finalRx: {
             visible: true,
             fields: {
               finalRxOdSphere: true,
@@ -338,61 +370,34 @@ export class ClinicalFormConfigService {
               finalRxOiAvVp: true,
             },
           },
-          step2_lensTypes: {
+          step3_lensTypes: {
             visible: true,
             fields: {
               lensTypes: true,
             },
           },
-          step2_additionalTreatments: {
+          step3_additionalTreatments: {
             visible: true,
             fields: {
               additionalTreatments: true,
             },
           },
-          step2_professionalName: {
-            visible: true,
-            fields: {
-              professionalName: true,
-            },
-          },
-          step3_pupillaryReflexes: {
-            visible: true,
-            fields: {
-              photomotor: true,
-              consensual: true,
-              accommodative: true,
-            },
-          },
-          step3_ophthalmoscopy: {
-            visible: true,
-            fields: {
-              ophthalmoscopyOd: true,
-              ophthalmoscopyOi: true,
-            },
-          },
-          step3_refractiveTests: {
-            visible: true,
-            fields: {
-              keratometry: true,
-              autorefract: true,
-              refraction: true,
-              subjective: true,
-            },
-          },
-          step3_otherExams: {
-            visible: true,
-            fields: {
-              stereopsis: true,
-              worthTest: true,
-              otherNotes: true,
-            },
-          },
-          step3_diagnosisAndDisposition: {
+          step3_diagnosis: {
             visible: true,
             fields: {
               diagnosis: true,
+            },
+          },
+          step3_disposition: {
+            visible: true,
+            fields: {
               disposition: true,
+            },
+          },
+          step3_professionalName: {
+            visible: true,
+            fields: {
+              professionalName: true,
             },
           },
         },

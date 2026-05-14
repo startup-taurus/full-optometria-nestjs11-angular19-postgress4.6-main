@@ -5,9 +5,20 @@
   top: 0;
   width: $sidenav-width;
   background: var(--#{$prefix}menu-bg);
-  box-shadow: var(--#{$prefix}box-shadow);
+  box-shadow: 6px 0 18px rgba(var(--#{$prefix}dark-rgb), 0.08);
   border-right: $card-border-width solid $card-border-color;
   transition: $transition-base;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 1px;
+    height: 100%;
+    background: rgba(var(--#{$prefix}body-color-rgb), 0.08);
+    pointer-events: none;
+  }
 
   [data-simplebar] {
     height: calc(100% - $topbar-height);
@@ -579,17 +590,17 @@ html[data-layout-mode='detached']:not([data-layout='topnav']) {
     margin: 0 auto;
 
     .app-topbar {
-      margin: 0 -2.65%;
+      margin: 0;
       z-index: 1005;
-      border-bottom-left-radius: 15px;
-      border-bottom-right-radius: 15px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
 
       .logo {
         display: inline-flex;
       }
 
       .topbar-menu {
-        max-width: 95%;
+        max-width: 100%;
       }
     }
 

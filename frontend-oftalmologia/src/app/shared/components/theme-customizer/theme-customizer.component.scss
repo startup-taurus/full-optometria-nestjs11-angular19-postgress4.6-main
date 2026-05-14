@@ -243,6 +243,31 @@
   }
 }
 
+.utility-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  background: var(--bs-secondary-bg);
+  color: var(--bs-body-color);
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--bs-tertiary-bg);
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
