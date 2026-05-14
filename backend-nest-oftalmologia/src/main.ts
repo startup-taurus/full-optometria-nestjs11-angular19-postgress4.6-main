@@ -24,6 +24,8 @@ async function bootstrap() {
       'Authorization',
       'skip',
       'x-admin-branch-id',
+      'Last-Event-ID',
+      'Cache-Control',
     ],
     exposedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
