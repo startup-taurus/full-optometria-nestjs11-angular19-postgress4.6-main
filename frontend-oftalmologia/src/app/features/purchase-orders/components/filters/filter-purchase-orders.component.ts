@@ -69,40 +69,9 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
     this.filterCommunicationService.currentFilter
       .pipe(takeUntil(this.destroy$))
       .subscribe((filter) => {
-        if (filter && Object.keys(filter).length === 0) {
+        if (!filter || Object.keys(filter).length === 0) {
           this.resetFormOnly()
-          return
         }
-
-        if (filter && Object.keys(filter).length > 0) {
-          const formValue = {
-            clientName: filter['clientName'] || '',
-            clientDocument: filter['clientDocument'] || '',
-            invoiceNumber: filter['invoiceNumber'] || '',
-            status: filter['status'] || '',
-            paymentMethod: filter['paymentMethod'] || '',
-            shouldInvoice:
-              filter['shouldInvoice'] !== undefined
-                ? filter['shouldInvoice']
-                  ? 'true'
-                  : 'false'
-                : '',
-            minTotal: filter['minTotal'] ?? '',
-            maxTotal: filter['maxTotal'] ?? '',
-            dateFrom: filter['dateFrom'] || '',
-            dateTo: filter['dateTo'] || '',
-          }
-
-          this.purchaseOrdersFilterForm?.patchValue(formValue)
-
-          setTimeout(() => {
-            this.filterCountChanged.emit(this.getFilterCount())
-          }, 0)
-
-          return
-        }
-
-        this.resetFormOnly()
       })
   }
 
@@ -142,7 +111,10 @@ export class FilterPurchaseOrdersComponent implements OnInit, OnDestroy {
       cleanedFilter['paymentMethod'] = formValue.paymentMethod
     }
 
-    if (formValue.shouldInvoice !== '') {
+    if (
+      formValue.shouldInvoice === 'true' ||
+      formValue.shouldInvoice === 'false'
+    ) {
       cleanedFilter['shouldInvoice'] = formValue.shouldInvoice === 'true'
     }
 
