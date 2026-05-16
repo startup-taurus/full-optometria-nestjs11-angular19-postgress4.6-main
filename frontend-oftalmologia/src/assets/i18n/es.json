@@ -754,6 +754,7 @@
     "RESET": "Restablecer",
     "TOGGLE": "Cambiar",
     "VIEW": "Ver",
+    "VIEW_DETAIL": "Ver detalle",
     "NO_DATA": "Sin datos disponibles",
     "SEARCH": "Buscar"
   },

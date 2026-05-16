@@ -1,0 +1,19 @@
+.row-actions-menu {
+  .btn.no-caret::after {
+    display: none;
+  }
+}
+
+.row-actions-menu__dropdown {
+  min-width: 12rem;
+
+  .dropdown-item {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.875rem;
+
+    i {
+      width: 1rem;
+      text-align: center;
+    }
+  }
+}

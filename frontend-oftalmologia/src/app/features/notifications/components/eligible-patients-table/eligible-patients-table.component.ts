@@ -60,6 +60,7 @@ export class EligiblePatientsTableComponent {
         width: 40,
         sortable: false,
         cellTemplate: this.checkboxTpl,
+        isPrimary: true,
       },
       {
         name: 'NOTIFICATIONS.ELIGIBLE.PATIENT',
@@ -67,6 +68,7 @@ export class EligiblePatientsTableComponent {
         width: 200,
         cellTemplate: this.patientTpl,
         sortable: true,
+        isPrimary: true,
       },
       {
         name: 'NOTIFICATIONS.ELIGIBLE.DOCUMENT',

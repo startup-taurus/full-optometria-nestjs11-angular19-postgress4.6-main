@@ -224,11 +224,13 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
           name: 'PATIENT.TABLE.FIRST_NAME',
           prop: 'firstName',
           width: 150,
+          isPrimary: true,
         },
         {
           name: 'PATIENT.TABLE.LAST_NAME',
           prop: 'lastName',
           width: 150,
+          isPrimary: true,
         },
         {
           name: 'PATIENT.TABLE.DOCUMENT_NUMBER',
@@ -249,6 +251,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
           name: 'PATIENT.TABLE.ADDRESS',
           prop: 'address',
           width: 180,
+          hideOnMobile: true,
         },
         {
           name: 'PATIENT.TABLE.BRANCH',
@@ -266,12 +269,14 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
           name: 'PATIENT.TABLE.CREATED_AT',
           cellTemplate: this.createdAtTemplate ?? undefined,
           width: 130,
+          hideOnMobile: true,
         },
         {
           name: 'PATIENT.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
           width: 280,
           sortable: false,
+          isActions: true,
         },
       ],
     })

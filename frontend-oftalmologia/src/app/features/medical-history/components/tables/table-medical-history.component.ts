@@ -184,11 +184,13 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
           name: 'MEDICAL_HISTORY.TABLE.IDENTIFICATION',
           prop: 'identification',
           width: 130,
+          isPrimary: true,
         },
         {
           name: 'MEDICAL_HISTORY.TABLE.FIRST_NAME',
           prop: 'firstName',
           width: 150,
+          isPrimary: true,
         },
         {
           name: 'MEDICAL_HISTORY.TABLE.LAST_NAME',
@@ -204,16 +206,19 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
           name: 'MEDICAL_HISTORY.TABLE.LAST_EXAM_DATE',
           prop: 'lastExamDate',
           width: 130,
+          hideOnMobile: true,
         },
         {
           name: 'MEDICAL_HISTORY.TABLE.OD_ADD',
           prop: 'rightEyeAdd',
           width: 100,
+          hideOnMobile: true,
         },
         {
           name: 'MEDICAL_HISTORY.TABLE.OI_ADD',
           prop: 'leftEyeAdd',
           width: 100,
+          hideOnMobile: true,
         },
         {
           name: 'MEDICAL_HISTORY.TABLE.STATUS',
@@ -226,6 +231,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
           cellTemplate: this.actionsTemplate ?? undefined,
           width: 180,
           sortable: false,
+          isActions: true,
         },
       ],
     })

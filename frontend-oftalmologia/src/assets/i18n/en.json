@@ -744,6 +744,7 @@
     "RESET": "Reset",
     "TOGGLE": "Toggle",
     "VIEW": "View",
+    "VIEW_DETAIL": "View detail",
     "NO_DATA": "No data available",
     "SEARCH": "Search"
   },

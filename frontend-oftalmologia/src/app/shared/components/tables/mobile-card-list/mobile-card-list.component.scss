@@ -1,0 +1,28 @@
+.mobile-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.mobile-card-list__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+.mobile-card-list__footer-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mobile-card-list__count {
+  font-size: 0.8125rem;
+  color: var(--bs-secondary-color);
+}

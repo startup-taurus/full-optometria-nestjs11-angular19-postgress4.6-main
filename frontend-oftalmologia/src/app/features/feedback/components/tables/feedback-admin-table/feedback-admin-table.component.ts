@@ -63,12 +63,12 @@ export class FeedbackAdminTableComponent implements OnInit {
       page: this.PAGINATION.PAGE,
       columns: [
         { name: 'FEEDBACK.FIELDS.COMPANY', cellTemplate: this.companyTemplate ?? undefined, width: 150, sortable: false },
-        { name: 'FEEDBACK.FIELDS.USER', cellTemplate: this.userTemplate ?? undefined, width: 160, sortable: false },
+        { name: 'FEEDBACK.FIELDS.USER', cellTemplate: this.userTemplate ?? undefined, width: 160, sortable: false, isPrimary: true },
         { name: 'FEEDBACK.FIELDS.TYPE', cellTemplate: this.typeTemplate ?? undefined, width: 120, sortable: false },
-        { name: 'FEEDBACK.FIELDS.TITLE', cellTemplate: this.titleTemplate ?? undefined, width: 240 },
+        { name: 'FEEDBACK.FIELDS.TITLE', cellTemplate: this.titleTemplate ?? undefined, width: 240, isPrimary: true },
         { name: 'FEEDBACK.FIELDS.STATUS', cellTemplate: this.statusTemplate ?? undefined, width: 130, sortable: false },
-        { name: 'FEEDBACK.FIELDS.CREATED_AT', cellTemplate: this.createdAtTemplate ?? undefined, width: 130 },
-        { name: 'FEEDBACK.TABLE.ACTIONS', cellTemplate: this.actionsTemplate ?? undefined, width: 110, sortable: false },
+        { name: 'FEEDBACK.FIELDS.CREATED_AT', cellTemplate: this.createdAtTemplate ?? undefined, width: 130, hideOnMobile: true },
+        { name: 'FEEDBACK.TABLE.ACTIONS', cellTemplate: this.actionsTemplate ?? undefined, width: 140, sortable: false, isActions: true },
       ],
     })
   }

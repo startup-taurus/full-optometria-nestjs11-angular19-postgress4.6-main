@@ -169,6 +169,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
           cellTemplate: this.nameTemplate,
           width: 230,
           sortable: false,
+          isPrimary: true,
         },
         {
           name: 'CLIENT.DOCUMENT_NUMBER',
@@ -197,6 +198,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
           cellTemplate: this.actionsTemplate,
           width: 220,
           sortable: false,
+          isActions: true,
         },
       ],
     })

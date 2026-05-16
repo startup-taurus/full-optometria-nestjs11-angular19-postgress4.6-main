@@ -1,147 +1,162 @@
-<ngx-datatable
-  #ngxDatatable
-  class="material"
-  [rows]="data"
-  [loadingIndicator]="ngxConfig.loadingIndicator"
-  [columnMode]="ngxConfig.columnMode"
-  [selectionType]="ngxConfig.selectionType"
-  [scrollbarH]="ngxConfig.scrollbarH"
-  [rowHeight]="ngxConfig.rowHeight"
-  [summaryRow]="ngxConfig.summaryRow"
-  [summaryPosition]="ngxConfig.summaryPosition"
-  [footerHeight]="1"
-  [messages]="{ emptyMessage: ngxConfig.emptyMessage | translate }"
-  (select)="emitOnSelectRow($event)"
->
-  <!-- Columnas de la tabla -->
-  @for (col of ngxConfig.columns; track $index) {
-    <!--  -->
-    @if (
-      !col.isExpandable &&
-      !col.expandableCellTemplate &&
-      !col.expandableRowTemplate
-    ) {
-      <!-- Template por defecto de la columna -->
-      @if (!col.cellTemplate) {
-        <ngx-datatable-column
-          [name]="col.name || '' | translate"
-          [prop]="col.prop || ''"
-          [sortable]="col.sortable ?? true"
-          [width]="col.width || 200"
-          [frozenLeft]="col.frozenLeft || false"
-          [frozenRight]="col.frozenRight || false"
-          [summaryFunc]="col.summaryFunc ?? col.summaryFunc!"
-          [summaryTemplate]="col.summaryTemplate ?? col.summaryTemplate!"
-        ></ngx-datatable-column>
-      }
+@if (isMobile()) {
+  <app-mobile-card-list
+    [config]="ngxConfig"
+    [data]="data"
+    (onChangeLimit)="emitMobileChangeLimit($event)"
+    (onChangePage)="emitMobileChangePage($event)"
+  ></app-mobile-card-list>
+} @else {
+  <ngx-datatable
+    #ngxDatatable
+    class="material"
+    [rows]="data"
+    [loadingIndicator]="ngxConfig.loadingIndicator"
+    [columnMode]="ngxConfig.columnMode"
+    [selectionType]="ngxConfig.selectionType"
+    [scrollbarH]="ngxConfig.scrollbarH"
+    [rowHeight]="ngxConfig.rowHeight"
+    [summaryRow]="ngxConfig.summaryRow"
+    [summaryPosition]="ngxConfig.summaryPosition"
+    [footerHeight]="1"
+    [messages]="{ emptyMessage: ngxConfig.emptyMessage | translate }"
+    (select)="emitOnSelectRow($event)"
+  >
+    <!-- Columnas de la tabla -->
+    @for (col of ngxConfig.columns; track $index) {
+      <!--  -->
+      @if (
+        !col.isExpandable &&
+        !col.expandableCellTemplate &&
+        !col.expandableRowTemplate
+      ) {
+        <!-- Template por defecto de la columna -->
+        @if (!col.cellTemplate) {
+          <ngx-datatable-column
+            [name]="col.name || '' | translate"
+            [prop]="col.prop || ''"
+            [sortable]="col.sortable ?? true"
+            [width]="col.width || 200"
+            [frozenLeft]="col.frozenLeft || false"
+            [frozenRight]="col.frozenRight || false"
+            [cellClass]="col.cellClass || ''"
+            [headerClass]="col.headerClass || ''"
+            [summaryFunc]="col.summaryFunc ?? col.summaryFunc!"
+            [summaryTemplate]="col.summaryTemplate ?? col.summaryTemplate!"
+          ></ngx-datatable-column>
+        }
 
-      <!-- Template personalizado de la columna -->
-      @if (col.cellTemplate) {
+        <!-- Template personalizado de la columna -->
+        @if (col.cellTemplate) {
+          <ngx-datatable-column
+            [name]="col.name || '' | translate"
+            [width]="col.width || 200"
+            [sortable]="col.sortable ?? true"
+            [frozenLeft]="col.frozenLeft || false"
+            [frozenRight]="col.frozenRight || false"
+            [cellClass]="col.cellClass || ''"
+            [headerClass]="col.headerClass || ''"
+            [summaryFunc]="col.summaryFunc ?? col.summaryFunc!"
+            [summaryTemplate]="col.summaryTemplate ?? col.summaryTemplate!"
+          >
+            <ng-template
+              let-row="row"
+              let-rowIndex="rowIndex"
+              ngx-datatable-cell-template
+            >
+              <ng-container
+                *ngTemplateOutlet="col.cellTemplate; context: { row, rowIndex }"
+              ></ng-container>
+            </ng-template>
+          </ngx-datatable-column>
+        }
+        <!--  -->
+      }
+      @if (
+        col.isExpandable ||
+        col.expandableCellTemplate ||
+        col.expandableRowTemplate
+      ) {
+        <!-- Template por defecto o personalizado para la columna con función expandible -->
         <ngx-datatable-column
-          [name]="col.name || '' | translate"
-          [width]="col.width || 200"
+          [width]="col.width || 75"
           [sortable]="col.sortable ?? true"
           [frozenLeft]="col.frozenLeft || false"
           [frozenRight]="col.frozenRight || false"
-          [summaryFunc]="col.summaryFunc ?? col.summaryFunc!"
-          [summaryTemplate]="col.summaryTemplate ?? col.summaryTemplate!"
+          [cellClass]="col.cellClass || ''"
+          [headerClass]="col.headerClass || ''"
         >
           <ng-template
             let-row="row"
             let-rowIndex="rowIndex"
+            let-expanded="expanded"
+            let-table="table"
             ngx-datatable-cell-template
           >
             <ng-container
-              *ngTemplateOutlet="col.cellTemplate; context: { row, rowIndex }"
+              *ngTemplateOutlet="
+                col.expandableCellTemplate ?? defaultExpandableCellTemplate;
+                context: { row, rowIndex, expanded, table: ngxDatatable }
+              "
             ></ng-container>
           </ng-template>
         </ngx-datatable-column>
+
+        <!-- Template por defecto o personalizado para la fila expandida -->
+        <ngx-datatable-row-detail>
+          <ng-template
+            let-row="row"
+            let-rowIndex="rowIndex"
+            let-expanded="expanded"
+            ngx-datatable-row-detail-template
+          >
+            <ng-container
+              *ngTemplateOutlet="
+                col.expandableRowTemplate ?? defaultExpandableRowTemplate;
+                context: { row, rowIndex, expanded }
+              "
+            ></ng-container>
+          </ng-template>
+        </ngx-datatable-row-detail>
       }
-      <!--  -->
     }
-    @if (
-      col.isExpandable ||
-      col.expandableCellTemplate ||
-      col.expandableRowTemplate
-    ) {
-      <!-- Template por defecto o personalizado para la columna con función expandible -->
-      <ngx-datatable-column
-        [width]="col.width || 75"
-        [sortable]="col.sortable ?? true"
-        [frozenLeft]="col.frozenLeft || false"
-        [frozenRight]="col.frozenRight || false"
-      >
-        <ng-template
-          let-row="row"
-          let-rowIndex="rowIndex"
-          let-expanded="expanded"
-          let-table="table"
-          ngx-datatable-cell-template
-        >
-          <ng-container
-            *ngTemplateOutlet="
-              col.expandableCellTemplate ?? defaultExpandableCellTemplate;
-              context: { row, rowIndex, expanded, table: ngxDatatable }
-            "
-          ></ng-container>
-        </ng-template>
-      </ngx-datatable-column>
 
-      <!-- Template por defecto o personalizado para la fila expandida -->
-      <ngx-datatable-row-detail>
-        <ng-template
-          let-row="row"
-          let-rowIndex="rowIndex"
-          let-expanded="expanded"
-          ngx-datatable-row-detail-template
-        >
-          <ng-container
-            *ngTemplateOutlet="
-              col.expandableRowTemplate ?? defaultExpandableRowTemplate;
-              context: { row, rowIndex, expanded }
-            "
-          ></ng-container>
-        </ng-template>
-      </ngx-datatable-row-detail>
-    }
-  }
-
-  <!-- Footer de la tabla -->
-  <ngx-datatable-footer>
-    <ng-template ngx-datatable-footer-template>
-      <div class="footer-left">
-        <div class="page-size-container">
-          <select class="form-select" (change)="emitOnChangeLimit($event)">
-            @for (option of ngxConfig.limitOptions; track $index) {
-              <option
-                [value]="option.value"
-                [selected]="option.value == ngxConfig.limit"
-              >
-                {{ option.label | translate }}
-              </option>
-            }
-          </select>
+    <!-- Footer de la tabla -->
+    <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template>
+        <div class="footer-left">
+          <div class="page-size-container">
+            <select class="form-select" (change)="emitOnChangeLimit($event)">
+              @for (option of ngxConfig.limitOptions; track $index) {
+                <option
+                  [value]="option.value"
+                  [selected]="option.value == ngxConfig.limit"
+                >
+                  {{ option.label | translate }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="total-rows-container">
+            <span>
+              {{ 'WORDS.RESULTS' | translate }}: {{ ngxConfig.count }}
+            </span>
+          </div>
         </div>
-        <div class="total-rows-container">
-          <span>
-            {{ 'WORDS.RESULTS' | translate }}: {{ ngxConfig.count }}
-          </span>
-        </div>
-      </div>
-      <datatable-pager
-        [pagerLeftArrowIcon]="'datatable-icon-left'"
-        [pagerRightArrowIcon]="'datatable-icon-right'"
-        [pagerPreviousIcon]="'datatable-icon-prev'"
-        [pagerNextIcon]="'datatable-icon-skip'"
-        [page]="ngxConfig.page"
-        [size]="ngxConfig.limit"
-        [count]="ngxConfig.count"
-        [hidden]="!(ngxConfig.count / ngxConfig.limit > 1)"
-        (change)="emitOnChangePage($event)"
-      />
-    </ng-template>
-  </ngx-datatable-footer>
-</ngx-datatable>
+        <datatable-pager
+          [pagerLeftArrowIcon]="'datatable-icon-left'"
+          [pagerRightArrowIcon]="'datatable-icon-right'"
+          [pagerPreviousIcon]="'datatable-icon-prev'"
+          [pagerNextIcon]="'datatable-icon-skip'"
+          [page]="ngxConfig.page"
+          [size]="ngxConfig.limit"
+          [count]="ngxConfig.count"
+          [hidden]="!(ngxConfig.count / ngxConfig.limit > 1)"
+          (change)="emitOnChangePage($event)"
+        />
+      </ng-template>
+    </ngx-datatable-footer>
+  </ngx-datatable>
+}
 
 <!-- Template por defecto para la columna con función expandible -->
 <ng-template
