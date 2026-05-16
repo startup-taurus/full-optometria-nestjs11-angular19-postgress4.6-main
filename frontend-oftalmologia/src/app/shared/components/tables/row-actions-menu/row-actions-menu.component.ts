@@ -1,6 +1,6 @@
-import { NgClass, NgFor, NgIf } from '@angular/common'
+import { NgClass, NgFor } from '@angular/common'
 import { Component, Input, computed, signal } from '@angular/core'
-import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { TranslatePipe } from '@ngx-translate/core'
 
 export type RowActionVariant =
@@ -24,14 +24,7 @@ export interface RowActionItem {
 @Component({
   selector: 'app-row-actions-menu',
   standalone: true,
-  imports: [
-    NgIf,
-    NgFor,
-    NgClass,
-    NgbDropdownModule,
-    NgbTooltipModule,
-    TranslatePipe,
-  ],
+  imports: [NgFor, NgClass, NgbTooltipModule, TranslatePipe],
   templateUrl: './row-actions-menu.component.html',
   styleUrl: './row-actions-menu.component.scss',
 })

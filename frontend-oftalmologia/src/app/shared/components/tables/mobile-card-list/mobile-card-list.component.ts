@@ -54,10 +54,6 @@ export class MobileCardListComponent {
     return (this.ngxConfig.columns || []).find((col) => col.isActions) ?? null
   }
 
-  public hasExpandableBody(): boolean {
-    return this.bodyColumns.length > 0
-  }
-
   public isExpanded(rowIndex: number): boolean {
     return this.expanded().has(rowIndex)
   }

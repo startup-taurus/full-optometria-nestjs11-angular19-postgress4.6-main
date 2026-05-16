@@ -12,39 +12,16 @@
     <i [class]="item.icon"></i>
   </button>
 
-  <div
-    *ngIf="visibleSecondary().length > 0"
-    ngbDropdown
-    container="body"
-    placement="bottom-end auto"
-    [autoClose]="true"
-    class="row-actions-menu__more"
+  <button
+    *ngFor="let item of visibleSecondary()"
+    type="button"
+    class="btn btn-xs"
+    [ngClass]="outlineClass(item.variant)"
+    placement="left"
+    [ngbTooltip]="item.tooltip | translate"
+    [disabled]="!!item.disabled"
+    (click)="runAction(item)"
   >
-    <button
-      type="button"
-      class="btn btn-xs btn-outline-secondary no-caret"
-      ngbDropdownToggle
-      [ngbTooltip]="'COMMON.ACTIONS' | translate"
-      container="body"
-      placement="left"
-    >
-      <i class="ti ti-dots-vertical"></i>
-    </button>
-    <div
-      ngbDropdownMenu
-      class="dropdown-menu row-actions-menu__dropdown"
-    >
-      <button
-        *ngFor="let item of visibleSecondary()"
-        type="button"
-        class="dropdown-item d-flex align-items-center gap-2"
-        [class.text-danger]="item.variant === 'danger'"
-        [disabled]="!!item.disabled"
-        (click)="runAction(item)"
-      >
-        <i [class]="item.icon"></i>
-        <span>{{ item.tooltip | translate }}</span>
-      </button>
-    </div>
-  </div>
+    <i [class]="item.icon"></i>
+  </button>
 </div>

@@ -21,7 +21,31 @@
           </header>
         }
 
-        @if (hasExpandableBody()) {
+        @if (bodyColumns.length > 0) {
+          <div class="data-card__body">
+            @for (col of bodyColumns; track $index) {
+              <div class="data-card__row">
+                <span class="data-card__label">
+                  {{ (col.mobileLabel || col.name || '') | translate }}
+                </span>
+                <span class="data-card__value">
+                  @if (col.cellTemplate) {
+                    <ng-container
+                      *ngTemplateOutlet="
+                        col.cellTemplate;
+                        context: { row, rowIndex }
+                      "
+                    ></ng-container>
+                  } @else {
+                    {{ row[col.prop || ''] }}
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (actionsColumn?.cellTemplate) {
           <button
             type="button"
             class="data-card__toggle"
@@ -37,39 +61,15 @@
           </button>
 
           @if (isExpanded(rowIndex)) {
-            <div class="data-card__body">
-              @for (col of bodyColumns; track $index) {
-                <div class="data-card__row">
-                  <span class="data-card__label">
-                    {{ (col.mobileLabel || col.name || '') | translate }}
-                  </span>
-                  <span class="data-card__value">
-                    @if (col.cellTemplate) {
-                      <ng-container
-                        *ngTemplateOutlet="
-                          col.cellTemplate;
-                          context: { row, rowIndex }
-                        "
-                      ></ng-container>
-                    } @else {
-                      {{ row[col.prop || ''] }}
-                    }
-                  </span>
-                </div>
-              }
-            </div>
+            <footer class="data-card__actions">
+              <ng-container
+                *ngTemplateOutlet="
+                  actionsColumn!.cellTemplate!;
+                  context: { row, rowIndex }
+                "
+              ></ng-container>
+            </footer>
           }
-        }
-
-        @if (actionsColumn?.cellTemplate) {
-          <footer class="data-card__actions">
-            <ng-container
-              *ngTemplateOutlet="
-                actionsColumn!.cellTemplate!;
-                context: { row, rowIndex }
-              "
-            ></ng-container>
-          </footer>
         }
       </article>
     }

@@ -85,7 +85,6 @@ export class TableLaboratoryOrdersComponent
   public exportColumns: ExportColumn<LaboratoryOrder>[] = []
   public sideFilterComponent = FilterLaboratoryOrdersComponent
   public isLoading = false
-  public showFloatingMenu: string | null = null
   public currentPage = 1
   public totalItems = 0
   public hasMore = true
@@ -578,10 +577,6 @@ export class TableLaboratoryOrdersComponent
     return order.id
   }
 
-  public toggleFloatingMenu(orderId: string): void {
-    this.showFloatingMenu = this.showFloatingMenu === orderId ? null : orderId
-  }
-
   hasPhoneNumber(order: LaboratoryOrder): boolean {
     return !!(order.patient?.mobilePhone || order.patient?.homePhone)
   }
@@ -710,7 +705,6 @@ export class TableLaboratoryOrdersComponent
       window.open(whatsappUrl, '_blank')
     } catch (error) {}
 
-    this.showFloatingMenu = null
   }
 
   private formatPhoneForWhatsApp(phone: string): string {
@@ -751,7 +745,6 @@ export class TableLaboratoryOrdersComponent
       window.location.href = mailtoUrl
     } catch (error) {}
 
-    this.showFloatingMenu = null
   }
 
   public async onPrintOrder(order: LaboratoryOrder): Promise<void> {
@@ -789,8 +782,6 @@ export class TableLaboratoryOrdersComponent
       }
 
       await this._pdfService.generatePdf(pdfData, pageSize)
-
-      this.showFloatingMenu = null
     } catch (error) {
       Swal.fire({
         icon: 'error',
