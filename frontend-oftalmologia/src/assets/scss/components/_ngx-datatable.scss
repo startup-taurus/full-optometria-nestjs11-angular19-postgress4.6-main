@@ -127,23 +127,13 @@
     background-image: none !important;
     background-repeat: no-repeat !important;
     z-index: 11 !important;
+    transform: none !important;
+    position: sticky !important;
+    right: 0 !important;
 
     .datatable-header-cell {
       border-left: 1px solid var(--bs-border-color);
     }
-  }
-
-  // ─── Alineación header ↔ body ─────────────────────────────────────────
-  // ngx-datatable v20:
-  //   body offset    = (offsetDiff + scrollbarHelper.width) * -1
-  //   header offset  =  totalDiff * -1
-  // Diferencia constante = scrollbarHelper.width (~15px en Windows).
-  // El header row-right queda 15px más a la derecha que el body row-right.
-  // Compensamos con `right: 15px` sobre el header row-right (su position es
-  // `relative`, así que `right` lo desplaza a la izquierda sin tocar el
-  // transform inline que ngx-datatable aplica).
-  &.scroll-horz .datatable-header .datatable-row-right {
-    right: 15px;
   }
 
   // Garantiza que el scrollbar siempre exista para que scrollbarHelper.width
