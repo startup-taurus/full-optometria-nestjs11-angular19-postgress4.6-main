@@ -107,20 +107,11 @@
         <div class="col-lg-6 mb-4">
           <div class="info-card">
             <div class="card-header">
-              <h6>{{ 'MEDICAL_HISTORY.FIELDS.LAST_EXAM' | translate }}</h6>
+              <h6>
+                {{ 'MEDICAL_HISTORY.FORM.PATIENT_INFORMATION' | translate }}
+              </h6>
             </div>
             <div class="card-body">
-              <div class="data-field">
-                <strong
-                  >{{
-                    'MEDICAL_HISTORY.FIELDS.PROFESSIONAL' | translate
-                  }}:</strong
-                >
-                <span>{{
-                  clinicalHistory.professionalName ||
-                    ('MEDICAL_HISTORY.MESSAGES.NOT_SPECIFIED' | translate)
-                }}</span>
-              </div>
               <div class="data-field">
                 <strong
                   >{{
@@ -146,7 +137,9 @@
               </div>
               <div class="data-field">
                 <strong
-                  >{{ 'MEDICAL_HISTORY.FIELDS.LAST_EXAM' | translate }}:</strong
+                  >{{
+                    'MEDICAL_HISTORY.FIELDS.LAST_VISUAL_EXAM_DATE' | translate
+                  }}:</strong
                 >
                 <span>{{
                   clinicalHistory.lastVisualExamDate
@@ -170,7 +163,7 @@
                 <div class="data-field">
                   <strong
                     >{{
-                      'MEDICAL_HISTORY.FIELDS.VISION_PROBLEMS' | translate
+                      'MEDICAL_HISTORY.FIELDS.VISUAL_COMPLAINTS' | translate
                     }}:</strong
                   >
                   <span>{{
@@ -203,21 +196,6 @@
                   <span>{{
                     clinicalHistory.otherHealthProblems ||
                       ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
-                  }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <div class="data-field">
-                  <strong
-                    >{{
-                      'MEDICAL_HISTORY.FIELDS.ANTERIOR_SEGMENT' | translate
-                    }}:</strong
-                  >
-                  <span>{{
-                    clinicalHistory.segmentAnterior ||
-                      ('MEDICAL_HISTORY.MESSAGES.NOT_SPECIFIED' | translate)
                   }}</span>
                 </div>
               </div>
@@ -334,6 +312,19 @@
                   <span>{{
                     clinicalHistory.previousAo ||
                       ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="data-field">
+                  <strong
+                    >{{
+                      'MEDICAL_HISTORY.FIELDS.ANTERIOR_SEGMENT' | translate
+                    }}:</strong
+                  >
+                  <span>{{
+                    clinicalHistory.segmentAnterior ||
+                      ('MEDICAL_HISTORY.MESSAGES.NOT_SPECIFIED' | translate)
                   }}</span>
                 </div>
               </div>

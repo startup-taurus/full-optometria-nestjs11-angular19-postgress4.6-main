@@ -217,11 +217,13 @@ export class UsersTableComponent implements OnInit, OnDestroy {
           name: 'USER.TABLE.USERNAME',
           prop: 'username',
           width: 120,
+          isPrimary: true,
         },
         {
           name: 'USER.TABLE.FIRST_NAME',
           prop: 'firstName',
           width: 130,
+          isPrimary: true,
         },
         {
           name: 'USER.TABLE.LAST_NAME',
@@ -242,6 +244,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
           name: 'USER.TABLE.MOBILE_PHONE',
           prop: 'mobilePhone',
           width: 130,
+          hideOnMobile: true,
         },
         {
           name: 'USER.TABLE.ROLE',
@@ -254,12 +257,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
           cellTemplate: this.branchTemplate ?? undefined,
           width: 120,
           sortable: false,
+          hideOnMobile: true,
         },
         {
           name: 'USER.TABLE.COMPANY',
           cellTemplate: this.companyTemplate ?? undefined,
           width: 150,
           sortable: false,
+          hideOnMobile: true,
         },
         {
           name: 'USER.TABLE.STATUS',
@@ -271,22 +276,26 @@ export class UsersTableComponent implements OnInit, OnDestroy {
           name: 'USER.TABLE.IS_LOCKED',
           prop: 'isLocked',
           width: 100,
+          hideOnMobile: true,
         },
         {
           name: 'USER.TABLE.LAST_LOGIN',
           cellTemplate: this.lastLoginAtTemplate ?? undefined,
           width: 150,
+          hideOnMobile: true,
         },
         {
           name: 'USER.TABLE.CREATED_AT',
           cellTemplate: this.createdAtTemplate ?? undefined,
           width: 130,
+          hideOnMobile: true,
         },
         {
           name: 'USER.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
           width: 190,
           sortable: false,
+          isActions: true,
         },
       ],
     })

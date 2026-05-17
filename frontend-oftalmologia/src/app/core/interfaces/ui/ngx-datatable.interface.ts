@@ -9,6 +9,12 @@ export interface NgxDatatableColumn {
   hide: boolean
   frozenLeft: boolean
   frozenRight: boolean
+  cellClass: string | ((data: any) => string | Record<string, boolean>)
+  headerClass: string | ((data: any) => string | Record<string, boolean>)
+  isActions: boolean
+  isPrimary: boolean
+  hideOnMobile: boolean
+  mobileLabel: string
   cellTemplate: TemplateRef<any>
   isExpandable: boolean
   expandableCellTemplate: TemplateRef<any>

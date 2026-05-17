@@ -1,0 +1,114 @@
+<div class="mobile-card-list">
+  @if (data && data.length > 0) {
+    @for (row of data; track $index; let rowIndex = $index) {
+      <article class="data-card">
+        @if (primaryColumns.length > 0) {
+          <header class="data-card__header">
+            @for (col of primaryColumns; track $index) {
+              <div class="data-card__primary">
+                @if (col.cellTemplate) {
+                  <ng-container
+                    *ngTemplateOutlet="
+                      col.cellTemplate;
+                      context: { row, rowIndex }
+                    "
+                  ></ng-container>
+                } @else {
+                  <span>{{ row[col.prop || ''] }}</span>
+                }
+              </div>
+            }
+          </header>
+        }
+
+        @if (bodyColumns.length > 0) {
+          <div class="data-card__body">
+            @for (col of bodyColumns; track $index) {
+              <div class="data-card__row">
+                <span class="data-card__label">
+                  {{ (col.mobileLabel || col.name || '') | translate }}
+                </span>
+                <span class="data-card__value">
+                  @if (col.cellTemplate) {
+                    <ng-container
+                      *ngTemplateOutlet="
+                        col.cellTemplate;
+                        context: { row, rowIndex }
+                      "
+                    ></ng-container>
+                  } @else {
+                    {{ row[col.prop || ''] }}
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (actionsColumn?.cellTemplate) {
+          <button
+            type="button"
+            class="data-card__toggle"
+            [attr.aria-expanded]="isExpanded(rowIndex)"
+            (click)="toggleExpand(rowIndex)"
+          >
+            <span>{{ 'COMMON.VIEW_DETAIL' | translate }}</span>
+            <i
+              class="ti"
+              [class.ti-chevron-down]="!isExpanded(rowIndex)"
+              [class.ti-chevron-up]="isExpanded(rowIndex)"
+            ></i>
+          </button>
+
+          @if (isExpanded(rowIndex)) {
+            <footer class="data-card__actions">
+              <ng-container
+                *ngTemplateOutlet="
+                  actionsColumn!.cellTemplate!;
+                  context: { row, rowIndex }
+                "
+              ></ng-container>
+            </footer>
+          }
+        }
+      </article>
+    }
+  } @else {
+    <div class="data-card data-card--empty">
+      <i class="ti ti-database-off"></i>
+      <span>{{ ngxConfig.emptyMessage | translate }}</span>
+    </div>
+  }
+
+  <div class="mobile-card-list__footer">
+    <div class="mobile-card-list__footer-left">
+      <select
+        class="form-select form-select-sm"
+        (change)="emitChangeLimit($event)"
+      >
+        @for (option of ngxConfig.limitOptions; track $index) {
+          <option
+            [value]="option.value"
+            [selected]="option.value == ngxConfig.limit"
+          >
+            {{ option.label | translate }}
+          </option>
+        }
+      </select>
+      <span class="mobile-card-list__count">
+        {{ 'WORDS.RESULTS' | translate }}: {{ ngxConfig.count }}
+      </span>
+    </div>
+    <datatable-pager
+      [pagerLeftArrowIcon]="'datatable-icon-left'"
+      [pagerRightArrowIcon]="'datatable-icon-right'"
+      [pagerPreviousIcon]="'datatable-icon-prev'"
+      [pagerNextIcon]="'datatable-icon-skip'"
+      [page]="ngxConfig.page"
+      [size]="ngxConfig.limit"
+      [count]="ngxConfig.count"
+      [hidden]="!(ngxConfig.count / ngxConfig.limit > 1)"
+      (change)="emitChangePage($event)"
+    />
+  </div>
+</div>

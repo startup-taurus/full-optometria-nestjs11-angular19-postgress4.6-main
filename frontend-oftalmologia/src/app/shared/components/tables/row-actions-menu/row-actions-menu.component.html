@@ -1,0 +1,27 @@
+<div class="row-actions-menu d-inline-flex align-items-center gap-1 flex-wrap">
+  <button
+    *ngFor="let item of visiblePrimary()"
+    type="button"
+    class="btn btn-xs"
+    [ngClass]="outlineClass(item.variant)"
+    placement="left"
+    [ngbTooltip]="item.tooltip | translate"
+    [disabled]="!!item.disabled"
+    (click)="runAction(item)"
+  >
+    <i [class]="item.icon"></i>
+  </button>
+
+  <button
+    *ngFor="let item of visibleSecondary()"
+    type="button"
+    class="btn btn-xs"
+    [ngClass]="outlineClass(item.variant)"
+    placement="left"
+    [ngbTooltip]="item.tooltip | translate"
+    [disabled]="!!item.disabled"
+    (click)="runAction(item)"
+  >
+    <i [class]="item.icon"></i>
+  </button>
+</div>

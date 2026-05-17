@@ -63,6 +63,10 @@ import { CreateEditPurchaseOrderModalComponent } from '../modals/create-edit-pur
 import { PurchaseOrdersSummaryComponent } from '../purchase-orders-summary/purchase-orders-summary.component'
 import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
 import { ExportColumn } from '@core/services/ui/table-export.service'
+import {
+  RowActionItem,
+  RowActionsMenuComponent,
+} from '../../../../shared/components/tables/row-actions-menu/row-actions-menu.component'
 
 @Component({
   selector: 'table-purchase-orders',
@@ -76,6 +80,7 @@ import { ExportColumn } from '@core/services/ui/table-export.service'
     NgxDatatableComponent,
     SideFilterPanelComponent,
     TableExportButtonsComponent,
+    RowActionsMenuComponent,
   ],
   templateUrl: './table-purchase-orders.component.html',
   styleUrl: './table-purchase-orders.component.scss',
@@ -284,18 +289,21 @@ export class TablePurchaseOrdersComponent
           cellTemplate: this.orderNumberTemplate,
           width: 110,
           sortable: false,
+          isPrimary: true,
         },
         {
           name: 'PURCHASE_ORDERS.TABLE.CLIENT',
           cellTemplate: this.clientTemplate,
           width: 230,
           sortable: false,
+          isPrimary: true,
         },
         {
           name: 'PURCHASE_ORDERS.TABLE.LAB_ORDER',
           cellTemplate: this.labOrderTemplate,
           width: 120,
           sortable: false,
+          hideOnMobile: true,
         },
         {
           name: 'PURCHASE_ORDERS.TABLE.STATUS',
@@ -314,6 +322,7 @@ export class TablePurchaseOrdersComponent
           cellTemplate: this.paymentMethodTemplate,
           width: 180,
           sortable: false,
+          hideOnMobile: true,
         },
         {
           name: 'PURCHASE_ORDERS.TABLE.PRICE',
@@ -326,12 +335,14 @@ export class TablePurchaseOrdersComponent
           cellTemplate: this.createdAtTemplate,
           width: 170,
           sortable: false,
+          hideOnMobile: true,
         },
         {
           name: 'PURCHASE_ORDERS.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate,
-          width: 280,
+          width: 220,
           sortable: false,
+          isActions: true,
         },
       ],
     })
@@ -1353,5 +1364,111 @@ export class TablePurchaseOrdersComponent
       if (Array.isArray(value)) return value.length > 0
       return value !== null && value !== undefined
     }).length
+  }
+
+  private primaryActionsCache = new WeakMap<PurchaseOrder, RowActionItem[]>()
+  private secondaryActionsCache = new Map<
+    string,
+    { row: PurchaseOrder; actions: RowActionItem[] }
+  >()
+
+  public getPrimaryActions(row: PurchaseOrder): RowActionItem[] {
+    const cached = this.primaryActionsCache.get(row)
+    if (cached) return cached
+    const actions: RowActionItem[] = [
+      {
+        icon: 'ti ti-eye',
+        tooltip: 'COMMON.VIEW',
+        variant: 'secondary',
+        onClick: () => this.openViewModal(row),
+      },
+      {
+        icon: 'ti ti-edit',
+        tooltip: 'COMMON.EDIT',
+        variant: 'secondary',
+        onClick: () => this.openEditModal(row),
+      },
+      {
+        icon: 'ti ti-trash',
+        tooltip: 'COMMON.DELETE',
+        variant: 'danger',
+        onClick: () => this.deleteOrder(row),
+      },
+    ]
+    this.primaryActionsCache.set(row, actions)
+    return actions
+  }
+
+  public getSecondaryActions(row: PurchaseOrder): RowActionItem[] {
+    const billingEnabled = this.canUseBilling()
+    const key = this.secondaryActionsKey(row, billingEnabled)
+    const cached = this.secondaryActionsCache.get(key)
+    if (cached && cached.row === row) return cached.actions
+    const actions: RowActionItem[] = [
+      {
+        icon: 'ti ti-info-circle',
+        tooltip: 'PURCHASE_ORDERS.BILLING.MESSAGES.BILLING_NOT_ENABLED_TOOLTIP',
+        variant: 'warning',
+        visible: this.showBillingBlockedIndicator(row),
+        onClick: () => this.onBillingActionBlocked(),
+      },
+      {
+        icon: 'ti ti-receipt',
+        tooltip: 'PURCHASE_ORDERS.BILLING.ACTION.ISSUE',
+        variant: 'success',
+        visible: this.canIssueInvoice(row) && billingEnabled,
+        onClick: () => this.issueInvoice(row),
+      },
+      {
+        icon: 'ti ti-refresh',
+        tooltip: 'PURCHASE_ORDERS.BILLING.ACTION.RETRY',
+        variant: 'warning',
+        visible: this.canRetryInvoice(row) && billingEnabled,
+        onClick: () => this.retryInvoice(row),
+      },
+      {
+        icon: 'ti ti-shield-check',
+        tooltip: 'PURCHASE_ORDERS.BILLING.ACTION.AUTHORIZE',
+        variant: 'primary',
+        visible: this.canAuthorizeInvoice(row) && billingEnabled,
+        onClick: () => this.authorizeInvoice(row),
+      },
+      {
+        icon: 'ti ti-refresh-alert',
+        tooltip: 'PURCHASE_ORDERS.BILLING.ACTION.CHECK_STATUS',
+        variant: 'dark',
+        visible: this.canCheckInvoiceStatus(row) && billingEnabled,
+        onClick: () => this.checkInvoiceStatus(row),
+      },
+      {
+        icon: 'ti ti-file-search',
+        tooltip: 'PURCHASE_ORDERS.BILLING.ACTION.VIEW_XML',
+        variant: 'info',
+        visible: this.hasInvoiceXml(row) && billingEnabled,
+        onClick: () => this.viewInvoiceXml(row),
+      },
+      {
+        icon: 'ti ti-file-download',
+        tooltip: 'PURCHASE_ORDERS.BILLING.ACTION.DOWNLOAD_XML',
+        variant: 'info',
+        visible: this.hasInvoiceXml(row) && billingEnabled,
+        onClick: () => this.downloadInvoiceXml(row),
+      },
+    ]
+    this.secondaryActionsCache.set(key, { row, actions })
+    return actions
+  }
+
+  private secondaryActionsKey(
+    row: PurchaseOrder,
+    billingEnabled: boolean
+  ): string {
+    return [
+      row.id,
+      row.status,
+      row.invoice?.state,
+      row.shouldInvoice,
+      billingEnabled,
+    ].join('|')
   }
 }

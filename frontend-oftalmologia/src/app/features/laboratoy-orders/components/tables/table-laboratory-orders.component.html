@@ -173,65 +173,38 @@
                       <i class="ti ti-switch-horizontal"></i>
                     </button>
 
-                    <div class="position-relative">
-                      <button
-                        type="button"
-                        class="btn btn-outline-primary btn-action"
-                        (click)="
-                          toggleFloatingMenu(order.id); $event.stopPropagation()
-                        "
-                        [attr.aria-expanded]="showFloatingMenu === order.id"
-                        [title]="
-                          'LABORATORY_ORDERS_MODULE.SEND_NOTIFICATION'
-                            | translate
-                        "
-                      >
-                        <i class="ti ti-send"></i>
-                      </button>
-
-                      <div
-                        class="floating-menu-actions"
-                        [class.show]="showFloatingMenu === order.id"
-                        id="menu-{{ order.id }}"
-                      >
-                        <button
-                          type="button"
-                          class="btn btn-success btn-action-menu"
-                          [disabled]="!hasPhoneNumber(order)"
-                          (click)="
-                            onSendWhatsApp(order); $event.stopPropagation()
-                          "
-                          [title]="
-                            'LABORATORY_ORDERS_MODULE.SEND_WHATSAPP' | translate
-                          "
-                        >
-                          <i class="ti ti-brand-whatsapp"></i>
-                        </button>
-                        <button
-                          type="button"
-                          class="btn btn-primary btn-action-menu"
-                          [disabled]="!hasEmail(order)"
-                          (click)="onSendEmail(order); $event.stopPropagation()"
-                          [title]="
-                            'LABORATORY_ORDERS_MODULE.SEND_EMAIL' | translate
-                          "
-                        >
-                          <i class="ti ti-mail"></i>
-                        </button>
-                        <button
-                          type="button"
-                          class="btn btn-dark btn-action-menu"
-                          (click)="
-                            onPrintOrder(order); $event.stopPropagation()
-                          "
-                          [title]="
-                            'LABORATORY_ORDERS_MODULE.PRINT_ORDER' | translate
-                          "
-                        >
-                          <i class="ti ti-printer"></i>
-                        </button>
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-action"
+                      [disabled]="!hasPhoneNumber(order)"
+                      (click)="onSendWhatsApp(order); $event.stopPropagation()"
+                      [title]="
+                        'LABORATORY_ORDERS_MODULE.SEND_WHATSAPP' | translate
+                      "
+                    >
+                      <i class="ti ti-brand-whatsapp"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-info btn-action"
+                      [disabled]="!hasEmail(order)"
+                      (click)="onSendEmail(order); $event.stopPropagation()"
+                      [title]="
+                        'LABORATORY_ORDERS_MODULE.SEND_EMAIL' | translate
+                      "
+                    >
+                      <i class="ti ti-mail"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-dark btn-action"
+                      (click)="onPrintOrder(order); $event.stopPropagation()"
+                      [title]="
+                        'LABORATORY_ORDERS_MODULE.PRINT_ORDER' | translate
+                      "
+                    >
+                      <i class="ti ti-printer"></i>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -272,6 +245,3 @@
   </div>
 </div>
 
-@if (showFloatingMenu) {
-  <div class="floating-menu-overlay" (click)="showFloatingMenu = null"></div>
-}

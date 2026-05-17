@@ -430,17 +430,20 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           name: 'INVENTORY.TABLE.CODE',
           prop: 'code',
           width: 120,
+          isPrimary: true,
         },
         {
           name: 'INVENTORY.TABLE.NAME',
           prop: 'name',
           width: 200,
+          isPrimary: true,
         },
         {
           name: 'INVENTORY.TABLE.DESCRIPTION',
           prop: 'description',
           cellTemplate: this.descriptionTemplate ?? undefined,
           width: 200,
+          hideOnMobile: true,
         },
         {
           name: 'INVENTORY.TABLE.CREATED_BY',
@@ -448,6 +451,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           cellTemplate: this.createdByTemplate ?? undefined,
           width: 150,
           sortable: false,
+          hideOnMobile: true,
         },
         {
           name: 'INVENTORY.TABLE.BRAND',
@@ -463,6 +467,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           name: 'INVENTORY.TABLE.SUBCATEGORY',
           prop: 'subcategory.name',
           width: 140,
+          hideOnMobile: true,
         },
         {
           name: 'INVENTORY.TABLE.SUPPLIER',
@@ -498,6 +503,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           cellTemplate: this.viewsTemplate ?? undefined,
           width: 90,
           sortable: false,
+          hideOnMobile: true,
         },
         {
           name: 'INVENTORY.TABLE.STATUS',
@@ -511,12 +517,14 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
           prop: 'createdAt',
           cellTemplate: this.createdAtTemplate ?? undefined,
           width: 130,
+          hideOnMobile: true,
         },
         {
           name: 'INVENTORY.TABLE.ACTIONS',
           cellTemplate: this.actionsTemplate ?? undefined,
           width: 205,
           sortable: false,
+          isActions: true,
         },
       ],
     })

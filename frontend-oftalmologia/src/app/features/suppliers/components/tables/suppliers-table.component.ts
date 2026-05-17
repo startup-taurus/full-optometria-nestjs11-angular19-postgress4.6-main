@@ -173,6 +173,7 @@ export class SuppliersTableComponent
           name: 'SUPPLIERS.TABLE.NAME',
           prop: 'name',
           width: 200,
+          isPrimary: true,
         },
         {
           name: 'SUPPLIERS.TABLE.RUT',
@@ -200,12 +201,14 @@ export class SuppliersTableComponent
           cellTemplate: this.createdAtTemplate,
           prop: 'createdAt',
           width: 150,
+          hideOnMobile: true,
         },
         {
           name: 'SUPPLIERS.TABLE.UPDATED_AT',
           cellTemplate: this.updatedAtTemplate,
           prop: 'updatedAt',
           width: 150,
+          hideOnMobile: true,
         },
         {
           name: 'SUPPLIERS.TABLE.CONTACT',
@@ -218,6 +221,7 @@ export class SuppliersTableComponent
           cellTemplate: this.actionsTemplate,
           width: 190,
           sortable: false,
+          isActions: true,
         },
       ],
     })

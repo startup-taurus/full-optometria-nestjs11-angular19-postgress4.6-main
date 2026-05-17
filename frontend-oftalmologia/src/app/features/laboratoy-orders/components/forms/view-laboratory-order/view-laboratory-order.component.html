@@ -234,22 +234,67 @@
 
       <div class="info-card mb-4">
         <div class="card-header">
-          <h6><i class="ti ti-ruler me-2"></i>Parámetros de Diseño</h6>
+          <h6>
+            <i class="ti ti-ruler me-2"></i>
+            {{ 'LABORATORY_ORDERS.STEP3_SUBTITLE' | translate }}
+          </h6>
         </div>
         <div class="card-body">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
+              <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.LABELS.HORIZONTAL' | translate }}:</strong><span>{{ order.frameHorizontal || '-' }}</span></div>
+            </div>
+            <div class="col-md-3">
+              <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.LABELS.VERTICAL' | translate }}:</strong><span>{{ order.frameVertical || '-' }}</span></div>
+            </div>
+            <div class="col-md-3">
+              <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.LABELS.LARGER_DIAMETER' | translate }}:</strong><span>{{ order.frameLargerDiameter || '-' }}</span></div>
+            </div>
+            <div class="col-md-3">
+              <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.LABELS.BRIDGE' | translate }}:</strong><span>{{ order.frameBridge || '-' }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card mb-4">
+        <div class="card-header">
+          <h6>
+            <i class="ti ti-adjustments-alt me-2"></i>
+            {{ 'LABORATORY_ORDERS.LABELS.DIGITAL_PARAMETERS' | translate }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
               <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.D_VERTEX' | translate }}:</strong><span>{{ order.dVertex || '-' }}</span></div>
+            </div>
+            <div class="col-md-4">
               <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.PANTOS' | translate }}:</strong><span>{{ order.pantos || '-' }}</span></div>
+            </div>
+            <div class="col-md-4">
               <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.PANORA' | translate }}:</strong><span>{{ order.panora || '-' }}</span></div>
-              <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_FIT' | translate }}:</strong><span>{{ order.frameFit || '-' }}</span></div>
             </div>
             <div class="col-md-6">
-              <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.PROFILE' | translate }}:</strong><span>{{ order.profile || '-' }}</span></div>
-              <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.MID' | translate }}:</strong><span>{{ order.mid || '-' }}</span></div>
               <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.DIST_VP' | translate }}:</strong><span>{{ order.distVp || '-' }}</span></div>
+            </div>
+            <div class="col-md-6">
               <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.ENGRAVING' | translate }}:</strong><span>{{ order.engraving || '-' }}</span></div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card mb-4">
+        <div class="card-header">
+          <h6>
+            <i class="ti ti-note me-2"></i>
+            {{ 'LABORATORY_ORDERS.LABELS.OBSERVATIONS' | translate }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="data-field">
+            <span>{{ order?.observations || '-' }}</span>
           </div>
         </div>
       </div>
@@ -319,24 +364,35 @@
               </div>
 
               <div class="row mt-3">
-                <div class="col-md-6">
-                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_TYPE' | translate }}:</strong><span>{{ getFrameTypeLabel(order?.frameType) | translate }}</span></div>
-                  <div class="data-field" *ngIf="order?.frameTypeDescription"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_TYPE_DESCRIPTION' | translate }}:</strong><span>{{ order?.frameTypeDescription }}</span></div>
-                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_BRAND' | translate }}:</strong><span>{{ order?.frameBrand || '-' }}</span></div>
-                </div>
-                <div class="col-md-6">
-                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_DATA' | translate }}:</strong><span>{{ order?.frameData || '-' }}</span></div>
-                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_LARGER_DIAMETER' | translate }}:</strong><span>{{ order?.frameLargerDiameter || '-' }}</span></div>
-                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_HORIZONTAL' | translate }}:</strong><span>{{ order?.frameHorizontal || '-' }}</span></div>
-                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_VERTICAL' | translate }}:</strong><span>{{ order?.frameVertical || '-' }}</span></div>
-                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.FIELDS.FRAME_BRIDGE' | translate }}:</strong><span>{{ order?.frameBridge || '-' }}</span></div>
+                <div class="col-12">
+                  <div class="data-field"><strong>{{ 'LABORATORY_ORDERS.LABELS.FRAME_DATA' | translate }}:</strong><span>{{ order?.frameData || '-' }}</span></div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <div class="data-field mt-3" *ngIf="order?.observations">
-                <strong>{{ 'LABORATORY_ORDERS.FIELDS.OBSERVATIONS' | translate }}:</strong>
-                <div class="mt-2">
-                  <span>{{ order?.observations }}</span>
+        <div class="col-12 mb-4">
+          <div class="info-card">
+            <div class="card-header">
+              <h6>
+                <i class="ti ti-checkbox me-2"></i>
+                {{ 'LABORATORY_ORDERS.LABELS.FRAME_TYPE' | translate }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="data-field">
+                    <strong>{{ 'LABORATORY_ORDERS.LABELS.FRAME_TYPE' | translate }}:</strong>
+                    <span>{{ order?.frameType ? (getFrameTypeLabel(order.frameType) | translate) : '-' }}</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="data-field">
+                    <strong>{{ 'LABORATORY_ORDERS.LABELS.ADDITIONAL_TYPE_DESCRIPTION' | translate }}:</strong>
+                    <span>{{ order?.frameTypeDescription || '-' }}</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -69,11 +69,11 @@ export class FeedbackTableComponent implements OnInit, OnChanges {
       page: this.PAGINATION.PAGE,
       columns: [
         { name: 'FEEDBACK.FIELDS.TYPE', cellTemplate: this.typeTemplate ?? undefined, width: 130, sortable: false },
-        { name: 'FEEDBACK.FIELDS.TITLE', cellTemplate: this.titleTemplate ?? undefined, width: 260 },
+        { name: 'FEEDBACK.FIELDS.TITLE', cellTemplate: this.titleTemplate ?? undefined, width: 260, isPrimary: true },
         { name: 'FEEDBACK.FIELDS.STATUS', cellTemplate: this.statusTemplate ?? undefined, width: 130, sortable: false },
-        { name: 'FEEDBACK.FIELDS.ATTACHMENTS', cellTemplate: this.attachmentsTemplate ?? undefined, width: 100, sortable: false },
-        { name: 'FEEDBACK.FIELDS.CREATED_AT', cellTemplate: this.createdAtTemplate ?? undefined, width: 130 },
-        { name: 'FEEDBACK.TABLE.ACTIONS', cellTemplate: this.actionsTemplate ?? undefined, width: 110, sortable: false },
+        { name: 'FEEDBACK.FIELDS.ATTACHMENTS', cellTemplate: this.attachmentsTemplate ?? undefined, width: 100, sortable: false, hideOnMobile: true },
+        { name: 'FEEDBACK.FIELDS.CREATED_AT', cellTemplate: this.createdAtTemplate ?? undefined, width: 130, hideOnMobile: true },
+        { name: 'FEEDBACK.TABLE.ACTIONS', cellTemplate: this.actionsTemplate ?? undefined, width: 140, sortable: false, isActions: true },
       ],
     })
   }
