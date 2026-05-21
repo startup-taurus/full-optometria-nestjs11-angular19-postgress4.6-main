@@ -1283,7 +1283,10 @@ export class ProductsService {
       }
     } else if (companyName) {
       const company = await this.companyRepository.findOne({
-        where: { name: companyName, isActive: true },
+        where: [
+          { slug: companyName, isActive: true },
+          { name: companyName, isActive: true },
+        ],
       });
       if (company) {
         companyId = company.id;

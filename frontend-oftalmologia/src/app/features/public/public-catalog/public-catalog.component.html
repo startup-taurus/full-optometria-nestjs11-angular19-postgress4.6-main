@@ -8,41 +8,42 @@
   } @else {
     <header class="catalog-header">
       <div class="container-fluid px-4 px-lg-5">
-        <div class="d-flex justify-content-between align-items-center py-3">
-          <div>
+        <div class="header-bar">
+          <div class="header-brand">
             <h1 class="mb-0">
-              <i class="bi bi-eyeglasses me-2"></i>Catálogo de Productos
+              <i class="bi bi-eyeglasses"></i>
+              <span class="header-brand-title">Catálogo de Productos</span>
             </h1>
-            <p class="text-white-50 mb-0">
+            <p class="header-brand-subtitle">
               Encuentra los mejores productos para el cuidado visual
             </p>
           </div>
-          <div>
+
+          <div class="header-actions">
             <button
               type="button"
-              class="btn btn-cart-header me-2"
+              class="btn btn-cart-header"
               [class.has-items]="hasCartItems"
               (click)="toggleCart()"
               aria-label="Abrir carrito"
             >
               <iconify-icon
                 [icon]="hasCartItems ? 'mdi:cart' : 'mdi:cart-outline'"
-                width="24"
-                height="24"
+                width="22"
+                height="22"
               ></iconify-icon>
               <span class="cart-count-badge" *ngIf="cartCount > 0">{{
                 cartCount
               }}</span>
             </button>
-            <button
+            <a
               type="button"
               (click)="goToLogin()"
-              class="btn btn-light btn-login"
+              class="btn-login-link"
               aria-label="Iniciar Sesión"
             >
-              <i class="bi bi-box-arrow-in-right me-2"></i>
               Iniciar Sesión
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -100,44 +101,72 @@
           >
             <div class="filters-panel">
               <div class="filters-card card">
-                <div class="card-header d-none d-lg-block">
-                  <h5 class="mb-0">Filtros</h5>
-                </div>
-                <div class="card-body">
-                  <div
-                    class="d-flex d-lg-none justify-content-between align-items-center mb-3"
-                  >
-                    <h5 class="mb-0 fw-bold">Filtros</h5>
+                <div class="filters-card-header d-none d-lg-flex">
+                  <div class="filters-card-header-title">
+                    <iconify-icon icon="mdi:tune-variant" width="18" height="18"></iconify-icon>
+                    <span>Filtros</span>
+                  </div>
+                  @if (selectedBrand || selectedCategoryId || selectedBranchId || hasPriceFilter || searchName) {
                     <button
                       type="button"
-                      class="btn btn-sm btn-outline-secondary"
-                      (click)="closeFiltersDrawer()"
+                      class="filters-clear-link"
+                      (click)="clearFilters()"
                     >
-                      Cerrar
+                      Limpiar
+                    </button>
+                  }
+                </div>
+
+                <div class="filters-card-body">
+                  <div
+                    class="d-flex d-lg-none justify-content-between align-items-center mb-3 filters-mobile-header"
+                  >
+                    <div class="filters-card-header-title">
+                      <iconify-icon icon="mdi:tune-variant" width="18" height="18"></iconify-icon>
+                      <span>Filtros</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn-close-filters"
+                      (click)="closeFiltersDrawer()"
+                      aria-label="Cerrar filtros"
+                    >
+                      <iconify-icon icon="mdi:close" width="18" height="18"></iconify-icon>
                     </button>
                   </div>
 
-                  <div class="filter-section">
-                    <h6 class="filter-section-title">Buscar</h6>
-                    <div>
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Buscar producto..."
-                        [(ngModel)]="searchName"
-                        (keyup.enter)="onSearch()"
-                      />
-                    </div>
+                  <div class="filter-search-group">
+                    <iconify-icon icon="mdi:magnify" width="18" height="18" class="filter-search-icon"></iconify-icon>
+                    <input
+                      type="text"
+                      class="filter-search-input"
+                      placeholder="Buscar por nombre..."
+                      [(ngModel)]="searchName"
+                      (keyup.enter)="onSearch()"
+                    />
+                    @if (searchName) {
+                      <button
+                        type="button"
+                        class="filter-search-clear"
+                        (click)="searchName = ''; onSearch()"
+                        aria-label="Limpiar búsqueda"
+                      >
+                        <iconify-icon icon="mdi:close" width="14" height="14"></iconify-icon>
+                      </button>
+                    }
                   </div>
 
                   <div class="filter-section">
-                    <h6 class="filter-section-title">Categoría</h6>
-                    <div>
+                    <label class="filter-label" for="filter-category">
+                      Categoría
+                    </label>
+                    <div class="filter-select-wrapper">
                       <select
-                        class="form-select"
+                        id="filter-category"
+                        class="filter-select"
                         [(ngModel)]="selectedCategoryId"
                       >
-                        <option value="">Todas las categorías</option>
+                        <option value="">Todas</option>
                         @for (
                           category of filters().categories;
                           track category.id
@@ -147,75 +176,72 @@
                           </option>
                         }
                       </select>
+                      <iconify-icon icon="mdi:chevron-down" width="16" height="16" class="filter-select-arrow"></iconify-icon>
                     </div>
                   </div>
 
                   <div class="filter-section">
-                    <h6 class="filter-section-title">Marca</h6>
-                    <div>
+                    <label class="filter-label" for="filter-brand">
+                      Marca
+                    </label>
+                    <div class="filter-select-wrapper">
                       <select
-                        class="form-select"
+                        id="filter-brand"
+                        class="filter-select"
                         [(ngModel)]="selectedBrand"
                       >
-                        <option value="">Todas las marcas</option>
+                        <option value="">Todas</option>
                         @for (brand of filters().brands; track brand) {
                           <option [value]="brand">{{ brand }}</option>
                         }
                       </select>
+                      <iconify-icon icon="mdi:chevron-down" width="16" height="16" class="filter-select-arrow"></iconify-icon>
                     </div>
                   </div>
 
                   @if (filters().branches?.length > 1) {
                     <div class="filter-section">
-                      <h6 class="filter-section-title">Sucursal</h6>
-                      <div>
+                      <label class="filter-label" for="filter-branch">
+                        Sucursal
+                      </label>
+                      <div class="filter-select-wrapper">
                         <select
-                          class="form-select"
+                          id="filter-branch"
+                          class="filter-select"
                           [(ngModel)]="selectedBranchId"
                         >
-                          <option value="">Todas las sucursales</option>
+                          <option value="">Todas</option>
                           @for (branch of filters().branches; track branch.id) {
                             <option [value]="branch.id">{{ branch.name }}</option>
                           }
                         </select>
+                        <iconify-icon icon="mdi:chevron-down" width="16" height="16" class="filter-select-arrow"></iconify-icon>
                       </div>
                     </div>
                   }
 
-                  <!-- <div class="mb-3">
-                <label class="form-label fw-bold">
-                  <i class="bi bi-file-text me-2 text-info"></i>
-                  Buscar por descripción
-                </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Descripción..."
-                  [(ngModel)]="searchDescription"
-                  (keyup.enter)="onSearch()"
-                />
-              </div> -->
-
                   <div class="filter-section">
-                    <h6 class="filter-section-title">Precio</h6>
-                    <small class="text-muted d-block mb-2">
-                      Si ingresas los valores al revés, el sistema los ajusta.
-                    </small>
-                    <div class="row g-2 mb-2">
-                      <div class="col-6">
+                    <label class="filter-label">
+                      Rango de precio
+                    </label>
+                    <div class="filter-price-inputs">
+                      <div class="filter-price-input-group">
+                        <span class="filter-price-prefix">$</span>
                         <input
                           type="number"
-                          class="form-control form-control-sm"
-                          placeholder="Desde"
+                          class="filter-price-input"
+                          placeholder="Mín"
                           min="0"
                           [(ngModel)]="minPrice"
                         />
                       </div>
-                      <div class="col-6">
+                      <span class="filter-price-sep">—</span>
+                      <div class="filter-price-input-group">
+                        <span class="filter-price-prefix">$</span>
                         <input
                           type="number"
-                          class="form-control form-control-sm"
-                          placeholder="Hasta"
+                          class="filter-price-input"
+                          placeholder="Máx"
                           min="0"
                           [(ngModel)]="maxPrice"
                         />
@@ -223,21 +249,12 @@
                     </div>
                   </div>
 
-                  <div class="filter-actions">
-                    <button
-                      class="btn btn-primary w-100"
-                      (click)="onSearch()"
-                    >
-                      Aplicar filtros
-                    </button>
-
-                    <button
-                      class="btn btn-outline-secondary w-100"
-                      (click)="clearFilters()"
-                    >
-                      Limpiar filtros
-                    </button>
-                  </div>
+                  <button
+                    class="filter-apply-btn"
+                    (click)="onSearch()"
+                  >
+                    Aplicar filtros
+                  </button>
                 </div>
               </div>
             </div>
@@ -247,15 +264,15 @@
             <div class="catalog-toolbar mb-3">
               <div class="toolbar-results">
                 <span class="toolbar-count">
-                  {{ totalCount() }} producto{{
-                    totalCount() !== 1 ? 's' : ''
-                  }}
-                  encontrado{{ totalCount() !== 1 ? 's' : '' }}
+                  <i class="bi bi-grid-3x3-gap-fill"></i>
+                  <strong>{{ totalCount() }}</strong>
+                  producto{{ totalCount() !== 1 ? 's' : '' }}
                 </span>
               </div>
               <div class="toolbar-right">
-                <label class="mb-0 text-muted d-none d-sm-inline">
-                  Ordenar por:
+                <label class="mb-0 toolbar-sort-label d-none d-sm-inline">
+                  <i class="bi bi-sort-down me-1"></i>
+                  Ordenar:
                 </label>
                 <select
                   class="form-select form-select-sm toolbar-sort-select"
@@ -347,10 +364,23 @@
             }
 
             @if (loading()) {
-              <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Cargando...</span>
-                </div>
+              <div
+                class="products-grid row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 row-cols-xxl-4 g-4"
+                aria-hidden="true"
+              >
+                @for (skeleton of [1,2,3,4,5,6,7,8]; track skeleton) {
+                  <div class="col">
+                    <div class="product-card skeleton-card">
+                      <div class="skeleton-image"></div>
+                      <div class="product-info">
+                        <div class="skeleton-line skeleton-line-title"></div>
+                        <div class="skeleton-line skeleton-line-meta"></div>
+                        <div class="skeleton-line skeleton-line-meta short"></div>
+                        <div class="skeleton-line skeleton-line-action"></div>
+                      </div>
+                    </div>
+                  </div>
+                }
               </div>
             }
 
@@ -360,13 +390,32 @@
               >
                 @for (product of products(); track product.id; let i = $index) {
                   <div class="col" [attr.data-index]="i">
-                    <div class="product-card">
+                    <div class="product-card" [class.is-out-of-stock]="isOutOfStock(product)">
                       <div
                         class="product-image-container"
                         (click)="openProductModal(product)"
                       >
                         @if (product.category) {
                           <span class="product-chip">{{ product.category.name }}</span>
+                        }
+
+                        @if (product.hasActiveDiscount && product.discount) {
+                          <div
+                            class="offer-ribbon"
+                            [attr.aria-label]="
+                              'Producto en oferta -' + product.discount.value +
+                              (product.discount.type === 'PERCENTAGE' ? '%' : '')
+                            "
+                          >
+                            <span>
+                              -{{ product.discount.value
+                              }}{{
+                                product.discount.type === 'PERCENTAGE'
+                                  ? '%'
+                                  : ''
+                              }}
+                            </span>
+                          </div>
                         }
 
                         <img
@@ -379,6 +428,11 @@
                         @if (isOutOfStock(product)) {
                           <span class="badge-stock badge-out">
                             <i class="bi bi-x-circle"></i> Agotado
+                          </span>
+                        } @else if (product.quantity > 0 && product.quantity <= 5) {
+                          <span class="badge-stock badge-low">
+                            <i class="bi bi-fire"></i>
+                            ¡Últimas {{ product.quantity }}!
                           </span>
                         }
 
@@ -404,18 +458,6 @@
                             {{ product.brand }}
                           </span>
 
-                          @if (product.category) {
-                            <span class="meta-item">
-                              <iconify-icon
-                                icon="mdi:tag-outline"
-                                width="16"
-                                height="16"
-                                class="text-success"
-                              ></iconify-icon>
-                              {{ product.category.name }}
-                            </span>
-                          }
-
                           @if (product.branchName) {
                             <span class="meta-item">
                               <iconify-icon
@@ -435,67 +477,36 @@
                               @if (
                                 product.hasActiveDiscount && product.discount
                               ) {
-                                <div
-                                  class="d-flex flex-column align-items-start"
-                                >
-                                  <span class="badge text-bg-danger mb-1">
-                                    -{{ product.discount.value
-                                    }}{{
-                                      product.discount.type === 'PERCENTAGE'
-                                        ? '%'
-                                        : ''
-                                    }}
-                                  </span>
-                                  <span
-                                    class="text-muted text-decoration-line-through small"
-                                  >
-                                    {{
-                                      product.unitPrice
-                                        | currency: 'USD' : 'symbol' : '1.2-2'
-                                    }}
-                                  </span>
-                                  <span class="text-danger fw-bold">
-                                    {{
-                                      product.discount.finalPrice
-                                        | currency: 'USD' : 'symbol' : '1.2-2'
-                                    }}
-                                  </span>
-                                </div>
+                                <span class="price-old">
+                                  {{
+                                    product.unitPrice
+                                      | currency: 'USD' : 'symbol' : '1.2-2'
+                                  }}
+                                </span>
+                                <span class="price-final on-sale">
+                                  {{
+                                    product.discount.finalPrice
+                                      | currency: 'USD' : 'symbol' : '1.2-2'
+                                  }}
+                                </span>
                               } @else {
-                                {{
-                                  product.unitPrice
-                                    | currency: 'USD' : 'symbol' : '1.2-2'
-                                }}
+                                <span class="price-final">
+                                  {{
+                                    product.unitPrice
+                                      | currency: 'USD' : 'symbol' : '1.2-2'
+                                  }}
+                                </span>
                               }
                             </div>
 
                             <div class="product-footer-meta">
                               @if (getProductQuantityInCart(product) > 0) {
                                 <span class="in-cart-count">
-                                  En carrito:
+                                  <i class="bi bi-cart-check"></i>
                                   {{ getProductQuantityInCart(product) }}
                                 </span>
                               }
                             </div>
-                          </div>
-
-                          <div class="product-links-row">
-                            @if (canShowWhatsAppButton(product)) {
-                              <a
-                                [href]="getWhatsAppLink(product)"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="btn-link-action whatsapp"
-                                (click)="$event.stopPropagation()"
-                              >
-                                <iconify-icon
-                                  icon="mdi:whatsapp"
-                                  width="16"
-                                  height="16"
-                                ></iconify-icon>
-                                WhatsApp
-                              </a>
-                            }
                           </div>
 
                           <div class="product-actions-row">
@@ -505,17 +516,40 @@
                               (click)="addToCart(product, 1, $event)"
                             >
                               <i class="bi bi-cart-plus-fill me-1"></i>
-                              Agregar al carrito
+                              <span>Agregar al carrito</span>
                             </button>
 
                             <button
                               type="button"
-                              class="btn btn-quick-view"
-                              (click)="openProductModal(product)"
+                              class="btn-icon-action btn-icon-view"
+                              (click)="openProductModal(product); $event.stopPropagation()"
+                              aria-label="Ver más detalles"
+                              title="Ver más detalles"
                             >
-                              <i class="bi bi-eye-fill me-1"></i>
-                              Ver más detalles
+                              <iconify-icon
+                                icon="mdi:eye-outline"
+                                width="20"
+                                height="20"
+                              ></iconify-icon>
                             </button>
+
+                            @if (canShowWhatsAppButton(product)) {
+                              <a
+                                [href]="getWhatsAppLink(product)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn-icon-action btn-icon-wsp"
+                                (click)="$event.stopPropagation()"
+                                aria-label="Consultar por WhatsApp"
+                                title="Consultar por WhatsApp"
+                              >
+                                <iconify-icon
+                                  icon="mdi:whatsapp"
+                                  width="20"
+                                  height="20"
+                                ></iconify-icon>
+                              </a>
+                            }
                           </div>
                         </div>
                       </div>
@@ -581,13 +615,16 @@
             }
 
             @if (!loading() && products() && products().length === 0) {
-              <div class="text-center py-5">
-                <i class="bi bi-inbox display-1 text-muted"></i>
-                <h3 class="mt-3">No se encontraron productos</h3>
-                <p class="text-muted">
-                  Intenta ajustar los filtros de búsqueda
+              <div class="empty-state">
+                <div class="empty-state-icon">
+                  <i class="bi bi-search"></i>
+                </div>
+                <h3 class="empty-state-title">No se encontraron productos</h3>
+                <p class="empty-state-subtitle">
+                  Prueba con otros términos o ajusta los filtros aplicados.
                 </p>
-                <button class="btn btn-primary" (click)="clearFilters()">
+                <button class="btn btn-empty-action" (click)="clearFilters()">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>
                   Limpiar filtros
                 </button>
               </div>
@@ -629,9 +666,28 @@
 
             <div class="modal-body">
               @if (selectedProduct) {
-                <div class="row g-4">
-                  <div class="col-lg-5">
+                <div class="product-detail">
+                  <div class="detail-media">
                     <div class="product-image-zone">
+                      @if (selectedProduct.hasActiveDiscount && selectedProduct.discount) {
+                        <div
+                          class="offer-ribbon offer-ribbon-lg"
+                          [attr.aria-label]="
+                            'Producto en oferta -' + selectedProduct.discount.value +
+                            (selectedProduct.discount.type === 'PERCENTAGE' ? '%' : '')
+                          "
+                        >
+                          <span>
+                            -{{ selectedProduct.discount.value
+                            }}{{
+                              selectedProduct.discount.type === 'PERCENTAGE'
+                                ? '%'
+                                : ''
+                            }}
+                          </span>
+                        </div>
+                      }
+
                       @if (getProductGallery(selectedProduct).length > 1) {
                         <button
                           type="button"
@@ -655,10 +711,10 @@
                       <div class="image-overlay-hint">
                         <iconify-icon
                           icon="mdi:magnify-plus-outline"
-                          width="32"
-                          height="32"
+                          width="28"
+                          height="28"
                         ></iconify-icon>
-                        <span>Click para ver completa</span>
+                        <span>Click para ampliar</span>
                       </div>
 
                       @if (getProductGallery(selectedProduct).length > 1) {
@@ -672,115 +728,106 @@
                         </button>
                       }
                     </div>
-                    <div class="product-gallery-thumbs mt-2">
-                      <button
-                        type="button"
-                        class="thumb-btn"
-                        *ngFor="
-                          let galleryImage of getProductGallery(selectedProduct)
-                        "
-                        [class.active]="
-                          galleryImage === selectedProductImageUrl
-                        "
-                        (click)="selectProductImage(galleryImage)"
-                      >
-                        <img [src]="galleryImage" alt="Imagen del producto" />
-                      </button>
-                    </div>
+
+                    @if (getProductGallery(selectedProduct).length > 1) {
+                      <div class="product-gallery-thumbs">
+                        <button
+                          type="button"
+                          class="thumb-btn"
+                          *ngFor="
+                            let galleryImage of getProductGallery(selectedProduct)
+                          "
+                          [class.active]="
+                            galleryImage === selectedProductImageUrl
+                          "
+                          (click)="selectProductImage(galleryImage)"
+                        >
+                          <img [src]="galleryImage" alt="Imagen del producto" />
+                        </button>
+                      </div>
+                    }
                   </div>
 
-                  <div class="col-lg-7">
-                    <div class="product-info-zone">
-                      <div class="info-group">
-                        <h6 class="group-title">PRODUCTO</h6>
+                  <div class="detail-info">
+                    <div class="detail-pills">
+                      @if (selectedProduct.category) {
+                        <span class="detail-pill detail-pill-primary">
+                          <iconify-icon icon="mdi:tag" width="14" height="14"></iconify-icon>
+                          {{ selectedProduct.category.name }}
+                        </span>
+                      }
+                      @if (selectedProduct.subcategory) {
+                        <span class="detail-pill">
+                          {{ selectedProduct.subcategory.name }}
+                        </span>
+                      }
+                    </div>
 
-                        @if (selectedProduct.category) {
-                          <div class="info-row">
-                            <span class="info-label">CATEGORÍA</span>
-                            <span class="info-value">
-                              {{ selectedProduct.category.name }}
-                            </span>
-                          </div>
-                        }
-
-                        @if (selectedProduct.subcategory) {
-                          <div class="info-row">
-                            <span class="info-label">SUBCATEGORÍA</span>
-                            <span class="info-value">
-                              {{ selectedProduct.subcategory.name }}
-                            </span>
-                          </div>
-                        }
-
-                        <div class="info-row">
-                          <span class="info-label">SUCURSAL</span>
-                          <span class="info-value">
-                            {{
-                              selectedProduct.branch?.name ||
-                                selectedProduct.branchName
-                            }}
-                          </span>
+                    @if (selectedProduct.branch?.name || selectedProduct.branchName) {
+                      <div class="detail-row">
+                        <iconify-icon icon="mdi:map-marker" width="18" height="18" class="detail-row-icon"></iconify-icon>
+                        <div class="detail-row-content">
+                          <span class="detail-row-label">Sucursal</span>
+                          <strong>{{ selectedProduct.branch?.name || selectedProduct.branchName }}</strong>
                           @if (selectedProduct.branch?.address) {
-                            <span class="info-address">
-                              {{ selectedProduct.branch?.address }}
-                            </span>
+                            <small>{{ selectedProduct.branch?.address }}</small>
                           }
                         </div>
                       </div>
+                    }
 
-                      <div class="info-group">
-                        <h6 class="group-title">DISPONIBILIDAD</h6>
-                        <div class="info-row">
-                          <span class="info-label">STOCK</span>
-                          <span
-                            class="info-value"
-                            [class.text-danger]="selectedProduct.quantity === 0"
-                          >
-                            @if (selectedProduct.quantity === 0) {
-                              <span class="badge bg-danger">Agotado</span>
-                            } @else {
-                              <span
-                                >{{ selectedProduct.quantity }} unidades</span
-                              >
-                            }
-                          </span>
-                        </div>
-                      </div>
-
-                      @if (selectedProduct.description) {
-                        <div class="info-group">
-                          <h6 class="group-title">DESCRIPCIÓN</h6>
-                          <p class="product-description">
-                            {{
-                              selectedProduct.description.length > 150
-                                ? (selectedProduct.description
-                                    | slice: 0 : 150) + '...'
-                                : selectedProduct.description
-                            }}
-                          </p>
-                        </div>
+                    <div
+                      class="detail-stock"
+                      [class.detail-stock-out]="selectedProduct.quantity === 0"
+                      [class.detail-stock-low]="selectedProduct.quantity > 0 && selectedProduct.quantity <= 5"
+                    >
+                      <iconify-icon
+                        [attr.icon]="selectedProduct.quantity === 0 ? 'mdi:close-circle' : 'mdi:check-circle'"
+                        width="18"
+                        height="18"
+                      ></iconify-icon>
+                      @if (selectedProduct.quantity === 0) {
+                        <span>Agotado</span>
+                      } @else if (selectedProduct.quantity <= 5) {
+                        <span>¡Quedan solo {{ selectedProduct.quantity }}!</span>
+                      } @else {
+                        <span>{{ selectedProduct.quantity }} disponibles</span>
                       }
                     </div>
+
+                    @if (selectedProduct.description) {
+                      <div class="detail-description">
+                        <span class="detail-row-label">Descripción</span>
+                        <p>
+                          {{
+                            selectedProduct.description.length > 120
+                              ? (selectedProduct.description
+                                  | slice: 0 : 120) + '...'
+                              : selectedProduct.description
+                          }}
+                        </p>
+                      </div>
+                    }
                   </div>
                 </div>
               }
             </div>
 
             <div class="modal-footer">
-              <div class="price-section">
+              <div class="footer-price">
                 <span class="price-label">PRECIO</span>
                 @if (
                   selectedProduct?.hasActiveDiscount &&
                   selectedProduct?.discount
                 ) {
-                  <div class="d-flex flex-column align-items-end">
-                    <span class="text-muted text-decoration-line-through small">
+                  <div class="price-stack">
+                    <span class="price-old">
                       {{
                         selectedProduct?.unitPrice
                           | currency: 'USD' : 'symbol' : '1.2-2'
                       }}
                     </span>
-                    <span class="price-value text-danger">
+                    <span class="price-value on-sale">
                       {{
                         selectedProduct?.discount?.finalPrice
                           | currency: 'USD' : 'symbol' : '1.2-2'
@@ -797,32 +844,50 @@
                 }
               </div>
 
-              <div class="actions-section">
-                @if (selectedProduct) {
-                  <div class="modal-cart-tools">
-                    <div class="quantity-control">
-                      <label for="modal-qty" class="qty-label">Cantidad</label>
-                      <input
-                        id="modal-qty"
-                        type="number"
-                        min="1"
-                        class="form-control"
-                        [(ngModel)]="selectedProductQuantity"
-                      />
-                    </div>
-
+              <div class="footer-actions">
+                @if (selectedProduct && !isOutOfStock(selectedProduct)) {
+                  <div class="qty-stepper" role="group" aria-label="Seleccionar cantidad">
                     <button
                       type="button"
-                      class="btn btn-add-cart-modal"
-                      (click)="
-                        addToCart(selectedProduct, selectedProductQuantity)
-                      "
+                      class="qty-step-btn"
+                      (click)="selectedProductQuantity = selectedProductQuantity > 1 ? selectedProductQuantity - 1 : 1"
+                      aria-label="Disminuir cantidad"
                     >
-                      <i class="bi bi-plus-lg"></i>
-                      Agregar
+                      <iconify-icon icon="mdi:minus" width="16" height="16"></iconify-icon>
+                    </button>
+                    <input
+                      id="modal-qty"
+                      type="number"
+                      min="1"
+                      class="qty-step-input"
+                      [(ngModel)]="selectedProductQuantity"
+                      aria-label="Cantidad"
+                    />
+                    <button
+                      type="button"
+                      class="qty-step-btn"
+                      (click)="selectedProductQuantity = (selectedProductQuantity || 0) + 1"
+                      aria-label="Aumentar cantidad"
+                    >
+                      <iconify-icon icon="mdi:plus" width="16" height="16"></iconify-icon>
                     </button>
                   </div>
 
+                  <button
+                    type="button"
+                    class="btn-action btn-action-cart"
+                    (click)="
+                      addToCart(selectedProduct, selectedProductQuantity)
+                    "
+                    aria-label="Guardar en mi pedido"
+                    title="Guardar en mi pedido"
+                  >
+                    <iconify-icon
+                      icon="mdi:sd"
+                      width="22"
+                      height="22"
+                    ></iconify-icon>
+                  </button>
                 }
 
                 @if (
@@ -832,44 +897,29 @@
                     [href]="getWhatsAppLink(selectedProduct)"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="btn btn-whatsapp-custom"
+                    class="btn-action btn-action-wsp-icon"
+                    aria-label="Consultar por WhatsApp"
+                    title="Consultar por WhatsApp"
                   >
                     <iconify-icon
                       icon="mdi:whatsapp"
-                      width="24"
-                      height="24"
+                      width="22"
+                      height="22"
                     ></iconify-icon>
-                    WhatsApp
                   </a>
                 } @else if (selectedProduct && isOutOfStock(selectedProduct)) {
                   <button
                     type="button"
-                    class="btn btn-disabled-custom"
+                    class="btn-action btn-action-disabled-icon"
                     disabled
+                    aria-label="Producto agotado"
+                    title="Agotado"
                   >
                     <iconify-icon
-                      icon="mdi:close-circle"
-                      width="24"
-                      height="24"
+                      icon="mdi:close-circle-outline"
+                      width="22"
+                      height="22"
                     ></iconify-icon>
-                    Sin stock
-                  </button>
-                } @else if (
-                  selectedProduct &&
-                  !isOutOfStock(selectedProduct) &&
-                  !getWhatsAppLink(selectedProduct)
-                ) {
-                  <button
-                    type="button"
-                    class="btn btn-disabled-custom"
-                    disabled
-                  >
-                    <iconify-icon
-                      icon="mdi:phone-off"
-                      width="24"
-                      height="24"
-                    ></iconify-icon>
-                    Contacto no disponible
                   </button>
                 }
               </div>
