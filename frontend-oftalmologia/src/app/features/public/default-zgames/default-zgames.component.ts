@@ -13,7 +13,7 @@ import { ToastrNotificationService } from '@core/services/ui/notification.servic
 })
 export class DefaultZgamesComponent {
   phoneNumber = '0995923599'
-  email = 'info@zgamestechnology.com'
+  email = 'info@latamsoft.com'
   copiedPhone = signal(false)
   copiedEmail = signal(false)
   private notificationService = inject(ToastrNotificationService)
@@ -58,7 +58,7 @@ export class DefaultZgamesComponent {
 
   openWhatsApp(): void {
     const message = encodeURIComponent(
-      '¡Hola ZGames Technology! Me gustaría saber más sobre sus servicios de desarrollo de software. Vengo del sistema de Oftalmología'
+      '¡Hola LatamSoft! Me gustaría saber más sobre sus servicios de desarrollo de software. Vengo del sistema de Oftalmología'
     )
     window.open(
       `https://wa.me/593${this.phoneNumber.slice(1)}?text=${message}`,
@@ -67,9 +67,9 @@ export class DefaultZgamesComponent {
   }
 
   openEmail(): void {
-    const subject = 'Solicitud de información - ZGames Technology'
+    const subject = 'Solicitud de información - LatamSoft'
     const body =
-      '¡Hola ZGames Technology! Me gustaría saber más sobre sus servicios de desarrollo de software. Vengo del sistema de Oftalmología.'
+      '¡Hola LatamSoft! Me gustaría saber más sobre sus servicios de desarrollo de software. Vengo del sistema de Oftalmología.'
     const mailto = `mailto:${this.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     window.location.href = mailto
   }

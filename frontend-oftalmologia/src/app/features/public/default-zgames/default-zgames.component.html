@@ -1,56 +1,68 @@
-<div class="zgames-content">
-  <div class="container-fluid px-4 px-lg-5 py-5">
+<div class="latamsoft-content">
+  <div class="container-fluid px-4 px-lg-5 py-4 py-lg-5">
     <div class="row justify-content-center">
-      <div class="col-lg-10 col-xl-8">
-        <div class="zgames-card">
-          <div class="row align-items-center g-4">
-            <div class="col-md-5 text-center">
-              <img
-                src="assets/images/ZGames.png"
-                alt="ZGames Technology"
-                class="zgames-logo"
-              />
-            </div>
+      <div class="col-xl-11 col-xxl-10">
+        <div class="latamsoft-card">
+          <div class="latamsoft-grid">
+            <section class="brand-panel">
+              <div class="brand-mark">
+                <img
+                  src="assets/images/logo_latamsoft.jpeg"
+                  alt="LatamSoft"
+                  class="brand-mark-image"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
 
-            <div class="col-md-7">
-              <h1 class="zgames-title">
-                ZGames <span class="highlight">Technology</span>
+              <div class="brand-copy">
+                <div class="brand-wordmark">LatamSoft</div>
+                <p class="brand-kicker">Software, automatización y crecimiento digital</p>
+                <div class="brand-badges">
+                  <span>Web</span>
+                  <span>Móvil</span>
+                  <span>Integraciones</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="content-panel">
+              <div class="eyebrow">LatamSoft</div>
+              <h1 class="brand-title">
+                Tecnología <span class="highlight">con identidad propia</span>
               </h1>
-              <p class="zgames-subtitle">Soluciones de Software a tu Medida</p>
+              <p class="brand-subtitle">Software para clínicas y ópticas</p>
 
-              <p class="zgames-description">
-                Transformamos tus ideas en software profesional y escalable.
-                Especializados en desarrollo web, aplicaciones móviles y
-                sistemas empresariales.
+              <p class="brand-description">
+                Convertimos ideas en productos digitales sólidos, modernos y escalables.
+                Diseñamos experiencias responsivas para equipos que necesitan velocidad,
+                claridad visual y una base técnica confiable.
               </p>
 
-              <div class="zgames-features">
+              <div class="brand-features">
                 <div class="feature-item">
                   <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                  <span>Desarrollo Web & Móvil</span>
+                  <span>Desarrollo web y móvil</span>
                 </div>
                 <div class="feature-item">
                   <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                  <span>Sistemas Empresariales</span>
+                  <span>Arquitectura escalable</span>
                 </div>
                 <div class="feature-item">
                   <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                  <span>Consultoría Tecnológica</span>
+                  <span>Consultoría tecnológica</span>
                 </div>
                 <div class="feature-item">
                   <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                  <span>Soporte & Mantenimiento</span>
+                  <span>Soporte y mantenimiento</span>
                 </div>
               </div>
 
-              <div class="zgames-contact">
-                <h3 class="contact-title">¡Contáctanos!</h3>
+              <div class="brand-contact">
+                <h3 class="contact-title">Hablemos de tu proyecto</h3>
 
                 <div class="contact-buttons">
-                  <button
-                    class="btn-contact btn-whatsapp"
-                    (click)="openWhatsApp()"
-                  >
+                  <button class="btn-contact btn-whatsapp" (click)="openWhatsApp()">
                     <iconify-icon icon="mdi:whatsapp"></iconify-icon>
                     <span>WhatsApp</span>
                   </button>
@@ -67,17 +79,13 @@
                     <span>{{ copiedPhone() ? '¡Copiado!' : phoneNumber }}</span>
                   </button>
 
-                  <button
-                    type="button"
-                    class="btn-contact btn-email"
-                    (click)="openEmail()"
-                  >
+                  <button type="button" class="btn-contact btn-email" (click)="openEmail()">
                     <iconify-icon icon="mdi:email"></iconify-icon>
                     <span class="btn-text">{{ email }}</span>
                   </button>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </div>
