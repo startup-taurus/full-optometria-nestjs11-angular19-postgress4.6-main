@@ -1019,7 +1019,7 @@ export class TablePurchaseOrdersComponent
   public getClientDisplayName(order: PurchaseOrder): string {
     const firstName = String(order.client?.firstName || '').trim()
     const lastName = String(order.client?.lastName || '').trim()
-    const fullName = `${firstName} ${lastName}`.trim()
+    const fullName = `${lastName} ${firstName}`.trim()
 
     return fullName || TablePurchaseOrdersComponent.FINAL_CONSUMER_NAME
   }

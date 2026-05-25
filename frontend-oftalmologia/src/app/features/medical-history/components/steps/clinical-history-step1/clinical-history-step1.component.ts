@@ -131,7 +131,7 @@ export class ClinicalHistoryStep1Component implements OnInit, OnDestroy {
   }
 
   private enhancePatientData(patient: Patient): PatientWithFullName {
-    const fullName = `${patient.firstName} ${patient.lastName}`
+    const fullName = `${patient.lastName} ${patient.firstName}`
     let age: number | undefined = undefined
 
     if (patient.dateOfBirth) {

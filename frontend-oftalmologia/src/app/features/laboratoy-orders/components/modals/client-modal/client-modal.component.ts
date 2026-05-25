@@ -260,6 +260,6 @@ export class ClientModalComponent implements OnInit {
   public getPatientLabel(
     patient: Pick<Patient, 'id' | 'firstName' | 'lastName' | 'documentNumber'>
   ): string {
-    return `${patient.firstName} ${patient.lastName} - ${patient.documentNumber}`
+    return `${patient.lastName} ${patient.firstName} - ${patient.documentNumber}`
   }
 }

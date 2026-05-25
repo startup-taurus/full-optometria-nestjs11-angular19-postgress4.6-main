@@ -86,9 +86,9 @@
                 <span>
                   {{
                     row.createdByUser?.firstName && row.createdByUser?.lastName
-                      ? row.createdByUser.firstName +
+                      ? row.createdByUser.lastName +
                         ' ' +
-                        row.createdByUser.lastName
+                        row.createdByUser.firstName
                       : ('COMMON.NOT_SPECIFIED' | translate)
                   }}
                 </span>

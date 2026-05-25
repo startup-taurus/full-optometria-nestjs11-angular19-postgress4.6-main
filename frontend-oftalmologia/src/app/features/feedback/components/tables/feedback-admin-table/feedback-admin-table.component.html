@@ -84,7 +84,7 @@
 <ng-template #userTemplate let-row="row">
   <div class="small" *ngIf="row.createdByUser">
     <div class="fw-medium">
-      {{ row.createdByUser.firstName }} {{ row.createdByUser.lastName }}
+      {{ row.createdByUser.lastName }} {{ row.createdByUser.firstName }}
     </div>
     <span class="text-muted">{{ row.createdByUser.email }}</span>
   </div>

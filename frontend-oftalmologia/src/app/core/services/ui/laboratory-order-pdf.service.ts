@@ -250,7 +250,7 @@ export class LaboratoryOrderPdfService {
                       text: `${this._translateService.instant('PDF.LABORATORY_ORDER.FULL_NAME')}: `,
                       bold: true,
                     },
-                    `${patient?.firstName || ''} ${patient?.lastName || ''}`,
+                    `${patient?.lastName || ''} ${patient?.firstName || ''}`,
                   ],
                 },
                 {

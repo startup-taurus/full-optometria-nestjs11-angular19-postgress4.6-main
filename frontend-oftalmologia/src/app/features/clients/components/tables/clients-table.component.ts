@@ -117,7 +117,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
       {
         label: translate.instant('CLIENT.SINGULAR'),
         formatter: (row) =>
-          `${row.firstName || ''} ${row.lastName || ''}`.trim() || '-',
+          `${row.lastName || ''} ${row.firstName || ''}`.trim() || '-',
       },
       {
         label: translate.instant('CLIENT.DOCUMENT_NUMBER'),
@@ -359,7 +359,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
     const linkedPatient = client.patients?.[0] || client.patient
     const firstName = linkedPatient?.firstName || ''
     const lastName = linkedPatient?.lastName || ''
-    const fullName = `${firstName} ${lastName}`.trim()
+    const fullName = `${lastName} ${firstName}`.trim()
 
     if (fullName) {
       return fullName

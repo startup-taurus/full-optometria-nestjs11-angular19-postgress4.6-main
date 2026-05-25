@@ -187,14 +187,14 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
           isPrimary: true,
         },
         {
-          name: 'MEDICAL_HISTORY.TABLE.FIRST_NAME',
-          prop: 'firstName',
+          name: 'MEDICAL_HISTORY.TABLE.LAST_NAME',
+          prop: 'lastName',
           width: 150,
           isPrimary: true,
         },
         {
-          name: 'MEDICAL_HISTORY.TABLE.LAST_NAME',
-          prop: 'lastName',
+          name: 'MEDICAL_HISTORY.TABLE.FIRST_NAME',
+          prop: 'firstName',
           width: 150,
         },
         {
@@ -428,7 +428,7 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   }
 
   private confirmDeleteRecord(record: MedicalHistoryRecord): void {
-    const patientName = `${record.firstName} ${record.lastName}`
+    const patientName = `${record.lastName} ${record.firstName}`
     
     Swal.fire({
       ...SWAL_DELETE_CONFIRM_CONFIG,

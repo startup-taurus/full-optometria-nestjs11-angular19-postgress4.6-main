@@ -226,7 +226,7 @@ export class LaboratoryOrderStep1Component
   }
 
   private buildClientLabel(client: Pick<ClientOption, 'firstName' | 'lastName' | 'documentNumber' | 'isPatientSelf'>): string {
-    const fullName = `${client.firstName || ''} ${client.lastName || ''}`.trim()
+    const fullName = `${client.lastName || ''} ${client.firstName || ''}`.trim()
     const document = String(client.documentNumber || '').trim()
     const suffix = client.isPatientSelf
       ? ` (${this._translateService.instant('CLIENT.IS_PATIENT')})`
@@ -399,7 +399,7 @@ export class LaboratoryOrderStep1Component
 
   get userDisplayName(): string {
     if (this.preloadedData) {
-      return `${this.preloadedData.firstName || ''} ${this.preloadedData.lastName || ''}`.trim()
+      return `${this.preloadedData.lastName || ''} ${this.preloadedData.firstName || ''}`.trim()
     }
     return ''
   }

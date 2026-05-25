@@ -21,7 +21,7 @@ export class ViewShiftModalComponent {
 
   getPatientFullName(): string {
     if (!this.selectedShift?.patient) return ''
-    return `${this.selectedShift.patient.firstName} ${this.selectedShift.patient.lastName}`
+    return `${this.selectedShift.patient.lastName} ${this.selectedShift.patient.firstName}`
   }
 
   getFormattedAppointmentDate(): string {

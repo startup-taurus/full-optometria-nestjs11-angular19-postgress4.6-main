@@ -142,7 +142,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
       .subscribe((patients) => {
         this.patients = patients.map((patient) => ({
           ...patient,
-          fullName: `${patient.firstName} ${patient.lastName}`,
+          fullName: `${patient.lastName} ${patient.firstName}`,
         }))
         this.patientsLoading = false
       })
@@ -210,7 +210,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
       .subscribe((patients) => {
         this.patients = patients.map((patient) => ({
           ...patient,
-          fullName: `${patient.firstName} ${patient.lastName}`,
+          fullName: `${patient.lastName} ${patient.firstName}`,
         }))
         this.applyPreSelectedPatient()
         this.patientsLoading = false
@@ -244,7 +244,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
 
           const mappedPatient: PatientWithFullName = {
             ...patient,
-            fullName: `${patient.firstName} ${patient.lastName}`,
+            fullName: `${patient.lastName} ${patient.firstName}`,
           }
 
           this.patients = [
@@ -287,7 +287,7 @@ export class ShiftModalComponent implements OnInit, OnDestroy {
 
     this.selectedPatient = {
       ...this.selectedShift.patient,
-      fullName: `${this.selectedShift.patient.firstName} ${this.selectedShift.patient.lastName}`,
+      fullName: `${this.selectedShift.patient.lastName} ${this.selectedShift.patient.firstName}`,
     }
 
     // Agregar el paciente seleccionado al array de pacientes para el ng-select

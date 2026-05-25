@@ -98,7 +98,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
       return
     }
 
-    const fullName = `${currentUser.firstName ?? ''} ${currentUser.lastName ?? ''}`.trim()
+    const fullName = `${currentUser.lastName ?? ''} ${currentUser.firstName ?? ''}`.trim()
     if (fullName) {
       this.clinicalForm.get('professionalName')?.setValue(fullName)
     }

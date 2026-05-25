@@ -38,7 +38,7 @@
       <div>
         <span *ngIf="(client.patientIds?.length || client.patients?.length || 0) > 0; else noLink">
           <span *ngFor="let patient of patientLinks; let isLast = last">
-            {{ patient.firstName }} {{ patient.lastName }}<span *ngIf="!isLast">, </span>
+            {{ patient.lastName }} {{ patient.firstName }}<span *ngIf="!isLast">, </span>
           </span>
         </span>
         <ng-template #noLink>{{ 'CLIENT.WITHOUT_PATIENT_LINK' | translate }}</ng-template>

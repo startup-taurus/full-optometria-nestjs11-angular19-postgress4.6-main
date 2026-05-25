@@ -426,7 +426,7 @@ export class CalendaryComponent implements OnInit, OnDestroy {
 
   formatShiftTooltip(shift: CalendarShift): string {
     return (
-      `${shift.patient.firstName} ${shift.patient.lastName}` +
+      `${shift.patient.lastName} ${shift.patient.firstName}` +
       ` - ${this.formatTime(shift.appointmentDate)}\n` +
       `${shift.status.name} | ${shift.branch.name}`
     )

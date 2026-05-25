@@ -19,7 +19,7 @@ export class ClientDetailsModalComponent {
   public get patientFullName(): string {
     const firstName = this.client?.patient?.firstName || ''
     const lastName = this.client?.patient?.lastName || ''
-    return `${firstName} ${lastName}`.trim()
+    return `${lastName} ${firstName}`.trim()
   }
 
   public get patientLinks(): Array<{ firstName: string; lastName: string }> {
