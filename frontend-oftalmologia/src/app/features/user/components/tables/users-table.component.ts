@@ -220,14 +220,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
           isPrimary: true,
         },
         {
-          name: 'USER.TABLE.FIRST_NAME',
-          prop: 'firstName',
+          name: 'USER.TABLE.LAST_NAME',
+          prop: 'lastName',
           width: 130,
           isPrimary: true,
         },
         {
-          name: 'USER.TABLE.LAST_NAME',
-          prop: 'lastName',
+          name: 'USER.TABLE.FIRST_NAME',
+          prop: 'firstName',
           width: 130,
         },
         {

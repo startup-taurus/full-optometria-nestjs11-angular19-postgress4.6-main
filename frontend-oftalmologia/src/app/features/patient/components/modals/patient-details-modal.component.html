@@ -9,7 +9,7 @@
       [src]="patientImage"
       class="rounded-circle w-100 h-100 object-fit-cover"
       [alt]="
-        selectedPatient?.firstName + ' ' + selectedPatient?.lastName ||
+        selectedPatient?.lastName + ' ' + selectedPatient?.firstName ||
         'patient-image'
       "
     />
@@ -17,7 +17,7 @@
 
   <div class="flex-grow-1">
     <h5 class="mb-1 fw-semibold text-dark">
-      {{ selectedPatient?.firstName }} {{ selectedPatient?.lastName }}
+      {{ selectedPatient?.lastName }} {{ selectedPatient?.firstName }}
     </h5>
     <p class="mb-0 text-muted small">
       <i class="ti ti-id me-1"></i>
@@ -175,7 +175,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let client of clients">
-                <td>{{ client.firstName }} {{ client.lastName }}</td>
+                <td>{{ client.lastName }} {{ client.firstName }}</td>
                 <td>{{ client.documentNumber }}</td>
                 <td>{{ client.email || 'N/A' }}</td>
                 <td class="text-end">

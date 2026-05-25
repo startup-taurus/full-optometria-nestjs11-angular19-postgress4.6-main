@@ -154,7 +154,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
 
   getDisplayClientName(): string {
     if (this.purchaseOrder?.client) {
-      return `${this.purchaseOrder.client.firstName || ''} ${this.purchaseOrder.client.lastName || ''}`.trim();
+      return `${this.purchaseOrder.client.lastName || ''} ${this.purchaseOrder.client.firstName || ''}`.trim();
     }
 
     return PurchaseOrderDetailComponent.FINAL_CONSUMER_NAME;

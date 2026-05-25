@@ -255,7 +255,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
   }
 
   public getPatientFullName(shift: Shift): string {
-    return `${shift.patient.firstName} ${shift.patient.lastName}`
+    return `${shift.patient.lastName} ${shift.patient.firstName}`
   }
 
   public getPatientProfileImage(shift: Shift): string {

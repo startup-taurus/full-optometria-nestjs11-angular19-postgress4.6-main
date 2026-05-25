@@ -123,7 +123,7 @@ export class TableLaboratoryOrdersComponent
       {
         label: translate.instant('PATIENT.SINGULAR') || 'Paciente',
         formatter: (row) =>
-          `${row.patient?.firstName || ''} ${row.patient?.lastName || ''}`
+          `${row.patient?.lastName || ''} ${row.patient?.firstName || ''}`
             .trim() || '-',
       },
       {
@@ -692,7 +692,7 @@ export class TableLaboratoryOrdersComponent
     const formattedPhone = this.formatPhoneForWhatsApp(phone)
 
     const patientName =
-      `${order.patient?.firstName || ''} ${order.patient?.lastName || ''}`.trim()
+      `${order.patient?.lastName || ''} ${order.patient?.firstName || ''}`.trim()
     const orderDate = this.formatDate(order.attendanceDate)
     const productName = this.getOrderProductsText(order)
 
@@ -730,7 +730,7 @@ export class TableLaboratoryOrdersComponent
     }
 
     const patientName =
-      `${order.patient?.firstName || ''} ${order.patient?.lastName || ''}`.trim()
+      `${order.patient?.lastName || ''} ${order.patient?.firstName || ''}`.trim()
     const orderDate = this.formatDate(order.attendanceDate)
     const productName = this.getOrderProductsText(order)
 

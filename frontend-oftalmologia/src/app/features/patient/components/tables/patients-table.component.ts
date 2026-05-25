@@ -133,8 +133,8 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   private buildExportColumns(): ExportColumn<Patient>[] {
     const translate = this._translateService
     return [
-      { label: translate.instant('PATIENT.TABLE.FIRST_NAME'), key: 'firstName' },
       { label: translate.instant('PATIENT.TABLE.LAST_NAME'), key: 'lastName' },
+      { label: translate.instant('PATIENT.TABLE.FIRST_NAME'), key: 'firstName' },
       {
         label: translate.instant('PATIENT.TABLE.DOCUMENT_NUMBER'),
         key: 'documentNumber',
@@ -221,14 +221,14 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
       page: this.PAGINATION.PAGE,
       columns: [
         {
-          name: 'PATIENT.TABLE.FIRST_NAME',
-          prop: 'firstName',
+          name: 'PATIENT.TABLE.LAST_NAME',
+          prop: 'lastName',
           width: 150,
           isPrimary: true,
         },
         {
-          name: 'PATIENT.TABLE.LAST_NAME',
-          prop: 'lastName',
+          name: 'PATIENT.TABLE.FIRST_NAME',
+          prop: 'firstName',
           width: 150,
           isPrimary: true,
         },
@@ -454,7 +454,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
     Swal.fire({
       ...SWAL_DELETE_CONFIRM_CONFIG,
       title: '¿Eliminar paciente?',
-      text: `¿Está seguro que desea eliminar al paciente ${patient.firstName} ${patient.lastName}? Esta acción no se puede deshacer.`,
+      text: `¿Está seguro que desea eliminar al paciente ${patient.lastName} ${patient.firstName}? Esta acción no se puede deshacer.`,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
     }).then((result: any) => {

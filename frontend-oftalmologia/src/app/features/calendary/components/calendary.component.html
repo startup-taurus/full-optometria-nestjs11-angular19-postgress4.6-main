@@ -188,8 +188,8 @@
                         [attr.title]="formatShiftTooltip(shift)"
                       >
                         <small class="d-block text-white fw-semibold"
-                          >{{ shift.patient.firstName }}
-                          {{ shift.patient.lastName }}</small
+                          >{{ shift.patient.lastName }}
+                          {{ shift.patient.firstName }}</small
                         >
                         <small class="d-block text-white-50">
                           {{ formatTime(shift.appointmentDate) }}
@@ -264,7 +264,7 @@
             <div class="d-flex justify-content-between align-items-start gap-2">
               <div>
                 <div class="fw-semibold text-dark">
-                  {{ shift.patient.firstName }} {{ shift.patient.lastName }}
+                  {{ shift.patient.lastName }} {{ shift.patient.firstName }}
                 </div>
                 <div class="small text-muted">
                   {{ shift.branch.name }}
@@ -348,9 +348,9 @@
                         type="text"
                         class="form-control form-control-readonly"
                         [value]="
-                          selectedShift()!.patient.firstName +
+                          selectedShift()!.patient.lastName +
                           ' ' +
-                          selectedShift()!.patient.lastName
+                          selectedShift()!.patient.firstName
                         "
                         readonly
                         disabled
@@ -361,9 +361,9 @@
                         (click)="
                           $event.stopPropagation();
                           copyToClipboard(
-                            selectedShift()!.patient.firstName +
+                            selectedShift()!.patient.lastName +
                               ' ' +
-                              selectedShift()!.patient.lastName,
+                              selectedShift()!.patient.firstName,
                             'name'
                           )
                         "

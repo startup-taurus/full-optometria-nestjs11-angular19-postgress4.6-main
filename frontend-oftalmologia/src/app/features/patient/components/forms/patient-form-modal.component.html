@@ -454,7 +454,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let client of clients">
-                <td>{{ client.firstName }} {{ client.lastName }}</td>
+                <td>{{ client.lastName }} {{ client.firstName }}</td>
                 <td>{{ client.documentNumber }}</td>
                 <td>{{ client.email || 'N/A' }}</td>
                 <td class="text-end">

@@ -930,7 +930,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
       const targetBalanceAfter = item.targetBalanceAfterTransfer ?? '-'
       const transferNote = item.note || 'Sin nota'
       const sentBy = item.createdByUser
-        ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
+        ? `${item.createdByUser.lastName || ''} ${item.createdByUser.firstName || ''}`.trim() ||
           item.createdByUser.username ||
           item.createdByUser.email ||
           '-'
@@ -994,7 +994,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         const quantity = item.quantity ?? 0
         const balanceAfter = item.balanceAfter ?? '-'
         const user = item.createdByUser
-          ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
+          ? `${item.createdByUser.lastName || ''} ${item.createdByUser.firstName || ''}`.trim() ||
             item.createdByUser.username ||
             item.createdByUser.email ||
             '-'
@@ -1115,7 +1115,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
         tone: 'secondary',
       }
       const user = item.createdByUser
-        ? `${item.createdByUser.firstName || ''} ${item.createdByUser.lastName || ''}`.trim() ||
+        ? `${item.createdByUser.lastName || ''} ${item.createdByUser.firstName || ''}`.trim() ||
           item.createdByUser.username ||
           item.createdByUser.email ||
           '-'
