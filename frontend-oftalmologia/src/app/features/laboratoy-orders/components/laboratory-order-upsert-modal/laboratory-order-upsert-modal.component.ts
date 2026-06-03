@@ -552,6 +552,12 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
 
   private async generateOrderPdf(order: LaboratoryOrder): Promise<void> {
     try {
+      const paperSize = await this._pdfService.askPaperSize()
+
+      if (!paperSize) {
+        return
+      }
+
       const branchState = await firstValueFrom(
         this._branchService.getBranchFilterState()
       )
@@ -577,8 +583,7 @@ export class LaboratoryOrderUpsertModalComponent implements OnInit {
         orderNumber: orderNumber,
       }
 
-      const filename = `orden_laboratorio_${orderNumber}.pdf`
-      await this._pdfService.downloadPdf(pdfData, filename)
+      await this._pdfService.generatePdf(pdfData, paperSize)
     } catch (error) {
       throw error
     }

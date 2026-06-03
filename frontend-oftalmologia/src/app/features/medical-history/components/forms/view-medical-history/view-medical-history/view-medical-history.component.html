@@ -423,29 +423,21 @@
                   }}</span>
                 </div>
                 <div *ngIf="test.data.applies" class="test-values">
-                  <div *ngIf="test.data.od" class="value-item">
+                  <div *ngIf="test.data.vl" class="value-item">
                     <strong
                       >{{
-                        'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate
+                        'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate
                       }}:</strong
                     >
-                    {{ test.data.od }}
+                    {{ test.data.vl }}
                   </div>
-                  <div *ngIf="test.data.oi" class="value-item">
+                  <div *ngIf="test.data.vp" class="value-item">
                     <strong
                       >{{
-                        'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate
+                        'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate
                       }}:</strong
                     >
-                    {{ test.data.oi }}
-                  </div>
-                  <div *ngIf="test.data.value" class="value-item">
-                    <strong
-                      >{{
-                        'MEDICAL_HISTORY.MOTOR_TESTS.OTHERS' | translate
-                      }}:</strong
-                    >
-                    {{ test.data.value }}
+                    {{ test.data.vp }}
                   </div>
                 </div>
               </div>
@@ -583,6 +575,15 @@
               }}</span>
             </div>
           </div>
+        </div>
+        <div class="data-field">
+          <strong
+            >{{ 'MEDICAL_HISTORY.FIELDS.ISHIHARA' | translate }}:</strong
+          >
+          <span>{{
+            clinicalHistory.ishihara ||
+              ('MEDICAL_HISTORY.MESSAGES.NO_REGISTERED' | translate)
+          }}</span>
         </div>
         <div class="data-field">
           <strong

@@ -101,13 +101,14 @@ export class ClinicalHistory {
 
   @Column({ type: 'jsonb', nullable: true })
   motorTest: {
-    exophoria?: { applies: string; value: string }; // OD/OI/A.O.
-    endophoria?: { applies: string; value: string };
-    exotropia?: { applies: string; value: string };
-    endotropia?: { applies: string; value: string };
-    hyperphoria?: { applies: string; value: string };
-    hypotropia?: { applies: string; value: string };
-    alternating?: { applies: string; value: string };
+    exophoria?: { applies: string; vl: string; vp: string };
+    endophoria?: { applies: string; vl: string; vp: string };
+    exotropia?: { applies: string; vl: string; vp: string };
+    endotropia?: { applies: string; vl: string; vp: string };
+    hyperphoria?: { applies: string; vl: string; vp: string };
+    hypotropia?: { applies: string; vl: string; vp: string };
+    alternating?: { applies: string; vl: string; vp: string };
+    orthophoria?: { applies: string; vl: string; vp: string };
   };
 
   @Column({ name: 'final_rx_od_sphere', nullable: true })
@@ -178,6 +179,9 @@ export class ClinicalHistory {
 
   @Column({ name: 'worth_test', nullable: true })
   worthTest: string;
+
+  @Column({ name: 'ishihara', nullable: true })
+  ishihara: string;
 
   @Column({ name: 'other_notes', type: 'text', nullable: true })
   otherNotes: string;

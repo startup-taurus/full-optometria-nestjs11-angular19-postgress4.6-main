@@ -94,43 +94,8 @@ export class ViewMedicalHistoryComponent implements OnInit {
       { name: 'Hiperforia', data: motorTest.hyperphoria || { applies: false } },
       { name: 'Hipertropia', data: motorTest.hypotropia || { applies: false } },
       { name: 'Alternante', data: motorTest.alternating || { applies: false } },
+      { name: 'Ortoforia', data: motorTest.orthophoria || { applies: false } },
     ]
-  }
-
-  public getMotorTestDisplay(motorTest: any): string[] {
-    if (!motorTest) return []
-
-    const tests = []
-    if (motorTest.exophoria?.applies)
-      tests.push(
-        `Exoforia - OD: ${motorTest.exophoria.od || 'N/A'}, OI: ${motorTest.exophoria.oi || 'N/A'}, Otros: ${motorTest.exophoria.value || 'N/A'}`
-      )
-    if (motorTest.endophoria?.applies)
-      tests.push(
-        `Endoforia - OD: ${motorTest.endophoria.od || 'N/A'}, OI: ${motorTest.endophoria.oi || 'N/A'}, Otros: ${motorTest.endophoria.value || 'N/A'}`
-      )
-    if (motorTest.exotropia?.applies)
-      tests.push(
-        `Exotropia - OD: ${motorTest.exotropia.od || 'N/A'}, OI: ${motorTest.exotropia.oi || 'N/A'}, Otros: ${motorTest.exotropia.value || 'N/A'}`
-      )
-    if (motorTest.endotropia?.applies)
-      tests.push(
-        `Endotropia - OD: ${motorTest.endotropia.od || 'N/A'}, OI: ${motorTest.endotropia.oi || 'N/A'}, Otros: ${motorTest.endotropia.value || 'N/A'}`
-      )
-    if (motorTest.hyperphoria?.applies)
-      tests.push(
-        `Hiperforia - OD: ${motorTest.hyperphoria.od || 'N/A'}, OI: ${motorTest.hyperphoria.oi || 'N/A'}, Otros: ${motorTest.hyperphoria.value || 'N/A'}`
-      )
-    if (motorTest.hypotropia?.applies)
-      tests.push(
-        `Hipertropia - OD: ${motorTest.hypotropia.od || 'N/A'}, OI: ${motorTest.hypotropia.oi || 'N/A'}, Otros: ${motorTest.hypotropia.value || 'N/A'}`
-      )
-    if (motorTest.alternating?.applies)
-      tests.push(
-        `Alternante - OD: ${motorTest.alternating.od || 'N/A'}, OI: ${motorTest.alternating.oi || 'N/A'}, Otros: ${motorTest.alternating.value || 'N/A'}`
-      )
-
-    return tests
   }
 
   public getLensTypesDisplay(lensTypes: string[]): string {

@@ -78,6 +78,7 @@ export const DEFAULT_CLINICAL_FORM_STRUCTURE: FieldsConfig = {
         hyperphoria: true,
         hypotropia: true,
         alternating: true,
+        orthophoria: true,
       },
     },
     step2_pupillaryReflexes: {
@@ -109,6 +110,7 @@ export const DEFAULT_CLINICAL_FORM_STRUCTURE: FieldsConfig = {
       fields: {
         stereopsis: true,
         worthTest: true,
+        ishihara: true,
         otherNotes: true,
       },
     },
@@ -212,6 +214,7 @@ export const CLINICAL_FORM_LABELS = {
     hyperphoria: 'Hiperforia',
     hypotropia: 'Hipertropia',
     alternating: 'Alternante',
+    orthophoria: 'Ortoforia',
 
     photomotor: 'Fotomotor (OD, OI)',
     consensual: 'Consensual (OD, OI)',
@@ -227,7 +230,8 @@ export const CLINICAL_FORM_LABELS = {
 
     stereopsis: 'Estereopsis',
     worthTest: 'Worth',
-    otherNotes: 'Otras notas',
+    ishihara: 'Test de color ISHIHARA',
+    otherNotes: 'Otros',
 
     finalRxOdSphere: 'Esfera OD',
     finalRxOdCylinder: 'Cilindro OD',

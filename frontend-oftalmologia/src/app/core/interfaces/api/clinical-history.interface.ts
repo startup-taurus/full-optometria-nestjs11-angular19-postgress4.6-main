@@ -31,13 +31,14 @@ export interface ClinicalHistory {
   visualAcuityOiVp?: string
 
   motorTest?: {
-    exophoria?: { applies: string; od: string; oi: string; value: string }
-    endophoria?: { applies: string; od: string; oi: string; value: string }
-    exotropia?: { applies: string; od: string; oi: string; value: string }
-    endotropia?: { applies: string; od: string; oi: string; value: string }
-    hyperphoria?: { applies: string; od: string; oi: string; value: string }
-    hypotropia?: { applies: string; od: string; oi: string; value: string }
-    alternating?: { applies: string; od: string; oi: string; value: string }
+    exophoria?: { applies: string; vl: string; vp: string }
+    endophoria?: { applies: string; vl: string; vp: string }
+    exotropia?: { applies: string; vl: string; vp: string }
+    endotropia?: { applies: string; vl: string; vp: string }
+    hyperphoria?: { applies: string; vl: string; vp: string }
+    hypotropia?: { applies: string; vl: string; vp: string }
+    alternating?: { applies: string; vl: string; vp: string }
+    orthophoria?: { applies: string; vl: string; vp: string }
   }
 
   finalRxOdSphere?: string
@@ -75,6 +76,7 @@ export interface ClinicalHistory {
 
   stereopsis?: string
   worthTest?: string
+  ishihara?: string
   otherNotes?: string
   diagnosis?: string
   disposition?: string
@@ -115,13 +117,14 @@ export interface CreateClinicalHistoryDto {
   visualAcuityOiVp?: string
 
   motorTest?: {
-    exophoria?: { applies: string; od: string; oi: string; value: string }
-    endophoria?: { applies: string; od: string; oi: string; value: string }
-    exotropia?: { applies: string; od: string; oi: string; value: string }
-    endotropia?: { applies: string; od: string; oi: string; value: string }
-    hyperphoria?: { applies: string; od: string; oi: string; value: string }
-    hypotropia?: { applies: string; od: string; oi: string; value: string }
-    alternating?: { applies: string; od: string; oi: string; value: string }
+    exophoria?: { applies: string; vl: string; vp: string }
+    endophoria?: { applies: string; vl: string; vp: string }
+    exotropia?: { applies: string; vl: string; vp: string }
+    endotropia?: { applies: string; vl: string; vp: string }
+    hyperphoria?: { applies: string; vl: string; vp: string }
+    hypotropia?: { applies: string; vl: string; vp: string }
+    alternating?: { applies: string; vl: string; vp: string }
+    orthophoria?: { applies: string; vl: string; vp: string }
   }
 
   finalRxOdSphere?: string
@@ -159,6 +162,7 @@ export interface CreateClinicalHistoryDto {
 
   stereopsis?: string
   worthTest?: string
+  ishihara?: string
   otherNotes?: string
   diagnosis?: string
   disposition?: string
