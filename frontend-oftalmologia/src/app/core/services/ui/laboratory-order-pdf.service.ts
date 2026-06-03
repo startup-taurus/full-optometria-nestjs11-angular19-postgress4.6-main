@@ -12,8 +12,12 @@ import { AppState } from '@core/states'
 import { selectUser } from '@core/states/auth/auth.selectors'
 import { firstValueFrom } from 'rxjs'
 import Swal from 'sweetalert2'
+import { PDFDocument, degrees } from 'pdf-lib'
 
 export type LabOrderPaperSize = 'full' | 'half'
+
+const A4_WIDTH_PT = 595.28
+const A4_HEIGHT_PT = 841.89
 
 @Injectable({
   providedIn: 'root',
@@ -98,12 +102,20 @@ export class LaboratoryOrderPdfService {
     }
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data, paperSize)
-      pdfMake.createPdf(docDefinition).open()
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.openPdfBytes(bytes)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).open()
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data, paperSize)
-      pdfMake.createPdf(docDefinition).open()
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.openPdfBytes(bytes)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).open()
     }
   }
 
@@ -120,32 +132,81 @@ export class LaboratoryOrderPdfService {
     const pdfFileName = filename || `orden_laboratorio_${data.orderNumber}.pdf`
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data, paperSize)
-      pdfMake.createPdf(docDefinition).download(pdfFileName)
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.downloadPdfBytes(bytes, pdfFileName)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).download(pdfFileName)
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data, paperSize)
-      pdfMake.createPdf(docDefinition).download(pdfFileName)
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.downloadPdfBytes(bytes, pdfFileName)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).download(pdfFileName)
     }
   }
 
-  private buildDocumentDefinition(
-    data: LaboratoryOrderPdfData,
-    paperSize: LabOrderPaperSize
-  ): TDocumentDefinitions {
-    if (paperSize === 'half') {
-      return {
-        pageSize: 'A4',
-        pageMargins: [28, 24, 28, 24],
-        content: this.buildHalfPageContent(data),
-        styles: this.getStyles(true),
-        defaultStyle: {
-          font: 'Roboto',
-          fontSize: 8,
-        },
-      }
-    }
+  private getPdfMakeBuffer(
+    docDefinition: TDocumentDefinitions
+  ): Promise<Uint8Array> {
+    return new Promise((resolve) => {
+      pdfMake.createPdf(docDefinition).getBuffer((buffer: any) => {
+        resolve(new Uint8Array(buffer))
+      })
+    })
+  }
 
+  private async buildHalfPageBytes(
+    data: LaboratoryOrderPdfData
+  ): Promise<Uint8Array> {
+    const sourceBytes = await this.getPdfMakeBuffer(
+      this.buildDocumentDefinition(data)
+    )
+
+    const outDoc = await PDFDocument.create()
+    const [orderPage] = await outDoc.embedPdf(sourceBytes, [0])
+    const page = outDoc.addPage([A4_WIDTH_PT, A4_HEIGHT_PT])
+
+    const scale = A4_WIDTH_PT / A4_HEIGHT_PT
+
+    page.drawPage(orderPage, {
+      x: 0,
+      y: A4_HEIGHT_PT,
+      xScale: scale,
+      yScale: scale,
+      rotate: degrees(-90),
+    })
+
+    return outDoc.save()
+  }
+
+  private createPdfObjectUrl(bytes: Uint8Array): string {
+    const buffer = new ArrayBuffer(bytes.byteLength)
+    new Uint8Array(buffer).set(bytes)
+    return URL.createObjectURL(
+      new Blob([buffer], { type: 'application/pdf' })
+    )
+  }
+
+  private openPdfBytes(bytes: Uint8Array): void {
+    window.open(this.createPdfObjectUrl(bytes), '_blank')
+  }
+
+  private downloadPdfBytes(bytes: Uint8Array, filename: string): void {
+    const url = this.createPdfObjectUrl(bytes)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  private buildDocumentDefinition(
+    data: LaboratoryOrderPdfData
+  ): TDocumentDefinitions {
     return {
       pageSize: 'A4',
       pageMargins: [40, 40, 40, 40],
@@ -168,26 +229,6 @@ export class LaboratoryOrderPdfService {
         fontSize: 10,
       },
     }
-  }
-
-  private buildHalfPageContent(data: LaboratoryOrderPdfData): Content[] {
-    return [
-      this.buildHeader(data, true),
-      { text: '', margin: [0, 3, 0, 3] },
-      this.buildCustomerSection(data),
-      { text: '', margin: [0, 3, 0, 3] },
-      {
-        columns: [
-          { width: '50%', stack: [this.buildProductSection(data)] },
-          { width: '50%', stack: [this.buildDesignParametersSection(data)] },
-        ],
-        columnGap: 12,
-      },
-      { text: '', margin: [0, 3, 0, 3] },
-      this.buildFrameDataSection(data),
-      { text: '', margin: [0, 6, 0, 0] },
-      this.buildSignatureSection(true),
-    ]
   }
 
   private buildHeader(
