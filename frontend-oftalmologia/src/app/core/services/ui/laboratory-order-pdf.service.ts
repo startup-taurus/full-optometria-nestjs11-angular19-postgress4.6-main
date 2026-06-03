@@ -209,18 +209,18 @@ export class LaboratoryOrderPdfService {
   ): TDocumentDefinitions {
     return {
       pageSize: 'A4',
-      pageMargins: [40, 40, 40, 40],
+      pageMargins: [30, 24, 30, 24],
       content: [
         this.buildHeader(data, false),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildCustomerSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildProductSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildDesignParametersSection(data),
-        { text: '', margin: [0, 10, 0, 10] },
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildFrameDataSection(data),
-        { text: '', margin: [0, 15, 0, 0] },
+        { text: '', margin: [0, 8, 0, 0] },
         this.buildSignatureSection(false),
       ],
       styles: this.getStyles(false),
@@ -850,7 +850,7 @@ export class LaboratoryOrderPdfService {
       sectionTitle: {
         fontSize: isCompact ? 10 : 12,
         bold: true,
-        margin: [0, 5, 0, 8],
+        margin: [0, 3, 0, 5],
         color: '#1976D2',
       },
       noLogo: {
