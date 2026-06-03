@@ -748,9 +748,9 @@ export class TableLaboratoryOrdersComponent
   }
 
   public async onPrintOrder(order: LaboratoryOrder): Promise<void> {
-    const pageSize = await this.askPdfPageSize()
+    const paperSize = await this._pdfService.askPaperSize()
 
-    if (!pageSize) {
+    if (!paperSize) {
       return
     }
 
@@ -781,7 +781,7 @@ export class TableLaboratoryOrdersComponent
         orderNumber: orderNumber,
       }
 
-      await this._pdfService.generatePdf(pdfData, pageSize)
+      await this._pdfService.generatePdf(pdfData, paperSize)
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -791,33 +791,6 @@ export class TableLaboratoryOrdersComponent
         ),
       })
     }
-  }
-
-  private async askPdfPageSize(): Promise<'A4' | 'A5' | null> {
-    const result = await Swal.fire({
-      title: 'Tamaño del PDF',
-      text: 'Selecciona el tamaño de impresión de la orden',
-      icon: 'question',
-      showCancelButton: true,
-      showDenyButton: true,
-      confirmButtonText: 'Hoja completa (A4)',
-      denyButtonText: 'Media hoja (A5)',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true,
-      confirmButtonColor: '#1976D2',
-      denyButtonColor: '#198754',
-      cancelButtonColor: '#6c757d',
-    })
-
-    if (result.isConfirmed) {
-      return 'A4'
-    }
-
-    if (result.isDenied) {
-      return 'A5'
-    }
-
-    return null
   }
 
   private formatOrderNumber(orderNumber: number): string {

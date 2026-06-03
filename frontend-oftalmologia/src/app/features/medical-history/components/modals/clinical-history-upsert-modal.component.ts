@@ -160,45 +160,43 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
       motorTest: this._formBuilder.group({
         exophoria: this._formBuilder.group({
           applies: [''],
-          od: [''],
-          oi: [''],
-          value: [''],
+          vl: [''],
+          vp: [''],
         }),
         endophoria: this._formBuilder.group({
           applies: [''],
-          od: [''],
-          oi: [''],
-          value: [''],
+          vl: [''],
+          vp: [''],
         }),
         exotropia: this._formBuilder.group({
           applies: [''],
-          od: [''],
-          oi: [''],
-          value: [''],
+          vl: [''],
+          vp: [''],
         }),
         endotropia: this._formBuilder.group({
           applies: [''],
-          od: [''],
-          oi: [''],
-          value: [''],
+          vl: [''],
+          vp: [''],
         }),
         hyperphoria: this._formBuilder.group({
           applies: [''],
-          od: [''],
-          oi: [''],
-          value: [''],
+          vl: [''],
+          vp: [''],
         }),
         hypotropia: this._formBuilder.group({
           applies: [''],
-          od: [''],
-          oi: [''],
-          value: [''],
+          vl: [''],
+          vp: [''],
         }),
         alternating: this._formBuilder.group({
           applies: [''],
-          od: [''],
-          oi: [''],
-          value: [''],
+          vl: [''],
+          vp: [''],
+        }),
+        orthophoria: this._formBuilder.group({
+          applies: [''],
+          vl: [''],
+          vp: [''],
         }),
       }),
 
@@ -258,6 +256,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       stereopsis: [''],
       worthTest: [''],
+      ishihara: [''],
       otherNotes: [''],
       diagnosis: [''],
       disposition: [''],
@@ -341,6 +340,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       stereopsis: record.stereopsis || '',
       worthTest: record.worthTest || '',
+      ishihara: record.ishihara || '',
       otherNotes: record.otherNotes || '',
       diagnosis: record.diagnosis || '',
       disposition: record.disposition || '',
@@ -356,6 +356,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
         'hyperphoria',
         'hypotropia',
         'alternating',
+        'orthophoria',
       ]
 
       motorTestTypes.forEach((testType) => {
@@ -364,9 +365,8 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
             record.motorTest[testType as keyof typeof record.motorTest]
           motorTestPatch[testType] = {
             applies: testData?.applies || '',
-            od: testData?.od || '',
-            oi: testData?.oi || '',
-            value: testData?.value || '',
+            vl: testData?.vl || '',
+            vp: testData?.vp || '',
           }
         }
       })
@@ -642,6 +642,7 @@ export class ClinicalHistoryUpsertModalComponent implements OnInit, OnDestroy {
 
       stereopsis: formData.stereopsis,
       worthTest: formData.worthTest,
+      ishihara: formData.ishihara,
       otherNotes: formData.otherNotes,
       diagnosis: formData.diagnosis,
       disposition: formData.disposition,

@@ -425,6 +425,7 @@ export class ClinicalHistoriesService {
       refractiveTests: clinicalHistory.refractiveTests,
       stereopsis: clinicalHistory.stereopsis,
       worthTest: clinicalHistory.worthTest,
+      ishihara: clinicalHistory.ishihara,
       otherNotes: clinicalHistory.otherNotes,
       diagnosis: clinicalHistory.diagnosis,
       disposition: clinicalHistory.disposition,

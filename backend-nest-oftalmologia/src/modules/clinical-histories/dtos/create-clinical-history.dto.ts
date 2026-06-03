@@ -115,13 +115,14 @@ export class CreateClinicalHistoryDto {
   @IsOptional()
   @IsObject()
   motorTest?: {
-    exophoria?: { applies: string; value: string };
-    endophoria?: { applies: string; value: string };
-    exotropia?: { applies: string; value: string };
-    endotropia?: { applies: string; value: string };
-    hyperphoria?: { applies: string; value: string };
-    hypotropia?: { applies: string; value: string };
-    alternating?: { applies: string; value: string };
+    exophoria?: { applies: string; vl: string; vp: string };
+    endophoria?: { applies: string; vl: string; vp: string };
+    exotropia?: { applies: string; vl: string; vp: string };
+    endotropia?: { applies: string; vl: string; vp: string };
+    hyperphoria?: { applies: string; vl: string; vp: string };
+    hypotropia?: { applies: string; vl: string; vp: string };
+    alternating?: { applies: string; vl: string; vp: string };
+    orthophoria?: { applies: string; vl: string; vp: string };
   };
 
   @IsOptional()
@@ -212,6 +213,10 @@ export class CreateClinicalHistoryDto {
   @IsOptional()
   @IsString()
   worthTest?: string;
+
+  @IsOptional()
+  @IsString()
+  ishihara?: string;
 
   @IsOptional()
   @IsString()

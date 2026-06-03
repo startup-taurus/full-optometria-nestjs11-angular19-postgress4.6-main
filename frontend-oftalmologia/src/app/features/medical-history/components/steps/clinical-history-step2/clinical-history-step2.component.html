@@ -499,72 +499,49 @@
                 class="row ms-3"
                 *ngIf="getMotorTestControl('exophoria')?.get('applies')?.value"
               >
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.od')"
+                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.exophoria.od')
+                        isOriginalValueModified('motorTest.exophoria.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.exophoria.od') }})</small
+                      >({{ getOriginalValue('motorTest.exophoria.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="od"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.oi')"
+                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.vp')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.exophoria.oi')
+                        isOriginalValueModified('motorTest.exophoria.vp')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.exophoria.oi') }})</small
+                      >({{ getOriginalValue('motorTest.exophoria.vp') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="oi"
+                    formControlName="vp"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
-                    "
-                  />
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
-                    <small
-                      *ngIf="shouldShowOriginalValue('motorTest.exophoria.value')"
-                      class="ms-1"
-                      [ngClass]="
-                        isOriginalValueModified('motorTest.exophoria.value')
-                          ? 'text-success'
-                          : 'text-muted'
-                      "
-                      >({{ getOriginalValue('motorTest.exophoria.value') }})</small
-                    >
-                  </label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    formControlName="value"
-                    [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
@@ -595,72 +572,49 @@
                 class="row ms-3"
                 *ngIf="getMotorTestControl('endophoria')?.get('applies')?.value"
               >
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.od')"
+                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.endophoria.od')
+                        isOriginalValueModified('motorTest.endophoria.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.endophoria.od') }})</small
+                      >({{ getOriginalValue('motorTest.endophoria.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="od"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.oi')"
+                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.vp')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.endophoria.oi')
+                        isOriginalValueModified('motorTest.endophoria.vp')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.endophoria.oi') }})</small
+                      >({{ getOriginalValue('motorTest.endophoria.vp') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="oi"
+                    formControlName="vp"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
-                    "
-                  />
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
-                    <small
-                      *ngIf="shouldShowOriginalValue('motorTest.endophoria.value')"
-                      class="ms-1"
-                      [ngClass]="
-                        isOriginalValueModified('motorTest.endophoria.value')
-                          ? 'text-success'
-                          : 'text-muted'
-                      "
-                      >({{ getOriginalValue('motorTest.endophoria.value') }})</small
-                    >
-                  </label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    formControlName="value"
-                    [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
@@ -691,72 +645,49 @@
                 class="row ms-3"
                 *ngIf="getMotorTestControl('exotropia')?.get('applies')?.value"
               >
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.od')"
+                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.exotropia.od')
+                        isOriginalValueModified('motorTest.exotropia.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.exotropia.od') }})</small
+                      >({{ getOriginalValue('motorTest.exotropia.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="od"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.oi')"
+                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.vp')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.exotropia.oi')
+                        isOriginalValueModified('motorTest.exotropia.vp')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.exotropia.oi') }})</small
+                      >({{ getOriginalValue('motorTest.exotropia.vp') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="oi"
+                    formControlName="vp"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
-                    "
-                  />
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
-                    <small
-                      *ngIf="shouldShowOriginalValue('motorTest.exotropia.value')"
-                      class="ms-1"
-                      [ngClass]="
-                        isOriginalValueModified('motorTest.exotropia.value')
-                          ? 'text-success'
-                          : 'text-muted'
-                      "
-                      >({{ getOriginalValue('motorTest.exotropia.value') }})</small
-                    >
-                  </label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    formControlName="value"
-                    [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
@@ -787,72 +718,49 @@
                 class="row ms-3"
                 *ngIf="getMotorTestControl('endotropia')?.get('applies')?.value"
               >
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.od')"
+                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.endotropia.od')
+                        isOriginalValueModified('motorTest.endotropia.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.endotropia.od') }})</small
+                      >({{ getOriginalValue('motorTest.endotropia.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="od"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.oi')"
+                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.vp')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.endotropia.oi')
+                        isOriginalValueModified('motorTest.endotropia.vp')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.endotropia.oi') }})</small
+                      >({{ getOriginalValue('motorTest.endotropia.vp') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="oi"
+                    formControlName="vp"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
-                    "
-                  />
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
-                    <small
-                      *ngIf="shouldShowOriginalValue('motorTest.endotropia.value')"
-                      class="ms-1"
-                      [ngClass]="
-                        isOriginalValueModified('motorTest.endotropia.value')
-                          ? 'text-success'
-                          : 'text-muted'
-                      "
-                      >({{ getOriginalValue('motorTest.endotropia.value') }})</small
-                    >
-                  </label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    formControlName="value"
-                    [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
@@ -887,72 +795,49 @@
                   getMotorTestControl('hyperphoria')?.get('applies')?.value
                 "
               >
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.od')"
+                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.hyperphoria.od')
+                        isOriginalValueModified('motorTest.hyperphoria.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.hyperphoria.od') }})</small
+                      >({{ getOriginalValue('motorTest.hyperphoria.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="od"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.oi')"
+                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.vp')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.hyperphoria.oi')
+                        isOriginalValueModified('motorTest.hyperphoria.vp')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.hyperphoria.oi') }})</small
+                      >({{ getOriginalValue('motorTest.hyperphoria.vp') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="oi"
+                    formControlName="vp"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
-                    "
-                  />
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
-                    <small
-                      *ngIf="shouldShowOriginalValue('motorTest.hyperphoria.value')"
-                      class="ms-1"
-                      [ngClass]="
-                        isOriginalValueModified('motorTest.hyperphoria.value')
-                          ? 'text-success'
-                          : 'text-muted'
-                      "
-                      >({{ getOriginalValue('motorTest.hyperphoria.value') }})</small
-                    >
-                  </label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    formControlName="value"
-                    [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
@@ -983,72 +868,49 @@
                 class="row ms-3"
                 *ngIf="getMotorTestControl('hypotropia')?.get('applies')?.value"
               >
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.od')"
+                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.hypotropia.od')
+                        isOriginalValueModified('motorTest.hypotropia.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.hypotropia.od') }})</small
+                      >({{ getOriginalValue('motorTest.hypotropia.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="od"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.oi')"
+                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.vp')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.hypotropia.oi')
+                        isOriginalValueModified('motorTest.hypotropia.vp')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.hypotropia.oi') }})</small
+                      >({{ getOriginalValue('motorTest.hypotropia.vp') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="oi"
+                    formControlName="vp"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
-                    "
-                  />
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
-                    <small
-                      *ngIf="shouldShowOriginalValue('motorTest.hypotropia.value')"
-                      class="ms-1"
-                      [ngClass]="
-                        isOriginalValueModified('motorTest.hypotropia.value')
-                          ? 'text-success'
-                          : 'text-muted'
-                      "
-                      >({{ getOriginalValue('motorTest.hypotropia.value') }})</small
-                    >
-                  </label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    formControlName="value"
-                    [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
@@ -1081,72 +943,124 @@
                   getMotorTestControl('alternating')?.get('applies')?.value
                 "
               >
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.RIGHT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.alternating.od')"
+                      *ngIf="shouldShowOriginalValue('motorTest.alternating.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.alternating.od')
+                        isOriginalValueModified('motorTest.alternating.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.alternating.od') }})</small
+                      >({{ getOriginalValue('motorTest.alternating.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="od"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OD' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.LEFT_EYE' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.alternating.oi')"
+                      *ngIf="shouldShowOriginalValue('motorTest.alternating.vp')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.alternating.oi')
+                        isOriginalValueModified('motorTest.alternating.vp')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.alternating.oi') }})</small
+                      >({{ getOriginalValue('motorTest.alternating.vp') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="oi"
+                    formControlName="vp"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_OI' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
-                <div class="col-md-4 mb-2">
+              </div>
+            </div>
+
+            <div
+              class="mb-4"
+              formGroupName="orthophoria"
+              *ngIf="shouldShowField('step2_motorTest', 'orthophoria')"
+            >
+              <div class="toggle-switch mb-3">
+                <input
+                  type="checkbox"
+                  id="orthophoria"
+                  class="toggle-input"
+                  formControlName="applies"
+                  value="enabled"
+                />
+                <label for="orthophoria" class="toggle-label">
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-text fw-bold">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.ORTHOPHORIA' | translate }}
+                  </span>
+                </label>
+              </div>
+              <div
+                class="row ms-3"
+                *ngIf="
+                  getMotorTestControl('orthophoria')?.get('applies')?.value
+                "
+              >
+                <div class="col-md-6 mb-2">
                   <label class="form-label small">
-                    {{ 'MEDICAL_HISTORY.FIELDS.OTHERS' | translate }}:
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VL' | translate }}:
                     <small
-                      *ngIf="shouldShowOriginalValue('motorTest.alternating.value')"
+                      *ngIf="shouldShowOriginalValue('motorTest.orthophoria.vl')"
                       class="ms-1"
                       [ngClass]="
-                        isOriginalValueModified('motorTest.alternating.value')
+                        isOriginalValueModified('motorTest.orthophoria.vl')
                           ? 'text-success'
                           : 'text-muted'
                       "
-                      >({{ getOriginalValue('motorTest.alternating.value') }})</small
+                      >({{ getOriginalValue('motorTest.orthophoria.vl') }})</small
                     >
                   </label>
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    formControlName="value"
+                    formControlName="vl"
                     [placeholder]="
-                      'MEDICAL_HISTORY.PLACEHOLDERS.OTHER_VALUES' | translate
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VL' | translate
+                    "
+                  />
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">
+                    {{ 'MEDICAL_HISTORY.MOTOR_TESTS.VP' | translate }}:
+                    <small
+                      *ngIf="shouldShowOriginalValue('motorTest.orthophoria.vp')"
+                      class="ms-1"
+                      [ngClass]="
+                        isOriginalValueModified('motorTest.orthophoria.vp')
+                          ? 'text-success'
+                          : 'text-muted'
+                      "
+                      >({{ getOriginalValue('motorTest.orthophoria.vp') }})</small
+                    >
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    formControlName="vp"
+                    [placeholder]="
+                      'MEDICAL_HISTORY.PLACEHOLDERS.VALUE_VP' | translate
                     "
                   />
                 </div>
@@ -1790,7 +1704,7 @@
       <div class="card-body">
         <div class="row">
           <div
-            class="col-md-4 mb-3"
+            class="col-md-3 mb-3"
             *ngIf="shouldShowField('step2_otherExams', 'stereopsis')"
           >
             <label class="form-label">
@@ -1814,7 +1728,7 @@
             />
           </div>
           <div
-            class="col-md-4 mb-3"
+            class="col-md-3 mb-3"
             *ngIf="shouldShowField('step2_otherExams', 'worthTest')"
           >
             <label class="form-label">
@@ -1838,7 +1752,31 @@
             />
           </div>
           <div
-            class="col-md-4 mb-3"
+            class="col-md-3 mb-3"
+            *ngIf="shouldShowField('step2_otherExams', 'ishihara')"
+          >
+            <label class="form-label">
+              {{ 'MEDICAL_HISTORY.FIELDS.ISHIHARA' | translate }}
+              <small
+                *ngIf="shouldShowOriginalValue('ishihara')"
+                class="ms-1"
+                [ngClass]="
+                  isOriginalValueModified('ishihara')
+                    ? 'text-success'
+                    : 'text-muted'
+                "
+                >({{ getOriginalValue('ishihara') }})</small
+              >
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="ishihara"
+              [placeholder]="'MEDICAL_HISTORY.FIELDS.ISHIHARA' | translate"
+            />
+          </div>
+          <div
+            class="col-md-3 mb-3"
             *ngIf="shouldShowField('step2_otherExams', 'otherNotes')"
           >
             <label class="form-label">

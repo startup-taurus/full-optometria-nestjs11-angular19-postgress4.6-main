@@ -11,6 +11,13 @@ import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
 import { selectUser } from '@core/states/auth/auth.selectors'
 import { firstValueFrom } from 'rxjs'
+import Swal from 'sweetalert2'
+import { PDFDocument, degrees } from 'pdf-lib'
+
+export type LabOrderPaperSize = 'full' | 'half'
+
+const A4_WIDTH_PT = 595.28
+const A4_HEIGHT_PT = 841.89
 
 @Injectable({
   providedIn: 'root',
@@ -58,9 +65,36 @@ export class LaboratoryOrderPdfService {
     }
   }
 
+  public async askPaperSize(): Promise<LabOrderPaperSize | null> {
+    const result = await Swal.fire({
+      title: 'Tamaño del PDF',
+      text: 'Selecciona el tamaño de impresión de la orden',
+      icon: 'question',
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: 'Hoja completa (A4)',
+      denyButtonText: 'Media hoja (A5)',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      confirmButtonColor: '#1976D2',
+      denyButtonColor: '#198754',
+      cancelButtonColor: '#6c757d',
+    })
+
+    if (result.isConfirmed) {
+      return 'full'
+    }
+
+    if (result.isDenied) {
+      return 'half'
+    }
+
+    return null
+  }
+
   public async generatePdf(
     data: LaboratoryOrderPdfData,
-    pageSize: 'A4' | 'A5' = 'A4'
+    paperSize: LabOrderPaperSize = 'full'
   ): Promise<void> {
     if (!this.logoBase64) {
       await this.loadLogo()
@@ -68,19 +102,27 @@ export class LaboratoryOrderPdfService {
     }
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data, pageSize)
-      pdfMake.createPdf(docDefinition).open()
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.openPdfBytes(bytes)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).open()
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data, pageSize)
-      pdfMake.createPdf(docDefinition).open()
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.openPdfBytes(bytes)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).open()
     }
   }
 
   public async downloadPdf(
     data: LaboratoryOrderPdfData,
     filename?: string,
-    pageSize: 'A4' | 'A5' = 'A4'
+    paperSize: LabOrderPaperSize = 'full'
   ): Promise<void> {
     if (!this.logoBase64) {
       await this.loadLogo()
@@ -90,47 +132,101 @@ export class LaboratoryOrderPdfService {
     const pdfFileName = filename || `orden_laboratorio_${data.orderNumber}.pdf`
 
     try {
-      const docDefinition = this.buildDocumentDefinition(data, pageSize)
-      pdfMake.createPdf(docDefinition).download(pdfFileName)
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.downloadPdfBytes(bytes, pdfFileName)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).download(pdfFileName)
     } catch (error) {
       this.logoBase64 = ''
-      const docDefinition = this.buildDocumentDefinition(data, pageSize)
-      pdfMake.createPdf(docDefinition).download(pdfFileName)
+      if (paperSize === 'half') {
+        const bytes = await this.buildHalfPageBytes(data)
+        this.downloadPdfBytes(bytes, pdfFileName)
+        return
+      }
+      pdfMake.createPdf(this.buildDocumentDefinition(data)).download(pdfFileName)
     }
   }
 
-  private buildDocumentDefinition(
-    data: LaboratoryOrderPdfData,
-    pageSize: 'A4' | 'A5'
-  ): TDocumentDefinitions {
-    const isCompact = pageSize === 'A5'
-    const margins: [number, number, number, number] = isCompact
-      ? [24, 24, 24, 24]
-      : [40, 40, 40, 40]
-    const sectionGap = isCompact ? 5 : 10
-    const signatureGap = isCompact ? 8 : 15
-    const fontSize = isCompact ? 8 : 10
+  private getPdfMakeBuffer(
+    docDefinition: TDocumentDefinitions
+  ): Promise<Uint8Array> {
+    return new Promise((resolve) => {
+      pdfMake.createPdf(docDefinition).getBuffer((buffer: any) => {
+        resolve(new Uint8Array(buffer))
+      })
+    })
+  }
 
+  private async buildHalfPageBytes(
+    data: LaboratoryOrderPdfData
+  ): Promise<Uint8Array> {
+    const sourceBytes = await this.getPdfMakeBuffer(
+      this.buildDocumentDefinition(data)
+    )
+
+    const outDoc = await PDFDocument.create()
+    const [orderPage] = await outDoc.embedPdf(sourceBytes, [0])
+    const page = outDoc.addPage([A4_WIDTH_PT, A4_HEIGHT_PT])
+
+    const scale = A4_WIDTH_PT / A4_HEIGHT_PT
+
+    page.drawPage(orderPage, {
+      x: 0,
+      y: A4_HEIGHT_PT,
+      xScale: scale,
+      yScale: scale,
+      rotate: degrees(-90),
+    })
+
+    return outDoc.save()
+  }
+
+  private createPdfObjectUrl(bytes: Uint8Array): string {
+    const buffer = new ArrayBuffer(bytes.byteLength)
+    new Uint8Array(buffer).set(bytes)
+    return URL.createObjectURL(
+      new Blob([buffer], { type: 'application/pdf' })
+    )
+  }
+
+  private openPdfBytes(bytes: Uint8Array): void {
+    window.open(this.createPdfObjectUrl(bytes), '_blank')
+  }
+
+  private downloadPdfBytes(bytes: Uint8Array, filename: string): void {
+    const url = this.createPdfObjectUrl(bytes)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  private buildDocumentDefinition(
+    data: LaboratoryOrderPdfData
+  ): TDocumentDefinitions {
     return {
-      pageSize,
-      pageMargins: margins,
+      pageSize: 'A4',
+      pageMargins: [30, 24, 30, 24],
       content: [
-        this.buildHeader(data, isCompact),
-        { text: '', margin: [0, sectionGap, 0, sectionGap] },
+        this.buildHeader(data, false),
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildCustomerSection(data),
-        { text: '', margin: [0, sectionGap, 0, sectionGap] },
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildProductSection(data),
-        { text: '', margin: [0, sectionGap, 0, sectionGap] },
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildDesignParametersSection(data),
-        { text: '', margin: [0, sectionGap, 0, sectionGap] },
+        { text: '', margin: [0, 4, 0, 4] },
         this.buildFrameDataSection(data),
-        { text: '', margin: [0, signatureGap, 0, 0] },
-        this.buildSignatureSection(isCompact),
+        { text: '', margin: [0, 8, 0, 0] },
+        this.buildSignatureSection(false),
       ],
-      styles: this.getStyles(isCompact),
+      styles: this.getStyles(false),
       defaultStyle: {
         font: 'Roboto',
-        fontSize,
+        fontSize: 10,
       },
     }
   }
@@ -754,7 +850,7 @@ export class LaboratoryOrderPdfService {
       sectionTitle: {
         fontSize: isCompact ? 10 : 12,
         bold: true,
-        margin: [0, 5, 0, 8],
+        margin: [0, 3, 0, 5],
         color: '#1976D2',
       },
       noLogo: {
