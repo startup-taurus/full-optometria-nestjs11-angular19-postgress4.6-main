@@ -1,0 +1,298 @@
+:host {
+  display: block;
+}
+
+@keyframes subFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes subPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--bs-success-rgb), 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(var(--bs-success-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--bs-success-rgb), 0);
+  }
+}
+
+.sub-reveal {
+  animation: subFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sub-hero {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--bs-primary-rgb), 0.13),
+    rgba(var(--bs-primary-rgb), 0.03)
+  );
+  box-shadow: 0 10px 30px rgba(var(--bs-primary-rgb), 0.08);
+
+  .card-body {
+    padding: 1.5rem 1.75rem;
+  }
+}
+
+.sub-hero-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.sub-logo {
+  position: relative;
+  flex: 0 0 auto;
+  width: 92px;
+  height: 92px;
+  border-radius: 18px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  > i {
+    font-size: 38px;
+    color: var(--bs-secondary-color);
+  }
+
+  .sub-logo-overlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    i {
+      font-size: 22px;
+      color: #fff;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+
+    .sub-logo-overlay {
+      opacity: 1;
+    }
+  }
+
+  &.is-loading .sub-logo-overlay {
+    opacity: 1;
+  }
+}
+
+.spin {
+  animation: subSpin 0.9s linear infinite;
+}
+
+.sub-hero-info {
+  min-width: 0;
+}
+
+.sub-optica {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 0.15rem;
+  color: var(--bs-emphasis-color);
+  word-break: break-word;
+}
+
+.sub-plan {
+  margin: 0 0 0.6rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.95rem;
+}
+
+.sub-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 50rem;
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &.is-pulse {
+    animation: subPulse 2.4s infinite;
+  }
+}
+
+.sub-logo-hint {
+  margin: 1rem 0 0;
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+}
+
+.sub-metrics > div {
+  animation: subFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &:nth-child(1) {
+    animation-delay: 0.04s;
+  }
+  &:nth-child(2) {
+    animation-delay: 0.09s;
+  }
+  &:nth-child(3) {
+    animation-delay: 0.14s;
+  }
+  &:nth-child(4) {
+    animation-delay: 0.19s;
+  }
+  &:nth-child(5) {
+    animation-delay: 0.24s;
+  }
+}
+
+.sub-metric {
+  border: 1px solid var(--bs-border-color);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .sub-metric-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    margin-bottom: 0.85rem;
+    background: rgba(var(--bs-primary-rgb), 0.12);
+    color: var(--bs-primary);
+
+    i {
+      font-size: 21px;
+    }
+  }
+
+  .sub-metric-label {
+    margin: 0 0 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+  }
+
+  .sub-metric-value {
+    margin: 0;
+    font-weight: 700;
+    color: var(--bs-emphasis-color);
+
+    small {
+      font-size: 0.68em;
+      font-weight: 500;
+      margin-left: 0.25rem;
+      color: var(--bs-secondary-color);
+    }
+  }
+}
+
+.sub-manage {
+  border: 1px solid var(--bs-border-color);
+
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
+.sub-manage-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(var(--bs-primary-rgb), 0.12);
+  color: var(--bs-primary);
+
+  i {
+    font-size: 22px;
+  }
+}
+
+.sub-none {
+  .card-body {
+    padding: 3rem 1.5rem;
+  }
+}
+
+.sub-none-icon {
+  font-size: 46px;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .sub-hero-row {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .sub-badge {
+    justify-content: center;
+  }
+
+  .sub-manage .card-body {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sub-reveal,
+  .sub-metrics > div {
+    animation: none;
+  }
+
+  .sub-badge.is-pulse {
+    animation: none;
+  }
+}

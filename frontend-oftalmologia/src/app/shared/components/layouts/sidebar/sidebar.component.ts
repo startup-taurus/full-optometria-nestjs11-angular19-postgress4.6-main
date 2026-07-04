@@ -153,7 +153,11 @@ export class SidebarComponent implements OnInit {
       return true
     }
 
-    if (item.key === 'COMPANIES' || item.key === 'FEEDBACK_ADMIN') {
+    if (
+      item.key === 'COMPANIES' ||
+      item.key === 'FEEDBACK_ADMIN' ||
+      item.key === 'SUBSCRIPTION_ADMIN'
+    ) {
       return this.permissionsService.isSuperAdmin()
     }
 

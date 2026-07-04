@@ -1,0 +1,78 @@
+<div class="filter-form filter-form-unified">
+  <form [formGroup]="filterForm!" (ngSubmit)="onSubmit()">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'SUBSCRIPTION_ADMIN.FILTER_COMPANY' | translate }}
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="search"
+          [placeholder]="'SUBSCRIPTION_ADMIN.SEARCH_PLACEHOLDER' | translate"
+        />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'SUBSCRIPTION_ADMIN.FILTER_SOURCE' | translate }}
+        </label>
+        <select class="form-select" formControlName="source">
+          <option value="">{{ 'SUBSCRIPTION_ADMIN.ALL' | translate }}</option>
+          <option value="landing">
+            {{ 'SUBSCRIPTION_ADMIN.SOURCE_LANDING' | translate }}
+          </option>
+          <option value="manual">
+            {{ 'SUBSCRIPTION_ADMIN.SOURCE_MANUAL' | translate }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'SUBSCRIPTION_ADMIN.FILTER_STATUS' | translate }}
+        </label>
+        <select class="form-select" formControlName="status">
+          <option value="">{{ 'SUBSCRIPTION_ADMIN.ALL' | translate }}</option>
+          @for (status of statuses; track status) {
+            <option [value]="status">
+              {{ statusLabelKey(status) | translate }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">
+          {{ 'SUBSCRIPTION_ADMIN.FILTER_COMPANY_STATUS' | translate }}
+        </label>
+        <select class="form-select" formControlName="active">
+          <option value="">{{ 'SUBSCRIPTION_ADMIN.ALL' | translate }}</option>
+          <option value="true">
+            {{ 'SUBSCRIPTION_ADMIN.COMPANY_ACTIVE' | translate }}
+          </option>
+          <option value="false">
+            {{ 'SUBSCRIPTION_ADMIN.COMPANY_INACTIVE' | translate }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="onReset()"
+          >
+            {{ 'WORDS.RESET' | translate }}
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            {{ 'WORDS.SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

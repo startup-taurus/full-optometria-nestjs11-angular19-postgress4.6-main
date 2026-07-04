@@ -6,10 +6,24 @@ import * as nodemailer from 'nodemailer';
 export class EmailUtil {
   constructor(private configService: ConfigService) {}
 
-  async sendResetPasswordEmail(email: string, token: string): Promise<void> {
-    const resetUrl = `${
+  // Base del front del sistema de optometría. En PROD debe ser
+  // https://optometria.zgameslatam.com (vía FRONTEND_URL); si falta, cae a localhost.
+  private frontendBase(): string {
+    return (
       this.configService.get('FRONTEND_URL') || 'http://localhost:4200'
-    }/auth/reset-password?token=${token}`;
+    ).replace(/\/+$/, '');
+  }
+
+  buildSetPasswordUrl(token: string): string {
+    return `${this.frontendBase()}/auth/reset-password?token=${token}`;
+  }
+
+  buildLoginUrl(): string {
+    return `${this.frontendBase()}/auth/login`;
+  }
+
+  async sendResetPasswordEmail(email: string, token: string): Promise<void> {
+    const resetUrl = this.buildSetPasswordUrl(token);
 
     const transporter = nodemailer.createTransport({
       host: this.configService.get('MAIL_HOST') || 'smtp.gmail.com',
@@ -39,6 +53,136 @@ export class EmailUtil {
     };
 
     await transporter.sendMail(mailOptions);
+  }
+
+  async sendSetPasswordEmail(
+    email: string,
+    token: string,
+    opticaName?: string
+  ): Promise<void> {
+    const setPasswordUrl = this.buildSetPasswordUrl(token);
+
+    const transporter = nodemailer.createTransport({
+      host: this.configService.get('MAIL_HOST') || 'smtp.gmail.com',
+      port: parseInt(this.configService.get('MAIL_PORT')) || 587,
+      secure: this.configService.get('MAIL_SECURE') === 'true' || false,
+      auth: {
+        user: this.configService.get('MAIL_USER'),
+        pass: this.configService.get('MAIL_PASS'),
+      },
+    });
+
+    if (
+      !this.configService.get('MAIL_USER') ||
+      !this.configService.get('MAIL_PASS')
+    ) {
+      throw new Error(
+        'Email configuration not found. Add MAIL_USER and MAIL_PASS to environment variables.'
+      );
+    }
+
+    const mailOptions = {
+      from: this.configService.get('MAIL_USER'),
+      to: email,
+      subject: 'Activa tu cuenta - Dioptrika',
+      html: this.getSetPasswordTemplate(setPasswordUrl, opticaName),
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
+
+  private getSetPasswordTemplate(
+    setPasswordUrl: string,
+    opticaName?: string
+  ): string {
+    const greeting = opticaName
+      ? `Tu suscripcion para <strong>${opticaName}</strong> ya esta activa.`
+      : 'Tu suscripcion ya esta activa.';
+
+    return `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Activa tu cuenta</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background-color: #f8fafc; line-height: 1.6;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; padding: 40px 0;">
+          <tr>
+            <td align="center">
+              <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); overflow: hidden;">
+
+                <tr>
+                  <td style="background: linear-gradient(135deg, #14B875 0%, #087A5A 100%); padding: 40px 30px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">
+                      Bienvenido a Dioptrika
+                    </h1>
+                    <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0; font-size: 16px; font-weight: 400;">
+                      Activa tu cuenta
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding: 50px 40px;">
+                    <div style="text-align: center; margin-bottom: 32px;">
+                      <h2 style="color: #1f2937; margin: 0 0 16px; font-size: 24px; font-weight: 600;">
+                        Define tu contrasena
+                      </h2>
+                      <p style="color: #6b7280; margin: 0; font-size: 16px; line-height: 1.5;">
+                        ${greeting} Crea tu contrasena para empezar a usar el sistema.
+                      </p>
+                    </div>
+
+                    <div style="text-align: center; margin: 40px 0;">
+                      <a href="${setPasswordUrl}" style="
+                        display: inline-block;
+                        background: linear-gradient(135deg, #14B875 0%, #087A5A 100%);
+                        color: #ffffff;
+                        padding: 16px 32px;
+                        text-decoration: none;
+                        border-radius: 12px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        box-shadow: 0 4px 12px rgba(20, 184, 117, 0.3);
+                      ">
+                        Definir mi contrasena
+                      </a>
+                    </div>
+
+                    <div style="background-color: #f1f5f9; border-radius: 12px; padding: 24px; margin: 30px 0;">
+                      <p style="color: #6b7280; margin: 0; font-size: 14px;">
+                        Este enlace expirara en <strong>72 horas</strong> por razones de seguridad.
+                        Si no reconoces esta cuenta, puedes ignorar este mensaje.
+                      </p>
+                    </div>
+
+                    <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                      <p style="color: #374151; margin: 0 0 12px; font-size: 14px; font-weight: 600;">
+                        Si el boton no funciona, copia y pega este enlace en tu navegador:
+                      </p>
+                      <p style="color: #087A5A; margin: 0; font-size: 12px; word-break: break-all; background-color: #ffffff; padding: 8px; border-radius: 4px; border: 1px solid #e5e7eb;">
+                        ${setPasswordUrl}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="background-color: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+                      Este es un correo automatico, por favor no respondas a este mensaje.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
   }
 
   private getResetPasswordTemplate(resetUrl: string): string {

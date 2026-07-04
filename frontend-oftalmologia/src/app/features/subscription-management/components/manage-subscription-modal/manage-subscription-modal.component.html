@@ -1,0 +1,242 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    <i class="ti ti-adjustments-alt me-2"></i>
+    {{ 'SUBSCRIPTION_ADMIN.MANAGE_TITLE' | translate }}
+  </h5>
+  <button
+    type="button"
+    class="btn-close ms-auto"
+    (click)="closeModal()"
+    [disabled]="formLoading"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <div class="alert alert-light border d-flex align-items-center gap-2 mb-3">
+    <i class="ti ti-building-store fs-4 text-primary"></i>
+    <div>
+      <div class="fw-semibold">{{ row.company.name }}</div>
+      <small class="text-muted">{{ row.company.code }}</small>
+    </div>
+    <div class="ms-auto d-flex flex-column align-items-end gap-1">
+      <span class="badge {{ statusBadgeClass(row.subscription?.status) }}">
+        {{ statusLabelKey(row.subscription?.status) | translate }}
+      </span>
+      @if (row.subscription) {
+        <span
+          class="badge"
+          [class.bg-info-subtle]="isLanding"
+          [class.text-info-emphasis]="isLanding"
+          [class.bg-secondary-subtle]="!isLanding"
+          [class.text-secondary-emphasis]="!isLanding"
+        >
+          <i class="ti me-1" [class.ti-world]="isLanding" [class.ti-hand-click]="!isLanding"></i>
+          {{
+            (isLanding
+              ? 'SUBSCRIPTION_ADMIN.SOURCE_LANDING'
+              : 'SUBSCRIPTION_ADMIN.SOURCE_MANUAL') | translate
+          }}
+        </span>
+      }
+    </div>
+  </div>
+
+  @if (isLanding && !isCanceled) {
+    <div class="alert alert-info d-flex align-items-start gap-2 mb-3">
+      <i class="ti ti-world mt-1 flex-shrink-0"></i>
+      <small class="mb-0">
+        {{ 'SUBSCRIPTION_ADMIN.LANDING_MANAGE_NOTE' | translate }}
+      </small>
+    </div>
+  }
+
+  <form [formGroup]="form">
+    <div class="mb-3">
+      <label class="form-label">{{ 'SUBSCRIPTION_ADMIN.PLAN' | translate }}</label>
+      <select
+        class="form-select"
+        formControlName="planCode"
+        (change)="onPlanChange()"
+      >
+        <option value="">{{ 'SUBSCRIPTION_ADMIN.NO_PLAN' | translate }}</option>
+        @for (plan of plans; track plan.id) {
+          <option [value]="plan.code">
+            {{ plan.name }} — {{ plan.amountCents / 100 | currency: 'USD' }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">
+          {{ 'SUBSCRIPTION_ADMIN.STATUS' | translate }}
+          <span class="text-danger">*</span>
+        </label>
+        <select class="form-select" formControlName="status">
+          <option value="active">
+            {{ 'SUBSCRIPTION.STATUS_ACTIVE' | translate }}
+          </option>
+          <option value="past_due">
+            {{ 'SUBSCRIPTION.STATUS_PAST_DUE' | translate }}
+          </option>
+          <option value="paused">
+            {{ 'SUBSCRIPTION.STATUS_PAUSED' | translate }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">
+          {{ 'SUBSCRIPTION_ADMIN.NEXT_CHARGE' | translate }}
+        </label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="currentPeriodEnd"
+        />
+        <div class="d-flex align-items-center gap-2 mt-2">
+          <small class="text-muted">
+            {{ 'SUBSCRIPTION_ADMIN.EXTEND_LABEL' | translate }}
+          </small>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="extendPeriod(7)"
+          >
+            {{ 'SUBSCRIPTION_ADMIN.EXTEND_WEEK' | translate }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="extendPeriod(30)"
+          >
+            {{ 'SUBSCRIPTION_ADMIN.EXTEND_MONTH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-1 mt-3">
+      <label class="form-label">
+        {{ 'SUBSCRIPTION_ADMIN.AMOUNT_USD' | translate }}
+      </label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="amountUsd"
+          min="0"
+          step="0.01"
+        />
+      </div>
+      <small class="text-muted">
+        {{ 'SUBSCRIPTION_ADMIN.AMOUNT_HINT' | translate }}
+      </small>
+    </div>
+  </form>
+
+  <hr class="my-3" />
+
+  <!-- Estado de la EMPRESA: acción DISTINTA a cancelar el cobro. Desactivar
+       bloquea el login de todos los usuarios de la empresa. -->
+  <div
+    class="d-flex align-items-start gap-2 p-2 rounded border"
+    [class.border-danger-subtle]="!isCompanyActive"
+  >
+    <i
+      class="ti mt-1 flex-shrink-0 fs-5"
+      [class.ti-lock-open]="isCompanyActive"
+      [class.text-success]="isCompanyActive"
+      [class.ti-lock]="!isCompanyActive"
+      [class.text-danger]="!isCompanyActive"
+    ></i>
+    <div class="flex-grow-1 min-w-0">
+      <div class="fw-semibold">
+        {{ 'SUBSCRIPTION_ADMIN.COMPANY_STATE' | translate }}
+        @if (isCompanyActive) {
+          <span class="badge bg-success-subtle text-success-emphasis ms-1">
+            {{ 'SUBSCRIPTION_ADMIN.COMPANY_ACTIVE' | translate }}
+          </span>
+        } @else {
+          <span class="badge bg-danger-subtle text-danger-emphasis ms-1">
+            {{ 'SUBSCRIPTION_ADMIN.COMPANY_INACTIVE' | translate }}
+          </span>
+        }
+      </div>
+      <small class="text-muted d-block">
+        {{ 'SUBSCRIPTION_ADMIN.COMPANY_STATE_NOTE' | translate }}
+      </small>
+    </div>
+    @if (isCompanyActive) {
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-dark flex-shrink-0"
+        (click)="requestDeactivateCompany()"
+        [disabled]="formLoading"
+      >
+        <i class="ti ti-lock me-1"></i>
+        {{ 'SUBSCRIPTION_ADMIN.DEACTIVATE_COMPANY' | translate }}
+      </button>
+    } @else {
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-success flex-shrink-0"
+        (click)="requestActivateCompany()"
+        [disabled]="formLoading"
+      >
+        <i class="ti ti-lock-open me-1"></i>
+        {{ 'SUBSCRIPTION_ADMIN.ACTIVATE_COMPANY' | translate }}
+      </button>
+    }
+  </div>
+</div>
+
+<div class="modal-footer">
+  @if (row.subscription && !isCanceled) {
+    <button
+      type="button"
+      class="btn btn-outline-danger me-auto"
+      (click)="requestCancel()"
+      [disabled]="formLoading"
+    >
+      <i class="ti ti-ban me-1"></i>
+      {{ 'SUBSCRIPTION_ADMIN.CANCEL_SUB' | translate }}
+    </button>
+  }
+  @if (row.subscription && isCanceled) {
+    <button
+      type="button"
+      class="btn btn-outline-success me-auto"
+      (click)="requestReactivate()"
+      [disabled]="formLoading"
+    >
+      <i class="ti ti-refresh me-1"></i>
+      {{ 'SUBSCRIPTION_ADMIN.REACTIVATE' | translate }}
+    </button>
+  }
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="closeModal()"
+    [disabled]="formLoading"
+  >
+    {{ 'WORDS.CANCEL' | translate }}
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="onSubmit()"
+    [disabled]="formLoading"
+  >
+    @if (formLoading) {
+      <span
+        class="spinner-border spinner-border-sm me-1"
+        role="status"
+        aria-hidden="true"
+      ></span>
+    }
+    {{ 'SUBSCRIPTION_ADMIN.SAVE' | translate }}
+  </button>
+</div>

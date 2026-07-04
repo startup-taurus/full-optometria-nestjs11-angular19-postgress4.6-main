@@ -141,6 +141,12 @@ export const MENU_ITEMS: MenuItemType[] = [
         requiredPermissions: [PERMISSION_IDS.COMPANIES],
       },
       {
+        key: 'SUBSCRIPTION_ADMIN',
+        label: 'SUBSCRIPTION_ADMIN',
+        icon: 'ti-receipt-2',
+        url: '/subscription-management',
+      },
+      {
         key: 'FEEDBACK_ADMIN',
         label: 'FEEDBACK_ADMIN',
         icon: 'ti-message-2-cog',
@@ -168,6 +174,13 @@ export const MENU_ITEMS: MenuItemType[] = [
         requiredPermissions: [PERMISSION_IDS.MEDICAL_HISTORY_CONFIGURATION],
       },
     ],
+  },
+  {
+    key: 'SUBSCRIPTION',
+    label: 'SUBSCRIPTION',
+    icon: 'ti-credit-card',
+    url: '/subscription',
+    requiredPermissions: [PERMISSION_IDS.SUBSCRIPTION],
   },
 ]
 

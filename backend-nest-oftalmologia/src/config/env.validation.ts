@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsIn } from 'class-validator';
+import { IsString, IsNumber, IsIn, IsOptional } from 'class-validator';
 
 export class EnvironmentVariables {
   @IsIn(['development', 'production', 'test'])
@@ -51,6 +51,22 @@ export class EnvironmentVariables {
 
   @IsNumber()
   BILLING_API_MAX_RETRIES: number;
+
+  @IsOptional()
+  @IsString()
+  PROVISIONING_API_KEY?: string;
+
+  @IsOptional()
+  @IsString()
+  LANDING_API_URL?: string;
+
+  @IsOptional()
+  @IsString()
+  LANDING_API_KEY?: string;
+
+  @IsOptional()
+  @IsString()
+  LANDING_API_TIMEOUT_MS?: string;
 }
 
 export function validate(config: Record<string, unknown>) {

@@ -4,8 +4,12 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Company } from './entities/company.entity';
+import { Branch } from '../branches/entities/branch.entity';
+import { CompanySubscription } from '../subscriptions/entities/company-subscription.entity';
+import { Patient } from '../patients/entities/patient.entity';
+import { Client } from '../patients/entities/client.entity';
 import { CreateCompanyDto } from './dtos/create-company.dto';
 import { CreateCompanyCompleteDto } from './dtos/create-company-complete.dto';
 import { UpdateCompanyDto } from './dtos/update-company.dto';
@@ -52,7 +56,8 @@ export class CompaniesService {
     private clinicalFormConfigRepository: Repository<ClinicalFormConfig>,
     private branchesService: BranchesService,
     private rolesService: RolesService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private dataSource: DataSource
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto) {
@@ -761,6 +766,78 @@ export class CompaniesService {
     }
 
     await this.companyRepository.remove(company);
+
+    return {
+      messageKey: 'COMPANY.DELETED',
+      data: { id },
+    };
+  }
+
+  // Borrado en CASCADA (solo superadmin, ver controlador). Elimina la empresa y
+  // TODOS sus datos en una transacción (todo-o-nada), en orden seguro de FKs.
+  // Pensado para resetear rápido una empresa de prueba creada desde la landing
+  // (empresa → rol → sucursal → usuario → suscripción). Si algo falla, hace
+  // rollback y no borra nada a medias.
+  async removeCascade(id: string) {
+    const company = await this.companyRepository.findOne({ where: { id } });
+    if (!company) {
+      throw new NotFoundException({ messageKey: 'ERROR.NOT_FOUND' });
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const manager = queryRunner.manager;
+
+      // 1) Hijos de los roles de la empresa (por role_id).
+      await manager.query(
+        `DELETE FROM role_permissions WHERE role_id IN (SELECT id FROM roles WHERE company_id = $1)`,
+        [id]
+      );
+      await manager.query(
+        `DELETE FROM role_modules WHERE role_id IN (SELECT id FROM roles WHERE company_id = $1)`,
+        [id]
+      );
+
+      // 2) Suscripción de la empresa.
+      await manager.delete(CompanySubscription, { companyId: id });
+
+      // 3) Datos operativos/clínicos/comerciales (hijos antes que sus padres).
+      await manager.delete(Client, { companyId: id });
+      await manager.delete(ClinicalHistory, { companyId: id });
+      await manager.delete(LaboratoryOrder, { companyId: id });
+      await manager.delete(Shift, { companyId: id });
+      await manager.delete(Patient, { companyId: id });
+      await manager.delete(Product, { companyId: id });
+      await manager.delete(Subcategory, { companyId: id });
+      await manager.delete(Category, { companyId: id });
+      await manager.delete(Supplier, { companyId: id });
+      await manager.delete(ClinicalFormConfig, { companyId: id });
+
+      // 4) Núcleo: usuarios (FK a rol/sucursal) → roles → sucursales → empresa.
+      await manager.delete(User, { companyId: id });
+      await manager.delete(Role, { companyId: id });
+      await manager.delete(Branch, { companyId: id });
+      await manager.delete(Company, { id });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new ConflictException({
+        messageKey: 'ERROR.VALIDATION',
+        message: {
+          es: `No se pudo eliminar la empresa ${company.name} en cascada: ${
+            error instanceof Error ? error.message : 'error desconocido'
+          }`,
+          en: `Could not cascade-delete company ${company.name}: ${
+            error instanceof Error ? error.message : 'unknown error'
+          }`,
+        },
+      });
+    } finally {
+      await queryRunner.release();
+    }
 
     return {
       messageKey: 'COMPANY.DELETED',

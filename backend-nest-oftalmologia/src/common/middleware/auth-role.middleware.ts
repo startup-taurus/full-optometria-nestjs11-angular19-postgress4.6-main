@@ -23,6 +23,7 @@ export class AuthRoleMiddleware implements NestMiddleware {
       '/auth/refresh',
       '/auth/forgot-password',
       '/auth/reset-password',
+      '/provisioning',
     ];
 
     const isPublicCatalog =
