@@ -49,8 +49,9 @@ export class FilesService {
     ];
 
     if (
-      (uploadFileDto.fileCategory === 'profile_photo' || 
-       uploadFileDto.fileCategory === 'product_image') &&
+      (uploadFileDto.fileCategory === 'profile_photo' ||
+        uploadFileDto.fileCategory === 'product_image' ||
+        uploadFileDto.fileCategory === 'company_logo') &&
       !allowedMimeTypes.includes(file.mimetype)
     ) {
       throw new BadRequestException({

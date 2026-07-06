@@ -43,6 +43,7 @@ import { CompanyQuotaModule } from './modules/company-quota/company-quota.module
 import { FeedbackModule } from './modules/feedback/feedback.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 
 // Entities
 import { User } from './modules/users/entities/user.entity';
@@ -80,6 +81,8 @@ import { ReminderRule } from './modules/notifications/entities/reminder-rule.ent
 import { Campaign } from './modules/notifications/entities/campaign.entity';
 import { MessageDispatchLog } from './modules/notifications/entities/message-dispatch-log.entity';
 import { PatientContactPreference } from './modules/notifications/entities/patient-contact-preference.entity';
+import { Plan } from './modules/subscriptions/entities/plan.entity';
+import { CompanySubscription } from './modules/subscriptions/entities/company-subscription.entity';
 
 @Module({
   imports: [
@@ -134,6 +137,8 @@ import { PatientContactPreference } from './modules/notifications/entities/patie
           Campaign,
           MessageDispatchLog,
           PatientContactPreference,
+          Plan,
+          CompanySubscription,
         ],
         synchronize: false,
         dropSchema: false,
@@ -164,6 +169,7 @@ import { PatientContactPreference } from './modules/notifications/entities/patie
     CompanyQuotaModule,
     FeedbackModule,
     NotificationsModule,
+    SubscriptionsModule,
   ],
   providers: [
     {

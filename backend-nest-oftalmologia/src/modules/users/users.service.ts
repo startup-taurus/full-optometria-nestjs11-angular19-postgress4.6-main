@@ -519,9 +519,12 @@ export class UsersService {
       });
     }
 
+    // La FK de shifts al usuario que lo creó es `created_by_user_id` (la columna
+    // `shift.user_id` NO existe; usarla rompía TODO borrado de usuario con
+    // "no existe la columna shift.user_id").
     const shiftsCount = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoin('shifts', 'shift', 'shift.user_id = user.id')
+      .leftJoin('shifts', 'shift', 'shift.created_by_user_id = user.id')
       .where('user.id = :id', { id })
       .select('COUNT(shift.id)', 'count')
       .getRawOne();
@@ -546,42 +549,15 @@ export class UsersService {
       });
     }
 
-    // Verificar si el usuario tiene historias clínicas asociadas
-    const clinicalHistoriesCount = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('clinical_histories', 'history', 'history.user_id = user.id')
-      .where('user.id = :id', { id })
-      .select('COUNT(history.id)', 'count')
-      .getRawOne();
+    // NOTA: las historias clínicas (`clinical_histories`) NO están ligadas a un
+    // usuario (solo a company/branch/patient y `professional_name` como texto).
+    // No hay columna de usuario que validar, así que no se comprueba aquí.
 
-    if (parseInt(clinicalHistoriesCount.count) > 0) {
-      throw new ConflictException({
-        messageKey: 'ERROR.VALIDATION',
-        message: {
-          es: `No se puede eliminar el usuario ${user.firstName} ${
-            user.lastName
-          } porque tiene ${clinicalHistoriesCount.count} historia${
-            parseInt(clinicalHistoriesCount.count) > 1 ? 's' : ''
-          } clínica${
-            parseInt(clinicalHistoriesCount.count) > 1 ? 's' : ''
-          } asociada${
-            parseInt(clinicalHistoriesCount.count) > 1 ? 's' : ''
-          }. Primero elimine las historias clínicas.`,
-          en: `Cannot delete user ${user.firstName} ${
-            user.lastName
-          } because it has ${
-            clinicalHistoriesCount.count
-          } associated clinical histor${
-            parseInt(clinicalHistoriesCount.count) > 1 ? 'ies' : 'y'
-          }. Please delete the clinical histories first.`,
-        },
-      });
-    }
-
-    // Verificar si el usuario tiene órdenes de laboratorio asociadas
+    // Verificar si el usuario tiene órdenes de laboratorio asociadas.
+    // La FK al usuario que la creó es `created_by_user_id` (no `user_id`).
     const laboratoryOrdersCount = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoin('laboratory_orders', 'order', 'order.user_id = user.id')
+      .leftJoin('laboratory_orders', 'order', 'order.created_by_user_id = user.id')
       .where('user.id = :id', { id })
       .select('COUNT(order.id)', 'count')
       .getRawOne();

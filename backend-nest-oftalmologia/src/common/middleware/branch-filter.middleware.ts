@@ -33,6 +33,7 @@ export class BranchFilterMiddleware implements NestMiddleware {
       'files',
       'branches',
       'public',
+      'provisioning',
     ];
 
     const urlParts = req.originalUrl.split('/');

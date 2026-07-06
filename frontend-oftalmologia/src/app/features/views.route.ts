@@ -113,4 +113,18 @@ export const VIEWS_ROUTES: Route[] = [
         (mod) => mod.NOTIFICATIONS_ROUTES
       ),
   },
+  {
+    path: 'subscription',
+    loadChildren: () =>
+      import('./subscription/subscription.route').then(
+        (mod) => mod.SUBSCRIPTION_ROUTES
+      ),
+  },
+  {
+    path: 'subscription-management',
+    loadChildren: () =>
+      import('./subscription-management/subscription-management.route').then(
+        (mod) => mod.SUBSCRIPTION_MANAGEMENT_ROUTES
+      ),
+  },
 ]

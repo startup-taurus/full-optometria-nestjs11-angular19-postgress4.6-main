@@ -1,0 +1,244 @@
+<page-title title="{{ 'SUBSCRIPTION.TITLE' | translate }}" />
+
+<input
+  #logoInput
+  type="file"
+  class="d-none"
+  accept="image/png,image/jpg,image/jpeg,image/webp"
+  (change)="onLogoSelected($event)"
+/>
+
+<div class="row justify-content-center">
+  <div class="col-xxl-9 col-xl-10">
+    <div class="sub-hero card border-0 mb-4 sub-reveal">
+      <div class="card-body">
+        <div class="sub-hero-row">
+          <div
+            class="sub-logo"
+            [class.is-loading]="uploadingLogo"
+            (click)="triggerLogoInput()"
+            role="button"
+            tabindex="0"
+          >
+            <img *ngIf="logoUrl; else logoPlaceholder" [src]="logoUrl" alt="logo" />
+            <ng-template #logoPlaceholder>
+              <i class="ti ti-building-store"></i>
+            </ng-template>
+            <span class="sub-logo-overlay">
+              <i
+                class="ti"
+                [ngClass]="uploadingLogo ? 'ti-loader-2 spin' : 'ti-camera'"
+              ></i>
+            </span>
+          </div>
+
+          <div class="sub-hero-info">
+            <h3 class="sub-optica">
+              {{ companyName || ('SUBSCRIPTION.TITLE' | translate) }}
+            </h3>
+            <p class="sub-plan" *ngIf="subscription">
+              {{
+                subscription.plan?.name ||
+                  subscription.planCode ||
+                  ('SUBSCRIPTION.CURRENT_PLAN' | translate)
+              }}
+            </p>
+            <span
+              *ngIf="subscription"
+              class="badge sub-badge {{ statusBadgeClass(subscription.status) }}"
+              [class.is-pulse]="subscription.status === 'active'"
+            >
+              <span class="dot"></span>
+              {{ statusLabelKey(subscription.status) | translate }}
+            </span>
+          </div>
+        </div>
+
+        <p class="sub-logo-hint" [class.text-danger]="logoError">
+          {{ logoError || ('SUBSCRIPTION.LOGO_HINT' | translate) }}
+        </p>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!loading; else loadingTpl">
+      <ng-container *ngIf="subscription; else noneTpl">
+        <div class="row g-3 g-md-4 sub-metrics">
+          <div class="col-6 col-lg-4">
+            <div class="sub-metric card h-100">
+              <div class="card-body">
+                <span class="sub-metric-icon"><i class="ti ti-cash"></i></span>
+                <p class="sub-metric-label">
+                  {{ 'SUBSCRIPTION.AMOUNT' | translate }}
+                </p>
+                <h4 class="sub-metric-value">
+                  ${{ (subscription.amountCents || 0) / 100 | number: '1.2-2' }}
+                  <small>{{ subscription.currency || 'USD' }}</small>
+                </h4>
+                <p class="text-muted small mb-0 mt-1" *ngIf="taxBreakdown">
+                  {{ 'SUBSCRIPTION.TAX_BREAKDOWN' | translate: taxBreakdown }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4">
+            <div class="sub-metric card h-100">
+              <div class="card-body">
+                <span class="sub-metric-icon"
+                  ><i class="ti ti-repeat"></i
+                ></span>
+                <p class="sub-metric-label">
+                  {{ 'SUBSCRIPTION.BILLING_CYCLE' | translate }}
+                </p>
+                <h4 class="sub-metric-value">
+                  {{ 'SUBSCRIPTION.MONTHLY' | translate }}
+                </h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4">
+            <div class="sub-metric card h-100">
+              <div class="card-body">
+                <span class="sub-metric-icon"
+                  ><i class="ti ti-calendar-event"></i
+                ></span>
+                <p class="sub-metric-label">
+                  {{ 'SUBSCRIPTION.NEXT_CHARGE' | translate }}
+                </p>
+                <h4 class="sub-metric-value">
+                  {{
+                    subscription.currentPeriodEnd
+                      ? (subscription.currentPeriodEnd | date: 'dd/MM/yyyy':'UTC')
+                      : '—'
+                  }}
+                </h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4">
+            <div class="sub-metric card h-100">
+              <div class="card-body">
+                <span class="sub-metric-icon"
+                  ><i class="ti ti-credit-card"></i
+                ></span>
+                <p class="sub-metric-label">
+                  {{ 'SUBSCRIPTION.PAYMENT_METHOD' | translate }}
+                </p>
+                <h4 class="sub-metric-value">
+                  <ng-container *ngIf="subscription.cardLast4; else noCard">
+                    {{ subscription.cardBrand || 'Tarjeta' }} ••••
+                    {{ subscription.cardLast4 }}
+                  </ng-container>
+                  <ng-template #noCard>—</ng-template>
+                </h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4" *ngIf="subscription.startedAt">
+            <div class="sub-metric card h-100">
+              <div class="card-body">
+                <span class="sub-metric-icon"
+                  ><i class="ti ti-flag"></i
+                ></span>
+                <p class="sub-metric-label">
+                  {{ 'SUBSCRIPTION.STARTED_AT' | translate }}
+                </p>
+                <h4 class="sub-metric-value">
+                  {{ subscription.startedAt | date: 'dd/MM/yyyy' }}
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-container *ngIf="!isCanceled">
+          <div class="sub-manage card mt-4 sub-reveal">
+            <div class="card-body">
+              <span class="sub-manage-icon">
+                <i
+                  class="ti"
+                  [ngClass]="canSelfCancel ? 'ti-settings' : 'ti-headset'"
+                ></i>
+              </span>
+              <div class="flex-grow-1">
+                <ng-container *ngIf="canSelfCancel; else supportInfo">
+                  <h5 class="mb-1">
+                    {{ 'SUBSCRIPTION.SELF_MANAGE_TITLE' | translate }}
+                  </h5>
+                  <p class="text-muted mb-0">
+                    {{ 'SUBSCRIPTION.SELF_MANAGE_TEXT' | translate }}
+                  </p>
+                </ng-container>
+                <ng-template #supportInfo>
+                  <h5 class="mb-1">
+                    {{ 'SUBSCRIPTION.MANAGE_TITLE' | translate }}
+                  </h5>
+                  <p class="text-muted mb-0">
+                    {{ 'SUBSCRIPTION.MANAGE_TEXT' | translate }}
+                  </p>
+                </ng-template>
+              </div>
+              <!--
+                Cancelación por el usuario DESHABILITADA (2026-07): el cobro
+                automático solo lo cancela el superadmin desde "Gestión de
+                suscripciones". El botón queda comentado a propósito.
+              <button
+                *ngIf="canSelfCancel"
+                type="button"
+                class="btn btn-outline-danger flex-shrink-0"
+                (click)="onCancelSubscription()"
+                [disabled]="canceling"
+              >
+                <span
+                  *ngIf="canceling"
+                  class="spinner-border spinner-border-sm me-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <i *ngIf="!canceling" class="ti ti-ban me-1"></i>
+                {{ 'SUBSCRIPTION.CANCEL_BUTTON' | translate }}
+              </button>
+              -->
+            </div>
+          </div>
+        </ng-container>
+
+        <div
+          *ngIf="isCanceled"
+          class="alert alert-warning d-flex align-items-center gap-2 mt-4 mb-0 sub-reveal"
+        >
+          <i class="ti ti-info-circle flex-shrink-0 fs-4"></i>
+          <span>{{ 'SUBSCRIPTION.CANCELED_NOTE' | translate }}</span>
+        </div>
+      </ng-container>
+
+      <ng-template #noneTpl>
+        <div class="card sub-none sub-reveal">
+          <div class="card-body text-center">
+            <div class="sub-none-icon"><i class="ti ti-receipt-off"></i></div>
+            <h4 class="fs-18 fw-semibold mb-1">
+              {{ 'SUBSCRIPTION.NONE_TITLE' | translate }}
+            </h4>
+            <p class="text-muted mb-0">
+              {{ 'SUBSCRIPTION.NONE_TEXT' | translate }}
+            </p>
+          </div>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <ng-template #loadingTpl>
+      <div class="card sub-reveal">
+        <div class="card-body text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-2 mb-0">
+            {{ 'SUBSCRIPTION.LOADING' | translate }}
+          </p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>

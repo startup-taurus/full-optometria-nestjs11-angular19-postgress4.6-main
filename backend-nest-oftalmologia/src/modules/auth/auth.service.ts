@@ -87,6 +87,16 @@ export class AuthService {
       });
     }
 
+    // Empresa desactivada por el superadmin ⇒ ningún usuario de esa empresa puede
+    // entrar (el superadmin no tiene companyId, así que nunca se bloquea a sí mismo).
+    // Se valida DESPUÉS de la contraseña para no filtrar el estado de la empresa.
+    if (user.companyId && user.company && !user.company.isActive) {
+      this.logger.warn(`Login bloqueado: empresa inactiva para ${identifier}`);
+      throw new UnauthorizedException({
+        messageKey: 'ERROR.COMPANY_INACTIVE',
+      });
+    }
+
     if (user.isLocked) {
       this.logger.warn(`Auto unlocking user after valid credentials: ${identifier}`);
       await this.userRepository.update(user.id, {
@@ -159,12 +169,20 @@ export class AuthService {
 
       const user = await this.userRepository.findOne({
         where: { id: payload.sub },
-        relations: ['role'],
+        relations: ['role', 'company'],
       });
 
       if (!user || !user.isActive || user.isLocked) {
         throw new UnauthorizedException({
           messageKey: 'ERROR.UNAUTHORIZED',
+        });
+      }
+
+      // Empresa desactivada ⇒ tampoco se puede refrescar el token (queda fuera al
+      // expirar el access token actual). El superadmin no tiene companyId.
+      if (user.companyId && user.company && !user.company.isActive) {
+        throw new UnauthorizedException({
+          messageKey: 'ERROR.COMPANY_INACTIVE',
         });
       }
 

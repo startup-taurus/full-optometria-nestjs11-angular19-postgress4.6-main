@@ -55,6 +55,9 @@ export const PERMISSION_IDS = {
 
   //notificaciones whatsapp
   WHATSAPP_MODULE: '772ddd04-70cf-4d3c-b4a3-c30b18bf8505',
+
+  //suscripción
+  SUBSCRIPTION: 'e3c9f7b5-2d80-4b4f-ac32-60a9d1b7f021',
 } as const
 
 // Mapeo de nombres de permisos a IDs para compatibilidad hacia atrás

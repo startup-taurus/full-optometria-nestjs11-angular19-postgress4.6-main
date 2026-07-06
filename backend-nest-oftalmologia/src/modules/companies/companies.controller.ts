@@ -56,4 +56,10 @@ export class CompaniesController {
   remove(@Param('id') id: string) {
     return this.companiesService.remove(id);
   }
+
+  // Borrado en CASCADA (superadmin): elimina la empresa y TODOS sus datos.
+  @Delete(':id/cascade')
+  removeCascade(@Param('id') id: string) {
+    return this.companiesService.removeCascade(id);
+  }
 }
