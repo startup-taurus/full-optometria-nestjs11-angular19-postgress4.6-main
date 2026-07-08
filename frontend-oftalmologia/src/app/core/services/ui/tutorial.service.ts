@@ -33,6 +33,7 @@ export class TutorialService {
   private activeSteps: TutorialStep[] = []
   private isTransitioning = false
   private writeGuardListener: ((event: Event) => void) | null = null
+  private allowProgrammaticClick = false
 
   getMainFlowTutorial(): TutorialDefinition {
     return MAIN_FLOW_TUTORIAL
@@ -133,6 +134,9 @@ export class TutorialService {
       return
     }
     this.writeGuardListener = (event: Event) => {
+      if (this.allowProgrammaticClick) {
+        return
+      }
       const target = event.target as HTMLElement | null
       if (!target || target.closest('.driver-popover, .driver-overlay')) {
         return
@@ -141,15 +145,13 @@ export class TutorialService {
       if (!modal) {
         return
       }
-      const dismiss = target.closest(
-        '[data-bs-dismiss="modal"], [aria-label="Close"], .btn-close, .modal-header button'
+      const allowed = target.closest(
+        '[data-bs-dismiss="modal"], [aria-label="Close"], .btn-close, .modal-header button, .btn-secondary, .btn-outline-secondary, [data-tutorial-allow]'
       )
-      if (dismiss) {
+      if (allowed) {
         return
       }
-      const control = target.closest(
-        'button[type="submit"], button:not([type]), input[type="submit"], [data-tutorial-submit]'
-      )
+      const control = target.closest('button, input[type="submit"], input[type="button"]')
       if (control) {
         event.preventDefault()
         event.stopImmediatePropagation()
@@ -183,6 +185,8 @@ export class TutorialService {
       showProgress: true,
       allowClose: true,
       disableActiveInteraction: true,
+      smoothScroll: true,
+      popoverClass: 'tutorial-popover',
       overlayOpacity: 0.55,
       stagePadding: 6,
       stageRadius: 8,
@@ -242,12 +246,31 @@ export class TutorialService {
   private resolveElement(selector: string, fallback?: string): Element {
     const primary = this.queryVisible(selector)
     if (primary) {
-      return primary
+      return this.toVisibleTarget(primary)
     }
     const fallbackElement = fallback ? this.queryVisible(fallback) : null
-    return (fallbackElement ??
+    const resolved = (fallbackElement ??
       document.querySelector(selector) ??
       (fallback ? document.querySelector(fallback) : null)) as Element
+    return resolved ? this.toVisibleTarget(resolved) : resolved
+  }
+
+  private toVisibleTarget(element: Element): Element {
+    const rect = element.getBoundingClientRect()
+    if (rect.width > 1 && rect.height > 1) {
+      return element
+    }
+    let current = element.parentElement
+    let depth = 0
+    while (current && depth < 4) {
+      const parentRect = current.getBoundingClientRect()
+      if (parentRect.width > 1 && parentRect.height > 1) {
+        return current
+      }
+      current = current.parentElement
+      depth += 1
+    }
+    return element
   }
 
   private queryVisible(selector: string): Element | null {
@@ -284,9 +307,74 @@ export class TutorialService {
     if (step.openModalTrigger) {
       await this.openModalFor(step.openModalTrigger)
     }
+    if (step.fillFields?.length) {
+      for (const field of step.fillFields) {
+        this.fillField(field.selector, field.value)
+      }
+      await this.nextTick()
+    }
+    if (step.clickTriggers?.length) {
+      for (const trigger of step.clickTriggers) {
+        await this.clickAndSettle(trigger)
+      }
+    }
     if (step.awaitSelector) {
       await this.waitForSelector(step.awaitSelector)
     }
+    this.scrollTargetIntoView(step)
+  }
+
+  private scrollTargetIntoView(step: TutorialStep): void {
+    const selector =
+      step.primarySelector ??
+      (typeof step.element === 'string' ? step.element : step.awaitSelector)
+    if (!selector) {
+      return
+    }
+    const element = this.queryVisible(selector)
+    if (!element) {
+      return
+    }
+    this.toVisibleTarget(element).scrollIntoView({
+      block: 'center',
+      inline: 'nearest',
+    })
+  }
+
+  private fillField(selector: string, value: string): void {
+    const field = this.queryVisible(selector) as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | null
+    if (!field) {
+      return
+    }
+    const setter = Object.getOwnPropertyDescriptor(
+      Object.getPrototypeOf(field),
+      'value'
+    )?.set
+    setter ? setter.call(field, value) : (field.value = value)
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    field.dispatchEvent(new Event('change', { bubbles: true }))
+    field.dispatchEvent(new Event('blur', { bubbles: true }))
+  }
+
+  private async clickAndSettle(selector: string): Promise<void> {
+    const trigger = this.queryVisible(selector) as HTMLElement | null
+    if (!trigger) {
+      return
+    }
+    this.allowProgrammaticClick = true
+    try {
+      trigger.click()
+    } finally {
+      this.allowProgrammaticClick = false
+    }
+    await this.nextTick()
+  }
+
+  private nextTick(): Promise<void> {
+    return new Promise((resolve) => window.setTimeout(resolve, 120))
   }
 
   private async openModalFor(triggerSelector: string): Promise<void> {

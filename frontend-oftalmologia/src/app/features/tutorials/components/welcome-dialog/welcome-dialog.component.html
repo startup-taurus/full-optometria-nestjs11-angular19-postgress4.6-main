@@ -19,42 +19,47 @@
       <i class="ti ti-x"></i>
     </button>
 
-    <div class="welcome-hero">
-      <span class="welcome-orb welcome-orb--one"></span>
-      <span class="welcome-orb welcome-orb--two"></span>
-      <div class="welcome-badge">
+    <section class="welcome-intro">
+      <span class="welcome-eyebrow">
         <i class="ti ti-sparkles"></i>
-      </div>
+        {{ 'TUTORIALS.WELCOME.EYEBROW' | translate }}
+      </span>
       <h2 class="welcome-title">{{ 'TUTORIALS.WELCOME.TITLE' | translate }}</h2>
       <p class="welcome-text">{{ 'TUTORIALS.WELCOME.TEXT' | translate }}</p>
-    </div>
-
-    <div class="welcome-body">
-      <ul class="welcome-steps">
-        <li
-          class="welcome-step"
-          *ngFor="let step of steps; let i = index"
-          [style.animation-delay.ms]="120 + i * 90"
-        >
-          <span class="welcome-step-index">{{ i + 1 }}</span>
-          <span class="welcome-step-icon"><i class="ti {{ step.icon }}"></i></span>
-          <span class="welcome-step-label">{{ step.titleKey | translate }}</span>
-        </li>
-      </ul>
 
       <div class="welcome-actions">
-        <button type="button" class="btn welcome-btn-primary" (click)="emit('start')">
+        <button type="button" class="welcome-btn-primary" (click)="emit('start')">
           <i class="ti ti-player-play"></i>
           <span>{{ 'TUTORIALS.WELCOME.CONFIRM' | translate }}</span>
         </button>
-        <button type="button" class="btn welcome-btn-ghost" (click)="emit('browse')">
-          <i class="ti ti-layout-grid"></i>
-          <span>{{ 'TUTORIALS.WELCOME.SEE_ALL' | translate }}</span>
-        </button>
-        <button type="button" class="btn welcome-btn-link" (click)="emit('dismiss')">
-          {{ 'TUTORIALS.WELCOME.CANCEL' | translate }}
+        <button type="button" class="welcome-btn-ghost" (click)="emit('browse')">
+          {{ 'TUTORIALS.WELCOME.SEE_ALL' | translate }}
         </button>
       </div>
-    </div>
+
+      <button type="button" class="welcome-btn-link" (click)="emit('dismiss')">
+        {{ 'TUTORIALS.WELCOME.CANCEL' | translate }}
+      </button>
+    </section>
+
+    <section class="welcome-flow" aria-hidden="true">
+      <span class="welcome-flow-label">{{ 'TUTORIALS.WELCOME.FLOW_LABEL' | translate }}</span>
+      <ul class="welcome-steps">
+        <li
+          class="welcome-step"
+          *ngFor="let step of steps; let i = index; let last = last"
+          [class.is-last]="last"
+          [style.animation-delay.ms]="90 + i * 70"
+        >
+          <span class="welcome-step-marker">
+            <span class="welcome-step-index">{{ i + 1 }}</span>
+          </span>
+          <span class="welcome-step-body">
+            <span class="welcome-step-icon"><i class="ti {{ step.icon }}"></i></span>
+            <span class="welcome-step-label">{{ step.titleKey | translate }}</span>
+          </span>
+        </li>
+      </ul>
+    </section>
   </div>
 </div>

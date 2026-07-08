@@ -223,11 +223,13 @@
       "FILTER_ALL": "Todos"
     },
     "WELCOME": {
-      "TITLE": "¡Bienvenido!",
-      "TEXT": "¿Quieres un recorrido guiado por el flujo principal del sistema? Te mostraremos, con datos de ejemplo, cómo crear un paciente, agendar su cita, registrar su historia clínica y generar la orden de laboratorio.",
-      "CONFIRM": "Sí, empezar recorrido",
+      "EYEBROW": "Primeros pasos",
+      "TITLE": "Aprende el flujo principal en minutos",
+      "TEXT": "Te guiamos paso a paso sobre el sistema real, con datos de ejemplo, para que domines el proceso de atención de principio a fin.",
+      "FLOW_LABEL": "El recorrido cubre",
+      "CONFIRM": "Empezar recorrido",
       "SEE_ALL": "Ver todos los tutoriales",
-      "CANCEL": "Ahora no"
+      "CANCEL": "Ahora no, gracias"
     },
     "TAG": {
       "PATIENTS": "Pacientes",
@@ -377,14 +379,6 @@
       }
     },
     "CLINICAL": {
-      "CREATE": {
-        "TITLE": "Registrar historia clínica",
-        "DESCRIPTION": "Documenta la atención del paciente.",
-        "STEP_1_TITLE": "Nueva historia",
-        "STEP_1_TEXT": "Este botón abre el formulario de la historia clínica: seleccionas el paciente y registras medidas y diagnóstico.",
-        "STEP_2_TITLE": "Historias registradas",
-        "STEP_2_TEXT": "Las historias clínicas se listan aquí (aquí ves ejemplos). Desde cada fila accedes a sus acciones."
-      },
       "MANAGE": {
         "TITLE": "Gestionar una historia clínica",
         "DESCRIPTION": "Edita o elimina una historia clínica.",
@@ -395,9 +389,27 @@
       },
       "LAB_ORDER": {
         "TITLE": "Generar orden de laboratorio",
-        "DESCRIPTION": "Crea la orden de laboratorio desde la historia clínica.",
-        "STEP_1_TITLE": "Generar orden",
-        "STEP_1_TEXT": "En las acciones de cada historia, este botón crea la orden de laboratorio con la fórmula de los lentes del paciente."
+        "DESCRIPTION": "Recorre los 4 pasos de la orden desde la historia clínica.",
+        "OPEN_TITLE": "Generar orden de laboratorio",
+        "OPEN_TEXT": "La orden nace desde una historia clínica: este botón abre el asistente con los datos del paciente ya cargados. Recorreremos sus 4 pasos; nada se guarda durante el tutorial.",
+        "F_CLIENT_TITLE": "Cliente que paga",
+        "F_CLIENT_TEXT": "Selecciona quién paga y recibe la factura. Puedes crear uno nuevo con el botón +. Si lo dejas vacío, se registra como consumidor final.",
+        "F_ATTENDANCE_TITLE": "Fecha de atención",
+        "F_ATTENDANCE_TEXT": "Es la fecha en que atendiste al paciente. Se completa con el día de hoy, pero puedes cambiarla.",
+        "F_DELIVERY_TITLE": "Fecha de entrega (obligatorio)",
+        "F_DELIVERY_TEXT": "Indica cuándo estarán listos los lentes. Es el único campo obligatorio del asistente: sin él no puedes pasar al siguiente paso.",
+        "F_OD_TITLE": "Graduación del ojo derecho",
+        "F_OD_TEXT": "Aquí registras la fórmula del ojo derecho (OD): esfera, cilindro, eje, adición, altura y DNP. Se puede precargar desde la historia clínica.",
+        "F_OI_TITLE": "Graduación del ojo izquierdo",
+        "F_OI_TEXT": "Del mismo modo, registra la fórmula del ojo izquierdo (OI). Debajo tienes los parámetros compartidos como curva base y prisma.",
+        "F_FRAME_TITLE": "Medidas del armazón",
+        "F_FRAME_TEXT": "Registra las medidas del armazón (horizontal, vertical, puente, diámetro). Con el botón de parámetros digitales despliegas medidas avanzadas para lentes personalizados.",
+        "F_OBSERVATIONS_TITLE": "Observaciones",
+        "F_OBSERVATIONS_TEXT": "Añade cualquier indicación adicional para el laboratorio (tratamientos especiales, aclaraciones de montaje, etc.).",
+        "F_PRODUCTS_TITLE": "Productos y armazón",
+        "F_PRODUCTS_TEXT": "Selecciona los lentes o productos de la orden. Al elegirlos se generan las líneas con cantidad, precio y descuento, y verás el resumen con el total.",
+        "CLOSING_TITLE": "Generar la orden",
+        "CLOSING_TEXT": "En el último paso este botón guarda la orden y ofrece imprimir el PDF. Durante el tutorial está desactivado para no crear órdenes reales."
       },
       "TOUR": {
         "TITLE": "Recorrido por Historia Clínica",
@@ -426,26 +438,6 @@
         "STEP_1_TEXT": "En esta pantalla administras todas las órdenes de laboratorio. Recuerda: las órdenes se crean desde la historia clínica.",
         "STEP_2_TITLE": "Tus órdenes",
         "STEP_2_TEXT": "Cada orden aparece como una tarjeta (aquí ves ejemplos) con el paciente, el producto, la fecha de entrega y su estado."
-      },
-      "MANAGE": {
-        "TITLE": "Gestionar una orden",
-        "DESCRIPTION": "Cambia el estado, edita o elimina una orden.",
-        "STEP_1_TITLE": "Cambiar el estado",
-        "STEP_1_TEXT": "Con este botón cambias el estado de la orden (pendiente, enviada, recibida, entregada).",
-        "STEP_2_TITLE": "Editar la orden",
-        "STEP_2_TEXT": "Este botón abre la orden para modificar sus datos y medidas.",
-        "STEP_3_TITLE": "Eliminar la orden",
-        "STEP_3_TEXT": "Este botón elimina la orden. Se te pedirá confirmación antes."
-      },
-      "COMMUNICATE": {
-        "TITLE": "Enviar e imprimir una orden",
-        "DESCRIPTION": "Comparte la orden por WhatsApp, correo o imprímela.",
-        "STEP_1_TITLE": "Enviar por WhatsApp",
-        "STEP_1_TEXT": "Con este botón envías la orden al paciente o al laboratorio por WhatsApp.",
-        "STEP_2_TITLE": "Enviar por correo",
-        "STEP_2_TEXT": "Este botón envía la orden por correo electrónico.",
-        "STEP_3_TITLE": "Imprimir la orden",
-        "STEP_3_TEXT": "Este botón genera el PDF de la orden para imprimirla o guardarla."
       },
       "TOUR": {
         "TITLE": "Recorrido por Laboratorio",

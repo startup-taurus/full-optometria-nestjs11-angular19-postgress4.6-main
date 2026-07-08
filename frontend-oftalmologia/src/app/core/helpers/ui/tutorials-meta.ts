@@ -19,15 +19,10 @@ import {
 } from './tutorials/shift.steps'
 import {
   buildHistoryTourSteps,
-  buildHistoryCreateSteps,
   buildHistoryManageSteps,
   buildHistoryLabOrderSteps,
 } from './tutorials/clinical.steps'
-import {
-  buildLabTourSteps,
-  buildLabManageSteps,
-  buildLabCommunicateSteps,
-} from './tutorials/laboratory.steps'
+import { buildLabTourSteps } from './tutorials/laboratory.steps'
 import { buildClientCreateSteps } from './tutorials/sales.steps'
 import {
   buildCategoryCreateSteps,
@@ -158,16 +153,6 @@ export const TUTORIALS: TutorialDefinition[] = [
     buildSteps: buildHistoryTourSteps,
   },
   {
-    id: 'history-create',
-    titleKey: 'TUTORIALS.CLINICAL.CREATE.TITLE',
-    descriptionKey: 'TUTORIALS.CLINICAL.CREATE.DESCRIPTION',
-    tag: 'CLINICAL',
-    icon: 'ti-file-plus',
-    order: 1,
-    requiredPermissions: [PERMISSION_IDS.MEDICAL_HISTORY],
-    buildSteps: buildHistoryCreateSteps,
-  },
-  {
     id: 'history-manage',
     titleKey: 'TUTORIALS.CLINICAL.MANAGE.TITLE',
     descriptionKey: 'TUTORIALS.CLINICAL.MANAGE.DESCRIPTION',
@@ -197,26 +182,6 @@ export const TUTORIALS: TutorialDefinition[] = [
     order: 0,
     requiredPermissions: [PERMISSION_IDS.LABORATORY_ORDERS],
     buildSteps: buildLabTourSteps,
-  },
-  {
-    id: 'lab-manage',
-    titleKey: 'TUTORIALS.LABORATORY.MANAGE.TITLE',
-    descriptionKey: 'TUTORIALS.LABORATORY.MANAGE.DESCRIPTION',
-    tag: 'LABORATORY',
-    icon: 'ti-adjustments',
-    order: 2,
-    requiredPermissions: [PERMISSION_IDS.LABORATORY_ORDERS],
-    buildSteps: buildLabManageSteps,
-  },
-  {
-    id: 'lab-communicate',
-    titleKey: 'TUTORIALS.LABORATORY.COMMUNICATE.TITLE',
-    descriptionKey: 'TUTORIALS.LABORATORY.COMMUNICATE.DESCRIPTION',
-    tag: 'LABORATORY',
-    icon: 'ti-send',
-    order: 3,
-    requiredPermissions: [PERMISSION_IDS.LABORATORY_ORDERS],
-    buildSteps: buildLabCommunicateSteps,
   },
 
   {

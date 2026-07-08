@@ -504,6 +504,11 @@ export class TableMedicalHistoryComponent
     const clinicalHistoryId = record.originalRecord.id
     const patientFilterId = record.originalRecord.patientId
 
+    if (this._tutorialMock.isActive('medical-history')) {
+      this.openLaboratoryOrderModal(clinicalHistoryId)
+      return
+    }
+
     this._laboratoryOrdersService
       .getAllWithFilters({
         page: 1,

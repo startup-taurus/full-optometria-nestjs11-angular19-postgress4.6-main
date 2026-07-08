@@ -228,11 +228,13 @@
       "FILTER_ALL": "All"
     },
     "WELCOME": {
-      "TITLE": "Welcome!",
-      "TEXT": "Would you like a guided tour of the system's main flow? Using sample data, we'll show you how to create a patient, book their appointment, record their medical history and generate the laboratory order.",
-      "CONFIRM": "Yes, start tour",
+      "EYEBROW": "Getting started",
+      "TITLE": "Learn the main flow in minutes",
+      "TEXT": "We'll guide you step by step through the real system, with sample data, so you master the patient care process from start to finish.",
+      "FLOW_LABEL": "The tour covers",
+      "CONFIRM": "Start tour",
       "SEE_ALL": "See all tutorials",
-      "CANCEL": "Not now"
+      "CANCEL": "Not now, thanks"
     },
     "TAG": {
       "PATIENTS": "Patients",
@@ -382,14 +384,6 @@
       }
     },
     "CLINICAL": {
-      "CREATE": {
-        "TITLE": "Record medical history",
-        "DESCRIPTION": "Document the patient's visit.",
-        "STEP_1_TITLE": "New history",
-        "STEP_1_TEXT": "This button opens the medical history form: you select the patient and record measurements and diagnosis.",
-        "STEP_2_TITLE": "Recorded histories",
-        "STEP_2_TEXT": "Medical histories are listed here (these are samples). From each row you reach its actions."
-      },
       "MANAGE": {
         "TITLE": "Manage a medical history",
         "DESCRIPTION": "Edit or delete a medical history.",
@@ -400,9 +394,27 @@
       },
       "LAB_ORDER": {
         "TITLE": "Generate laboratory order",
-        "DESCRIPTION": "Create the laboratory order from the medical history.",
-        "STEP_1_TITLE": "Generate order",
-        "STEP_1_TEXT": "In each history's actions, this button creates the laboratory order with the patient's lens prescription."
+        "DESCRIPTION": "Walk through the 4 steps of the order from the medical history.",
+        "OPEN_TITLE": "Generate laboratory order",
+        "OPEN_TEXT": "The order starts from a medical history: this button opens the wizard with the patient's data already loaded. We'll walk through its 4 steps; nothing is saved during the tutorial.",
+        "F_CLIENT_TITLE": "Paying client",
+        "F_CLIENT_TEXT": "Select who pays and receives the invoice. You can create a new one with the + button. If you leave it empty, it's recorded as a final consumer.",
+        "F_ATTENDANCE_TITLE": "Attendance date",
+        "F_ATTENDANCE_TEXT": "The date you attended the patient. It defaults to today, but you can change it.",
+        "F_DELIVERY_TITLE": "Delivery date (required)",
+        "F_DELIVERY_TEXT": "Indicate when the lenses will be ready. It's the only required field in the wizard: without it you can't move to the next step.",
+        "F_OD_TITLE": "Right eye prescription",
+        "F_OD_TEXT": "Here you record the right eye (OD) prescription: sphere, cylinder, axis, addition, height and PD. It can be preloaded from the medical history.",
+        "F_OI_TITLE": "Left eye prescription",
+        "F_OI_TEXT": "Likewise, record the left eye (OI) prescription. Below you'll find shared parameters such as base curve and prism.",
+        "F_FRAME_TITLE": "Frame measurements",
+        "F_FRAME_TEXT": "Record the frame measurements (horizontal, vertical, bridge, diameter). With the digital parameters button you expand advanced measurements for custom lenses.",
+        "F_OBSERVATIONS_TITLE": "Observations",
+        "F_OBSERVATIONS_TEXT": "Add any extra instructions for the lab (special treatments, mounting notes, etc.).",
+        "F_PRODUCTS_TITLE": "Products and frame",
+        "F_PRODUCTS_TEXT": "Select the lenses or products for the order. Choosing them generates the line items with quantity, price and discount, and you'll see the summary with the total.",
+        "CLOSING_TITLE": "Generate the order",
+        "CLOSING_TEXT": "In the last step this button saves the order and offers to print the PDF. During the tutorial it's disabled so no real orders are created."
       },
       "TOUR": {
         "TITLE": "Medical History Tour",
@@ -431,26 +443,6 @@
         "STEP_1_TEXT": "On this screen you manage all laboratory orders. Remember: orders are created from the medical history.",
         "STEP_2_TITLE": "Your orders",
         "STEP_2_TEXT": "Each order appears as a card (these are samples) with the patient, product, delivery date and status."
-      },
-      "MANAGE": {
-        "TITLE": "Manage an order",
-        "DESCRIPTION": "Change the status, edit or delete an order.",
-        "STEP_1_TITLE": "Change the status",
-        "STEP_1_TEXT": "With this button you change the order's status (pending, sent, received, delivered).",
-        "STEP_2_TITLE": "Edit the order",
-        "STEP_2_TEXT": "This button opens the order to modify its data and measurements.",
-        "STEP_3_TITLE": "Delete the order",
-        "STEP_3_TEXT": "This button deletes the order. You'll be asked to confirm first."
-      },
-      "COMMUNICATE": {
-        "TITLE": "Send and print an order",
-        "DESCRIPTION": "Share the order via WhatsApp, email or print it.",
-        "STEP_1_TITLE": "Send via WhatsApp",
-        "STEP_1_TEXT": "With this button you send the order to the patient or the lab via WhatsApp.",
-        "STEP_2_TITLE": "Send via email",
-        "STEP_2_TEXT": "This button sends the order by email.",
-        "STEP_3_TITLE": "Print the order",
-        "STEP_3_TEXT": "This button generates the order's PDF to print or save it."
       },
       "TOUR": {
         "TITLE": "Laboratory Tour",

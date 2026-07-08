@@ -29,6 +29,11 @@ export interface TutorialMockable<T = unknown> {
   clearTutorialMock(): void
 }
 
+export interface TutorialFieldFill {
+  selector: string
+  value: string
+}
+
 export interface TutorialStep extends DriveStep {
   route?: string
   queryParams?: Record<string, string>
@@ -38,6 +43,8 @@ export interface TutorialStep extends DriveStep {
   mockTarget?: TutorialMockTarget
   openModalTrigger?: string
   closeModal?: boolean
+  clickTriggers?: string[]
+  fillFields?: TutorialFieldFill[]
 }
 
 export interface TutorialContext {
