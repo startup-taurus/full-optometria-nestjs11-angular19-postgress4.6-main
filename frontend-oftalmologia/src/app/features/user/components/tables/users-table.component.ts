@@ -28,6 +28,8 @@ import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { UserService } from '@core/services/api/user.service'
 import { AuthenticationService } from '@core/services/api/auth.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule } from '@ngx-translate/core'
@@ -66,7 +68,9 @@ import { UserDetailsModalComponent } from '../modals/user-details-modal.componen
   styleUrls: ['./users-table.component.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class UsersTableComponent implements OnInit, OnDestroy {
+export class UsersTableComponent
+  implements OnInit, OnDestroy, TutorialMockable<User>
+{
   public BUTTON_ACTIONS = BUTTON_ACTIONS
   public FORMAT_FOR_DATES = FORMAT_FOR_DATES
   private PAGINATION = DEFAULT_NGX_DATATABLE_PAGINATION
@@ -101,17 +105,34 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   private _userService = inject(UserService)
   private _authService = inject(AuthenticationService)
   private _bsModalService = inject(BootstrapModalService)
+  private _tutorialMock = inject(TutorialMockService)
 
   ngOnInit(): void {
     this.suscribeToFilter()
     this.config$ = this.setConfigDatatable()
     this.reloadDatatable()
     this.loadQuota()
+    this._tutorialMock.register('users', this)
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('users', this)
     this.unsubscribe$.next(true)
     this.unsubscribe$.unsubscribe()
+  }
+
+  applyTutorialMock(rows: User[]): void {
+    this.data$ = of(rows)
+    this.config$.next({
+      ...this.config$.value,
+      loadingIndicator: false,
+      count: rows.length,
+      page: this.PAGINATION.PAGE,
+    })
+  }
+
+  clearTutorialMock(): void {
+    this.reloadDatatable(this.filter)
   }
 
   private loadQuota(): void {
@@ -327,6 +348,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   public reloadDatatable(filter: object = {}): void {
+    if (this._tutorialMock.isActive('users')) {
+      return
+    }
     this.filter = filter
     this.config$.next({
       ...this.config$.value,
@@ -338,6 +362,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   public onChangeLimit(limit: number): void {
+    if (this._tutorialMock.isActive('users')) {
+      return
+    }
     this.config$.next({
       ...this.config$.value,
       limit,
@@ -347,6 +374,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   public onChangePage(page: number): void {
+    if (this._tutorialMock.isActive('users')) {
+      return
+    }
     this.config$.next({ ...this.config$.value, page })
     this.data$ = this.fetchUsers(this.filter)
   }

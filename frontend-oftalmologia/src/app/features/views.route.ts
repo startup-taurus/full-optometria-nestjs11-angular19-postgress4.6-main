@@ -127,4 +127,11 @@ export const VIEWS_ROUTES: Route[] = [
         (mod) => mod.SUBSCRIPTION_MANAGEMENT_ROUTES
       ),
   },
+  {
+    path: 'tutorials',
+    loadChildren: () =>
+      import('./tutorials/tutorials.route').then(
+        (mod) => mod.TUTORIALS_ROUTES
+      ),
+  },
 ]

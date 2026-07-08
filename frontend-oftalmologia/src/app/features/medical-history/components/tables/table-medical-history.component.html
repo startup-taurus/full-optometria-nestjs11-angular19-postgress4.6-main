@@ -36,6 +36,7 @@
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
                 placement="top"
+                data-tour="history-create"
                 [ngbTooltip]="'MEDICAL_HISTORY.BUTTONS.ADD_RECORD' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
@@ -45,7 +46,7 @@
           </div>
         </div>
 
-        <div class="card-body p-0">
+        <div class="card-body p-0" data-tour="history-table">
           <shared-ngx-datatable
             [config]="config$ | async"
             [data]="data$ | async"
@@ -120,6 +121,7 @@
     <button
       type="button"
       class="btn btn-sm btn-outline-secondary"
+      data-tour="history-edit"
       (click)="openModal(BUTTON_ACTIONS.EDIT, row)"
       [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.EDIT' | translate"
       [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.EDIT' | translate"
@@ -130,6 +132,7 @@
     <button
       type="button"
       class="btn btn-sm btn-outline-primary"
+      data-tour="history-duplicate"
       (click)="duplicateRecord(row)"
       [attr.aria-label]="'Duplicar historia clínica'"
       [ngbTooltip]="'Duplicar historia clínica'"
@@ -141,6 +144,7 @@
       *ngIf="row.status !== 'cancelado'"
       type="button"
       class="btn btn-sm btn-outline-danger"
+      data-tour="history-delete"
       (click)="openModal(BUTTON_ACTIONS.DELETE, row)"
       [attr.aria-label]="'MEDICAL_HISTORY.ACTIONS.DELETE' | translate"
       [ngbTooltip]="'MEDICAL_HISTORY.ACTIONS.DELETE' | translate"
@@ -151,6 +155,7 @@
     <button
       type="button"
       class="btn btn-sm btn-outline-info"
+      data-tour="history-lab-order"
       (click)="createLaboratoryOrder(row)"
       [attr.aria-label]="'Crear Orden Lab'"
       [ngbTooltip]="'LABORATORY_ORDERS.CREATE_TITLE' | translate"

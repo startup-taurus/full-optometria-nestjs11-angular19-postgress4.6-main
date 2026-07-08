@@ -1,0 +1,60 @@
+<div
+  class="welcome-backdrop"
+  [class.is-leaving]="leaving"
+  (click)="emit('dismiss')"
+>
+  <div
+    class="welcome-card"
+    [class.is-leaving]="leaving"
+    role="dialog"
+    aria-modal="true"
+    (click)="$event.stopPropagation()"
+  >
+    <button
+      type="button"
+      class="welcome-close"
+      [attr.aria-label]="'TUTORIALS.WELCOME.CANCEL' | translate"
+      (click)="emit('dismiss')"
+    >
+      <i class="ti ti-x"></i>
+    </button>
+
+    <div class="welcome-hero">
+      <span class="welcome-orb welcome-orb--one"></span>
+      <span class="welcome-orb welcome-orb--two"></span>
+      <div class="welcome-badge">
+        <i class="ti ti-sparkles"></i>
+      </div>
+      <h2 class="welcome-title">{{ 'TUTORIALS.WELCOME.TITLE' | translate }}</h2>
+      <p class="welcome-text">{{ 'TUTORIALS.WELCOME.TEXT' | translate }}</p>
+    </div>
+
+    <div class="welcome-body">
+      <ul class="welcome-steps">
+        <li
+          class="welcome-step"
+          *ngFor="let step of steps; let i = index"
+          [style.animation-delay.ms]="120 + i * 90"
+        >
+          <span class="welcome-step-index">{{ i + 1 }}</span>
+          <span class="welcome-step-icon"><i class="ti {{ step.icon }}"></i></span>
+          <span class="welcome-step-label">{{ step.titleKey | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="welcome-actions">
+        <button type="button" class="btn welcome-btn-primary" (click)="emit('start')">
+          <i class="ti ti-player-play"></i>
+          <span>{{ 'TUTORIALS.WELCOME.CONFIRM' | translate }}</span>
+        </button>
+        <button type="button" class="btn welcome-btn-ghost" (click)="emit('browse')">
+          <i class="ti ti-layout-grid"></i>
+          <span>{{ 'TUTORIALS.WELCOME.SEE_ALL' | translate }}</span>
+        </button>
+        <button type="button" class="btn welcome-btn-link" (click)="emit('dismiss')">
+          {{ 'TUTORIALS.WELCOME.CANCEL' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

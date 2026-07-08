@@ -103,7 +103,8 @@
     "FEEDBACK_USER": "Feedback",
     "FEEDBACK_ADMIN": "Feedback General",
     "SUBSCRIPTION": "Suscripción",
-    "SUBSCRIPTION_ADMIN": "Suscripciones"
+    "SUBSCRIPTION_ADMIN": "Suscripciones",
+    "TUTORIALS": "Tutoriales"
   },
   "SUBSCRIPTION": {
     "TITLE": "Mi Suscripción",
@@ -132,7 +133,8 @@
     "SELF_MANAGE_TEXT": "Puedes cancelarla cuando quieras. Se detiene el cobro automático de tu tarjeta y no se te vuelve a cobrar.",
     "CANCEL_BUTTON": "Cancelar suscripción",
     "CANCEL_CONFIRM_TITLE": "¿Cancelar tu suscripción?",
-    "CANCEL_CONFIRM_TEXT": "Se detendrá el cobro automático y no se te volverá a cobrar. Para reactivarla más adelante tendrás que comprar de nuevo (con el mismo correo mantienes tu cuenta y tus datos).",
+    "CANCEL_CONFIRM_TEXT": "Se detendrá el cobro automático y no se te volverá a cobrar. Para reactivarla más adelante tendrás que comprar de nuevo (con el mismo correo mantienes tu cuenta y tus datos).<br><br>Para confirmar, escribe el nombre de tu óptica: <b>{{company}}</b>",
+    "CANCEL_NAME_MISMATCH": "El nombre no coincide con el de tu óptica.",
     "CANCEL_YES": "Sí, cancelar",
     "CANCEL_NO": "No, mantener",
     "CANCELED_OK": "Tu suscripción fue cancelada",
@@ -209,6 +211,439 @@
     "DELETE_COMPANY_YES": "Eliminar todo",
     "DELETE_NAME_MISMATCH": "El nombre no coincide.",
     "COMPANY_DELETED": "Empresa eliminada"
+  },
+  "TUTORIALS": {
+    "PAGE": {
+      "TITLE": "Tutoriales",
+      "RECOMMENDED": "Recomendado para empezar",
+      "START_MAIN": "Iniciar recorrido",
+      "SPECIFIC_TITLE": "Tutoriales por módulo",
+      "SPECIFIC_SUBTITLE": "¿Quieres aprender algo puntual? Elige el módulo y la acción que necesites.",
+      "START": "Ver tutorial",
+      "FILTER_ALL": "Todos"
+    },
+    "WELCOME": {
+      "TITLE": "¡Bienvenido!",
+      "TEXT": "¿Quieres un recorrido guiado por el flujo principal del sistema? Te mostraremos, con datos de ejemplo, cómo crear un paciente, agendar su cita, registrar su historia clínica y generar la orden de laboratorio.",
+      "CONFIRM": "Sí, empezar recorrido",
+      "SEE_ALL": "Ver todos los tutoriales",
+      "CANCEL": "Ahora no"
+    },
+    "TAG": {
+      "PATIENTS": "Pacientes",
+      "SCHEDULING": "Agenda de citas",
+      "CLINICAL": "Historia clínica",
+      "LABORATORY": "Laboratorio",
+      "SALES": "Clientes y ventas",
+      "CATALOG": "Catálogo e inventario",
+      "ADMIN": "Administración"
+    },
+    "CONTROLS": {
+      "NEXT": "Siguiente",
+      "PREV": "Anterior",
+      "DONE": "Finalizar",
+      "PROGRESS": "Paso {{current}} de {{total}}"
+    },
+    "MAIN_FLOW": {
+      "TITLE": "Recorrido del flujo principal",
+      "DESCRIPTION": "El camino esencial de tu óptica: crear un paciente, agendar su cita, registrar su historia clínica y generar la orden de laboratorio. Usamos datos de ejemplo, no se guarda nada.",
+      "STEP_WELCOME_TITLE": "Empecemos el recorrido",
+      "STEP_WELCOME_TEXT": "Te guiaremos por los 4 pasos del flujo principal. Verás las pantallas con datos de ejemplo para que reconozcas cada acción. Nada de esto se guarda.",
+      "STEP_PATIENT_TITLE": "1. Crear un paciente",
+      "STEP_PATIENT_TEXT": "Todo empieza por el paciente. Con este botón abres el formulario para registrar sus datos: nombre, cédula, contacto y sucursal.",
+      "STEP_PATIENT_LIST_TITLE": "Tus pacientes",
+      "STEP_PATIENT_LIST_TEXT": "Los pacientes registrados aparecen en esta tabla (aquí ves ejemplos). Desde cada fila podrás gestionar su información y su historia clínica.",
+      "STEP_SHIFT_TITLE": "2. Agendar su cita",
+      "STEP_SHIFT_TEXT": "Con el paciente creado, agenda su cita. Esta tarjeta abre el formulario donde eliges el paciente, la fecha y la hora.",
+      "STEP_SHIFT_LIST_TITLE": "Tus citas",
+      "STEP_SHIFT_LIST_TEXT": "Cada cita aparece como una tarjeta (aquí ves ejemplos). Desde ella puedes verla, editarla, cambiar su estado o crear la historia clínica.",
+      "STEP_HISTORY_TITLE": "3. Registrar la historia clínica",
+      "STEP_HISTORY_TEXT": "Registra la atención del paciente. Con este botón abres el formulario de la historia clínica con sus medidas y diagnóstico.",
+      "STEP_HISTORY_LIST_TITLE": "Historias clínicas",
+      "STEP_HISTORY_LIST_TEXT": "Las historias se listan aquí (aquí ves ejemplos). Desde cada una puedes verla, editarla y, muy importante, generar la orden de laboratorio.",
+      "STEP_LAB_TITLE": "4. Generar la orden de laboratorio",
+      "STEP_LAB_TEXT": "Desde la historia clínica generas la orden de laboratorio con la fórmula de los lentes. Este es el botón que la crea.",
+      "STEP_END_TITLE": "¡Listo! Ese es el flujo principal",
+      "STEP_END_TEXT": "Paciente → cita → historia clínica → orden de laboratorio. Cuando quieras aprender acciones más específicas, encuéntralas en el módulo de Tutoriales."
+    },
+    "PATIENT": {
+      "CREATE": {
+        "TITLE": "Crear un paciente",
+        "DESCRIPTION": "Registra un paciente nuevo desde cero.",
+        "STEP_1_TITLE": "Crear paciente",
+        "STEP_1_TEXT": "Este botón abre el formulario para registrar un paciente: nombre, cédula, contacto y sucursal.",
+        "STEP_2_TITLE": "Tus pacientes",
+        "STEP_2_TEXT": "Los pacientes registrados aparecen en esta tabla (aquí ves ejemplos). Desde aquí los buscas y gestionas.",
+        "OPEN_TITLE": "Crear paciente",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se registra un paciente. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_FIRSTNAME_TITLE": "Nombres",
+        "F_FIRSTNAME_TEXT": "Escribe aquí el nombre completo del paciente.",
+        "F_LASTNAME_TITLE": "Apellidos",
+        "F_LASTNAME_TEXT": "Escribe aquí los apellidos del paciente.",
+        "F_DOCUMENT_TITLE": "Cédula",
+        "F_DOCUMENT_TEXT": "Ingresa el número de cédula o documento de identidad del paciente.",
+        "F_EMAIL_TITLE": "Correo electrónico",
+        "F_EMAIL_TEXT": "Indica el correo electrónico del paciente para poder contactarlo.",
+        "F_PHONE_TITLE": "Teléfono móvil",
+        "F_PHONE_TEXT": "Ingresa el número de teléfono móvil del paciente."
+      },
+      "EDIT": {
+        "TITLE": "Editar un paciente",
+        "DESCRIPTION": "Actualiza los datos de un paciente ya registrado.",
+        "STEP_1_TITLE": "Editar paciente",
+        "STEP_1_TEXT": "En las acciones de cada fila, este botón abre el formulario para editar los datos del paciente."
+      },
+      "DELETE": {
+        "TITLE": "Eliminar un paciente",
+        "DESCRIPTION": "Elimina un paciente del sistema de forma segura.",
+        "STEP_1_TITLE": "Eliminar paciente",
+        "STEP_1_TEXT": "Este botón elimina el paciente. El sistema te pedirá confirmación antes de borrarlo."
+      },
+      "HISTORY": {
+        "TITLE": "Historia clínica del paciente",
+        "DESCRIPTION": "Abre, crea o consulta la historia clínica de un paciente.",
+        "STEP_1_TITLE": "Gestionar su historia",
+        "STEP_1_TEXT": "Este botón abre o crea la historia clínica del paciente según si ya tiene una.",
+        "STEP_2_TITLE": "Ver su historia",
+        "STEP_2_TEXT": "Este otro botón te lleva al módulo de historia clínica ya filtrado por ese paciente."
+      },
+      "FILTER": {
+        "TITLE": "Buscar y exportar pacientes",
+        "DESCRIPTION": "Filtra el listado y expórtalo a Excel o PDF.",
+        "STEP_1_TITLE": "Exportar",
+        "STEP_1_TEXT": "Con estos botones exportas el listado de pacientes a Excel, CSV o PDF.",
+        "STEP_2_TITLE": "Recargar",
+        "STEP_2_TEXT": "Este botón vuelve a cargar la tabla con la información más reciente."
+      },
+      "TOUR": {
+        "TITLE": "Recorrido por Pacientes",
+        "DESCRIPTION": "Conoce para qué sirve cada botón del módulo de pacientes.",
+        "INTRO_TITLE": "Bienvenido a Pacientes",
+        "INTRO_TEXT": "Te mostramos, con datos de ejemplo, qué hace cada botón de esta pantalla. Nada de lo que veas aquí se guarda.",
+        "CREATE_TITLE": "Crear paciente",
+        "CREATE_TEXT": "Este botón abre el formulario para registrar un paciente nuevo desde cero.",
+        "TABLE_TITLE": "Listado de pacientes",
+        "TABLE_TEXT": "Aquí aparecen tus pacientes (ahora ves ejemplos). Desde cada fila accedes a sus acciones.",
+        "HISTORY_TITLE": "Historia clínica",
+        "HISTORY_TEXT": "Este botón abre o crea la historia clínica del paciente según si ya tiene una.",
+        "VIEW_HISTORY_TITLE": "Ver su historia",
+        "VIEW_HISTORY_TEXT": "Este botón te lleva al módulo de historia clínica ya filtrado por ese paciente.",
+        "EDIT_TITLE": "Editar paciente",
+        "EDIT_TEXT": "Este botón abre el formulario para actualizar los datos del paciente.",
+        "DELETE_TITLE": "Eliminar paciente",
+        "DELETE_TEXT": "Este botón elimina al paciente. El sistema pedirá confirmación antes de borrarlo.",
+        "EXPORT_TITLE": "Exportar",
+        "EXPORT_TEXT": "Con estos botones exportas el listado de pacientes a Excel, CSV o PDF.",
+        "RELOAD_TITLE": "Recargar",
+        "RELOAD_TEXT": "Este botón vuelve a cargar la tabla con la información más reciente."
+      }
+    },
+    "SHIFT": {
+      "CREATE": {
+        "TITLE": "Agendar una cita",
+        "DESCRIPTION": "Reserva un turno para atender a un paciente.",
+        "STEP_1_TITLE": "Agendar cita",
+        "STEP_1_TEXT": "Esta tarjeta abre el formulario de una nueva cita: eliges el paciente, la fecha y la hora.",
+        "STEP_2_TITLE": "Tus citas",
+        "STEP_2_TEXT": "Cada cita aparece como una tarjeta (aquí ves ejemplos) con su estado y sus acciones.",
+        "OPEN_TITLE": "Crear cita",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se agenda una cita. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_PATIENT_TITLE": "Paciente",
+        "F_PATIENT_TEXT": "Selecciona de la lista el paciente al que le vas a agendar la cita.",
+        "F_DATE_TITLE": "Fecha y hora de la cita",
+        "F_DATE_TEXT": "Elige el día y la hora en que se atenderá al paciente.",
+        "F_DESCRIPTION_TITLE": "Descripción",
+        "F_DESCRIPTION_TEXT": "Añade una breve descripción o el motivo de la cita."
+      },
+      "MANAGE": {
+        "TITLE": "Gestionar una cita",
+        "DESCRIPTION": "Edita, cambia el estado o elimina una cita.",
+        "STEP_1_TITLE": "Editar la cita",
+        "STEP_1_TEXT": "Este botón abre la cita para modificar su fecha, hora o detalles.",
+        "STEP_2_TITLE": "Cambiar el estado",
+        "STEP_2_TEXT": "Con este botón cambias el estado de la cita (confirmada, pendiente, cancelada, etc.).",
+        "STEP_3_TITLE": "Eliminar la cita",
+        "STEP_3_TEXT": "Este botón elimina la cita. Se te pedirá confirmación antes."
+      },
+      "HISTORY": {
+        "TITLE": "Crear historia desde la cita",
+        "DESCRIPTION": "Registra la historia clínica directamente desde una cita.",
+        "STEP_1_TITLE": "Crear historia clínica",
+        "STEP_1_TEXT": "Desde la propia cita, este botón abre la historia clínica del paciente para registrar la atención."
+      }
+    },
+    "CLINICAL": {
+      "CREATE": {
+        "TITLE": "Registrar historia clínica",
+        "DESCRIPTION": "Documenta la atención del paciente.",
+        "STEP_1_TITLE": "Nueva historia",
+        "STEP_1_TEXT": "Este botón abre el formulario de la historia clínica: seleccionas el paciente y registras medidas y diagnóstico.",
+        "STEP_2_TITLE": "Historias registradas",
+        "STEP_2_TEXT": "Las historias clínicas se listan aquí (aquí ves ejemplos). Desde cada fila accedes a sus acciones."
+      },
+      "MANAGE": {
+        "TITLE": "Gestionar una historia clínica",
+        "DESCRIPTION": "Edita o elimina una historia clínica.",
+        "STEP_1_TITLE": "Editar la historia",
+        "STEP_1_TEXT": "Este botón abre la historia clínica para modificar sus datos.",
+        "STEP_2_TITLE": "Eliminar la historia",
+        "STEP_2_TEXT": "Este botón elimina la historia clínica. Se te pedirá confirmación antes."
+      },
+      "LAB_ORDER": {
+        "TITLE": "Generar orden de laboratorio",
+        "DESCRIPTION": "Crea la orden de laboratorio desde la historia clínica.",
+        "STEP_1_TITLE": "Generar orden",
+        "STEP_1_TEXT": "En las acciones de cada historia, este botón crea la orden de laboratorio con la fórmula de los lentes del paciente."
+      },
+      "TOUR": {
+        "TITLE": "Recorrido por Historia Clínica",
+        "DESCRIPTION": "Conoce para qué sirve cada botón del módulo de historia clínica.",
+        "INTRO_TITLE": "Bienvenido a Historia Clínica",
+        "INTRO_TEXT": "Te mostramos, con datos de ejemplo, qué hace cada botón de esta pantalla. Nada de lo que veas aquí se guarda.",
+        "CREATE_TITLE": "Nueva historia clínica",
+        "CREATE_TEXT": "Este botón abre el formulario de la historia clínica: seleccionas el paciente y registras medidas y diagnóstico.",
+        "TABLE_TITLE": "Listado de historias",
+        "TABLE_TEXT": "Aquí se listan las historias clínicas (ahora ves ejemplos). Desde cada fila accedes a sus acciones.",
+        "EDIT_TITLE": "Editar la historia",
+        "EDIT_TEXT": "Este botón abre la historia clínica para modificar sus datos.",
+        "DUPLICATE_TITLE": "Duplicar la historia",
+        "DUPLICATE_TEXT": "Este botón crea una copia de la historia clínica para reutilizar sus datos en una nueva atención.",
+        "DELETE_TITLE": "Eliminar la historia",
+        "DELETE_TEXT": "Este botón elimina la historia clínica. Se pedirá confirmación antes.",
+        "LAB_ORDER_TITLE": "Generar orden de laboratorio",
+        "LAB_ORDER_TEXT": "Este botón crea la orden de laboratorio con la fórmula de los lentes del paciente."
+      }
+    },
+    "LABORATORY": {
+      "OVERVIEW": {
+        "TITLE": "Conocer las órdenes de laboratorio",
+        "DESCRIPTION": "Aprende a leer y administrar las órdenes de laboratorio.",
+        "STEP_1_TITLE": "Órdenes de laboratorio",
+        "STEP_1_TEXT": "En esta pantalla administras todas las órdenes de laboratorio. Recuerda: las órdenes se crean desde la historia clínica.",
+        "STEP_2_TITLE": "Tus órdenes",
+        "STEP_2_TEXT": "Cada orden aparece como una tarjeta (aquí ves ejemplos) con el paciente, el producto, la fecha de entrega y su estado."
+      },
+      "MANAGE": {
+        "TITLE": "Gestionar una orden",
+        "DESCRIPTION": "Cambia el estado, edita o elimina una orden.",
+        "STEP_1_TITLE": "Cambiar el estado",
+        "STEP_1_TEXT": "Con este botón cambias el estado de la orden (pendiente, enviada, recibida, entregada).",
+        "STEP_2_TITLE": "Editar la orden",
+        "STEP_2_TEXT": "Este botón abre la orden para modificar sus datos y medidas.",
+        "STEP_3_TITLE": "Eliminar la orden",
+        "STEP_3_TEXT": "Este botón elimina la orden. Se te pedirá confirmación antes."
+      },
+      "COMMUNICATE": {
+        "TITLE": "Enviar e imprimir una orden",
+        "DESCRIPTION": "Comparte la orden por WhatsApp, correo o imprímela.",
+        "STEP_1_TITLE": "Enviar por WhatsApp",
+        "STEP_1_TEXT": "Con este botón envías la orden al paciente o al laboratorio por WhatsApp.",
+        "STEP_2_TITLE": "Enviar por correo",
+        "STEP_2_TEXT": "Este botón envía la orden por correo electrónico.",
+        "STEP_3_TITLE": "Imprimir la orden",
+        "STEP_3_TEXT": "Este botón genera el PDF de la orden para imprimirla o guardarla."
+      },
+      "TOUR": {
+        "TITLE": "Recorrido por Laboratorio",
+        "DESCRIPTION": "Conoce para qué sirve cada botón del módulo de órdenes de laboratorio.",
+        "INTRO_TITLE": "Bienvenido a Órdenes de Laboratorio",
+        "INTRO_TEXT": "Te mostramos, con datos de ejemplo, qué hace cada botón de esta pantalla. Recuerda: las órdenes se crean desde la historia clínica.",
+        "LIST_TITLE": "Listado de órdenes",
+        "LIST_TEXT": "Cada orden aparece como una tarjeta (ahora ves ejemplos) con el paciente, el producto, la fecha de entrega y su estado.",
+        "VIEW_TITLE": "Ver la orden",
+        "VIEW_TEXT": "Este botón abre el detalle completo de la orden para revisarla.",
+        "PURCHASE_ORDER_TITLE": "Ver orden de pedido",
+        "PURCHASE_ORDER_TEXT": "Este botón abre la orden de pedido vinculada a esta orden de laboratorio.",
+        "EDIT_TITLE": "Editar la orden",
+        "EDIT_TEXT": "Este botón abre la orden para modificar sus datos y medidas.",
+        "DELETE_TITLE": "Eliminar la orden",
+        "DELETE_TEXT": "Este botón elimina la orden. Se pedirá confirmación antes.",
+        "STATUS_TITLE": "Cambiar el estado",
+        "STATUS_TEXT": "Con este botón cambias el estado de la orden (pendiente, enviada, recibida, entregada).",
+        "WHATSAPP_TITLE": "Enviar por WhatsApp",
+        "WHATSAPP_TEXT": "Con este botón envías la orden al paciente o al laboratorio por WhatsApp.",
+        "EMAIL_TITLE": "Enviar por correo",
+        "EMAIL_TEXT": "Este botón envía la orden por correo electrónico.",
+        "PRINT_TITLE": "Imprimir la orden",
+        "PRINT_TEXT": "Este botón genera el PDF de la orden para imprimirla o guardarla."
+      }
+    },
+    "CLIENT": {
+      "CREATE": {
+        "TITLE": "Crear un cliente",
+        "DESCRIPTION": "Registra un cliente y, si quieres, vincúlalo a un paciente.",
+        "STEP_1_TITLE": "Crear cliente",
+        "STEP_1_TEXT": "Este botón abre el formulario para registrar un cliente: nombre, cédula, contacto y su vínculo con un paciente.",
+        "STEP_2_TITLE": "Tus clientes",
+        "STEP_2_TEXT": "Los clientes registrados aparecen en esta tabla (aquí ves ejemplos). Desde aquí los buscas, editas y gestionas.",
+        "OPEN_TITLE": "Crear cliente",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se registra un cliente. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_FIRSTNAME_TITLE": "Nombres",
+        "F_FIRSTNAME_TEXT": "Escribe aquí el nombre completo del cliente.",
+        "F_LASTNAME_TITLE": "Apellidos",
+        "F_LASTNAME_TEXT": "Escribe aquí los apellidos del cliente.",
+        "F_DOCUMENT_TITLE": "Cédula",
+        "F_DOCUMENT_TEXT": "Ingresa el número de cédula o documento de identidad del cliente.",
+        "F_EMAIL_TITLE": "Correo electrónico",
+        "F_EMAIL_TEXT": "Indica el correo electrónico del cliente para poder contactarlo.",
+        "F_PHONE_TITLE": "Teléfono móvil",
+        "F_PHONE_TEXT": "Ingresa el número de teléfono móvil del cliente."
+      }
+    },
+    "CATEGORY": {
+      "CREATE": {
+        "TITLE": "Crear una categoría",
+        "DESCRIPTION": "Organiza tu inventario creando categorías de productos.",
+        "STEP_1_TITLE": "Crear categoría",
+        "STEP_1_TEXT": "Este botón abre el formulario para crear una categoría (por ejemplo: Armazones, Lentes, Accesorios).",
+        "STEP_2_TITLE": "Tus categorías",
+        "STEP_2_TEXT": "Las categorías se listan aquí (aquí ves ejemplos). Cada categoría puede tener sus subcategorías.",
+        "OPEN_TITLE": "Crear categoría",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se registra una categoría. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_NAME_TITLE": "Nombre de la categoría",
+        "F_NAME_TEXT": "Escribe el nombre de la categoría (por ejemplo: Armazones, Lentes o Accesorios).",
+        "F_DESCRIPTION_TITLE": "Descripción",
+        "F_DESCRIPTION_TEXT": "Añade una breve descripción que explique qué productos agrupa esta categoría."
+      },
+      "SUBCATEGORY": {
+        "TITLE": "Crear una subcategoría",
+        "DESCRIPTION": "Añade subcategorías dentro de una categoría para clasificar mejor.",
+        "STEP_1_TITLE": "Tus categorías",
+        "STEP_1_TEXT": "Cada categoría (aquí ves ejemplos) puede contener subcategorías para clasificar tus productos con más detalle.",
+        "STEP_2_TITLE": "Añadir subcategoría",
+        "STEP_2_TEXT": "Este botón dentro de la categoría abre el formulario para crear una subcategoría (por ejemplo: Monofocales dentro de Lentes)."
+      }
+    },
+    "SUPPLIER": {
+      "CREATE": {
+        "TITLE": "Crear un proveedor",
+        "DESCRIPTION": "Registra los proveedores de tu óptica.",
+        "STEP_1_TITLE": "Crear proveedor",
+        "STEP_1_TEXT": "Este botón abre el formulario para registrar un proveedor: nombre, RUC, contacto y sitio web.",
+        "STEP_2_TITLE": "Tus proveedores",
+        "STEP_2_TEXT": "Los proveedores registrados aparecen en esta tabla (aquí ves ejemplos). Desde aquí los gestionas y contactas.",
+        "OPEN_TITLE": "Crear proveedor",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se registra un proveedor. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_NAME_TITLE": "Nombre",
+        "F_NAME_TEXT": "Escribe el nombre de la empresa proveedora.",
+        "F_DOCUMENT_TITLE": "RUC",
+        "F_DOCUMENT_TEXT": "Ingresa el RUC del proveedor.",
+        "F_PHONE_TITLE": "Teléfono",
+        "F_PHONE_TEXT": "Ingresa el número de teléfono de contacto del proveedor.",
+        "F_EMAIL_TITLE": "Correo",
+        "F_EMAIL_TEXT": "Indica el correo electrónico del proveedor para poder contactarlo.",
+        "F_WEBSITE_TITLE": "Sitio web",
+        "F_WEBSITE_TEXT": "Escribe la dirección del sitio web del proveedor, si tiene."
+      }
+    },
+    "PRODUCT": {
+      "CREATE": {
+        "TITLE": "Crear un producto",
+        "DESCRIPTION": "Añade productos a tu inventario.",
+        "STEP_1_TITLE": "Crear producto",
+        "STEP_1_TEXT": "Este botón abre el formulario para crear un producto: código, nombre, marca, precio, categoría y proveedor.",
+        "STEP_2_TITLE": "Tu inventario",
+        "STEP_2_TEXT": "Los productos aparecen en esta tabla (aquí ves ejemplos) con su stock, precio y estado.",
+        "OPEN_TITLE": "Crear producto",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se registra un producto. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_CODE_TITLE": "Código",
+        "F_CODE_TEXT": "Ingresa el código con el que identificas este producto en tu inventario.",
+        "F_NAME_TITLE": "Nombre",
+        "F_NAME_TEXT": "Escribe el nombre del producto.",
+        "F_BRAND_TITLE": "Marca",
+        "F_BRAND_TEXT": "Indica la marca del producto.",
+        "F_CATEGORY_TITLE": "Categoría",
+        "F_CATEGORY_TEXT": "Selecciona la categoría a la que pertenece el producto.",
+        "F_PRICE_TITLE": "Precio unitario",
+        "F_PRICE_TEXT": "Ingresa el precio de venta por unidad del producto.",
+        "F_QUANTITY_TITLE": "Cantidad",
+        "F_QUANTITY_TEXT": "Indica la cantidad disponible en stock de este producto."
+      }
+    },
+    "USER": {
+      "CREATE": {
+        "TITLE": "Crear un usuario",
+        "DESCRIPTION": "Registra a los miembros de tu equipo (vendedores, optometristas, etc.).",
+        "STEP_1_TITLE": "Crear usuario",
+        "STEP_1_TEXT": "Este botón abre el formulario para crear un usuario: datos personales, rol y sucursal a la que pertenece.",
+        "STEP_2_TITLE": "Tus usuarios",
+        "STEP_2_TEXT": "Los usuarios de tu equipo aparecen en esta tabla (aquí ves ejemplos) con su rol, sucursal y estado.",
+        "OPEN_TITLE": "Crear usuario",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se registra un usuario. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_USERNAME_TITLE": "Nombre de usuario",
+        "F_USERNAME_TEXT": "Escribe el nombre de usuario con el que iniciará sesión en el sistema.",
+        "F_EMAIL_TITLE": "Correo",
+        "F_EMAIL_TEXT": "Indica el correo electrónico del usuario.",
+        "F_FIRSTNAME_TITLE": "Nombres",
+        "F_FIRSTNAME_TEXT": "Escribe aquí el nombre completo del usuario.",
+        "F_LASTNAME_TITLE": "Apellidos",
+        "F_LASTNAME_TEXT": "Escribe aquí los apellidos del usuario.",
+        "F_ROLE_TITLE": "Rol",
+        "F_ROLE_TEXT": "Selecciona el rol que define los permisos del usuario.",
+        "F_BRANCH_TITLE": "Sucursal",
+        "F_BRANCH_TEXT": "Selecciona la sucursal a la que pertenece el usuario."
+      }
+    },
+    "ROLE": {
+      "CREATE": {
+        "TITLE": "Crear un rol",
+        "DESCRIPTION": "Define roles con permisos para controlar qué puede hacer cada usuario.",
+        "STEP_1_TITLE": "Crear rol",
+        "STEP_1_TEXT": "Abre este menú de opciones y elige crear un rol. Podrás definir su nombre y los permisos que tendrá.",
+        "STEP_2_TITLE": "Tus roles",
+        "STEP_2_TEXT": "Los roles se listan aquí (aquí ves ejemplos). Cada rol agrupa permisos que luego asignas a tus usuarios."
+      }
+    },
+    "BRANCH": {
+      "CREATE": {
+        "TITLE": "Crear una sucursal",
+        "DESCRIPTION": "Registra las sucursales de tu óptica.",
+        "STEP_1_TITLE": "Crear sucursal",
+        "STEP_1_TEXT": "Esta tarjeta abre el formulario para crear una sucursal: nombre, código, dirección y horario de atención.",
+        "STEP_2_TITLE": "Tus sucursales",
+        "STEP_2_TEXT": "Las sucursales aparecen como tarjetas (aquí ves ejemplos) con su ciudad, contacto y estado.",
+        "OPEN_TITLE": "Crear sucursal",
+        "OPEN_TEXT": "Pulsa este botón para abrir el formulario. Te mostramos cada campo con datos de ejemplo; no se guarda nada.",
+        "CLOSING_TITLE": "Eso es todo",
+        "CLOSING_TEXT": "Así se registra una sucursal. Recuerda: este es un recorrido de ejemplo y no se guarda ninguna información.",
+        "F_NAME_TITLE": "Nombre",
+        "F_NAME_TEXT": "Escribe el nombre de la sucursal.",
+        "F_CODE_TITLE": "Código",
+        "F_CODE_TEXT": "Ingresa el código con el que identificas esta sucursal.",
+        "F_ADDRESS_TITLE": "Dirección",
+        "F_ADDRESS_TEXT": "Escribe la dirección física de la sucursal.",
+        "F_CITY_TITLE": "Ciudad",
+        "F_CITY_TEXT": "Indica la ciudad donde se ubica la sucursal.",
+        "F_PHONE_TITLE": "Teléfono",
+        "F_PHONE_TEXT": "Ingresa el número de teléfono de contacto de la sucursal.",
+        "F_EMAIL_TITLE": "Correo corporativo",
+        "F_EMAIL_TEXT": "Indica el correo corporativo de la sucursal."
+      }
+    },
+    "COMPANY": {
+      "CREATE": {
+        "TITLE": "Crear una empresa",
+        "DESCRIPTION": "Registra una empresa (óptica) en el sistema.",
+        "STEP_1_TITLE": "Crear empresa",
+        "STEP_1_TEXT": "Esta tarjeta abre el formulario para crear una empresa: nombre, código y sus límites de usuarios y sucursales.",
+        "STEP_2_TITLE": "Tus empresas",
+        "STEP_2_TEXT": "Las empresas aparecen como tarjetas (aquí ves ejemplos) con su uso de usuarios, sucursales y estado."
+      }
+    }
   },
   "TOPBAR": {
     "SEARCH": "Busca algo...",

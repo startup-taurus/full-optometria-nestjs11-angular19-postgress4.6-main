@@ -28,6 +28,8 @@ import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { PatientService } from '@core/services/api/patient.service'
 import { ClinicalHistoriesService } from '@core/services/api/clinical-histories.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
@@ -80,7 +82,9 @@ import { TranslateService } from '@ngx-translate/core'
   styleUrls: ['./patients-table.component.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PatientsTableComponent implements OnInit, OnDestroy {
+export class PatientsTableComponent
+  implements OnInit, OnDestroy, TutorialMockable<Patient>
+{
   public BUTTON_ACTIONS = BUTTON_ACTIONS
   public FORMAT_FOR_DATES = FORMAT_FOR_DATES
   private PAGINATION = DEFAULT_NGX_DATATABLE_PAGINATION
@@ -115,6 +119,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   private _patientService = inject(PatientService)
   private _clinicalHistoriesService = inject(ClinicalHistoriesService)
   private _bsModalService = inject(BootstrapModalService)
+  private _tutorialMock = inject(TutorialMockService)
   private _modal = inject(NgbModal)
   private _store = inject(Store<AppState>)
   private _route = inject(ActivatedRoute)
@@ -128,6 +133,7 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
     this.config$ = this.setConfigDatatable()
     this.exportColumns = this.buildExportColumns()
     this.reloadDatatable()
+    this._tutorialMock.register('patients', this)
   }
 
   private buildExportColumns(): ExportColumn<Patient>[] {
@@ -178,8 +184,30 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('patients', this)
     this.unsubscribe$.next(true)
     this.unsubscribe$.unsubscribe()
+  }
+
+  applyTutorialMock(rows: Patient[]): void {
+    this.data$ = of(rows)
+    this.latestRows = rows
+    rows.forEach((patient) => {
+      if (patient.id) {
+        this.medicalHistoryCache.set(patient.id, null)
+      }
+    })
+    this.config$.next({
+      ...this.config$.value,
+      loadingIndicator: false,
+      count: rows.length,
+      page: this.PAGINATION.PAGE,
+    })
+  }
+
+  clearTutorialMock(): void {
+    this.medicalHistoryCache.clear()
+    this.reloadDatatable(this.filter)
   }
 
   private suscribeToFilter(): void {
@@ -312,6 +340,9 @@ export class PatientsTableComponent implements OnInit, OnDestroy {
   }
 
   public reloadDatatable(filter: object = {}): void {
+    if (this._tutorialMock.isActive('patients')) {
+      return
+    }
     this.filter = filter
     this.config$.next({
       ...this.config$.value,

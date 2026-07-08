@@ -1,0 +1,108 @@
+<page-title title="{{ 'TUTORIALS.PAGE.TITLE' | translate }}" />
+
+<div class="container-fluid tutorials-page">
+  <div class="row justify-content-center">
+    <div class="col-xxl-10">
+      <div class="card tutorial-hero mb-3">
+        <div class="card-body">
+          <div class="tutorial-hero-main">
+            <span class="tutorial-hero-icon">
+              <i class="ti {{ mainFlow.icon }}"></i>
+            </span>
+            <div class="flex-grow-1">
+              <span class="badge bg-primary-subtle text-primary mb-1">
+                <i class="ti ti-star-filled me-1"></i>
+                {{ 'TUTORIALS.PAGE.RECOMMENDED' | translate }}
+              </span>
+              <h4 class="card-title mb-1">{{ mainFlow.titleKey | translate }}</h4>
+              <p class="text-muted mb-0">
+                {{ mainFlow.descriptionKey | translate }}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary tutorial-hero-btn"
+            (click)="start(mainFlow)"
+          >
+            <i class="ti ti-player-play me-1"></i>
+            {{ 'TUTORIALS.PAGE.START_MAIN' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div class="tutorial-section-header mb-2">
+        <h5 class="mb-1">{{ 'TUTORIALS.PAGE.SPECIFIC_TITLE' | translate }}</h5>
+        <p class="text-muted mb-0">
+          {{ 'TUTORIALS.PAGE.SPECIFIC_SUBTITLE' | translate }}
+        </p>
+      </div>
+
+      <div class="tutorial-filters mb-3" role="tablist">
+        <button
+          type="button"
+          class="tutorial-filter-chip"
+          [class.active]="isTagActive('ALL')"
+          (click)="selectTag('ALL')"
+        >
+          <i class="ti ti-layout-grid"></i>
+          {{ 'TUTORIALS.PAGE.FILTER_ALL' | translate }}
+          <span class="tutorial-filter-count">{{ totalTutorials }}</span>
+        </button>
+        <button
+          type="button"
+          class="tutorial-filter-chip"
+          *ngFor="let category of categories"
+          [class.active]="isTagActive(category.tag)"
+          (click)="selectTag(category.tag)"
+        >
+          {{ 'TUTORIALS.TAG.' + category.tag | translate }}
+          <span class="tutorial-filter-count">{{
+            category.tutorials.length
+          }}</span>
+        </button>
+      </div>
+
+      <div
+        class="tutorial-group mb-4"
+        *ngFor="let category of visibleCategories()"
+      >
+        <h6 class="tutorial-group-title">
+          <span class="tutorial-group-dot"></span>
+          {{ 'TUTORIALS.TAG.' + category.tag | translate }}
+        </h6>
+
+        <div class="row g-3">
+          <div
+            class="col-12 col-md-6 col-xl-4"
+            *ngFor="let tutorial of category.tutorials"
+          >
+            <div class="card tutorial-card h-100">
+              <div class="card-body">
+                <div class="tutorial-card-head">
+                  <span class="tutorial-card-icon">
+                    <i class="ti {{ tutorial.icon }}"></i>
+                  </span>
+                  <h6 class="tutorial-card-title mb-0">
+                    {{ tutorial.titleKey | translate }}
+                  </h6>
+                </div>
+                <p class="tutorial-card-text text-muted">
+                  {{ tutorial.descriptionKey | translate }}
+                </p>
+                <button
+                  type="button"
+                  class="btn btn-sm tutorial-card-btn"
+                  (click)="start(tutorial)"
+                >
+                  {{ 'TUTORIALS.PAGE.START' | translate }}
+                  <i class="ti ti-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

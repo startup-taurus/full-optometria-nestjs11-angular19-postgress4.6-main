@@ -17,6 +17,8 @@ import { Client, ClientQueryParams } from '@core/interfaces/api/client.interface
 import { ClientsService } from '@core/services/api/clients.service'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { ToastrNotificationService } from '@core/services/ui/notification.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
@@ -61,7 +63,9 @@ import { ExportColumn } from '@core/services/ui/table-export.service'
   templateUrl: './clients-table.component.html',
   styleUrls: ['./clients-table.component.scss'],
 })
-export class ClientsTableComponent implements OnInit, OnDestroy {
+export class ClientsTableComponent
+  implements OnInit, OnDestroy, TutorialMockable<Client>
+{
   private pagination = DEFAULT_NGX_DATATABLE_PAGINATION
 
   @ViewChild('sideFilterPanel', { static: false })
@@ -95,6 +99,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
   private _translate = inject(TranslateService)
   private _notificationService = inject(ToastrNotificationService)
   private _store = inject(Store<AppState>)
+  private _tutorialMock = inject(TutorialMockService)
 
   ngOnInit(): void {
     this.config$ = this.setConfigDatatable()
@@ -109,6 +114,7 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
       })
 
     this._filterCommunicationService.resetFilter()
+    this._tutorialMock.register('clients', this)
   }
 
   private buildExportColumns(): ExportColumn<Client>[] {
@@ -155,8 +161,24 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('clients', this)
     this._destroy$.next()
     this._destroy$.complete()
+  }
+
+  applyTutorialMock(rows: Client[]): void {
+    this.data$ = of(rows)
+    this.latestRows = rows
+    this.config$.next({
+      ...this.config$.value,
+      loadingIndicator: false,
+      count: rows.length,
+      page: this.pagination.PAGE,
+    })
+  }
+
+  clearTutorialMock(): void {
+    this.reloadDatatable(this.filter)
   }
 
   private setConfigDatatable(): BehaviorSubject<Partial<NgxDatatableConfig>> {
@@ -231,6 +253,9 @@ export class ClientsTableComponent implements OnInit, OnDestroy {
   }
 
   public reloadDatatable(filter: ClientQueryParams = {}): void {
+    if (this._tutorialMock.isActive('clients')) {
+      return
+    }
     this.filter = filter
     this.config$.next({
       ...this.config$.value,

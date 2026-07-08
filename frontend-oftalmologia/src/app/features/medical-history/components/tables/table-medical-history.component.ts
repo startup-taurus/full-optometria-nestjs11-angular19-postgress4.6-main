@@ -51,6 +51,8 @@ import {
   LaboratoryOrder,
   LaboratoryOrderStatus,
 } from '@core/interfaces/api/laboratory-order.interface'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import Swal from 'sweetalert2'
 import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } from '@core/helpers/ui/ui.constants'
 
@@ -82,7 +84,9 @@ export interface MedicalHistoryRecord {
   styleUrls: ['./table-medical-history.component.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
+export class TableMedicalHistoryComponent
+  implements OnInit, OnDestroy, TutorialMockable<MedicalHistoryRecord>
+{
   public BUTTON_ACTIONS = BUTTON_ACTIONS
   private PAGINATION = DEFAULT_NGX_DATATABLE_PAGINATION
 
@@ -109,11 +113,13 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   private _laboratoryOrdersService = inject(LaboratoryOrdersService)
   private _modal = inject(NgbModal)
   private _store = inject(Store<AppState>)
+  private _tutorialMock = inject(TutorialMockService)
 
   ngOnInit(): void {
     this.config$ = this.setConfigDatatable()
     this.isReady = true
     this.initializeSubscriptions()
+    this._tutorialMock.register('medical-history', this)
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -125,8 +131,23 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('medical-history', this)
     this.unsubscribe$.next(true)
     this.unsubscribe$.unsubscribe()
+  }
+
+  applyTutorialMock(rows: MedicalHistoryRecord[]): void {
+    this.data$ = of(rows)
+    this.config$.next({
+      ...this.config$.value,
+      loadingIndicator: false,
+      count: rows.length,
+      page: this.PAGINATION.PAGE,
+    })
+  }
+
+  clearTutorialMock(): void {
+    this.reloadDatatable(this.filter)
   }
 
   private isSameFilter(
@@ -262,6 +283,9 @@ export class TableMedicalHistoryComponent implements OnInit, OnDestroy {
   }
 
   public reloadDatatable(filter: ClinicalHistoryQueryParams = {}): void {
+    if (this._tutorialMock.isActive('medical-history')) {
+      return
+    }
     this.filter = filter
 
     const queryParams: ClinicalHistoryQueryParams = {

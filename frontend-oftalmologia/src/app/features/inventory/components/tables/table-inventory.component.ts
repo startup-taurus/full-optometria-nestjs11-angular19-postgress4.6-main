@@ -28,6 +28,8 @@ import {
 } from '@core/services/api/products-management.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
 import { CompanyLogoService } from '@core/services/ui/company-logo.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
@@ -92,7 +94,9 @@ interface InventoryUpsertModalData extends ModalWithAction<Product> {
   styleUrls: ['./table-inventory.component.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TableInventoryComponent implements OnInit, OnDestroy {
+export class TableInventoryComponent
+  implements OnInit, OnDestroy, TutorialMockable<Product>
+{
   public BUTTON_ACTIONS = BUTTON_ACTIONS
   public FORMAT_FOR_DATES = FORMAT_FOR_DATES
   private PAGINATION = DEFAULT_NGX_DATATABLE_PAGINATION
@@ -146,12 +150,29 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   private _store = inject(Store<AppState>)
   private _catalogPdfService = inject(PublicCatalogPdfService)
   private _companyLogoService = inject(CompanyLogoService)
+  private _tutorialMock = inject(TutorialMockService)
 
   ngOnInit(): void {
     this.initializeSubscriptions()
     this.loadBranchNames()
     this.config$ = this.setConfigDatatable()
     this.exportColumns = this.buildExportColumns()
+    this._tutorialMock.register('inventory', this)
+  }
+
+  applyTutorialMock(rows: Product[]): void {
+    this.data$ = of(rows)
+    this.latestRows = rows
+    this.config$.next({
+      ...this.config$.value,
+      loadingIndicator: false,
+      count: rows.length,
+      page: this.PAGINATION.PAGE,
+    })
+  }
+
+  clearTutorialMock(): void {
+    this.reloadDatatable(this.filter)
   }
 
   private buildExportColumns(): ExportColumn<Product>[] {
@@ -365,6 +386,7 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('inventory', this)
     this.unsubscribe$.next(true)
     this.unsubscribe$.unsubscribe()
   }
@@ -399,6 +421,9 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   }
 
   private loadProducts(): void {
+    if (this._tutorialMock.isActive('inventory')) {
+      return
+    }
     this.data$ = this.loadProductsObservable()
     this.isInitialLoad = false
   }
@@ -531,6 +556,9 @@ export class TableInventoryComponent implements OnInit, OnDestroy {
   }
 
   public reloadDatatable(filter: object = {}): void {
+    if (this._tutorialMock.isActive('inventory')) {
+      return
+    }
     this.filter = filter
     this.config$.next({
       ...this.config$.value,

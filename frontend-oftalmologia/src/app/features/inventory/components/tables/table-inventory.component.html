@@ -60,6 +60,7 @@
               </button>
 
               <button
+                data-tour="inventory-create"
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
                 placement="left"
@@ -74,6 +75,7 @@
 
         <div class="card-body p-0">
           <shared-ngx-datatable
+            data-tour="inventory-table"
             [config]="config$ | async"
             [data]="data$ | async"
             (onChangePage)="onChangePage($event)"

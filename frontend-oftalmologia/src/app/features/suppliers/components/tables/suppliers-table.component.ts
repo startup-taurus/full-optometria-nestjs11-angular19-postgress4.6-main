@@ -22,6 +22,8 @@ import { ButtonAction } from '@core/interfaces/ui/ui.interface'
 import { SupplierService } from '@core/services/api/supplier.service'
 import { SuppliersManagementService } from '@core/services/api/suppliers-management.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import { FilterCommunicationService } from '@core/services/ui/filter-comumunication.service'
 import { Store } from '@ngrx/store'
 import { AppState } from '@core/states'
@@ -69,7 +71,7 @@ import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } fr
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class SuppliersTableComponent
-  implements OnInit, OnDestroy, AfterViewInit
+  implements OnInit, OnDestroy, AfterViewInit, TutorialMockable<Supplier>
 {
   public BUTTON_ACTIONS = BUTTON_ACTIONS
   public FORMAT_FOR_DATES = FORMAT_FOR_DATES
@@ -100,10 +102,12 @@ export class SuppliersTableComponent
   private _supplierService = inject(SupplierService)
   private _suppliersManagementService = inject(SuppliersManagementService)
   private _bsModalService = inject(BootstrapModalService)
+  private _tutorialMock = inject(TutorialMockService)
   private _store = inject(Store<AppState>)
 
   ngOnInit(): void {
     this.initializeSubscriptions()
+    this._tutorialMock.register('suppliers', this)
   }
 
   ngAfterViewInit(): void {
@@ -113,8 +117,23 @@ export class SuppliersTableComponent
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('suppliers', this)
     this.unsubscribe$.next(true)
     this.unsubscribe$.unsubscribe()
+  }
+
+  applyTutorialMock(rows: Supplier[]): void {
+    this.data$ = of(rows)
+    this.config$.next({
+      ...this.config$.value,
+      loadingIndicator: false,
+      count: rows.length,
+      page: this.PAGINATION.PAGE,
+    })
+  }
+
+  clearTutorialMock(): void {
+    this.reloadDatatable(this.filter)
   }
 
   private initializeSubscriptions(): void {
@@ -144,6 +163,9 @@ export class SuppliersTableComponent
   }
 
   private loadSuppliers(): void {
+    if (this._tutorialMock.isActive('suppliers')) {
+      return
+    }
     this.data$ = this.loadSuppliersObservable()
   }
 
@@ -242,6 +264,9 @@ export class SuppliersTableComponent
   }
 
   public reloadDatatable(filter: object = {}): void {
+    if (this._tutorialMock.isActive('suppliers')) {
+      return
+    }
     this.filter = filter
     this.config$.next({
       ...this.config$.value,

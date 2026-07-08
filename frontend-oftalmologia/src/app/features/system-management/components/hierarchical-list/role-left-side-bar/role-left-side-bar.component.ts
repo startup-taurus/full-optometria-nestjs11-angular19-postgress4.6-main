@@ -11,6 +11,8 @@ import { Role } from '@core/interfaces/api/role.interface'
 import { RoleService } from '@core/services/api/role.service'
 import { BootstrapModalService } from '@core/services/ui/bootstrap-modal.service'
 import { SelectionService } from '@core/services/ui/selection.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import {
@@ -41,7 +43,9 @@ import {
   styleUrl: './role-left-side-bar.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class RoleLeftSideBarComponent implements OnInit, OnDestroy {
+export class RoleLeftSideBarComponent
+  implements OnInit, OnDestroy, TutorialMockable<Role>
+{
   public roles$: BehaviorSubject<Role[]> = new BehaviorSubject<Role[]>([])
   public searchTerm: string = ''
   public isLoading: boolean = false
@@ -55,9 +59,20 @@ export class RoleLeftSideBarComponent implements OnInit, OnDestroy {
   private _selectionService = inject(SelectionService)
   private _bootstrapModalService = inject(BootstrapModalService)
   private _translateService = inject(TranslateService)
+  private _tutorialMock = inject(TutorialMockService)
 
   ngOnInit(): void {
     this.initializeSubscriptions()
+    this.loadRoles()
+    this._tutorialMock.register('roles', this)
+  }
+
+  applyTutorialMock(rows: Role[]): void {
+    this.roles$.next(rows)
+    this.isLoading = false
+  }
+
+  clearTutorialMock(): void {
     this.loadRoles()
   }
 
@@ -82,15 +97,26 @@ export class RoleLeftSideBarComponent implements OnInit, OnDestroy {
         ),
         takeUntil(this.destroy$)
       )
-      .subscribe((response) => this.roles$.next(response.data.result))
+      .subscribe((response) => {
+        if (this._tutorialMock.isActive('roles')) {
+          return
+        }
+        this.roles$.next(response.data.result)
+      })
   }
 
   private loadRoles(): void {
+    if (this._tutorialMock.isActive('roles')) {
+      return
+    }
     this.isLoading = true
     this._roleService
       .getAllRoles(undefined, 1, this.pageSize)
       .pipe(
         tap((response) => {
+          if (this._tutorialMock.isActive('roles')) {
+            return
+          }
           this.isLoading = false
           this.roles$.next(response.data.result)
         }),
@@ -112,10 +138,16 @@ export class RoleLeftSideBarComponent implements OnInit, OnDestroy {
   }
 
   public searchRoles(): void {
+    if (this._tutorialMock.isActive('roles')) {
+      return
+    }
     this.isLoading = true
     this._roleService
       .getAllRoles(this.searchTerm, 1, this.pageSize)
       .subscribe((response) => {
+        if (this._tutorialMock.isActive('roles')) {
+          return
+        }
         this.isLoading = false
         this.roles$.next(response.data.result)
       })
@@ -211,6 +243,7 @@ export class RoleLeftSideBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('roles', this)
     this.destroy$.next()
     this.destroy$.complete()
   }

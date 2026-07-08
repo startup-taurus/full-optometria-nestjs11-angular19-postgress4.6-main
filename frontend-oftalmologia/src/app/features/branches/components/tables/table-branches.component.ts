@@ -22,6 +22,8 @@ import { BranchesService } from '@core/services/api/branches.service'
 import { AuthenticationService } from '@core/services/api/auth.service'
 import { Branch, QueryBranchDto } from '@core/interfaces/api/branch.interface'
 import { PlanQuota } from '@core/interfaces/api/company.interface'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import Swal from 'sweetalert2'
 import {
   SWAL_DELETE_CONFIRM_CONFIG,
@@ -45,7 +47,9 @@ import { formatBranchScheduleForDisplay } from '@core/helpers/branch-schedule.he
   styleUrl: './table-branches.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TableBranchesComponent implements OnInit, OnDestroy {
+export class TableBranchesComponent
+  implements OnInit, OnDestroy, TutorialMockable<Branch>
+{
   public branches: Branch[] = []
   public loading = false
   public showFloatingMenu: string | null = null
@@ -63,6 +67,7 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   private modalService = inject(NgbModal)
   private toastr = inject(ToastrService)
   private translateService = inject(TranslateService)
+  private _tutorialMock = inject(TutorialMockService)
 
   @ViewChild('sideFilterPanel', { static: false })
   public sideFilterPanel?: SideFilterPanelComponent
@@ -75,11 +80,25 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadBranches()
     this.loadQuota()
+    this._tutorialMock.register('branches', this)
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('branches', this)
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  applyTutorialMock(rows: Branch[]): void {
+    this.branches = rows
+    this.totalItems = rows.length
+    this.currentPage = 1
+    this.loading = false
+    this.hasMore = false
+  }
+
+  clearTutorialMock(): void {
+    this.resetAndLoad()
   }
 
   public formatOpeningHours(openingHours?: string): string {
@@ -186,6 +205,10 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   }
 
   private loadBranches(filters: QueryBranchDto = {}): void {
+    if (this._tutorialMock.isActive('branches')) {
+      return
+    }
+
     if (this.loading || !this.hasMore) {
       return
     }
@@ -203,6 +226,11 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
+          if (this._tutorialMock.isActive('branches')) {
+            this.loading = false
+            return
+          }
+
           if (response.data && response.data.result) {
             const newBranches = response.data.result || []
 
@@ -232,6 +260,10 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
           this.loading = false
         },
         error: (error) => {
+          if (this._tutorialMock.isActive('branches')) {
+            this.loading = false
+            return
+          }
           console.error('[Branches] Error loading:', error)
           if (this.currentPage === 1) {
             this.branches = []
@@ -244,6 +276,10 @@ export class TableBranchesComponent implements OnInit, OnDestroy {
   }
 
   private resetAndLoad(): void {
+    if (this._tutorialMock.isActive('branches')) {
+      return
+    }
+
     this.currentPage = 1
     this.branches = []
     this.hasMore = true

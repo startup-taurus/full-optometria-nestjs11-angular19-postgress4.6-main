@@ -181,14 +181,10 @@
                   </p>
                 </ng-template>
               </div>
-              <!--
-                Cancelación por el usuario DESHABILITADA (2026-07): el cobro
-                automático solo lo cancela el superadmin desde "Gestión de
-                suscripciones". El botón queda comentado a propósito.
               <button
                 *ngIf="canSelfCancel"
                 type="button"
-                class="btn btn-outline-danger flex-shrink-0"
+                class="btn btn-link btn-sm text-danger text-decoration-none flex-shrink-0 p-0"
                 (click)="onCancelSubscription()"
                 [disabled]="canceling"
               >
@@ -201,7 +197,6 @@
                 <i *ngIf="!canceling" class="ti ti-ban me-1"></i>
                 {{ 'SUBSCRIPTION.CANCEL_BUTTON' | translate }}
               </button>
-              -->
             </div>
           </div>
         </ng-container>

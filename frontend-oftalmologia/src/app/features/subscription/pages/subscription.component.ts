@@ -126,13 +126,8 @@ export class SubscriptionComponent implements OnInit {
     return status === 'canceled' || status === 'cancelled'
   }
 
-  // Cancelación por el usuario DESHABILITADA (2026-07): cancelar el cobro
-  // automático solo lo hace el superadmin desde "Gestión de suscripciones".
-  // Al devolver siempre false, la tarjeta muestra el aviso de soporte
-  // (MANAGE_TITLE/MANAGE_TEXT) y nunca el botón de auto-cancelación.
-  // Lógica original: !!this.subscription?.externalSubscriptionId && !this.isCanceled
   get canSelfCancel(): boolean {
-    return false
+    return !!this.subscription?.externalSubscriptionId && !this.isCanceled
   }
 
   get taxBreakdown(): { base: string; tax: string } | null {
@@ -149,12 +144,28 @@ export class SubscriptionComponent implements OnInit {
   }
 
   onCancelSubscription(): void {
+    const expectedName = (this.companyName || '').trim()
+
     Swal.fire({
       ...SWAL_DELETE_CONFIRM_CONFIG,
       title: this.translate.instant('SUBSCRIPTION.CANCEL_CONFIRM_TITLE'),
-      text: this.translate.instant('SUBSCRIPTION.CANCEL_CONFIRM_TEXT'),
+      html: this.translate.instant('SUBSCRIPTION.CANCEL_CONFIRM_TEXT', {
+        company: expectedName,
+      }),
+      input: 'text',
+      inputPlaceholder: expectedName,
+      inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
       confirmButtonText: this.translate.instant('SUBSCRIPTION.CANCEL_YES'),
       cancelButtonText: this.translate.instant('SUBSCRIPTION.CANCEL_NO'),
+      preConfirm: (value: string) => {
+        if ((value || '').trim() !== expectedName) {
+          Swal.showValidationMessage(
+            this.translate.instant('SUBSCRIPTION.CANCEL_NAME_MISMATCH')
+          )
+          return false
+        }
+        return true
+      },
     }).then((result) => {
       if (!result.isConfirmed) {
         return
