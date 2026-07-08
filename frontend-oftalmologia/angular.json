@@ -48,6 +48,7 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
+              "node_modules/driver.js/dist/driver.css",
               "node_modules/font-awesome/scss/font-awesome.scss",
               "src/styles.scss",
               "node_modules/@swimlane/ngx-datatable/index.css",
