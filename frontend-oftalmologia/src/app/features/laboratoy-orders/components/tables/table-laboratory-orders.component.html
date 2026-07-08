@@ -3,7 +3,7 @@
   <div
     class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-2"
   >
-    <h5 class="page-title mb-0">
+    <h5 class="page-title mb-0" data-tour="lab-header">
       <i class="ti ti-test-pipe me-2"></i>
       {{ 'LABORATORY_ORDERS_MODULE.TITLE' | translate }}
     </h5>
@@ -68,7 +68,10 @@
     [scrollThreshold]="200"
     (scrolled)="onScrollEnd()"
   >
-    <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
+    <div
+      class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3"
+      data-tour="lab-list"
+    >
       @for (order of filteredOrders; track order.id) {
         <div class="col">
           <div
@@ -132,6 +135,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-secondary btn-action"
+                      data-tour="lab-view"
                       (click)="onViewClick($event, order)"
                       [title]="'LABORATORY_ORDERS_MODULE.VIEW' | translate"
                     >
@@ -140,6 +144,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-secondary btn-action"
+                      data-tour="lab-purchase-order"
                       (click)="onViewLinkedPurchaseOrderClick($event, order)"
                       [title]="'LABORATORY_ORDERS.ACTIONS.VIEW_PURCHASE_ORDER' | translate"
                     >
@@ -148,6 +153,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-secondary btn-action"
+                      data-tour="lab-edit"
                       (click)="onEditClick($event, order)"
                       [title]="'LABORATORY_ORDERS_MODULE.EDIT' | translate"
                     >
@@ -156,6 +162,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-danger btn-action"
+                      data-tour="lab-delete"
                       (click)="onDeleteClick($event, order)"
                       [title]="'LABORATORY_ORDERS_MODULE.DELETE' | translate"
                     >
@@ -164,6 +171,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-secondary btn-action status-action-btn"
+                      data-tour="lab-status"
                       [ngClass]="getStatusActionClass(order)"
                       (click)="onChangeStatusClick($event, order)"
                       [title]="
@@ -176,6 +184,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-success btn-action"
+                      data-tour="lab-whatsapp"
                       [disabled]="!hasPhoneNumber(order)"
                       (click)="onSendWhatsApp(order); $event.stopPropagation()"
                       [title]="
@@ -187,6 +196,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-info btn-action"
+                      data-tour="lab-email"
                       [disabled]="!hasEmail(order)"
                       (click)="onSendEmail(order); $event.stopPropagation()"
                       [title]="
@@ -198,6 +208,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-dark btn-action"
+                      data-tour="lab-print"
                       (click)="onPrintOrder(order); $event.stopPropagation()"
                       [title]="
                         'LABORATORY_ORDERS_MODULE.PRINT_ORDER' | translate

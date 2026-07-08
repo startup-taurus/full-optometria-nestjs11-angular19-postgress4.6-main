@@ -108,7 +108,8 @@
     "CLIENTS": "Clients",
     "NOTIFICATIONS": "WhatsApp Notifications",
     "SUBSCRIPTION": "Subscription",
-    "SUBSCRIPTION_ADMIN": "Subscriptions"
+    "SUBSCRIPTION_ADMIN": "Subscriptions",
+    "TUTORIALS": "Tutorials"
   },
   "SUBSCRIPTION": {
     "TITLE": "My Subscription",
@@ -137,7 +138,8 @@
     "SELF_MANAGE_TEXT": "You can cancel anytime. Automatic card billing stops and you won't be charged again.",
     "CANCEL_BUTTON": "Cancel subscription",
     "CANCEL_CONFIRM_TITLE": "Cancel your subscription?",
-    "CANCEL_CONFIRM_TEXT": "Automatic billing will stop and you won't be charged again. To reactivate it later you'll need to purchase again (using the same email keeps your account and data).",
+    "CANCEL_CONFIRM_TEXT": "Automatic billing will stop and you won't be charged again. To reactivate it later you'll need to purchase again (using the same email keeps your account and data).<br><br>To confirm, type your optical shop name: <b>{{company}}</b>",
+    "CANCEL_NAME_MISMATCH": "The name does not match your optical shop.",
     "CANCEL_YES": "Yes, cancel",
     "CANCEL_NO": "No, keep it",
     "CANCELED_OK": "Your subscription was canceled",
@@ -214,6 +216,459 @@
     "DELETE_COMPANY_YES": "Delete everything",
     "DELETE_NAME_MISMATCH": "The name does not match.",
     "COMPANY_DELETED": "Company deleted"
+  },
+  "TUTORIALS": {
+    "PAGE": {
+      "TITLE": "Tutorials",
+      "RECOMMENDED": "Recommended to start",
+      "START_MAIN": "Start tour",
+      "SPECIFIC_TITLE": "Tutorials by module",
+      "SPECIFIC_SUBTITLE": "Want to learn something specific? Pick the module and the action you need.",
+      "START": "View tutorial",
+      "FILTER_ALL": "All"
+    },
+    "WELCOME": {
+      "EYEBROW": "Getting started",
+      "TITLE": "Learn the main flow in minutes",
+      "TEXT": "We'll guide you step by step through the real system, with sample data, so you master the patient care process from start to finish.",
+      "FLOW_LABEL": "The tour covers",
+      "CONFIRM": "Start tour",
+      "SEE_ALL": "See all tutorials",
+      "CANCEL": "Not now, thanks"
+    },
+    "TAG": {
+      "PATIENTS": "Patients",
+      "SCHEDULING": "Appointments",
+      "CLINICAL": "Medical history",
+      "LABORATORY": "Laboratory orders",
+      "SALES": "Clients & sales",
+      "CATALOG": "Catalog & inventory",
+      "ADMIN": "Administration"
+    },
+    "CONTROLS": {
+      "NEXT": "Next",
+      "PREV": "Previous",
+      "DONE": "Finish",
+      "PROGRESS": "Step {{current}} of {{total}}"
+    },
+    "MAIN_FLOW": {
+      "TITLE": "Main flow tour",
+      "DESCRIPTION": "Your optical shop's essential path: create a patient, book their appointment, record their medical history and generate the laboratory order. We use sample data, nothing is saved.",
+      "STEP_WELCOME_TITLE": "Let's start the tour",
+      "STEP_WELCOME_TEXT": "We'll guide you through the 4 steps of the main flow. You'll see the screens with sample data so you recognize each action. None of it is saved.",
+      "STEP_PATIENT_TITLE": "1. Create a patient",
+      "STEP_PATIENT_TEXT": "Everything starts with the patient. This button opens the form to register their data: name, ID, contact and branch.",
+      "STEP_PATIENT_LIST_TITLE": "Your patients",
+      "STEP_PATIENT_LIST_TEXT": "Registered patients appear in this table (these are samples). From each row you'll manage their information and medical history.",
+      "STEP_SHIFT_TITLE": "2. Book their appointment",
+      "STEP_SHIFT_TEXT": "With the patient created, book their appointment. This card opens the form where you pick the patient, date and time.",
+      "STEP_SHIFT_LIST_TITLE": "Your appointments",
+      "STEP_SHIFT_LIST_TEXT": "Each appointment appears as a card (these are samples). From it you can view, edit, change its status or create the medical history.",
+      "STEP_HISTORY_TITLE": "3. Record the medical history",
+      "STEP_HISTORY_TEXT": "Record the patient's visit. This button opens the medical history form with their measurements and diagnosis.",
+      "STEP_HISTORY_LIST_TITLE": "Medical histories",
+      "STEP_HISTORY_LIST_TEXT": "Histories are listed here (these are samples). From each one you can view, edit and, importantly, generate the laboratory order.",
+      "STEP_LAB_TITLE": "4. Generate the laboratory order",
+      "STEP_LAB_TEXT": "From the medical history you generate the laboratory order with the lens prescription. This is the button that creates it.",
+      "STEP_END_TITLE": "Done! That's the main flow",
+      "STEP_END_TEXT": "Patient → appointment → medical history → laboratory order. Whenever you want to learn more specific actions, find them in the Tutorials module."
+    },
+    "PATIENT": {
+      "CREATE": {
+        "TITLE": "Create a patient",
+        "DESCRIPTION": "Register a new patient from scratch.",
+        "STEP_1_TITLE": "Create patient",
+        "STEP_1_TEXT": "This button opens the form to register a patient: name, ID, contact and branch.",
+        "STEP_2_TITLE": "Your patients",
+        "STEP_2_TEXT": "Registered patients appear in this table (these are samples). From here you search and manage them.",
+        "OPEN_TITLE": "Create patient",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you register a patient. Remember: this is a sample walkthrough and no information is saved.",
+        "F_FIRSTNAME_TITLE": "First name",
+        "F_FIRSTNAME_TEXT": "Type the patient's full first name here.",
+        "F_LASTNAME_TITLE": "Last name",
+        "F_LASTNAME_TEXT": "Type the patient's last name here.",
+        "F_DOCUMENT_TITLE": "ID number",
+        "F_DOCUMENT_TEXT": "Enter the patient's ID or identity document number.",
+        "F_EMAIL_TITLE": "Email",
+        "F_EMAIL_TEXT": "Enter the patient's email address so you can contact them.",
+        "F_PHONE_TITLE": "Mobile phone",
+        "F_PHONE_TEXT": "Enter the patient's mobile phone number."
+      },
+      "EDIT": {
+        "TITLE": "Edit a patient",
+        "DESCRIPTION": "Update the data of an existing patient.",
+        "STEP_1_TITLE": "Edit patient",
+        "STEP_1_TEXT": "In each row's actions, this button opens the form to edit the patient's data."
+      },
+      "DELETE": {
+        "TITLE": "Delete a patient",
+        "DESCRIPTION": "Remove a patient from the system safely.",
+        "STEP_1_TITLE": "Delete patient",
+        "STEP_1_TEXT": "This button deletes the patient. The system will ask for confirmation before removing them."
+      },
+      "HISTORY": {
+        "TITLE": "Patient's medical history",
+        "DESCRIPTION": "Open, create or review a patient's medical history.",
+        "STEP_1_TITLE": "Manage their history",
+        "STEP_1_TEXT": "This button opens or creates the patient's medical history depending on whether they already have one.",
+        "STEP_2_TITLE": "View their history",
+        "STEP_2_TEXT": "This other button takes you to the medical history module filtered by that patient."
+      },
+      "FILTER": {
+        "TITLE": "Search and export patients",
+        "DESCRIPTION": "Filter the list and export it to Excel or PDF.",
+        "STEP_1_TITLE": "Export",
+        "STEP_1_TEXT": "With these buttons you export the patient list to Excel, CSV or PDF.",
+        "STEP_2_TITLE": "Reload",
+        "STEP_2_TEXT": "This button reloads the table with the latest information."
+      },
+      "TOUR": {
+        "TITLE": "Patients Tour",
+        "DESCRIPTION": "Learn what each button in the patients module does.",
+        "INTRO_TITLE": "Welcome to Patients",
+        "INTRO_TEXT": "Using sample data, we'll show you what each button on this screen does. Nothing you see here is saved.",
+        "CREATE_TITLE": "Create patient",
+        "CREATE_TEXT": "This button opens the form to register a brand-new patient from scratch.",
+        "TABLE_TITLE": "Patients list",
+        "TABLE_TEXT": "Your patients appear here (you're seeing samples now). From each row you can access its actions.",
+        "HISTORY_TITLE": "Medical history",
+        "HISTORY_TEXT": "This button opens or creates the patient's medical history depending on whether they already have one.",
+        "VIEW_HISTORY_TITLE": "View their history",
+        "VIEW_HISTORY_TEXT": "This button takes you to the medical history module already filtered by that patient.",
+        "EDIT_TITLE": "Edit patient",
+        "EDIT_TEXT": "This button opens the form to update the patient's data.",
+        "DELETE_TITLE": "Delete patient",
+        "DELETE_TEXT": "This button deletes the patient. The system will ask for confirmation before removing them.",
+        "EXPORT_TITLE": "Export",
+        "EXPORT_TEXT": "With these buttons you export the patient list to Excel, CSV or PDF.",
+        "RELOAD_TITLE": "Reload",
+        "RELOAD_TEXT": "This button reloads the table with the latest information."
+      }
+    },
+    "SHIFT": {
+      "CREATE": {
+        "TITLE": "Book an appointment",
+        "DESCRIPTION": "Reserve a slot to see a patient.",
+        "STEP_1_TITLE": "Book appointment",
+        "STEP_1_TEXT": "This card opens the new appointment form: you pick the patient, date and time.",
+        "STEP_2_TITLE": "Your appointments",
+        "STEP_2_TEXT": "Each appointment appears as a card (these are samples) with its status and actions.",
+        "OPEN_TITLE": "Create appointment",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you book an appointment. Remember: this is a sample walkthrough and no information is saved.",
+        "F_PATIENT_TITLE": "Patient",
+        "F_PATIENT_TEXT": "Select the patient you're booking the appointment for from the list.",
+        "F_DATE_TITLE": "Appointment date and time",
+        "F_DATE_TEXT": "Choose the day and time when the patient will be seen.",
+        "F_DESCRIPTION_TITLE": "Description",
+        "F_DESCRIPTION_TEXT": "Add a short description or the reason for the appointment."
+      },
+      "MANAGE": {
+        "TITLE": "Manage an appointment",
+        "DESCRIPTION": "Edit, change the status or delete an appointment.",
+        "STEP_1_TITLE": "Edit the appointment",
+        "STEP_1_TEXT": "This button opens the appointment to change its date, time or details.",
+        "STEP_2_TITLE": "Change the status",
+        "STEP_2_TEXT": "With this button you change the appointment's status (confirmed, pending, cancelled, etc.).",
+        "STEP_3_TITLE": "Delete the appointment",
+        "STEP_3_TEXT": "This button deletes the appointment. You'll be asked to confirm first."
+      },
+      "HISTORY": {
+        "TITLE": "Create history from the appointment",
+        "DESCRIPTION": "Record the medical history straight from an appointment.",
+        "STEP_1_TITLE": "Create medical history",
+        "STEP_1_TEXT": "From the appointment itself, this button opens the patient's medical history to record the visit."
+      }
+    },
+    "CLINICAL": {
+      "MANAGE": {
+        "TITLE": "Manage a medical history",
+        "DESCRIPTION": "Edit or delete a medical history.",
+        "STEP_1_TITLE": "Edit the history",
+        "STEP_1_TEXT": "This button opens the medical history to modify its data.",
+        "STEP_2_TITLE": "Delete the history",
+        "STEP_2_TEXT": "This button deletes the medical history. You'll be asked to confirm first."
+      },
+      "TOUR": {
+        "TITLE": "Medical History Tour",
+        "DESCRIPTION": "Learn what each button in the medical history module does.",
+        "INTRO_TITLE": "Welcome to Medical History",
+        "INTRO_TEXT": "Using sample data, we'll show you what each button on this screen does. Nothing you see here is saved.",
+        "CREATE_TITLE": "New medical history",
+        "CREATE_TEXT": "This button opens the medical history form: you select the patient and record measurements and diagnosis.",
+        "TABLE_TITLE": "Histories list",
+        "TABLE_TEXT": "Medical histories are listed here (you're seeing samples now). From each row you can access its actions.",
+        "EDIT_TITLE": "Edit the history",
+        "EDIT_TEXT": "This button opens the medical history to modify its data.",
+        "DUPLICATE_TITLE": "Duplicate the history",
+        "DUPLICATE_TEXT": "This button creates a copy of the medical history to reuse its data in a new visit.",
+        "DELETE_TITLE": "Delete the history",
+        "DELETE_TEXT": "This button deletes the medical history. You'll be asked to confirm first.",
+        "LAB_ORDER_TITLE": "Generate laboratory order",
+        "LAB_ORDER_TEXT": "This button creates the laboratory order with the patient's lens prescription."
+      }
+    },
+    "LABORATORY": {
+      "CREATE": {
+        "TITLE": "Create a laboratory order",
+        "DESCRIPTION": "Walk through the 4 steps of the laboratory order from the medical history.",
+        "OPEN_TITLE": "Create laboratory order",
+        "OPEN_TEXT": "The laboratory order starts from a medical history: this button opens the wizard with the patient's data already loaded. We'll walk through its 4 steps; nothing is saved during the tutorial.",
+        "F_CLIENT_TITLE": "Paying client",
+        "F_CLIENT_TEXT": "Select who pays and receives the invoice. You can create a new one with the + button. If you leave it empty, it's recorded as a final consumer.",
+        "F_ATTENDANCE_TITLE": "Attendance date",
+        "F_ATTENDANCE_TEXT": "The date you attended the patient. It defaults to today, but you can change it.",
+        "F_DELIVERY_TITLE": "Delivery date (required)",
+        "F_DELIVERY_TEXT": "Indicate when the lenses will be ready. It's the only required field in the wizard: without it you can't move to the next step.",
+        "F_OD_TITLE": "Right eye prescription",
+        "F_OD_TEXT": "Here you record the right eye (OD) prescription: sphere, cylinder, axis, addition, height and PD. It can be preloaded from the medical history.",
+        "F_OI_TITLE": "Left eye prescription",
+        "F_OI_TEXT": "Likewise, record the left eye (OI) prescription. Below you'll find shared parameters such as base curve and prism.",
+        "F_FRAME_TITLE": "Frame measurements",
+        "F_FRAME_TEXT": "Record the frame measurements (horizontal, vertical, bridge, diameter). With the digital parameters button you expand advanced measurements for custom lenses.",
+        "F_OBSERVATIONS_TITLE": "Observations",
+        "F_OBSERVATIONS_TEXT": "Add any extra instructions for the lab (special treatments, mounting notes, etc.).",
+        "F_PRODUCTS_TITLE": "Products and frame",
+        "F_PRODUCTS_TEXT": "Select the lenses or products for the order. Choosing them generates the line items with quantity, price and discount, and you'll see the summary with the total.",
+        "CLOSING_TITLE": "Generate the order",
+        "CLOSING_TEXT": "In the last step this button saves the laboratory order and offers to print the PDF. During the tutorial it's disabled so no real orders are created."
+      },
+      "TOUR": {
+        "TITLE": "Laboratory Orders Tour",
+        "DESCRIPTION": "Learn what each button in the laboratory orders module does.",
+        "INTRO_TITLE": "Welcome to Laboratory Orders",
+        "INTRO_TEXT": "Using sample data, we'll show you what each button on this screen does. Remember: orders are created from the medical history.",
+        "LIST_TITLE": "Orders list",
+        "LIST_TEXT": "Each order appears as a card (you're seeing samples now) with the patient, product, delivery date and status.",
+        "VIEW_TITLE": "View the order",
+        "VIEW_TEXT": "This button opens the full order detail to review it.",
+        "PURCHASE_ORDER_TITLE": "View purchase order",
+        "PURCHASE_ORDER_TEXT": "This button opens the purchase order linked to this laboratory order.",
+        "EDIT_TITLE": "Edit the order",
+        "EDIT_TEXT": "This button opens the order to modify its data and measurements.",
+        "DELETE_TITLE": "Delete the order",
+        "DELETE_TEXT": "This button deletes the order. You'll be asked to confirm first.",
+        "STATUS_TITLE": "Change the status",
+        "STATUS_TEXT": "With this button you change the order's status (pending, sent, received, delivered).",
+        "WHATSAPP_TITLE": "Send via WhatsApp",
+        "WHATSAPP_TEXT": "With this button you send the order to the patient or the lab via WhatsApp.",
+        "EMAIL_TITLE": "Send via email",
+        "EMAIL_TEXT": "This button sends the order by email.",
+        "PRINT_TITLE": "Print the order",
+        "PRINT_TEXT": "This button generates the order's PDF to print or save it."
+      }
+    },
+    "CLIENT": {
+      "CREATE": {
+        "TITLE": "Create a client",
+        "DESCRIPTION": "Register a client and, if you want, link them to a patient.",
+        "STEP_1_TITLE": "Create client",
+        "STEP_1_TEXT": "This button opens the form to register a client: name, ID, contact and their link to a patient.",
+        "STEP_2_TITLE": "Your clients",
+        "STEP_2_TEXT": "Registered clients appear in this table (you see samples here). From here you search, edit and manage them.",
+        "OPEN_TITLE": "Create client",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you register a client. Remember: this is a sample walkthrough and no information is saved.",
+        "F_FIRSTNAME_TITLE": "First name",
+        "F_FIRSTNAME_TEXT": "Type the client's full first name here.",
+        "F_LASTNAME_TITLE": "Last name",
+        "F_LASTNAME_TEXT": "Type the client's last name here.",
+        "F_DOCUMENT_TITLE": "ID number",
+        "F_DOCUMENT_TEXT": "Enter the client's ID or identity document number.",
+        "F_EMAIL_TITLE": "Email",
+        "F_EMAIL_TEXT": "Enter the client's email address so you can contact them.",
+        "F_PHONE_TITLE": "Mobile phone",
+        "F_PHONE_TEXT": "Enter the client's mobile phone number."
+      }
+    },
+    "PURCHASE_ORDER": {
+      "TOUR": {
+        "TITLE": "Purchase Orders Tour",
+        "DESCRIPTION": "Learn the summary, actions and billing of your orders.",
+        "INTRO_TITLE": "Purchase orders",
+        "INTRO_TEXT": "Here you manage your clients' purchase orders: their status, amounts and billing. We'll show you each part.",
+        "SUMMARY_TITLE": "At a glance",
+        "SUMMARY_TEXT": "These cards summarize your orders: pending, to invoice, invoiced, total orders and the sold and invoiced amounts. Click a card to filter the list by that status.",
+        "TOOLS_TITLE": "Reload and filter",
+        "TOOLS_TEXT": "Use this button to reload the list. When you apply filters, a button to clear them appears next to it, and you can also export the data.",
+        "LIST_TITLE": "Orders list",
+        "LIST_TEXT": "All purchase orders are listed here with their client, amounts and status (pending, invoiced or cancelled).",
+        "ACTIONS_TITLE": "Actions for each order",
+        "ACTIONS_TEXT": "On each row you have: View (review the detail), Edit (change its data) and Cancel (void the order; confirmation is requested).",
+        "BILLING_TITLE": "Electronic billing",
+        "BILLING_TEXT": "If your company has billing enabled, each order shows actions to issue the invoice, authorize it with the tax authority, check its status and download the XML.",
+        "ORIGIN_TITLE": "Where do they come from?",
+        "ORIGIN_TEXT": "Purchase orders are generated from a laboratory order (with the cart button). Here you only manage and bill them."
+      }
+    },
+    "CLINICAL_CONFIG": {
+      "TOUR": {
+        "TITLE": "Configure the medical history",
+        "DESCRIPTION": "Customize which fields and sections appear in the medical history.",
+        "INTRO_TITLE": "Medical history configuration",
+        "INTRO_TEXT": "Here you decide which sections and fields appear in your branch's medical history. Tailor it to how your optical shop works.",
+        "TABS_TITLE": "The three steps",
+        "TABS_TEXT": "The history is organized in three steps (data, exams and diagnosis). Each tab shows how many sections you have enabled for that step.",
+        "SECTION_TITLE": "Enable or disable a section",
+        "SECTION_TEXT": "With this switch you enable or disable a whole section. When you disable it, its fields stop appearing in the medical history.",
+        "FIELD_TITLE": "Individual fields",
+        "FIELD_TEXT": "Within each section you can enable or disable field by field, to show only what your optical shop needs.",
+        "SAVE_TITLE": "Save the configuration",
+        "SAVE_TEXT": "When you're done, this button saves the changes. The medical history will immediately reflect the fields you left active."
+      }
+    },
+    "CATEGORY": {
+      "CREATE": {
+        "TITLE": "Create a category",
+        "DESCRIPTION": "Organize your inventory by creating product categories.",
+        "STEP_1_TITLE": "Create category",
+        "STEP_1_TEXT": "This button opens the form to create a category (for example: Frames, Lenses, Accessories).",
+        "STEP_2_TITLE": "Your categories",
+        "STEP_2_TEXT": "Categories are listed here (you see samples here). Each category can have its subcategories.",
+        "OPEN_TITLE": "Create category",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you register a category. Remember: this is a sample walkthrough and no information is saved.",
+        "F_NAME_TITLE": "Category name",
+        "F_NAME_TEXT": "Type the name of the category (for example: Frames, Lenses or Accessories).",
+        "F_DESCRIPTION_TITLE": "Description",
+        "F_DESCRIPTION_TEXT": "Add a short description explaining which products this category groups."
+      },
+      "SUBCATEGORY": {
+        "TITLE": "Create a subcategory",
+        "DESCRIPTION": "Add subcategories inside a category for finer classification.",
+        "STEP_1_TITLE": "Your categories",
+        "STEP_1_TEXT": "Each category (you see samples here) can contain subcategories to classify your products in more detail.",
+        "STEP_2_TITLE": "Add subcategory",
+        "STEP_2_TEXT": "This button inside the category opens the form to create a subcategory (for example: Single-vision inside Lenses)."
+      }
+    },
+    "SUPPLIER": {
+      "CREATE": {
+        "TITLE": "Create a supplier",
+        "DESCRIPTION": "Register your optical shop's suppliers.",
+        "STEP_1_TITLE": "Create supplier",
+        "STEP_1_TEXT": "This button opens the form to register a supplier: name, tax ID, contact and website.",
+        "STEP_2_TITLE": "Your suppliers",
+        "STEP_2_TEXT": "Registered suppliers appear in this table (you see samples here). From here you manage and contact them.",
+        "OPEN_TITLE": "Create supplier",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you register a supplier. Remember: this is a sample walkthrough and no information is saved.",
+        "F_NAME_TITLE": "Name",
+        "F_NAME_TEXT": "Type the supplier company's name.",
+        "F_DOCUMENT_TITLE": "Tax ID",
+        "F_DOCUMENT_TEXT": "Enter the supplier's tax ID (RUC).",
+        "F_PHONE_TITLE": "Phone",
+        "F_PHONE_TEXT": "Enter the supplier's contact phone number.",
+        "F_EMAIL_TITLE": "Email",
+        "F_EMAIL_TEXT": "Enter the supplier's email address so you can contact them.",
+        "F_WEBSITE_TITLE": "Website",
+        "F_WEBSITE_TEXT": "Type the supplier's website address, if they have one."
+      }
+    },
+    "PRODUCT": {
+      "CREATE": {
+        "TITLE": "Create a product",
+        "DESCRIPTION": "Add products to your inventory.",
+        "STEP_1_TITLE": "Create product",
+        "STEP_1_TEXT": "This button opens the form to create a product: code, name, brand, price, category and supplier.",
+        "STEP_2_TITLE": "Your inventory",
+        "STEP_2_TEXT": "Products appear in this table (you see samples here) with their stock, price and status.",
+        "OPEN_TITLE": "Create product",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you register a product. Remember: this is a sample walkthrough and no information is saved.",
+        "F_CODE_TITLE": "Code",
+        "F_CODE_TEXT": "Enter the code you use to identify this product in your inventory.",
+        "F_NAME_TITLE": "Name",
+        "F_NAME_TEXT": "Type the product's name.",
+        "F_BRAND_TITLE": "Brand",
+        "F_BRAND_TEXT": "Enter the product's brand.",
+        "F_CATEGORY_TITLE": "Category",
+        "F_CATEGORY_TEXT": "Select the category the product belongs to.",
+        "F_PRICE_TITLE": "Unit price",
+        "F_PRICE_TEXT": "Enter the product's sale price per unit.",
+        "F_QUANTITY_TITLE": "Quantity",
+        "F_QUANTITY_TEXT": "Enter the quantity of this product available in stock."
+      }
+    },
+    "USER": {
+      "CREATE": {
+        "TITLE": "Create a user",
+        "DESCRIPTION": "Register your team members (salespeople, optometrists, etc.).",
+        "STEP_1_TITLE": "Create user",
+        "STEP_1_TEXT": "This button opens the form to create a user: personal details, role and the branch they belong to.",
+        "STEP_2_TITLE": "Your users",
+        "STEP_2_TEXT": "Your team members appear in this table (you see samples here) with their role, branch and status.",
+        "OPEN_TITLE": "Create user",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you register a user. Remember: this is a sample walkthrough and no information is saved.",
+        "F_USERNAME_TITLE": "Username",
+        "F_USERNAME_TEXT": "Type the username the person will use to sign in to the system.",
+        "F_EMAIL_TITLE": "Email",
+        "F_EMAIL_TEXT": "Enter the user's email address.",
+        "F_FIRSTNAME_TITLE": "First name",
+        "F_FIRSTNAME_TEXT": "Type the user's full first name here.",
+        "F_LASTNAME_TITLE": "Last name",
+        "F_LASTNAME_TEXT": "Type the user's last name here.",
+        "F_ROLE_TITLE": "Role",
+        "F_ROLE_TEXT": "Select the role that defines the user's permissions.",
+        "F_BRANCH_TITLE": "Branch",
+        "F_BRANCH_TEXT": "Select the branch the user belongs to."
+      }
+    },
+    "ROLE": {
+      "CREATE": {
+        "TITLE": "Create a role",
+        "DESCRIPTION": "Define roles with permissions to control what each user can do.",
+        "STEP_1_TITLE": "Create role",
+        "STEP_1_TEXT": "Open this options menu and choose to create a role. You'll define its name and the permissions it will have.",
+        "STEP_2_TITLE": "Your roles",
+        "STEP_2_TEXT": "Roles are listed here (you see samples here). Each role groups permissions that you then assign to your users."
+      }
+    },
+    "BRANCH": {
+      "CREATE": {
+        "TITLE": "Create a branch",
+        "DESCRIPTION": "Register your optical shop's branches.",
+        "STEP_1_TITLE": "Create branch",
+        "STEP_1_TEXT": "This card opens the form to create a branch: name, code, address and opening hours.",
+        "STEP_2_TITLE": "Your branches",
+        "STEP_2_TEXT": "Branches appear as cards (you see samples here) with their city, contact and status.",
+        "OPEN_TITLE": "Create branch",
+        "OPEN_TEXT": "Press this button to open the form. We'll walk you through each field with sample data; nothing is saved.",
+        "CLOSING_TITLE": "That's it",
+        "CLOSING_TEXT": "That's how you register a branch. Remember: this is a sample walkthrough and no information is saved.",
+        "F_NAME_TITLE": "Name",
+        "F_NAME_TEXT": "Type the branch's name.",
+        "F_CODE_TITLE": "Code",
+        "F_CODE_TEXT": "Enter the code you use to identify this branch.",
+        "F_ADDRESS_TITLE": "Address",
+        "F_ADDRESS_TEXT": "Type the branch's physical address.",
+        "F_CITY_TITLE": "City",
+        "F_CITY_TEXT": "Enter the city where the branch is located.",
+        "F_PHONE_TITLE": "Phone",
+        "F_PHONE_TEXT": "Enter the branch's contact phone number.",
+        "F_EMAIL_TITLE": "Corporate email",
+        "F_EMAIL_TEXT": "Enter the branch's corporate email address."
+      }
+    },
+    "COMPANY": {
+      "CREATE": {
+        "TITLE": "Create a company",
+        "DESCRIPTION": "Register a company (optical shop) in the system.",
+        "STEP_1_TITLE": "Create company",
+        "STEP_1_TEXT": "This card opens the form to create a company: name, code and its user and branch limits.",
+        "STEP_2_TITLE": "Your companies",
+        "STEP_2_TEXT": "Companies appear as cards (you see samples here) with their user and branch usage and status."
+      }
+    }
   },
   "TOPBAR": {
     "SEARCH": "Search something...",
@@ -857,6 +1312,25 @@
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
+    "GREETING": {
+      "MORNING": "Good morning",
+      "AFTERNOON": "Good afternoon",
+      "EVENING": "Good evening"
+    },
+    "KPIS": {
+      "TOTAL_PATIENTS": "Patients",
+      "TOTAL_PATIENTS_DESC": "Total registered in the branch",
+      "APPOINTMENTS": "Appointments",
+      "APPOINTMENTS_DESC": "Booked in the last months",
+      "LAB_PENDING": "Pending orders",
+      "LAB_PENDING_DESC": "Laboratory orders to complete",
+      "LOW_STOCK": "Low stock",
+      "LOW_STOCK_DESC": "Products with fewer than 10 units",
+      "TOTAL_SOLD": "Total sold",
+      "TOTAL_SOLD_DESC": "Accumulated amount of purchase orders",
+      "TOTAL_INVOICED": "Total invoiced",
+      "TOTAL_INVOICED_DESC": "Accumulated invoiced amount"
+    },
     "APPOINTMENTS_TREND": {
       "TITLE": "Appointments Trend",
       "TOOLTIP": "Shows how many appointments we have each month, helping us see busy periods and plan better.",

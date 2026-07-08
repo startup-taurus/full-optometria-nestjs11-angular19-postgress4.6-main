@@ -30,10 +30,14 @@
     [scrollThreshold]="200"
     (scrolled)="onScrollEnd()"
   >
-    <div class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3">
+    <div
+      class="row responsive-card-grid row-cols-1 row-cols-md-2 row-cols-xxl-3"
+      data-tour="shift-list"
+    >
       <div class="col">
         <div
           class="card new-item-card h-100 border-0 shadow-sm"
+          data-tour="shift-create"
           (click)="onNewShift()"
           role="button"
         >
@@ -137,6 +141,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-secondary btn-action"
+                      data-tour="shift-edit"
                       (click)="onEditShift(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.EDIT_APPOINTMENT' | translate
@@ -147,6 +152,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-info btn-action"
+                      data-tour="shift-create-history"
                       (click)="onCreateClinicalHistory(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.CREATE_CLINICAL_HISTORY' | translate
@@ -157,6 +163,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-info btn-action"
+                      data-tour="shift-status"
                       (click)="onChangeStatus(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.CHANGE_STATUS' | translate
@@ -167,6 +174,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-danger btn-action"
+                      data-tour="shift-delete"
                       (click)="onDeleteShift(shift); $event.stopPropagation()"
                       [title]="
                         'SHIFT_MANAGEMENT_MODULE.DELETE_APPOINTMENT' | translate

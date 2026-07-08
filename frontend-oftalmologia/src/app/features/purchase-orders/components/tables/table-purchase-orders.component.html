@@ -4,6 +4,7 @@
   <div class="row g-4 mb-2">
     <div class="col-12">
       <purchase-orders-summary
+        data-tour="po-summary"
         (filterApplied)="onSummaryFilterApplied($event)"
       ></purchase-orders-summary>
     </div>
@@ -11,10 +12,10 @@
 
   <div class="row g-4">
     <div class="col-12">
-      <div class="card common-datatable-card border-0 shadow-sm">
+      <div class="card common-datatable-card border-0 shadow-sm" data-tour="po-list">
         <div class="card-header border-bottom">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0 text-primary">
+            <h5 class="card-title mb-0 text-primary" data-tour="po-header">
               <i class="ti ti-shopping-cart me-2"></i>
               {{ 'PURCHASE_ORDERS.LIST' | translate }}
             </h5>
@@ -34,6 +35,7 @@
               <button
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
+                data-tour="po-reload"
                 placement="top"
                 [ngbTooltip]="'WORDS.RELOAD_TABLE' | translate"
                 (click)="reloadDatatable(filter)"

@@ -141,6 +141,13 @@ export const MENU_ITEMS: MenuItemType[] = [
         requiredPermissions: [PERMISSION_IDS.COMPANIES],
       },
       {
+        key: 'SUBSCRIPTION',
+        label: 'SUBSCRIPTION',
+        icon: 'ti-credit-card',
+        url: '/subscription',
+        requiredPermissions: [PERMISSION_IDS.SUBSCRIPTION],
+      },
+      {
         key: 'SUBSCRIPTION_ADMIN',
         label: 'SUBSCRIPTION_ADMIN',
         icon: 'ti-receipt-2',
@@ -176,11 +183,10 @@ export const MENU_ITEMS: MenuItemType[] = [
     ],
   },
   {
-    key: 'SUBSCRIPTION',
-    label: 'SUBSCRIPTION',
-    icon: 'ti-credit-card',
-    url: '/subscription',
-    requiredPermissions: [PERMISSION_IDS.SUBSCRIPTION],
+    key: 'TUTORIALS',
+    label: 'TUTORIALS',
+    icon: 'ti-school',
+    url: '/tutorials',
   },
 ]
 

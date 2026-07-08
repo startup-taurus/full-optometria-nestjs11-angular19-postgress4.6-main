@@ -8,6 +8,8 @@ import {
 } from '@angular/core'
 import { CategoryTreeNode } from '@core/interfaces/api/category-tree.interface'
 import { CategoriesManagementService } from '@core/services/api/categories-management.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { BehaviorSubject, catchError, of, Subject, takeUntil, tap, debounceTime, distinctUntilChanged, switchMap } from 'rxjs'
@@ -28,13 +30,16 @@ import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } fr
   styleUrl: './categories-table.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CategoriesTableComponent implements OnInit, OnDestroy {
+export class CategoriesTableComponent
+  implements OnInit, OnDestroy, TutorialMockable<CategoryTreeNode>
+{
   private readonly destroy$ = new Subject<void>()
   private readonly categoriesService = inject(CategoriesManagementService)
   private readonly modalService = inject(NgbModal)
   private readonly translate = inject(TranslateService)
   private readonly toastr = inject(ToastrService)
   private readonly store = inject(Store<AppState>)
+  private readonly _tutorialMock = inject(TutorialMockService)
 
   categoriesData$ = new BehaviorSubject<CategoryTreeNode[]>([])
   isLoading$ = new BehaviorSubject<boolean>(false)
@@ -42,11 +47,26 @@ export class CategoriesTableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeBranchSubscription()
+    this._tutorialMock.register('categories', this)
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('categories', this)
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  applyTutorialMock(rows: CategoryTreeNode[]): void {
+    this.categoriesData$.next(rows)
+    this.isLoading$.next(false)
+    rows
+      .filter((r) => r.type === 'category')
+      .forEach((c) => this.expandedCategories.add(c.id))
+  }
+
+  clearTutorialMock(): void {
+    this.expandedCategories.clear()
+    this.loadCategories()
   }
 
   private initializeBranchSubscription(): void {
@@ -55,6 +75,9 @@ export class CategoriesTableComponent implements OnInit, OnDestroy {
       distinctUntilChanged(), 
       debounceTime(300),
       tap((branchId) => {
+        if (this._tutorialMock.isActive('categories')) {
+          return
+        }
         this.categoriesData$.next([])
         this.expandedCategories.clear()
       }),
@@ -63,7 +86,9 @@ export class CategoriesTableComponent implements OnInit, OnDestroy {
       })
     ).subscribe({
       next: (categories) => {
-       
+        if (this._tutorialMock.isActive('categories')) {
+          return
+        }
         this.categoriesData$.next(categories)
         this.isLoading$.next(false)
       },
@@ -78,6 +103,9 @@ export class CategoriesTableComponent implements OnInit, OnDestroy {
   }
 
   private loadCategoriesObservable() {
+    if (this._tutorialMock.isActive('categories')) {
+      return of(this.categoriesData$.value)
+    }
     this.isLoading$.next(true)
     return this.categoriesService.getCategoriesTree().pipe(
       catchError((error) => {
@@ -112,10 +140,16 @@ export class CategoriesTableComponent implements OnInit, OnDestroy {
   }
 
   private loadCategories(): void {
+    if (this._tutorialMock.isActive('categories')) {
+      return
+    }
     this.loadCategoriesObservable().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (categories) => {
+        if (this._tutorialMock.isActive('categories')) {
+          return
+        }
         this.categoriesData$.next(categories)
         this.isLoading$.next(false)
       },

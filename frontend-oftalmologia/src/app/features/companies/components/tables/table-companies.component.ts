@@ -15,6 +15,8 @@ import { CompanySetupModalComponent } from '../modals/create-company/company-set
 import { ViewCompanyModalComponent } from '../modals/view-company/view-company-modal.component'
 import { ChangeStatusCompanyModalComponent } from '../modals/change-status-company/change-status-company-modal.component'
 import { CompanyService } from '@core/services/api/company.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import {
   Company,
   QueryCompanyDto,
@@ -35,7 +37,9 @@ import {
   styleUrl: './table-companies.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TableCompaniesComponent implements OnInit, OnDestroy {
+export class TableCompaniesComponent
+  implements OnInit, OnDestroy, TutorialMockable<Company>
+{
   public companies: Company[] = []
   public loading = false
   public showFloatingMenu: string | null = null
@@ -47,6 +51,7 @@ export class TableCompaniesComponent implements OnInit, OnDestroy {
   private companyService = inject(CompanyService)
   private modalService = inject(NgbModal)
   private toastr = inject(ToastrService)
+  private _tutorialMock = inject(TutorialMockService)
 
   constructor(config: NgbModalConfig) {
     config.backdrop = 'static'
@@ -55,14 +60,29 @@ export class TableCompaniesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCompanies()
+    this._tutorialMock.register('companies', this)
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('companies', this)
     this.destroy$.next()
     this.destroy$.complete()
   }
 
+  applyTutorialMock(rows: Company[]): void {
+    this.companies = rows
+    this.totalItems = rows.length
+    this.loading = false
+  }
+
+  clearTutorialMock(): void {
+    this.loadCompanies()
+  }
+
   private loadCompanies(): void {
+    if (this._tutorialMock.isActive('companies')) {
+      return
+    }
     this.loading = true
 
     const queryParams: QueryCompanyDto = {
@@ -75,6 +95,10 @@ export class TableCompaniesComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
+          if (this._tutorialMock.isActive('companies')) {
+            this.loading = false
+            return
+          }
           if (response.data && response.data.result) {
             this.companies = response.data.result || []
             this.totalItems = response.data.totalCount || 0
@@ -85,6 +109,10 @@ export class TableCompaniesComponent implements OnInit, OnDestroy {
           this.loading = false
         },
         error: (error) => {
+          if (this._tutorialMock.isActive('companies')) {
+            this.loading = false
+            return
+          }
           this.companies = []
           this.totalItems = 0
           this.loading = false

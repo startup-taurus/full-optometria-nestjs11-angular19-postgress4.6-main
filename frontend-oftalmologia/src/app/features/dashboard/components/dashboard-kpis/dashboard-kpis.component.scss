@@ -1,0 +1,242 @@
+:host {
+  display: block;
+  --kpi-bg: var(--bs-body-bg);
+  --kpi-border: var(--bs-border-color);
+  --kpi-text: var(--bs-body-color);
+  --kpi-muted: var(--bs-secondary-color);
+  --kpi-shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+}
+
+.dashboard-kpis {
+  margin-top: 1.25rem;
+  margin-bottom: 1.1rem;
+}
+
+.kpis-greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+
+  .greeting-text {
+    h4 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--kpi-text);
+    }
+
+    p {
+      margin: 0.15rem 0 0;
+      font-size: 0.85rem;
+      color: var(--kpi-muted);
+      text-transform: capitalize;
+    }
+  }
+}
+
+.kpis-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.9rem;
+}
+
+.kpi-card {
+  min-height: 132px;
+  border: 1px solid var(--kpi-border);
+  border-radius: 0.75rem;
+  background: var(--kpi-bg);
+  box-shadow: var(--kpi-shadow);
+  padding: 0.95rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: kpi-fade-in 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(17, 24, 39, 0.11);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.45rem;
+
+    i {
+      font-size: 1.2rem;
+      opacity: 0.95;
+    }
+
+    .label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: var(--kpi-text);
+      line-height: 1.1;
+    }
+  }
+
+  .card-value {
+    font-size: clamp(1.6rem, 2.2vw, 2rem);
+    line-height: 1.05;
+    font-weight: 800;
+    color: var(--kpi-text);
+    margin: 0.25rem 0 0.6rem;
+    word-break: break-word;
+  }
+
+  .card-footer {
+    border-top: 1px solid color-mix(in srgb, var(--kpi-border) 80%, transparent);
+    padding-top: 0.6rem;
+
+    small {
+      color: var(--kpi-muted);
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+  }
+}
+
+.kpi-patients {
+  border-left: 5px solid #6366f1;
+  .card-header i,
+  .card-value {
+    color: #4f46e5;
+  }
+}
+
+.kpi-appointments {
+  border-left: 5px solid #0ea5e9;
+  .card-header i,
+  .card-value {
+    color: #0284c7;
+  }
+}
+
+.kpi-lab {
+  border-left: 5px solid #8b5cf6;
+  .card-header i,
+  .card-value {
+    color: #7c3aed;
+  }
+}
+
+.kpi-stock {
+  border-left: 5px solid #22c55e;
+  .card-header i,
+  .card-value {
+    color: #16a34a;
+  }
+
+  &.is-alert {
+    border-left-color: #f59e0b;
+    .card-header i,
+    .card-value {
+      color: #d97706;
+    }
+  }
+}
+
+.kpi-sold {
+  border-left: 5px solid #0ea5e9;
+  .card-header i,
+  .card-value {
+    color: #0284c7;
+  }
+}
+
+.kpi-invoiced {
+  border-left: 5px solid #16a34a;
+  .card-header i,
+  .card-value {
+    color: #15803d;
+  }
+}
+
+.kpi-skeleton {
+  opacity: 1;
+  animation: none;
+  gap: 0.6rem;
+
+  .skeleton-line {
+    border-radius: 0.4rem;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--kpi-border) 55%, transparent) 25%,
+      color-mix(in srgb, var(--kpi-border) 25%, transparent) 37%,
+      color-mix(in srgb, var(--kpi-border) 55%, transparent) 63%
+    );
+    background-size: 400% 100%;
+    animation: kpi-shimmer 1.4s ease infinite;
+  }
+
+  .skeleton-header {
+    height: 0.9rem;
+    width: 60%;
+  }
+
+  .skeleton-value {
+    height: 1.8rem;
+    width: 45%;
+  }
+
+  .skeleton-footer {
+    height: 0.7rem;
+    width: 80%;
+  }
+}
+
+@keyframes kpi-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kpi-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+[data-bs-theme='dark'] :host,
+:host-context([data-bs-theme='dark']) {
+  --kpi-bg: #1f2a37;
+  --kpi-border: #334155;
+  --kpi-text: #e2e8f0;
+  --kpi-muted: #94a3b8;
+  --kpi-shadow: 0 10px 22px rgba(2, 6, 23, 0.35);
+}
+
+@media (max-width: 992px) {
+  .kpis-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .kpis-row {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .kpis-greeting .greeting-text h4 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi-card {
+    animation-duration: 0.001ms;
+  }
+}

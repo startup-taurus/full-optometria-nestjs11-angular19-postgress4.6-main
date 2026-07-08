@@ -48,6 +48,8 @@ import {
 } from '@core/helpers/ui/ui.constants'
 import { TableExportButtonsComponent } from '../../../../shared/components/table-export-buttons/table-export-buttons.component'
 import { ExportColumn } from '@core/services/ui/table-export.service'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 
 @Component({
   selector: 'table-laboratory-orders',
@@ -66,7 +68,7 @@ import { ExportColumn } from '@core/services/ui/table-export.service'
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TableLaboratoryOrdersComponent
-  implements OnInit, OnChanges, OnDestroy
+  implements OnInit, OnChanges, OnDestroy, TutorialMockable<LaboratoryOrder>
 {
   private _laboratoryOrdersService = inject(LaboratoryOrdersService)
   private _purchaseOrdersService = inject(PurchaseOrdersService)
@@ -77,6 +79,7 @@ export class TableLaboratoryOrdersComponent
   private _filterCommunicationService = inject(FilterCommunicationService)
   private _store = inject(Store<AppState>)
   private _router = inject(Router)
+  private _tutorialMock = inject(TutorialMockService)
 
   @Input() orderId: string | null = null
 
@@ -101,6 +104,20 @@ export class TableLaboratoryOrdersComponent
   ngOnInit(): void {
     this.exportColumns = this.buildExportColumns()
     this.initializeSubscriptions()
+    this._tutorialMock.register('laboratory-orders', this)
+  }
+
+  applyTutorialMock(rows: LaboratoryOrder[]): void {
+    this.laboratoryOrders = [...rows]
+    this.filteredOrders = [...rows]
+    this.isLoading = false
+    this.hasMore = false
+    this.currentPage = 1
+    this.totalItems = rows.length
+  }
+
+  clearTutorialMock(): void {
+    this.resetAndLoad()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -155,6 +172,7 @@ export class TableLaboratoryOrdersComponent
   }
 
   ngOnDestroy(): void {
+    this._tutorialMock.unregister('laboratory-orders', this)
     this.unsubscribe$.next(true)
     this.unsubscribe$.unsubscribe()
   }
@@ -199,6 +217,9 @@ export class TableLaboratoryOrdersComponent
   }
 
   private resetAndLoad(): void {
+    if (this._tutorialMock.isActive('laboratory-orders')) {
+      return
+    }
     const requestToken = ++this.loadRequestToken
     this.currentPage = 1
     this.laboratoryOrders = []

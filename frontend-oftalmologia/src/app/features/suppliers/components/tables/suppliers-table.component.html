@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="row g-4">
     <div class="col-12">
-      <div class="card common-datatable-card border-0 shadow-sm">
+      <div class="card common-datatable-card border-0 shadow-sm" data-tour="suppliers-table">
         <div class="card-header border-bottom">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 text-primary">
@@ -34,6 +34,7 @@
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
                 placement="top"
+                data-tour="suppliers-create"
                 [ngbTooltip]="'SUPPLIERS.ACTIONS.CREATE' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >

@@ -31,6 +31,8 @@ import {
 } from '../../../../core/interfaces/api/shift.interface'
 import { environment } from '../../../../../environments/environment'
 import { formatAppointmentDateTime } from '@core/helpers/date-time/appointment-date-time.helper'
+import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { TutorialMockable } from '@core/interfaces/ui/tutorial.interface'
 import Swal from 'sweetalert2'
 import { SWAL_DELETE_CONFIRM_CONFIG, SWAL_SUCCESS_CONFIG, SWAL_ERROR_CONFIG } from '@core/helpers/ui/ui.constants'
 
@@ -61,7 +63,9 @@ interface ShiftAppointment {
   styleUrl: './table-shift-management.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TableShiftManagementComponent implements OnInit, OnDestroy {
+export class TableShiftManagementComponent
+  implements OnInit, OnDestroy, TutorialMockable<Shift>
+{
   public shifts: Shift[] = []
   public shiftStatuses: ShiftStatus[] = []
   public loading = false
@@ -86,6 +90,7 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private toastr: ToastrService,
     private store: Store<AppState>,
+    private tutorialMock: TutorialMockService,
     config: NgbModalConfig
   ) {
     config.backdrop = 'static'
@@ -95,11 +100,25 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadShiftStatuses()
     this.initializeBranchFilter()
+    this.tutorialMock.register('shifts', this)
   }
 
   ngOnDestroy(): void {
+    this.tutorialMock.unregister('shifts', this)
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  applyTutorialMock(rows: Shift[]): void {
+    this.shifts = [...rows]
+    this.loading = false
+    this.hasMore = false
+    this.currentPage = 1
+    this.totalItems = rows.length
+  }
+
+  clearTutorialMock(): void {
+    this.resetAndLoad()
   }
 
   private initializeBranchFilter(): void {
@@ -130,6 +149,9 @@ export class TableShiftManagementComponent implements OnInit, OnDestroy {
   }
 
   private resetAndLoad(): void {
+    if (this.tutorialMock.isActive('shifts')) {
+      return
+    }
     this.currentPage = 1
     this.shifts = []
     this.hasMore = true

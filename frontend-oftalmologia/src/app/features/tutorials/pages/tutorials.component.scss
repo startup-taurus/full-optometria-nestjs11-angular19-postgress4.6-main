@@ -1,0 +1,275 @@
+.tutorials-page {
+  --tutorial-accent: var(--bs-primary);
+  --tutorial-border: var(--bs-border-color);
+  --tutorial-text: var(--bs-body-color);
+  --tutorial-muted: var(--bs-secondary-color);
+  --tutorial-shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+  --tutorial-shadow-hover: 0 10px 24px rgba(17, 24, 39, 0.11);
+}
+
+/* Hero -------------------------------------------------------------- */
+
+@keyframes tutorial-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tutorial-hero {
+  border: 1px solid var(--tutorial-border);
+  border-left: 4px solid var(--bs-primary);
+  border-radius: 0.75rem;
+  box-shadow: var(--tutorial-shadow);
+  animation: tutorial-fade-in 220ms ease-out;
+}
+
+.tutorial-hero .card-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.tutorial-hero-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1 1 320px;
+}
+
+.tutorial-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.65rem;
+  background: var(--bs-primary-bg-subtle);
+  color: var(--bs-primary);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.tutorial-hero .card-title {
+  font-weight: 700;
+}
+
+.tutorial-hero p {
+  max-width: 62ch;
+}
+
+.tutorial-hero-btn {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+/* Section header ---------------------------------------------------- */
+
+.tutorial-section-header h5 {
+  font-weight: 700;
+  color: var(--tutorial-text);
+}
+
+/* Filter chips ------------------------------------------------------ */
+
+.tutorial-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tutorial-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.6rem;
+  border: 1.5px solid var(--tutorial-border);
+  background: var(--bs-body-bg);
+  color: var(--tutorial-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.tutorial-filter-chip:hover {
+  border-color: color-mix(in srgb, var(--tutorial-accent) 55%, var(--tutorial-border));
+  color: var(--tutorial-accent);
+}
+
+.tutorial-filter-chip:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+
+.tutorial-filter-chip.active {
+  border-color: var(--tutorial-accent);
+  color: var(--tutorial-accent);
+  background: color-mix(in srgb, var(--tutorial-accent) 10%, var(--bs-body-bg));
+  box-shadow: 0 2px 8px -3px color-mix(in srgb, var(--tutorial-accent) 45%, transparent);
+}
+
+.tutorial-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tutorial-accent) 16%, transparent);
+  color: var(--tutorial-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Category groups --------------------------------------------------- */
+
+.tutorial-group {
+  animation: tutorial-fade-in 220ms ease-out;
+}
+
+.tutorial-group-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--tutorial-muted);
+  margin-bottom: 0.85rem;
+}
+
+.tutorial-group-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--tutorial-accent);
+}
+
+.tutorial-group-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--tutorial-border),
+    transparent
+  );
+}
+
+/* Cards ------------------------------------------------------------- */
+
+.tutorial-card {
+  border: 1px solid var(--tutorial-border);
+  border-left: 5px solid var(--tutorial-accent);
+  border-radius: 0.75rem;
+  box-shadow: var(--tutorial-shadow);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.tutorial-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--tutorial-shadow-hover);
+}
+
+.tutorial-card .card-body {
+  display: flex;
+  flex-direction: column;
+  padding: 1.05rem 1.1rem;
+}
+
+.tutorial-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--tutorial-accent) 14%, transparent);
+  color: var(--tutorial-accent);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.tutorial-card-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--tutorial-text);
+  line-height: 1.25;
+}
+
+.tutorial-card-text {
+  font-size: 0.83rem;
+  line-height: 1.5;
+  margin-bottom: 0.85rem;
+  flex-grow: 1;
+}
+
+.tutorial-card-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--tutorial-accent);
+  background: color-mix(in srgb, var(--tutorial-accent) 12%, transparent);
+  border: none;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+
+  i {
+    transition: transform 0.18s ease;
+  }
+}
+
+.tutorial-card:hover .tutorial-card-btn,
+.tutorial-card-btn:hover,
+.tutorial-card-btn:focus-visible {
+  color: #fff;
+  background: var(--tutorial-accent);
+}
+
+.tutorial-card:hover .tutorial-card-btn i {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-hero,
+  .tutorial-group {
+    animation: none;
+  }
+
+  .tutorial-card,
+  .tutorial-card-btn,
+  .tutorial-card-btn i,
+  .tutorial-filter-chip {
+    transition: none;
+  }
+
+  .tutorial-card:hover {
+    transform: none;
+  }
+}

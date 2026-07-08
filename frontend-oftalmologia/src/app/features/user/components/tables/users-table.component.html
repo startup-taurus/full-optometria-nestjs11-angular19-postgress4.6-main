@@ -64,6 +64,7 @@
                 class="btn btn-outline-secondary btn-sm"
                 type="button"
                 placement="top"
+                data-tour="users-create"
                 [ngbTooltip]="'USER.BUTTONS.ADD_USER' | translate"
                 (click)="openModal(BUTTON_ACTIONS.ADD)"
               >
@@ -75,6 +76,7 @@
 
         <div class="card-body p-0">
           <shared-ngx-datatable
+            data-tour="users-table"
             [config]="config$ | async"
             [data]="data$ | async"
             (onChangeLimit)="onChangeLimit($event)"

@@ -12,12 +12,14 @@ import { ProductsInventoryChartComponent } from '../components/products-inventor
 import { ShiftStatusDistributionChartComponent } from '../components/shift-status-distribution-chart/shift-status-distribution-chart.component'
 import { PatientsAgeDistributionChartComponent } from '../components/patients-age-distribution-chart/patients-age-distribution-chart.component'
 import { TopProductsSoldChartComponent } from '../components/top-products-sold-chart/top-products-sold-chart.component'
+import { DashboardKpisComponent } from '../components/dashboard-kpis/dashboard-kpis.component'
 import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    DashboardKpisComponent,
     AppointmentsTrendChartComponent,
     DiagnosisFrequencyChartComponent,
     LaboratoryOrdersStatusChartComponent,

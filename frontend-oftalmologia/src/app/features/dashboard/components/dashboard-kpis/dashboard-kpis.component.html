@@ -1,0 +1,42 @@
+<div class="dashboard-kpis">
+  <div class="kpis-greeting">
+    <div class="greeting-text">
+      <h4>
+        {{ greetingKey() | translate }}<span *ngIf="userName()">, {{ userName() }}</span>
+      </h4>
+      <p>{{ today | date: 'fullDate' : '' : 'es' }}</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="kpis-row">
+      @for (placeholder of [1, 2, 3, 4, 5, 6]; track placeholder) {
+        <div class="kpi-card kpi-skeleton">
+          <div class="skeleton-line skeleton-header"></div>
+          <div class="skeleton-line skeleton-value"></div>
+          <div class="skeleton-line skeleton-footer"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="kpis-row">
+      @for (card of cards(); track card.key; let i = $index) {
+        <div
+          class="kpi-card"
+          [ngClass]="card.variant"
+          [class.is-alert]="card.alert"
+          [style.animation-delay.ms]="i * 60"
+        >
+          <div class="card-header">
+            <i [class]="card.icon"></i>
+            <span class="label">{{ card.labelKey | translate }}</span>
+          </div>
+          <div class="card-value">{{ card.value }}</div>
+          <div class="card-footer">
+            <small>{{ card.descKey | translate }}</small>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

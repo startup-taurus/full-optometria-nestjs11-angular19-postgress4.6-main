@@ -1,4 +1,4 @@
-<div id="chat-user-list">
+<div id="chat-user-list" data-tour="roles-list-container">
   <div class="chat-user-list">
     <div class="card-body py-2 px-3 border-bottom">
       <div class="d-flex align-items-center gap-2 py-1">
@@ -13,6 +13,7 @@
             class="dropdown-toggle cursor-pointer drop-arrow-none card-drop"
             data-bs-toggle="dropdown"
             aria-expanded="false"
+            data-tour="roles-create-menu"
           >
             <iconify-icon
               icon="solar:settings-outline"
@@ -20,7 +21,12 @@
             ></iconify-icon>
           </a>
           <div ngbDropdownMenu class="dropdown-menu-end">
-            <a href="javascript:void(0);" ngbDropdownItem (click)="openModal()">
+            <a
+              href="javascript:void(0);"
+              ngbDropdownItem
+              (click)="openModal()"
+              data-tour="roles-create"
+            >
               <i class="ti ti-shield-plus me-1 fs-17 align-middle"></i>
               <span class="align-middle">{{
                 'ROLES_AND_PERMISSIONS.ROLE.NEW_ROLE' | translate
