@@ -7,6 +7,7 @@ import 'driver.js/dist/driver.css'
 import { PermissionsService } from '@core/services/api/permissions.service'
 import { StorageService } from '@core/services/ui/storage.service'
 import { TutorialMockService } from '@core/services/ui/tutorial-mock.service'
+import { ToastrNotificationService } from '@core/services/ui/notification.service'
 import { MAIN_FLOW_TUTORIAL, TUTORIALS } from '@core/helpers/ui/tutorials-meta'
 import {
   MAIN_FLOW_TUTORIAL_ID,
@@ -23,6 +24,7 @@ export class TutorialService {
   private readonly permissions = inject(PermissionsService)
   private readonly storage = inject(StorageService)
   private readonly mock = inject(TutorialMockService)
+  private readonly notifications = inject(ToastrNotificationService)
 
   private readonly WELCOME_KEY = 'TUTORIAL_WELCOME_SEEN'
   private readonly SELECTOR_TIMEOUT = 8000
@@ -89,6 +91,7 @@ export class TutorialService {
     this.activeSteps = []
     this.isTransitioning = false
     this.stopWriteGuard()
+    this.notifications.setSuppressed(false)
     this.closeOpenModal()
     this.driverInstance?.destroy()
     this.driverInstance = null
@@ -120,6 +123,7 @@ export class TutorialService {
     }
     this.destroy()
     this.activeSteps = steps
+    this.notifications.setSuppressed(true)
 
     await this.prepareStep(steps[0])
 
@@ -199,6 +203,8 @@ export class TutorialService {
       onPrevClick: () => this.goToStep(this.currentIndex() - 1),
       onCloseClick: () => this.destroy(),
       onDestroyed: () => {
+        this.notifications.setSuppressed(false)
+        this.stopWriteGuard()
         this.mock.restoreAll()
         this.driverInstance = null
       },

@@ -10,13 +10,22 @@ import { MessageService } from './message.service'
   providedIn: 'root',
 })
 export class ToastrNotificationService {
+  private suppressed = false
+
   constructor(
     private _toastrService: ToastrService,
     private _translateService: TranslateService,
     private _messageService: MessageService
   ) {}
 
+  public setSuppressed(value: boolean): void {
+    this.suppressed = value
+  }
+
   public showNotification(notification: ToastrNotification): void {
+    if (this.suppressed) {
+      return
+    }
     const { type, message, title, config } = notification
     const titleText = title ? this._translateService.instant(title) : ''
     const messageText = this.getMessageTest(message)

@@ -235,7 +235,7 @@
       "PATIENTS": "Pacientes",
       "SCHEDULING": "Agenda de citas",
       "CLINICAL": "Historia clínica",
-      "LABORATORY": "Laboratorio",
+      "LABORATORY": "Órdenes de laboratorio",
       "SALES": "Clientes y ventas",
       "CATALOG": "Catálogo e inventario",
       "ADMIN": "Administración"
@@ -387,30 +387,6 @@
         "STEP_2_TITLE": "Eliminar la historia",
         "STEP_2_TEXT": "Este botón elimina la historia clínica. Se te pedirá confirmación antes."
       },
-      "LAB_ORDER": {
-        "TITLE": "Generar orden de laboratorio",
-        "DESCRIPTION": "Recorre los 4 pasos de la orden desde la historia clínica.",
-        "OPEN_TITLE": "Generar orden de laboratorio",
-        "OPEN_TEXT": "La orden nace desde una historia clínica: este botón abre el asistente con los datos del paciente ya cargados. Recorreremos sus 4 pasos; nada se guarda durante el tutorial.",
-        "F_CLIENT_TITLE": "Cliente que paga",
-        "F_CLIENT_TEXT": "Selecciona quién paga y recibe la factura. Puedes crear uno nuevo con el botón +. Si lo dejas vacío, se registra como consumidor final.",
-        "F_ATTENDANCE_TITLE": "Fecha de atención",
-        "F_ATTENDANCE_TEXT": "Es la fecha en que atendiste al paciente. Se completa con el día de hoy, pero puedes cambiarla.",
-        "F_DELIVERY_TITLE": "Fecha de entrega (obligatorio)",
-        "F_DELIVERY_TEXT": "Indica cuándo estarán listos los lentes. Es el único campo obligatorio del asistente: sin él no puedes pasar al siguiente paso.",
-        "F_OD_TITLE": "Graduación del ojo derecho",
-        "F_OD_TEXT": "Aquí registras la fórmula del ojo derecho (OD): esfera, cilindro, eje, adición, altura y DNP. Se puede precargar desde la historia clínica.",
-        "F_OI_TITLE": "Graduación del ojo izquierdo",
-        "F_OI_TEXT": "Del mismo modo, registra la fórmula del ojo izquierdo (OI). Debajo tienes los parámetros compartidos como curva base y prisma.",
-        "F_FRAME_TITLE": "Medidas del armazón",
-        "F_FRAME_TEXT": "Registra las medidas del armazón (horizontal, vertical, puente, diámetro). Con el botón de parámetros digitales despliegas medidas avanzadas para lentes personalizados.",
-        "F_OBSERVATIONS_TITLE": "Observaciones",
-        "F_OBSERVATIONS_TEXT": "Añade cualquier indicación adicional para el laboratorio (tratamientos especiales, aclaraciones de montaje, etc.).",
-        "F_PRODUCTS_TITLE": "Productos y armazón",
-        "F_PRODUCTS_TEXT": "Selecciona los lentes o productos de la orden. Al elegirlos se generan las líneas con cantidad, precio y descuento, y verás el resumen con el total.",
-        "CLOSING_TITLE": "Generar la orden",
-        "CLOSING_TEXT": "En el último paso este botón guarda la orden y ofrece imprimir el PDF. Durante el tutorial está desactivado para no crear órdenes reales."
-      },
       "TOUR": {
         "TITLE": "Recorrido por Historia Clínica",
         "DESCRIPTION": "Conoce para qué sirve cada botón del módulo de historia clínica.",
@@ -431,16 +407,32 @@
       }
     },
     "LABORATORY": {
-      "OVERVIEW": {
-        "TITLE": "Conocer las órdenes de laboratorio",
-        "DESCRIPTION": "Aprende a leer y administrar las órdenes de laboratorio.",
-        "STEP_1_TITLE": "Órdenes de laboratorio",
-        "STEP_1_TEXT": "En esta pantalla administras todas las órdenes de laboratorio. Recuerda: las órdenes se crean desde la historia clínica.",
-        "STEP_2_TITLE": "Tus órdenes",
-        "STEP_2_TEXT": "Cada orden aparece como una tarjeta (aquí ves ejemplos) con el paciente, el producto, la fecha de entrega y su estado."
+      "CREATE": {
+        "TITLE": "Crear una orden de laboratorio",
+        "DESCRIPTION": "Recorre los 4 pasos de la orden de laboratorio desde la historia clínica.",
+        "OPEN_TITLE": "Crear orden de laboratorio",
+        "OPEN_TEXT": "La orden de laboratorio nace desde una historia clínica: este botón abre el asistente con los datos del paciente ya cargados. Recorreremos sus 4 pasos; nada se guarda durante el tutorial.",
+        "F_CLIENT_TITLE": "Cliente que paga",
+        "F_CLIENT_TEXT": "Selecciona quién paga y recibe la factura. Puedes crear uno nuevo con el botón +. Si lo dejas vacío, se registra como consumidor final.",
+        "F_ATTENDANCE_TITLE": "Fecha de atención",
+        "F_ATTENDANCE_TEXT": "Es la fecha en que atendiste al paciente. Se completa con el día de hoy, pero puedes cambiarla.",
+        "F_DELIVERY_TITLE": "Fecha de entrega (obligatorio)",
+        "F_DELIVERY_TEXT": "Indica cuándo estarán listos los lentes. Es el único campo obligatorio del asistente: sin él no puedes pasar al siguiente paso.",
+        "F_OD_TITLE": "Graduación del ojo derecho",
+        "F_OD_TEXT": "Aquí registras la fórmula del ojo derecho (OD): esfera, cilindro, eje, adición, altura y DNP. Se puede precargar desde la historia clínica.",
+        "F_OI_TITLE": "Graduación del ojo izquierdo",
+        "F_OI_TEXT": "Del mismo modo, registra la fórmula del ojo izquierdo (OI). Debajo tienes los parámetros compartidos como curva base y prisma.",
+        "F_FRAME_TITLE": "Medidas del armazón",
+        "F_FRAME_TEXT": "Registra las medidas del armazón (horizontal, vertical, puente, diámetro). Con el botón de parámetros digitales despliegas medidas avanzadas para lentes personalizados.",
+        "F_OBSERVATIONS_TITLE": "Observaciones",
+        "F_OBSERVATIONS_TEXT": "Añade cualquier indicación adicional para el laboratorio (tratamientos especiales, aclaraciones de montaje, etc.).",
+        "F_PRODUCTS_TITLE": "Productos y armazón",
+        "F_PRODUCTS_TEXT": "Selecciona los lentes o productos de la orden. Al elegirlos se generan las líneas con cantidad, precio y descuento, y verás el resumen con el total.",
+        "CLOSING_TITLE": "Generar la orden",
+        "CLOSING_TEXT": "En el último paso este botón guarda la orden de laboratorio y ofrece imprimir el PDF. Durante el tutorial está desactivado para no crear órdenes reales."
       },
       "TOUR": {
-        "TITLE": "Recorrido por Laboratorio",
+        "TITLE": "Recorrido por Órdenes de Laboratorio",
         "DESCRIPTION": "Conoce para qué sirve cada botón del módulo de órdenes de laboratorio.",
         "INTRO_TITLE": "Bienvenido a Órdenes de Laboratorio",
         "INTRO_TEXT": "Te mostramos, con datos de ejemplo, qué hace cada botón de esta pantalla. Recuerda: las órdenes se crean desde la historia clínica.",
@@ -486,6 +478,42 @@
         "F_EMAIL_TEXT": "Indica el correo electrónico del cliente para poder contactarlo.",
         "F_PHONE_TITLE": "Teléfono móvil",
         "F_PHONE_TEXT": "Ingresa el número de teléfono móvil del cliente."
+      }
+    },
+    "PURCHASE_ORDER": {
+      "TOUR": {
+        "TITLE": "Recorrido por Órdenes de pedido",
+        "DESCRIPTION": "Conoce el resumen, las acciones y la facturación de tus órdenes.",
+        "INTRO_TITLE": "Órdenes de pedido",
+        "INTRO_TEXT": "Aquí gestionas las órdenes de pedido de tus clientes: su estado, sus montos y su facturación. Te mostramos cada parte.",
+        "SUMMARY_TITLE": "Resumen en un vistazo",
+        "SUMMARY_TEXT": "Estas tarjetas resumen tus órdenes: pendientes, por facturar, facturadas, total de órdenes y los montos vendido y facturado. Haz clic en una tarjeta para filtrar la lista por ese estado.",
+        "TOOLS_TITLE": "Recargar y filtrar",
+        "TOOLS_TEXT": "Con este botón recargas la lista. Cuando apliques filtros, aparecerá junto a él un botón para limpiarlos y también podrás exportar la información.",
+        "LIST_TITLE": "Listado de órdenes",
+        "LIST_TEXT": "Aquí se listan todas las órdenes de pedido con su cliente, montos y estado (pendiente, facturada o anulada).",
+        "ACTIONS_TITLE": "Acciones de cada orden",
+        "ACTIONS_TEXT": "En cada fila tienes: Ver (revisar el detalle), Editar (modificar sus datos) y Cancelar (anular la orden; se pide confirmación).",
+        "BILLING_TITLE": "Facturación electrónica",
+        "BILLING_TEXT": "Si tu empresa tiene la facturación activa, en cada orden aparecen acciones para emitir la factura, autorizarla ante el SRI, consultar su estado y descargar el XML.",
+        "ORIGIN_TITLE": "¿De dónde nacen?",
+        "ORIGIN_TEXT": "Las órdenes de pedido se generan desde una orden de laboratorio (con el botón del carrito). Aquí solo las gestionas y facturas."
+      }
+    },
+    "CLINICAL_CONFIG": {
+      "TOUR": {
+        "TITLE": "Configurar la historia clínica",
+        "DESCRIPTION": "Personaliza qué campos y secciones aparecen en la historia clínica.",
+        "INTRO_TITLE": "Configuración de la historia clínica",
+        "INTRO_TEXT": "Desde aquí decides qué secciones y campos aparecen en la historia clínica de tu sucursal. Ajústala a la forma de trabajar de tu óptica.",
+        "TABS_TITLE": "Los tres pasos",
+        "TABS_TEXT": "La historia se organiza en tres pasos (datos, exámenes y diagnóstico). Cada pestaña muestra cuántas secciones tienes habilitadas de ese paso.",
+        "SECTION_TITLE": "Activar o desactivar una sección",
+        "SECTION_TEXT": "Con este interruptor activas o desactivas una sección completa. Al desactivarla, sus campos dejan de aparecer en la historia clínica.",
+        "FIELD_TITLE": "Campos individuales",
+        "FIELD_TEXT": "Dentro de cada sección puedes activar o desactivar campo por campo, para mostrar solo lo que tu óptica necesita.",
+        "SAVE_TITLE": "Guardar la configuración",
+        "SAVE_TEXT": "Cuando termines, este botón guarda los cambios. La historia clínica reflejará de inmediato los campos que dejaste activos."
       }
     },
     "CATEGORY": {
@@ -1294,6 +1322,25 @@
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
+    "GREETING": {
+      "MORNING": "Buenos días",
+      "AFTERNOON": "Buenas tardes",
+      "EVENING": "Buenas noches"
+    },
+    "KPIS": {
+      "TOTAL_PATIENTS": "Pacientes",
+      "TOTAL_PATIENTS_DESC": "Total registrados en la sucursal",
+      "APPOINTMENTS": "Citas",
+      "APPOINTMENTS_DESC": "Agendadas en los últimos meses",
+      "LAB_PENDING": "Órdenes pendientes",
+      "LAB_PENDING_DESC": "Órdenes de laboratorio por completar",
+      "LOW_STOCK": "Stock bajo",
+      "LOW_STOCK_DESC": "Productos con menos de 10 unidades",
+      "TOTAL_SOLD": "Total vendido",
+      "TOTAL_SOLD_DESC": "Monto acumulado de órdenes de pedido",
+      "TOTAL_INVOICED": "Total facturado",
+      "TOTAL_INVOICED_DESC": "Monto acumulado facturado"
+    },
     "APPOINTMENTS_TREND": {
       "TITLE": "Tendencias de Citas",
       "TOOLTIP": "Muestra cuántas citas hay cada mes, ayudándonos a ver los períodos más ocupados y planificar mejor.",

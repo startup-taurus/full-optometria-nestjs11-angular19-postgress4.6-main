@@ -22,7 +22,9 @@ import {
   buildHistoryManageSteps,
   buildHistoryLabOrderSteps,
 } from './tutorials/clinical.steps'
+import { buildClinicalConfigTourSteps } from './tutorials/clinical-config.steps'
 import { buildLabTourSteps } from './tutorials/laboratory.steps'
+import { buildPurchaseOrderTourSteps } from './tutorials/purchase-order.steps'
 import { buildClientCreateSteps } from './tutorials/sales.steps'
 import {
   buildCategoryCreateSteps,
@@ -163,14 +165,14 @@ export const TUTORIALS: TutorialDefinition[] = [
     buildSteps: buildHistoryManageSteps,
   },
   {
-    id: 'history-lab-order',
-    titleKey: 'TUTORIALS.CLINICAL.LAB_ORDER.TITLE',
-    descriptionKey: 'TUTORIALS.CLINICAL.LAB_ORDER.DESCRIPTION',
+    id: 'clinical-config-tour',
+    titleKey: 'TUTORIALS.CLINICAL_CONFIG.TOUR.TITLE',
+    descriptionKey: 'TUTORIALS.CLINICAL_CONFIG.TOUR.DESCRIPTION',
     tag: 'CLINICAL',
-    icon: 'ti-flask',
-    order: 3,
-    requiredPermissions: [PERMISSION_IDS.MEDICAL_HISTORY],
-    buildSteps: buildHistoryLabOrderSteps,
+    icon: 'ti-adjustments-alt',
+    order: 4,
+    requiredPermissions: [PERMISSION_IDS.MEDICAL_HISTORY_CONFIGURATION],
+    buildSteps: buildClinicalConfigTourSteps,
   },
 
   {
@@ -183,6 +185,16 @@ export const TUTORIALS: TutorialDefinition[] = [
     requiredPermissions: [PERMISSION_IDS.LABORATORY_ORDERS],
     buildSteps: buildLabTourSteps,
   },
+  {
+    id: 'history-lab-order',
+    titleKey: 'TUTORIALS.LABORATORY.CREATE.TITLE',
+    descriptionKey: 'TUTORIALS.LABORATORY.CREATE.DESCRIPTION',
+    tag: 'LABORATORY',
+    icon: 'ti-flask',
+    order: 1,
+    requiredPermissions: [PERMISSION_IDS.MEDICAL_HISTORY],
+    buildSteps: buildHistoryLabOrderSteps,
+  },
 
   {
     id: 'client-create',
@@ -193,6 +205,16 @@ export const TUTORIALS: TutorialDefinition[] = [
     order: 1,
     requiredPermissions: [PERMISSION_IDS.CLIENTS],
     buildSteps: buildClientCreateSteps,
+  },
+  {
+    id: 'purchase-order-tour',
+    titleKey: 'TUTORIALS.PURCHASE_ORDER.TOUR.TITLE',
+    descriptionKey: 'TUTORIALS.PURCHASE_ORDER.TOUR.DESCRIPTION',
+    tag: 'SALES',
+    icon: 'ti-shopping-cart',
+    order: 2,
+    requiredPermissions: [PERMISSION_IDS.PURCHASE_ORDERS],
+    buildSteps: buildPurchaseOrderTourSteps,
   },
 
   {

@@ -240,7 +240,7 @@
       "PATIENTS": "Patients",
       "SCHEDULING": "Appointments",
       "CLINICAL": "Medical history",
-      "LABORATORY": "Laboratory",
+      "LABORATORY": "Laboratory orders",
       "SALES": "Clients & sales",
       "CATALOG": "Catalog & inventory",
       "ADMIN": "Administration"
@@ -392,30 +392,6 @@
         "STEP_2_TITLE": "Delete the history",
         "STEP_2_TEXT": "This button deletes the medical history. You'll be asked to confirm first."
       },
-      "LAB_ORDER": {
-        "TITLE": "Generate laboratory order",
-        "DESCRIPTION": "Walk through the 4 steps of the order from the medical history.",
-        "OPEN_TITLE": "Generate laboratory order",
-        "OPEN_TEXT": "The order starts from a medical history: this button opens the wizard with the patient's data already loaded. We'll walk through its 4 steps; nothing is saved during the tutorial.",
-        "F_CLIENT_TITLE": "Paying client",
-        "F_CLIENT_TEXT": "Select who pays and receives the invoice. You can create a new one with the + button. If you leave it empty, it's recorded as a final consumer.",
-        "F_ATTENDANCE_TITLE": "Attendance date",
-        "F_ATTENDANCE_TEXT": "The date you attended the patient. It defaults to today, but you can change it.",
-        "F_DELIVERY_TITLE": "Delivery date (required)",
-        "F_DELIVERY_TEXT": "Indicate when the lenses will be ready. It's the only required field in the wizard: without it you can't move to the next step.",
-        "F_OD_TITLE": "Right eye prescription",
-        "F_OD_TEXT": "Here you record the right eye (OD) prescription: sphere, cylinder, axis, addition, height and PD. It can be preloaded from the medical history.",
-        "F_OI_TITLE": "Left eye prescription",
-        "F_OI_TEXT": "Likewise, record the left eye (OI) prescription. Below you'll find shared parameters such as base curve and prism.",
-        "F_FRAME_TITLE": "Frame measurements",
-        "F_FRAME_TEXT": "Record the frame measurements (horizontal, vertical, bridge, diameter). With the digital parameters button you expand advanced measurements for custom lenses.",
-        "F_OBSERVATIONS_TITLE": "Observations",
-        "F_OBSERVATIONS_TEXT": "Add any extra instructions for the lab (special treatments, mounting notes, etc.).",
-        "F_PRODUCTS_TITLE": "Products and frame",
-        "F_PRODUCTS_TEXT": "Select the lenses or products for the order. Choosing them generates the line items with quantity, price and discount, and you'll see the summary with the total.",
-        "CLOSING_TITLE": "Generate the order",
-        "CLOSING_TEXT": "In the last step this button saves the order and offers to print the PDF. During the tutorial it's disabled so no real orders are created."
-      },
       "TOUR": {
         "TITLE": "Medical History Tour",
         "DESCRIPTION": "Learn what each button in the medical history module does.",
@@ -436,16 +412,32 @@
       }
     },
     "LABORATORY": {
-      "OVERVIEW": {
-        "TITLE": "Get to know laboratory orders",
-        "DESCRIPTION": "Learn to read and manage laboratory orders.",
-        "STEP_1_TITLE": "Laboratory orders",
-        "STEP_1_TEXT": "On this screen you manage all laboratory orders. Remember: orders are created from the medical history.",
-        "STEP_2_TITLE": "Your orders",
-        "STEP_2_TEXT": "Each order appears as a card (these are samples) with the patient, product, delivery date and status."
+      "CREATE": {
+        "TITLE": "Create a laboratory order",
+        "DESCRIPTION": "Walk through the 4 steps of the laboratory order from the medical history.",
+        "OPEN_TITLE": "Create laboratory order",
+        "OPEN_TEXT": "The laboratory order starts from a medical history: this button opens the wizard with the patient's data already loaded. We'll walk through its 4 steps; nothing is saved during the tutorial.",
+        "F_CLIENT_TITLE": "Paying client",
+        "F_CLIENT_TEXT": "Select who pays and receives the invoice. You can create a new one with the + button. If you leave it empty, it's recorded as a final consumer.",
+        "F_ATTENDANCE_TITLE": "Attendance date",
+        "F_ATTENDANCE_TEXT": "The date you attended the patient. It defaults to today, but you can change it.",
+        "F_DELIVERY_TITLE": "Delivery date (required)",
+        "F_DELIVERY_TEXT": "Indicate when the lenses will be ready. It's the only required field in the wizard: without it you can't move to the next step.",
+        "F_OD_TITLE": "Right eye prescription",
+        "F_OD_TEXT": "Here you record the right eye (OD) prescription: sphere, cylinder, axis, addition, height and PD. It can be preloaded from the medical history.",
+        "F_OI_TITLE": "Left eye prescription",
+        "F_OI_TEXT": "Likewise, record the left eye (OI) prescription. Below you'll find shared parameters such as base curve and prism.",
+        "F_FRAME_TITLE": "Frame measurements",
+        "F_FRAME_TEXT": "Record the frame measurements (horizontal, vertical, bridge, diameter). With the digital parameters button you expand advanced measurements for custom lenses.",
+        "F_OBSERVATIONS_TITLE": "Observations",
+        "F_OBSERVATIONS_TEXT": "Add any extra instructions for the lab (special treatments, mounting notes, etc.).",
+        "F_PRODUCTS_TITLE": "Products and frame",
+        "F_PRODUCTS_TEXT": "Select the lenses or products for the order. Choosing them generates the line items with quantity, price and discount, and you'll see the summary with the total.",
+        "CLOSING_TITLE": "Generate the order",
+        "CLOSING_TEXT": "In the last step this button saves the laboratory order and offers to print the PDF. During the tutorial it's disabled so no real orders are created."
       },
       "TOUR": {
-        "TITLE": "Laboratory Tour",
+        "TITLE": "Laboratory Orders Tour",
         "DESCRIPTION": "Learn what each button in the laboratory orders module does.",
         "INTRO_TITLE": "Welcome to Laboratory Orders",
         "INTRO_TEXT": "Using sample data, we'll show you what each button on this screen does. Remember: orders are created from the medical history.",
@@ -491,6 +483,42 @@
         "F_EMAIL_TEXT": "Enter the client's email address so you can contact them.",
         "F_PHONE_TITLE": "Mobile phone",
         "F_PHONE_TEXT": "Enter the client's mobile phone number."
+      }
+    },
+    "PURCHASE_ORDER": {
+      "TOUR": {
+        "TITLE": "Purchase Orders Tour",
+        "DESCRIPTION": "Learn the summary, actions and billing of your orders.",
+        "INTRO_TITLE": "Purchase orders",
+        "INTRO_TEXT": "Here you manage your clients' purchase orders: their status, amounts and billing. We'll show you each part.",
+        "SUMMARY_TITLE": "At a glance",
+        "SUMMARY_TEXT": "These cards summarize your orders: pending, to invoice, invoiced, total orders and the sold and invoiced amounts. Click a card to filter the list by that status.",
+        "TOOLS_TITLE": "Reload and filter",
+        "TOOLS_TEXT": "Use this button to reload the list. When you apply filters, a button to clear them appears next to it, and you can also export the data.",
+        "LIST_TITLE": "Orders list",
+        "LIST_TEXT": "All purchase orders are listed here with their client, amounts and status (pending, invoiced or cancelled).",
+        "ACTIONS_TITLE": "Actions for each order",
+        "ACTIONS_TEXT": "On each row you have: View (review the detail), Edit (change its data) and Cancel (void the order; confirmation is requested).",
+        "BILLING_TITLE": "Electronic billing",
+        "BILLING_TEXT": "If your company has billing enabled, each order shows actions to issue the invoice, authorize it with the tax authority, check its status and download the XML.",
+        "ORIGIN_TITLE": "Where do they come from?",
+        "ORIGIN_TEXT": "Purchase orders are generated from a laboratory order (with the cart button). Here you only manage and bill them."
+      }
+    },
+    "CLINICAL_CONFIG": {
+      "TOUR": {
+        "TITLE": "Configure the medical history",
+        "DESCRIPTION": "Customize which fields and sections appear in the medical history.",
+        "INTRO_TITLE": "Medical history configuration",
+        "INTRO_TEXT": "Here you decide which sections and fields appear in your branch's medical history. Tailor it to how your optical shop works.",
+        "TABS_TITLE": "The three steps",
+        "TABS_TEXT": "The history is organized in three steps (data, exams and diagnosis). Each tab shows how many sections you have enabled for that step.",
+        "SECTION_TITLE": "Enable or disable a section",
+        "SECTION_TEXT": "With this switch you enable or disable a whole section. When you disable it, its fields stop appearing in the medical history.",
+        "FIELD_TITLE": "Individual fields",
+        "FIELD_TEXT": "Within each section you can enable or disable field by field, to show only what your optical shop needs.",
+        "SAVE_TITLE": "Save the configuration",
+        "SAVE_TEXT": "When you're done, this button saves the changes. The medical history will immediately reflect the fields you left active."
       }
     },
     "CATEGORY": {
@@ -1284,6 +1312,25 @@
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
+    "GREETING": {
+      "MORNING": "Good morning",
+      "AFTERNOON": "Good afternoon",
+      "EVENING": "Good evening"
+    },
+    "KPIS": {
+      "TOTAL_PATIENTS": "Patients",
+      "TOTAL_PATIENTS_DESC": "Total registered in the branch",
+      "APPOINTMENTS": "Appointments",
+      "APPOINTMENTS_DESC": "Booked in the last months",
+      "LAB_PENDING": "Pending orders",
+      "LAB_PENDING_DESC": "Laboratory orders to complete",
+      "LOW_STOCK": "Low stock",
+      "LOW_STOCK_DESC": "Products with fewer than 10 units",
+      "TOTAL_SOLD": "Total sold",
+      "TOTAL_SOLD_DESC": "Accumulated amount of purchase orders",
+      "TOTAL_INVOICED": "Total invoiced",
+      "TOTAL_INVOICED_DESC": "Accumulated invoiced amount"
+    },
     "APPOINTMENTS_TREND": {
       "TITLE": "Appointments Trend",
       "TOOLTIP": "Shows how many appointments we have each month, helping us see busy periods and plan better.",
