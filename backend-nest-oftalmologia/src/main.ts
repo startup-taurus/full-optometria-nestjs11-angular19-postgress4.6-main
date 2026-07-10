@@ -13,6 +13,10 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  // Montado antes de que Nest registre AuthRoleMiddleware (forRoutes('*')) y
+  // fuera del prefijo global, para que el healthcheck no requiera token.
+  app.use('/health', (_req, res) => res.status(200).send('ok'));
+
   const corsOrigin = configService.get<string>('CORS_ORIGIN') || '*';
   const staticCorsOrigin =
     corsOrigin === '*' || corsOrigin.includes(',') ? '*' : corsOrigin;
